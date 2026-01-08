@@ -93,6 +93,21 @@ const CreateListing: React.FC = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [showNotification, setShowNotification] = useState(false);
+  const [createdProductData, setCreatedProductData] = useState<{
+    id: string;
+    title: string;
+    price: string;
+    currency: string;
+    image: string;
+    status: 'inactive';
+    rating: number;
+    reviews: number;
+    createdAt: number;
+    priceValue: number;
+    messages: number;
+    category: string;
+    reviewStatus: 'success';
+  } | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -1256,42 +1271,39 @@ const CreateListing: React.FC = () => {
         // Get product image for navigation
         const productImage = publishResult.data?.images?.[0]?.url || imageUrls[primaryImageIndex] || imageUrls[0] || '';
 
-        // Navigate to product details while product is still inactive
-        navigate(`/product/${actualProductId}`, {
-          state: {
-            fromMyListings: true,
-            listing: {
-              id: actualProductId,
-              title: productTitle,
-              price: publishResult.data?.price?.toString() || price || '0',
-              currency: publishResult.data?.currency || currency,
-              image: productImage,
-              status: 'inactive' as const,
-              rating: 0,
-              reviews: 0,
-              createdAt: Date.now(),
-              priceValue: parseFloat(publishResult.data?.price?.toString() || price || '0'),
-              messages: 0,
-              category: publishResult.data?.category || category || '',
-              reviewStatus: 'success' as const
-            },
-            sellerVerified: false
-          }
-        });
+        // Store product data for navigation after modal
+        const productData = {
+          id: actualProductId,
+          title: productTitle,
+          price: publishResult.data?.price?.toString() || price || '0',
+          currency: publishResult.data?.currency || currency,
+          image: productImage,
+          status: 'inactive' as const,
+          rating: 0,
+          reviews: 0,
+          createdAt: Date.now(),
+          priceValue: parseFloat(publishResult.data?.price?.toString() || price || '0'),
+          messages: 0,
+          category: publishResult.data?.category || category || '',
+          reviewStatus: 'success' as const
+        };
+        setCreatedProductData(productData);
+
+        // Show success modal instead of navigating immediately
+        setShowSuccessModal(true);
+        setShowNotification(true);
+        setCountdown(10);
 
         // Show first notification: "under review"
-        showNotificationToast({
-          type: 'app',
-          mainText: 'Your listing is under review',
-          subText: 'Wait while your product is being reviewed.',
-          subText2: 'This usually takes a few minutes.',
-          duration: 10000
-        });
+        // showNotificationToast({
+        //   type: 'app',
+        //   mainText: 'Your listing is under review',
+        //   subText: 'Wait while your product is being reviewed.',
+        //   subText2: 'This usually takes a few minutes.',
+        //   duration: 10000
+        // });
 
-        // After 10 seconds, show second notification: "available on marketplace" and make product active
         setTimeout(() => {
-          // Update product status to active (simulate by updating the listing state)
-          // The backend will handle the actual status change
           showNotificationToast({
             type: 'app',
             mainText: `Your listing "${productTitle}" is available on the marketplace!`,
@@ -1305,10 +1317,10 @@ const CreateListing: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Post listing error', error);
-      addToast({
-        type: 'error',
-        title: 'Action Failed',
-        message: (error && (error.message || String(error))) || 'Failed to post listing. Please try again.',
+      showNotificationToast({
+        type: 'app',
+        mainText: 'Action Failed',
+        subText: (error && (error.message || String(error))) || 'Failed to post listing. Please try again.',
         duration: 2000
       });
       setIsPostingListing(false);
@@ -1322,32 +1334,20 @@ const CreateListing: React.FC = () => {
         setCountdown(countdown - 1);
       }, 1000);
       return () => clearTimeout(timer);
-    } else if (showSuccessModal && countdown === 0) {
+    } else if (showSuccessModal && countdown === 0 && createdProductData) {
       // Navigate to owner view state (product detail with fromMyListings state)
-      const newListingId = `new-${Date.now()}`;
-      navigate(`/product/${newListingId}`, {
+      navigate(`/product/${createdProductData.id}`, {
         state: {
           fromMyListings: true,
-          listing: {
-            id: newListingId,
-            title,
-            price,
-            currency,
-            image: imageUrls[primaryImageIndex] || imageUrls[0] || '',
-            status: 'inactive' as const,
-            rating: 0,
-            reviews: 0,
-            createdAt: Date.now(),
-            priceValue: parseFloat(price) || 0,
-            messages: 0,
-            category: category || '',
-            reviewStatus: 'success' as const
-          },
+          listing: createdProductData,
           sellerVerified: false
         }
       });
+      // Reset modal state
+      setShowSuccessModal(false);
+      setCreatedProductData(null);
     }
-  }, [showSuccessModal, countdown, navigate, title, price, currency, imageUrls, primaryImageIndex, category]);
+  }, [showSuccessModal, countdown, navigate, createdProductData]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1366,28 +1366,21 @@ const CreateListing: React.FC = () => {
 
   const handleBackToHomepage = () => {
     // Navigate to owner view state (product detail with fromMyListings state)
-    const newListingId = `new-${Date.now()}`;
-    navigate(`/product/${newListingId}`, {
-      state: {
-        fromMyListings: true,
-        listing: {
-          id: newListingId,
-          title,
-          price,
-          currency,
-          image: imageUrls[primaryImageIndex] || imageUrls[0] || '',
-          status: 'inactive' as const,
-          rating: 0,
-          reviews: 0,
-          createdAt: Date.now(),
-          priceValue: parseFloat(price) || 0,
-          messages: 0,
-          category: category || '',
-          reviewStatus: 'pending' as const
-        },
-        sellerVerified: false
-      }
-    });
+    if (createdProductData) {
+      navigate(`/product/${createdProductData.id}`, {
+        state: {
+          fromMyListings: true,
+          listing: createdProductData,
+          sellerVerified: false
+        }
+      });
+      // Reset modal state
+      setShowSuccessModal(false);
+      setCreatedProductData(null);
+    } else {
+      // Fallback if no product data (shouldn't happen, but just in case)
+      navigate('/my-listings');
+    }
   };
 
   const handleAddNewListing = () => {

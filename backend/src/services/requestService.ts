@@ -42,7 +42,8 @@ export const requestService = {
               email: true,
               firstName: true,
               lastName: true,
-              profileImage: true
+              profileImage: true,
+              rating: true
             }
           }
         },

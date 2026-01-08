@@ -306,7 +306,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Fixed productData preview on messages page when making a product inquiry, draft count on MyListings page and MyRequest page, mylisting status change toast notification, and currency on product inquiry page.</p>
+                            <p><strong>Changes made:</strong>Update request status in the backend, mobile conversation click, request page: fixed display, my requests: location icon for country fixed.</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

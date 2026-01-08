@@ -2623,14 +2623,35 @@ const Home: React.FC = () => {
                               </h3>
 
                               {/* Location and Bookmark Row */}
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center text-gray-500 flex-1">
-                                  <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                                    width: isMobile ? '8px' : '10px',
-                                    height: isMobile ? '8px' : '10px',
-                                    marginRight: isMobile ? '3px' : '4px'
-                                  }} />
-                                  <span className="truncate font-normal" style={{ fontSize: isMobile ? '8px' : '10px' }}>{product.location}</span>
+                              <div className="flex items-center justify-between w-full relative" style={{ minHeight: isMobile ? '16px' : '20px' }}>
+                                <div className="flex-1 overflow-hidden pr-4 relative">
+                                  <div className="flex items-center text-gray-500 w-full">
+                                    <img
+                                      src={locationIcon}
+                                      alt="Location"
+                                      className="flex-shrink-0"
+                                      style={{
+                                        width: isMobile ? '8px' : '10px',
+                                        height: isMobile ? '8px' : '10px',
+                                        marginRight: isMobile ? '3px' : '4px',
+                                        flexShrink: 0
+                                      }}
+                                    />
+                                    <span
+                                      className="font-normal truncate block w-full"
+                                      style={{
+                                        fontSize: isMobile ? '8px' : '10px',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        position: 'relative',
+                                        paddingRight: '4px'
+                                      }}
+                                    >
+                                      {product.location}
+                                    </span>
+                                    <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+                                  </div>
                                 </div>
                                 {/* Bookmark Button */}
                                 <button
@@ -2638,14 +2659,15 @@ const Home: React.FC = () => {
                                     e.preventDefault();
                                     handleSave(product.id);
                                   }}
-                                  className="transition-colors touch-manipulation"
+                                  className="transition-colors touch-manipulation flex-shrink-0"
                                   style={{
                                     width: isMobile ? '16px' : '20px',
                                     height: isMobile ? '16px' : '20px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    marginLeft: isMobile ? '4px' : '8px'
+                                    position: 'relative',
+                                    zIndex: 1
                                   }}
                                 >
                                   <img
@@ -3336,15 +3358,15 @@ const Home: React.FC = () => {
       )}
 
       {/* Make a Request Card - Always Visible */}
-      <section className="py-8 px-6 sm:px-8 lg:px-16" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <section className="py-8 px-6 sm:px-8 lg:px-12" style={{ fontFamily: 'Poppins, sans-serif' }}>
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div className="bg-white rounded-2xl p-6 sm:p-8">
             <div className="flex flex-col items-center text-center">
               <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                 Can't find what you're looking for?
               </h3>
               <p className="text-sm sm:text-base text-gray-600 mb-6 max-w-2xl">
-                Don't worry, just ask for it and we will bring it for you.
+                Don't worry, just ask for it and we will bring it to you.
               </p>
               <button
                 onClick={() => setShowRequestModal(true)}

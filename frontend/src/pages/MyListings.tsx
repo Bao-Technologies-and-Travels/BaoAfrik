@@ -923,17 +923,13 @@ const MyListings: React.FC = () => {
         setListingToDelete(null);
         setListingToDeleteId(null);
         setIsDeleting(false);
+        setIsDeleteSuccess(false);
     };
 
     const deleteListingById = async (productId: string) => {
         setIsDeleting(true);
         try {
             const token = localStorage.getItem('accessToken');
-
-            // Remove from UI state collections
-            setListings(prev => prev.filter(l => l.id !== productId));
-            setProducts(prev => prev.filter(p => p.id !== productId));
-            setDraftListings(prev => prev.filter(d => d.id !== productId));
 
             const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
                 method: 'DELETE',
@@ -945,6 +941,14 @@ const MyListings: React.FC = () => {
                 throw new Error(err?.message || 'Failed to delete product');
             }
 
+            // Show success state
+            setIsDeleteSuccess(true);
+
+            // Remove from UI state collections
+            setListings(prev => prev.filter(l => l.id !== productId));
+            setProducts(prev => prev.filter(p => p.id !== productId));
+            setDraftListings(prev => prev.filter(d => d.id !== productId));
+
             // Clear cache for current page
             const cacheKey = `listings-${activeTab}-${currentPage}`;
             sessionStorage.removeItem(cacheKey);
@@ -955,13 +959,17 @@ const MyListings: React.FC = () => {
             addToast({ type: 'success', title: 'Success', message: 'Listing deleted successfully', duration: 2000 });
         } catch (e: any) {
             console.error('Delete product error', e);
+            setIsDeleteSuccess(false);
             await fetchMyListings(currentPage, itemsPerPage);
             addToast({ type: 'error', title: 'Error', message: (e && e.message) || 'Failed to delete product', duration: 3000 });
         } finally {
             setIsDeleting(false);
-            setIsDeleteModalOpen(false);
-            setListingToDelete(null);
-            setListingToDeleteId(null);
+            // Don't close modal immediately - let user see success state
+            if (!isDeleteSuccess) {
+                setIsDeleteModalOpen(false);
+                setListingToDelete(null);
+                setListingToDeleteId(null);
+            }
             setMoreOptionsOpenFor(null);
         }
     };
@@ -1300,7 +1308,7 @@ const MyListings: React.FC = () => {
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E4E4E4',
                 borderRadius: '30px',
-                overflow: 'hidden'
+                overflow: 'visible'
             }}
         >
             {/* Table Header */}
@@ -1580,7 +1588,7 @@ const MyListings: React.FC = () => {
                                     <div
                                         style={{
                                             position: 'absolute',
-                                            top: '0',
+                                            top: '32px',
                                             right: '0',
                                             backgroundColor: '#FFFFFF',
                                             borderRadius: '12px',
@@ -1588,7 +1596,8 @@ const MyListings: React.FC = () => {
                                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                             padding: '8px',
                                             minWidth: '180px',
-                                            zIndex: 1000
+                                            zIndex: 10000,
+                                            isolation: 'isolate'
                                         }}
                                     >
                                         <button
@@ -1787,7 +1796,8 @@ const MyListings: React.FC = () => {
                                     boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                     padding: isMobile ? '4px' : '6px',
                                     minWidth: isMobile ? '130px' : '150px',
-                                    zIndex: 1000
+                                    zIndex: 10000,
+                                    isolation: 'isolate'
                                 }}
                             >
                                 <button

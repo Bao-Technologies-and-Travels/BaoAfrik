@@ -2965,7 +2965,7 @@ const Messages: React.FC = (): JSX.Element => {
           style={{ display: 'none' }}
         />
         {/* Mobile Conversation View - Full Screen on Mobile */}
-        {showMobileConversation && productData && (
+        {showMobileConversation && (
           <div className="md:hidden w-full bg-white flex flex-col h-screen overflow-hidden">
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto">
@@ -3573,10 +3573,8 @@ const Messages: React.FC = (): JSX.Element => {
                                   {/* Product Inquiry Card - Mobile */}
                                   {message.isProductInquiry && message.productData && (
                                     <div className={`${message.text ? 'mt-2' : ''}`}>
-                                      <div className="bg-gray-50 rounded-xl p-3">
-                                        <div className="flex items-start justify-between mb-1">
-                                          <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
-                                        </div>
+                                      <div className="rounded-xl p-3">
+
                                         <div className="flex space-x-4">
                                           <div className="relative">
                                             <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
@@ -4593,7 +4591,7 @@ const Messages: React.FC = (): JSX.Element => {
         {/* Left Sidebar - Full Height */}
         <div
           ref={chatListRef}
-          className={`${showMobileConversation && productData ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen top-0 relative`}
+          className={`${showMobileConversation ? 'hidden md:flex' : 'flex'} w-full md:w-1/4 bg-white md:border-r-2 border-gray-300 flex-col h-screen top-0 relative`}
         >
           {/* Header */}
           <header className="bg-white">
@@ -4785,8 +4783,7 @@ const Messages: React.FC = (): JSX.Element => {
                             zIndex: actionsMenuOpen === conv.id ? 45 : 'auto',
                             position: actionsMenuOpen === conv.id ? 'relative' : 'static'
                           }}
-                          onClick={(e) => {
-                            e.stopPropagation();
+                          onClick={() => {
                             handleConversationClick(conv);
                           }}
                         >
@@ -4819,7 +4816,10 @@ const Messages: React.FC = (): JSX.Element => {
                                 <div className="flex items-center space-x-1">
                                   <span className="text-xs text-gray-500">{lastMessageTime}</span>
                                   <button
-                                    onClick={(e) => handleActionsMenuClick(conv.id, e)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleActionsMenuClick(conv.id, e);
+                                    }}
                                     className="p-1 rounded transition-colors"
                                     style={{
                                       color: actionsMenuOpen === conv.id ? '#64B5F6' : '#000000'
@@ -6453,10 +6453,10 @@ const Messages: React.FC = (): JSX.Element => {
                                       {/* Product Inquiry Card - Desktop */}
                                       {message.isProductInquiry && message.productData && (
                                         <div className={`mb-3 ${message.text ? 'mt-3' : ''}`}>
-                                          <div className="bg-gray-50 rounded-xl p-3 flex-1 max-w-lg">
-                                            <div className="flex items-start justify-between mb-1">
+                                          <div className="rounded-xl p-3 flex-1 max-w-lg">
+                                            {/* <div className="flex items-start justify-between mb-1">
                                               <span className="text-xs font-medium" style={{ color: '#83C4F8' }}>From Bao'Afrik</span>
-                                            </div>
+                                            </div> */}
                                             <div className="flex space-x-4">
                                               <div className="relative">
                                                 <div className="absolute -left-3 top-0 w-0.5 h-24" style={{ backgroundColor: '#83C4F8' }}></div>
@@ -6471,22 +6471,22 @@ const Messages: React.FC = (): JSX.Element => {
                                               </div>
                                               <div className="flex-1">
                                                 <div className="flex items-center justify-between">
-                                                  <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>
+                                                  <div className="text-xl font-semibold" style={{ color: '#FFFFFF' }}>
                                                     {message.productData.currency || 'GBP'} {message.productData.price}
                                                   </div>
                                                   {message.productData.location && (
-                                                    <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
+                                                    <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#FFFFFF' }}>
                                                       <img src={locIcon} alt="Location" className="w-4 h-4" />
                                                       <span>{message.productData.location}</span>
                                                     </div>
                                                   )}
                                                 </div>
                                                 <div className="flex items-center justify-between -mt-0.5">
-                                                  <h4 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                                  <h4 className="text-xs font-medium" style={{ color: '#FFFFFF' }}>
                                                     {message.productData.name || message.productData.title}
                                                   </h4>
                                                   {message.productData.category && (
-                                                    <div className="text-[10px]" style={{ color: '#BABABA' }}>
+                                                    <div className="text-[10px]" style={{ color: '#FFFFFF' }}>
                                                       <span>Category: {message.productData.category}</span>
                                                     </div>
                                                   )}
@@ -6495,7 +6495,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                   <p
                                                     className="text-[10px] mt-2 leading-relaxed"
                                                     style={{
-                                                      color: '#6A6A6A',
+                                                      color: '#FFFFFF',
                                                       display: '-webkit-box',
                                                       WebkitLineClamp: 2,
                                                       WebkitBoxOrient: 'vertical',
@@ -6506,7 +6506,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                     {message.productData.description}
                                                   </p>
                                                 )}
-                                                <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
+                                                <a href="#" className="text-xs mt-1 block" style={{ color: '#000000' }}>
                                                   baoafrik.com/product-id/
                                                 </a>
                                               </div>

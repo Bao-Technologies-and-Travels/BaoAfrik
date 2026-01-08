@@ -123,13 +123,35 @@ export const RequestController = {
                 return res.status(401).json({ error: 'Authentication required' });
             }
 
+            // Check if request exists first
+            const existingRequest = await requestService.getRequestById(id);
+            if (!existingRequest) {
+                return res.status(404).json({ error: 'Request not found' });
+            }
+
             const isOwner = await requestService.isRequestOwner(id, userId);
+            
+            // Log for debugging
+            console.log('Update request check:', {
+                requestId: id,
+                userId,
+                requestUserId: existingRequest.userId,
+                isOwner,
+                userRole
+            });
+
             if (!isOwner && userRole !== 'ADMIN') {
-                return res.status(403).json({ error: 'Not authorized to update this request' });
+                return res.status(403).json({ 
+                    error: 'Not authorized to update this request',
+                    details: 'You can only update your own requests'
+                });
             }
 
             const updatedRequest = await requestService.updateRequest(id, req.body);
-            return res.json(updatedRequest);
+            return res.json({
+                success: true,
+                data: updatedRequest
+            });
 
         } catch (error) {
             console.error('Error updating request:', error);

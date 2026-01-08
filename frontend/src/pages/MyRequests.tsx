@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import { useToast } from '../contexts/ToastContext';
 import { getProductCountry } from '../utils/countryHelpers';
+
 import listIcon from '../assets/images/pre/list.svg';
 import gridIcon from '../assets/images/pre/grid.svg';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
@@ -531,7 +532,18 @@ const MyRequests: React.FC = () => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || errorData.message || 'Failed to update request status');
+                const errorMessage = errorData.error || errorData.message || 'Failed to update request status';
+
+                // Log detailed error for debugging
+                console.error('Status update error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    errorData,
+                    requestId,
+                    backendStatus
+                });
+
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
@@ -539,15 +551,15 @@ const MyRequests: React.FC = () => {
             const updatedRequest = result.data || result;
 
             // Update local state
-        setRequests((prev) =>
-            prev.map((request) =>
+            setRequests((prev) =>
+                prev.map((request) =>
                     request.id === requestId ? {
                         ...request,
                         status: mapBackendStatusToFrontend(updatedRequest.status || backendStatus)
                     } : request
-            )
-        );
-        setStatusModalOpenFor(null);
+                )
+            );
+            setStatusModalOpenFor(null);
 
             addToast({
                 type: 'success',
@@ -628,7 +640,12 @@ const MyRequests: React.FC = () => {
 
         return (
             <div style={{ position: 'relative' }} ref={statusModalRef}>
-                <div
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setStatusModalOpenFor(isModalOpen ? null : requestId);
+                    }}
                     className="inline-flex items-center gap-1 px-2.5 rounded-full"
                     style={{
                         backgroundColor: config.bgColor,
@@ -636,7 +653,10 @@ const MyRequests: React.FC = () => {
                         borderRadius: '8px',
                         paddingTop: '4px',
                         paddingBottom: '6px',
-                        height: '24px'
+                        height: '24px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif'
                     }}
                 >
                     <span
@@ -647,27 +667,10 @@ const MyRequests: React.FC = () => {
                     >
                         {config.text}
                     </span>
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setStatusModalOpenFor(isModalOpen ? null : requestId);
-                        }}
-                        style={{
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </button>
-                </div>
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                </button>
                 {isModalOpen && (
                     <div
                         style={{
@@ -681,7 +684,8 @@ const MyRequests: React.FC = () => {
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '4px',
                             width: '100px',
-                            zIndex: 1000,
+                            zIndex: 10000,
+                            isolation: 'isolate',
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '2px'
@@ -814,7 +818,12 @@ const MyRequests: React.FC = () => {
                         <div className="flex items-center gap-2" style={{ position: 'relative' }}>
                             {/* Status Badge with Arrow */}
                             <div style={{ position: 'relative' }}>
-                                <div
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                                    }}
                                     className="inline-flex items-center gap-1 px-2.5"
                                     style={{
                                         backgroundColor: config.bgColor,
@@ -822,7 +831,10 @@ const MyRequests: React.FC = () => {
                                         borderRadius: '8px',
                                         paddingTop: '4px',
                                         paddingBottom: '6px',
-                                        height: '24px'
+                                        height: '24px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        fontFamily: 'Poppins, sans-serif'
                                     }}
                                 >
                                     <span
@@ -833,27 +845,10 @@ const MyRequests: React.FC = () => {
                                     >
                                         {config.text}
                                     </span>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
-                                        }}
-                                        style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </button>
                                 {/* Status Modal */}
                                 {isStatusModalOpen && (
                                     <div
@@ -868,7 +863,8 @@ const MyRequests: React.FC = () => {
                                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                             padding: '4px',
                                             width: '100px',
-                                            zIndex: 1000,
+                                            zIndex: 10000,
+                                            isolation: 'isolate',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             gap: '2px'
@@ -980,7 +976,8 @@ const MyRequests: React.FC = () => {
                                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                             padding: '8px',
                                             minWidth: '180px',
-                                            zIndex: 1000
+                                            zIndex: 10000,
+                                            isolation: 'isolate'
                                         }}
                                     >
                                         <button
@@ -1100,7 +1097,12 @@ const MyRequests: React.FC = () => {
                         <div className="flex items-center gap-2" style={{ position: 'relative' }}>
                             {/* Status Badge with Arrow */}
                             <div style={{ position: 'relative' }} ref={statusModalRef}>
-                                <div
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                                    }}
                                     className="inline-flex items-center gap-1 px-2 rounded-full"
                                     style={{
                                         backgroundColor: config.bgColor,
@@ -1108,7 +1110,10 @@ const MyRequests: React.FC = () => {
                                         borderRadius: '8px',
                                         paddingTop: '3px',
                                         paddingBottom: '4px',
-                                        height: '20px'
+                                        height: '20px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        fontFamily: 'Poppins, sans-serif'
                                     }}
                                 >
                                     <span
@@ -1119,27 +1124,10 @@ const MyRequests: React.FC = () => {
                                     >
                                         {config.text}
                                     </span>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
-                                        }}
-                                        style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                    <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 3L4 5L6 3" stroke={config.textColor} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </button>
                                 {/* Status Modal */}
                                 {isStatusModalOpen && (
                                     <div
@@ -1155,7 +1143,8 @@ const MyRequests: React.FC = () => {
                                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                             padding: isMobile ? '3px' : '4px',
                                             width: isMobile ? '80px' : '90px',
-                                            zIndex: isMobile ? 10000 : 1000,
+                                            zIndex: 10000,
+                                            isolation: 'isolate',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             gap: '2px'
@@ -1268,7 +1257,8 @@ const MyRequests: React.FC = () => {
                                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                             padding: isMobile ? '4px' : '6px',
                                             minWidth: isMobile ? '130px' : '150px',
-                                            zIndex: 1000
+                                            zIndex: 10000,
+                                            isolation: 'isolate'
                                         }}
                                     >
                                         <button
@@ -1451,12 +1441,12 @@ const MyRequests: React.FC = () => {
                                         const country = getProductCountry(request.origin);
                                         return (
                                             <>
-                                    <img
+                                                <img
                                                     src={country.flag}
                                                     alt={country.name}
-                                        className="object-cover rounded-full"
-                                        style={{ width: '16px', height: '16px' }}
-                                    />
+                                                    className="object-cover rounded-full"
+                                                    style={{ width: '16px', height: '16px' }}
+                                                />
                                                 <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{country.name}</span>
                                             </>
                                         );
@@ -1528,12 +1518,12 @@ const MyRequests: React.FC = () => {
                                     const country = getProductCountry(request.origin);
                                     return (
                                         <>
-                                <img
+                                            <img
                                                 src={country.flag}
                                                 alt={country.name}
-                                    className="object-cover rounded-full"
-                                    style={{ width: '12px', height: '12px' }}
-                                />
+                                                className="object-cover rounded-full"
+                                                style={{ width: '12px', height: '12px' }}
+                                            />
                                             <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{country.name}</span>
                                         </>
                                     );
@@ -1820,7 +1810,7 @@ const MyRequests: React.FC = () => {
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E4E4E4',
                 borderRadius: '30px',
-                overflow: 'hidden'
+                overflow: 'visible'
             }}
         >
             {/* Table Header */}
@@ -1939,34 +1929,48 @@ const MyRequests: React.FC = () => {
 
                         {/* Column 3: Location */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
-                            {(() => {
-                                const ukCountry = getProductCountry('United Kingdom');
+                            {request.sellerLocation && (() => {
+                                const country = getProductCountry(request.sellerLocation);
                                 return (
                                     <>
-                            <img
-                                            src={ukCountry.flag}
-                                            alt={request.sellerLocation}
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover',
-                                    flexShrink: 0
-                                }}
-                            />
-                            <span
-                                style={{
-                                    color: '#939393',
-                                    fontSize: '12px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    maxWidth: '120px'
-                                }}
-                            >
+                                        {country.flag ? (
+                                            <img
+                                                src={country.flag}
+                                                alt={country.name || 'Location'}
+                                                style={{
+                                                    width: '16px',
+                                                    height: '16px',
+                                                    borderRadius: '50%',
+                                                    objectFit: 'cover',
+                                                    flexShrink: 0
+                                                }}
+                                            />
+                                        ) : (
+                                            <div style={{
+                                                width: '16px',
+                                                height: '16px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#F4F4F4',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <span style={{ fontSize: '8px', color: '#B0B0B0' }}>?</span>
+                                            </div>
+                                        )}
+                                        <span
+                                            style={{
+                                                color: '#939393',
+                                                fontSize: '12px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                maxWidth: '120px'
+                                            }}
+                                        >
                                             {request.sellerLocation}
-                            </span>
+                                        </span>
                                     </>
                                 );
                             })()}
@@ -1978,20 +1982,20 @@ const MyRequests: React.FC = () => {
                                 const country = getProductCountry(request.origin);
                                 return (
                                     <>
-                            <img
+                                        <img
                                             src={country.flag}
                                             alt={country.name}
-                                style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover',
-                                    flexShrink: 0
-                                }}
-                            />
-                            <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
+                                            style={{
+                                                width: '16px',
+                                                height: '16px',
+                                                borderRadius: '50%',
+                                                objectFit: 'cover',
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                        <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Poppins, sans-serif' }}>
                                             {country.name}
-                            </span>
+                                        </span>
                                     </>
                                 );
                             })()}
@@ -2045,7 +2049,8 @@ const MyRequests: React.FC = () => {
                                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                                             padding: '8px',
                                             minWidth: '180px',
-                                            zIndex: 1000
+                                            zIndex: 10000,
+                                            isolation: 'isolate'
                                         }}
                                     >
                                         <button
@@ -2943,17 +2948,17 @@ const MyRequests: React.FC = () => {
                                                 {selectedRequestForView.origin && (() => {
                                                     const country = getProductCountry(selectedRequestForView.origin);
                                                     return (
-                                                <div
-                                                    className="flex items-center gap-1.5 px-3 py-1.5"
-                                                    style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                                                >
-                                                    <img
+                                                        <div
+                                                            className="flex items-center gap-1.5 px-3 py-1.5"
+                                                            style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                                                        >
+                                                            <img
                                                                 src={country.flag}
                                                                 alt={country.name}
-                                                        className="w-4 h-4 object-cover rounded-full"
-                                                    />
+                                                                className="w-4 h-4 object-cover rounded-full"
+                                                            />
                                                             <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{country.name}</span>
-                                                </div>
+                                                        </div>
                                                     );
                                                 })()}
                                             </div>
@@ -3141,17 +3146,17 @@ const MyRequests: React.FC = () => {
                                             {selectedRequestForView.origin && (() => {
                                                 const country = getProductCountry(selectedRequestForView.origin);
                                                 return (
-                                            <div
-                                                className="flex items-center gap-1.5 px-3 py-1.5"
-                                                style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
-                                            >
-                                                <img
+                                                    <div
+                                                        className="flex items-center gap-1.5 px-3 py-1.5"
+                                                        style={{ backgroundColor: '#F0F8FE', borderRadius: '6px' }}
+                                                    >
+                                                        <img
                                                             src={country.flag}
                                                             alt={country.name}
-                                                    className="w-4 h-4 object-cover rounded-full"
-                                                />
+                                                            className="w-4 h-4 object-cover rounded-full"
+                                                        />
                                                         <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{country.name}</span>
-                                            </div>
+                                                    </div>
                                                 );
                                             })()}
                                         </div>
@@ -3336,7 +3341,7 @@ const MyRequests: React.FC = () => {
                                                             fontWeight: 600
                                                         }}
                                                     >
-                                                        Why do you delete your request?
+                                                        Why did you delete your request?
                                                     </p>
                                                 </div>
 
@@ -3600,7 +3605,7 @@ const MyRequests: React.FC = () => {
                                                         fontWeight: 600
                                                     }}
                                                 >
-                                                    Why do you delete your request?
+                                                    Why did you delete your request?
                                                 </p>
                                             </div>
 

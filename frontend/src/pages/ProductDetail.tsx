@@ -1013,119 +1013,6 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  // const handleContactSeller = async () => {
-  //   if (!user || !product) return;
-
-  //   try {
-  //     setIsContactingSeller(true);
-
-  //     // check for existing conversation with this seller
-  //     const existingConversation = conversations.find(conv =>
-  //       conv.participant?.id === product.seller.id
-  //     );
-
-  //     const productDataToSend = {
-  //       id: product.id,
-  //       name: product.title,
-  //       price: product.price,
-  //       location: product.location,
-  //       category: product.category,
-  //       description: product.description,
-  //       images: getProductImages(product),
-  //       seller: {
-  //         id: product.seller.id,
-  //         name: getSellerName(product.seller),
-  //         email: product.seller.email,
-  //         avatar: getSellerProfileImage(product.seller),
-  //         rating: getSellerRating(product.seller),
-  //         location: getSellerLocation(product.seller),
-  //       },
-  //     };
-
-  //     let targetConversationId: string;
-
-  //     if (existingConversation) {
-  //       targetConversationId = existingConversation.id;
-  //     } else {
-  //       const token = localStorage.getItem("accessToken");
-
-  //       const response = await fetch(
-  //         `${process.env.REACT_APP_API_URL}/chat/contact-seller`,
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //           body: JSON.stringify({
-  //             productId: product.id,
-  //             sellerId: product.seller.id
-  //           }),
-  //         }
-  //       );
-
-  //       const result = await response.json();
-
-  //       if (!response.ok) {
-  //         const errorMessage =
-  //           result?.error ||
-  //           result?.message ||
-  //           result?.data?.error ||
-  //           'Failed to contact seller';
-  //         throw new Error(errorMessage);
-  //       }
-
-  //       if (result.success) {
-  //         targetConversationId = result.data.conversation.id;
-  //       } else {
-  //         const errorMessage =
-  //           result?.error ||
-  //           result?.message ||
-  //           'Failed to contact seller';
-  //         throw new Error(errorMessage);
-  //       }
-  //     }
-
-  //     navigate("/messages", {
-  //       state: {
-  //         conversationId: targetConversationId,
-  //         productData: productDataToSend,
-  //         preFilledMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
-  //         isProductInquiry: true,
-  //         shouldOpenConversation: true
-  //       },
-  //       replace: false
-  //     });
-
-  //   } catch (error: any) {
-  //     if (
-  //       error.message.includes("Authentication failed") ||
-  //       error.message.includes("Please log in again")
-  //     ) {
-  //       return;
-  //     }
-
-  //     let errorMessage = "Failed to contact seller. Please try again.";
-
-  //     if (error.message.includes("User not found")) {
-  //       errorMessage = "Seller not found. Please try again later.";
-  //     } else if (error.message.includes("Cannot create conversation with yourself")) {
-  //       errorMessage = "You cannot contact yourself.";
-  //     } else if (error.message.includes("Invalid access token")) {
-  //       errorMessage = "You need to login to chat with a seller."
-  //     }
-
-  //     addToast({
-  //       type: 'error',
-  //       title: "Cannot contact seller",
-  //       message: errorMessage,
-  //       duration: 2000,
-  //     });
-  //   } finally {
-  //     setIsContactingSeller(false);
-  //   }
-  // };
-
   const handleContactSeller = async () => {
     if (!user || !product) {
       addToast({
@@ -1187,11 +1074,11 @@ const ProductDetail: React.FC = () => {
         {
           participantId: product.seller.id,
           productId: product.id,
-          initialMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
+          initialMessage: `Hi, I'm interested in your product "${product.title}". Is it still available please?`,
           productData: {
             id: product.id,
             name: product.title,
-            title: product.title, // Also include title for consistency
+            title: product.title,
             price: product.price,
             currency: product.currency || 'USD',
             description: product.description || '',
@@ -1231,7 +1118,7 @@ const ProductDetail: React.FC = () => {
         state: {
           conversationId: conversation.id,
           productData: product,
-          preFilledMessage: `Hi, I'm interested in your product "${product.title}". Is it still available?`,
+          preFilledMessage: `Hi, I'm interested in your product "${product.title}". Is it still available please?`,
         },
         replace: false
       });
@@ -2221,7 +2108,7 @@ const ProductDetail: React.FC = () => {
 
                 {/* See Seller Profile Button */}
                 <button
-                  onClick={() => navigate(`/seller/${getSellerName(product.seller).toLowerCase().replace(/\s+/g, '-')}`)}
+                  onClick={handleSellerProfileClick}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors hover:opacity-80 flex-shrink-0 ml-auto"
                   style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '12px', fontWeight: 500, marginTop: '12px' }}
                 >
@@ -3200,7 +3087,7 @@ const ProductDetail: React.FC = () => {
             </div>
           )}
 
-          {showAdditionalInfo && (
+          {/* {showAdditionalInfo && (
             <div className="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 text-sm text-gray-600 space-y-2">
               <div className="flex justify-between">
                 <span className="font-medium text-gray-800">Origin</span>
@@ -3215,7 +3102,7 @@ const ProductDetail: React.FC = () => {
                 <span>2-3 years</span>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Seller Profile Section - Mobile */}
           <div className="mt-1" style={{ marginBottom: isMobile && isOwnerView ? '12px' : '0' }}>
@@ -3246,7 +3133,7 @@ const ProductDetail: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => navigate(`/seller/${getSellerName(product.seller).toLowerCase().replace(/\s+/g, '-')}`)}
+                onClick={handleSellerProfileClick}
                 className="flex items-center gap-1 px-3 py-1 rounded-full transition-colors hover:opacity-80 flex-shrink-0"
                 style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', fontSize: '11px', fontWeight: 500 }}
               >
