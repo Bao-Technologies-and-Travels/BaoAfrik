@@ -1270,7 +1270,7 @@ const Header: React.FC<HeaderProps> = ({
                           </Link>
 
                           {/* Settings */}
-                          {/* <Link
+                          <Link
                             to="/settings"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                             onClick={() => setIsDesktopMenuOpen(false)}
@@ -1294,31 +1294,7 @@ const Header: React.FC<HeaderProps> = ({
                                 </div>
                               </div>
                             </div>
-                          </Link> */}
-                          <div
-                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                            onClick={() => setIsDesktopMenuOpen(false)}
-                          >
-                            <div className="flex items-center space-x-2">
-                              <img
-                                src={settingIcon}
-                                alt="Setting"
-                                className="w-4 h-4"
-                                style={{ color: "#64B5F6" }}
-                              />
-                              <div>
-                                <div
-                                  className="font-medium text-sm"
-                                  style={{ color: "#6A6A6A" }}
-                                >
-                                  Settings
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  Set your account preferences
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                          </Link>
                         </div>
 
                         {/* Logout Button */}
@@ -1953,7 +1929,7 @@ const Header: React.FC<HeaderProps> = ({
                       </Link>
 
                       {/* Settings */}
-                      {/* <Link
+                      <Link
                         to="/settings"
                         className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
@@ -1965,19 +1941,7 @@ const Header: React.FC<HeaderProps> = ({
                             <div className="text-xs text-gray-500">Set your account preferences</div>
                           </div>
                         </div>
-                      </Link> */}
-                      <div
-                        className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <img src={settingIcon} alt="Setting" className="w-5 h-5" style={{ color: '#64B5F6' }} />
-                          <div>
-                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Settings</div>
-                            <div className="text-xs text-gray-500">Set your account preferences</div>
-                          </div>
-                        </div>
-                      </div>
+                      </Link>
                     </div>
 
                     {/* Logout Button */}

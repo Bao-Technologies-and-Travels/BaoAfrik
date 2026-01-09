@@ -1646,6 +1646,14 @@ const ProductDetail: React.FC = () => {
                   className="w-full h-full object-cover"
                   loading="eager"
                 />
+                
+                {/* Smoky fade effect at the top */}
+                <div 
+                  className="absolute top-0 left-0 right-0 h-32 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 30%, transparent 100%)'
+                  }}
+                />
 
                 {/* Image Slider Indicator */}
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ backgroundColor: '#21212199' }}>

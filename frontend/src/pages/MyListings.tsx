@@ -296,6 +296,28 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
     return payload;
 };
 
+const buildListingPrefillPayload = (listing: Listing) => {
+    const payload: Record<string, string> = {};
+    if (listing.title) payload.title = listing.title;
+    if (listing.price) payload.price = listing.price;
+    if (listing.currency) payload.currency = listing.currency;
+    if (listing.image) payload.image = listing.image;
+    if (listing.category) {
+      // Map category to the format expected by CreateListing
+      const categoryMap: Record<string, string> = {
+        'Food & Spicy': 'food',
+        'Beauty & Wellness': 'beauty',
+        'Fashion & Textiles': 'fashion',
+        'Home & Decor': 'home',
+        'Books & Media': 'books'
+      };
+      payload.category = categoryMap[listing.category] || listing.category.toLowerCase().replace(/\s+/g, '_');
+    }
+    // Note: description and country are not available in Listing interface
+    // They will remain empty and user can fill them in
+    return payload;
+  };
+
 const MyListings: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -344,6 +366,7 @@ const MyListings: React.FC = () => {
     const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
     const [draftListings, setDraftListings] = useState<DraftListing[]>([]);
     const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
+    const moreOptionsRef = useRef<HTMLDivElement | null>(null);
     const moreOptionsRefs = useRef<Map<string, HTMLDivElement>>(new Map());
     const [listingToDelete, setListingToDelete] = useState<Listing | null>(null);
     const [listingToDeleteId, setListingToDeleteId] = useState<string | null>(null);
@@ -896,7 +919,16 @@ const MyListings: React.FC = () => {
         const prefillData = buildDraftPrefillPayload(draft);
         navigate('/create-listing', { state: { draft: prefillData } });
         setIsDraftsModalOpen(false);
+        setShowMobileDrafts(false);
     };
+
+    const handleListingEdit = (listing: Listing, e?: React.MouseEvent) => {
+        if (e) {
+          e.stopPropagation();
+        }
+        const prefillData = buildListingPrefillPayload(listing);
+        navigate('/create-listing', { state: { draft: prefillData } });
+      };
 
     const handleDraftDelete = (draftId: string) => {
         setDraftListings((prev) => prev.filter((draft) => draft.id !== draftId));
@@ -2195,6 +2227,531 @@ const MyListings: React.FC = () => {
         );
     }
 
+    // Mobile Search View
+  if (showMobileSearch && isMobile) {
+    const mobileSearchFiltered = mobileSearchSubmitted ? listings.filter(listing => {
+      const query = mobileSearchQuery.toLowerCase().trim();
+      return (
+        listing.title.toLowerCase().includes(query) ||
+        listing.category?.toLowerCase().includes(query) ||
+        listing.price.includes(query)
+      );
+    }) : [];
+
+    const hasSearchResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length > 0;
+    const isNoResults = mobileSearchSubmitted && mobileSearchQuery.trim() !== '' && mobileSearchFiltered.length === 0;
+    const showSearchButton = !mobileSearchSubmitted || (mobileSearchSubmitted && mobileSearchFiltered.length === 0 && mobileSearchQuery.trim() === '');
+
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Search Bar at Top */}
+        <div className="px-4 pt-4 pb-3">
+          <div
+            className="flex items-center gap-3 px-3 py-2 bg-white"
+            style={{
+              border: `1px solid ${mobileSearchQuery ? '#97CDF9' : '#E4E4E4'}`,
+              borderRadius: '12px'
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setShowMobileSearch(false);
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+            </button>
+            <input
+              type="text"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              className="flex-1 outline-none"
+              style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121' }}
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setMobileSearchQuery('');
+                setMobileSearchSubmitted(false);
+              }}
+              className="flex-shrink-0"
+            >
+              <img src={SDicon} alt="Clear" className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Search Results Title */}
+        {hasSearchResults && (
+          <div className="px-4 pb-3">
+            <h2 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', color: '#212121', fontWeight: 600 }}>
+              Search results for "{mobileSearchQuery}" <span style={{ fontWeight: 400 }}>({mobileSearchFiltered.length} {mobileSearchFiltered.length === 1 ? 'item' : 'items'})</span>
+            </h2>
+          </div>
+        )}
+
+        {/* Search Results or Empty State */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          {isNoResults && (
+            <div className="flex flex-col items-center justify-center" style={{ paddingTop: '140px' }}>
+              <img src={bagIcon} alt="No listings" style={{ width: '50px', height: '50px', marginBottom: '14px', opacity: 0.3 }} />
+              <p style={{ color: '#939393', fontSize: '11px', textAlign: 'center', marginBottom: '14px', lineHeight: '1.5' }}>
+                No listings found. Please try adjusting<br />your search criteria or adding a new listing.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/create-listing')}
+                style={{
+                  backgroundColor: '#64B5F6',
+                  color: '#FFFFFF',
+                  padding: '7px 18px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  fontSize: '11px',
+                  fontFamily: 'Poppins, sans-serif',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Add listing
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {hasSearchResults && (
+            <div className="grid grid-cols-2 gap-3">
+              {mobileSearchFiltered.map((listing) => (
+                <div
+                  key={listing.id}
+                  className="bg-white rounded-lg overflow-hidden cursor-pointer"
+                  onClick={() => navigate(`/listing/${listing.id}`)}
+                >
+                  {/* Product Image */}
+                  <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '12px', padding: '2px' }}>
+                    <img
+                      src={listing.image}
+                      alt={listing.title}
+                      className="w-full h-full object-cover"
+                      style={{ borderRadius: '12px', transform: 'scaleX(1.0) scaleY(0.92)' }}
+                    />
+                  </div>
+
+                  {/* Product Content */}
+                  <div className="px-2 pb-2">
+                    {/* Status Badge and More Options */}
+                    <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
+                      {/* Status Badge */}
+                      <div>
+                        <div
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: listing.status === 'active' ? '#EDFBF0' : '#FFF5F5',
+                            fontSize: '10px'
+                          }}
+                        >
+                          <img
+                            src={listing.status === 'active' ? activeIcon : inactiveIcon}
+                            alt={listing.status}
+                            className="w-3 h-3"
+                          />
+                          <span
+                            style={{
+                              color: listing.status === 'active' ? '#70E183' : '#FF5151',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}
+                          >
+                            {listing.status === 'active' ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* More Options Button */}
+                      <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                        <button
+                          type="button"
+                          className="w-5 h-5 rounded-full border flex items-center justify-center"
+                          style={{
+                            borderColor: '#B0B0B0',
+                            borderWidth: '1.5px',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer',
+                            padding: 0
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoreOptionsOpenFor(moreOptionsOpenFor === listing.id ? null : listing.id);
+                          }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                          </svg>
+                        </button>
+                        {moreOptionsOpenFor === listing.id && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '26px',
+                              right: 0,
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '12px',
+                              border: '1px solid #E9E9E9',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              padding: '3px',
+                              minWidth: '110px',
+                              zIndex: 1000
+                            }}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                handleDeleteClick(listing);
+                              }}
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '5px 6px',
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                borderRadius: '6px'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#FFF5F5';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '12px', height: '12px', flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                              <span style={{ color: '#FF5151', fontSize: '11px', fontFamily: 'Poppins, sans-serif', lineHeight: 1, whiteSpace: 'nowrap' }}>Delete the listing</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMoreOptionsOpenFor(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '5px 6px',
+                                border: 'none',
+                                background: '#FAFAFA',
+                                cursor: 'pointer',
+                                borderRadius: '6px',
+                                marginTop: '3px'
+                              }}
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* Product Name */}
+                    <h3
+                      className="font-medium mb-1 text-[12px] truncate"
+                      style={{
+                        color: '#212121',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {listing.title}
+                    </h3>
+
+                    {/* Ratings */}
+                    <div className="flex items-center gap-1 mb-2" style={{ alignItems: 'center' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#FBBC05" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, marginTop: '1px' }}>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                      <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif', lineHeight: '1.2' }}>
+                        {listing.rating}
+                      </span>
+                      <span style={{ color: '#B0B0B0', fontSize: '10px', fontFamily: 'Poppins, sans-serif', lineHeight: '1.2' }}>
+                        ({listing.reviews} Reviews)
+                      </span>
+                    </div>
+
+                    {/* Price and Edit Button */}
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="font-semibold"
+                        style={{
+                          color: '#212121',
+                          fontSize: '14px',
+                          fontFamily: 'Bricolage Grotesque, sans-serif'
+                        }}
+                      >
+                        {listing.currency} {listing.price}
+                      </span>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md transition-colors hover:opacity-80"
+                        style={{
+                          backgroundColor: '#F4F4F4',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onClick={(e) => handleListingEdit(listing, e)}
+                      >
+                        <img src={pencilIcon} alt="Edit" style={{ width: '11px', height: '11px' }} />
+                        <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>Edit</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Search Button */}
+        {showSearchButton && (
+          <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 bg-white" style={{ boxShadow: 'none', border: 'none', borderTop: 'none' }}>
+            <button
+              type="button"
+              className="w-full py-3 rounded-xl"
+              style={{
+                backgroundColor: mobileSearchQuery.trim() ? '#F9A825' : '#D9D9D9',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '14px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 500,
+                cursor: 'pointer',
+                boxShadow: 'none'
+              }}
+              onClick={() => {
+                if (mobileSearchQuery.trim()) {
+                  setMobileSearchSubmitted(true);
+                }
+              }}
+            >
+              Search
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+    // Mobile Drafts View
+  if (showMobileDrafts && isMobile) {
+    return (
+      <div className="bg-white min-h-screen flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        {/* Mobile Drafts Header */}
+        <div className="lg:hidden fixed top-4 left-4 right-4 z-50 flex items-center justify-between mb-16">
+          <button
+            type="button"
+            onClick={() => setShowMobileDrafts(false)}
+            className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+            style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            aria-label="Back"
+          >
+            <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="Search"
+              onClick={() => setShowMobileSearch(true)}
+            >
+              <img src={searchNormalIcon} alt="Search" className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              aria-label="More options"
+            >
+              <svg width="16" height="4" viewBox="0 0 24 4" fill="none">
+                <circle cx="4" cy="2" r="2" fill="#171717" />
+                <circle cx="12" cy="2" r="2" fill="#171717" />
+                <circle cx="20" cy="2" r="2" fill="#171717" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="pt-20 px-4 mb-6">
+          <h1
+            className="text-lg font-semibold"
+            style={{ color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            Drafts ({draftCount})
+          </h1>
+        </div>
+
+        {/* Drafts List */}
+        <div className="px-4 pb-20 space-y-4">
+          {draftListings.map((draft) => (
+            <div
+              key={draft.id}
+              className="bg-white flex gap-3"
+            >
+              {/* Draft Image */}
+              <div
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}
+              >
+                <img src={draft.image} alt={draft.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+
+              {/* Draft Info - Right of image */}
+              <div className="flex-1 flex flex-col justify-between">
+                {/* Title and Price */}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#1E1E1E', fontSize: '14px', fontWeight: 500 }}>
+                    {draft.title}
+                  </span>
+                  <span style={{ color: '#B0B0B0', fontSize: '14px' }}>·</span>
+                  <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    {draft.currency} {draft.price}
+                  </span>
+                </div>
+
+                {/* Country tag if exists */}
+                {draft.country && (
+                  <div className="inline-flex items-center gap-1 py-0.5 rounded-full mb-1" style={{ border: '1px solid #E1E1E1', paddingLeft: '6px', paddingRight: '8px', width: 'fit-content' }}>
+                    <img
+                      src={draft.flag}
+                      alt={draft.country}
+                      className="w-3 h-3 rounded-full object-cover"
+                    />
+                    <span style={{ color: '#939393', fontSize: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                      {draft.country}
+                    </span>
+                  </div>
+                )}
+
+                {/* Description - smaller, center-right, 2 lines max */}
+                <p
+                  style={{
+                    color: '#B0B0B0',
+                    fontSize: '10px',
+                    fontFamily: 'Poppins, sans-serif',
+                    lineHeight: '1.4',
+                    marginBottom: '6px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {draft.description || '(Empty)'}
+                </p>
+
+                {/* Action Buttons - Bottom right */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5"
+                    style={{
+                      backgroundColor: '#F4F4F4',
+                      color: '#939393',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontFamily: 'Poppins, sans-serif',
+                      border: 'none',
+                      cursor: 'pointer',
+                      paddingLeft: '10px',
+                      paddingRight: '10px',
+                      paddingTop: '4px',
+                      paddingBottom: '4px'
+                    }}
+                    onClick={() => {
+                      // Close modal immediately before navigation
+                      setIsDraftsModalOpen(false);
+                      setShowMobileDrafts(false);
+
+                      // Small delay to ensure modal closes before navigation
+                      setTimeout(() => {
+                        navigate('/create-listing', { state: { prefill: buildDraftPrefillPayload(draft) } });
+                      }, 0);
+                    }}
+                  >
+                    <img src={pencilIcon} alt="Edit" className="w-3 h-3" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#FFE9E9',
+                      borderRadius: '6px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      paddingLeft: '8px',
+                      paddingRight: '8px',
+                      paddingTop: '4px',
+                      paddingBottom: '4px'
+                    }}
+                    onClick={() => {
+                      handleDraftDelete(draft.id);
+                    }}
+                  >
+                    <img src={trashIcon} alt="Delete" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <footer className="bg-white mt-auto">
+          <div className="px-4 py-5">
+            <div className="flex flex-col items-center text-xs space-y-2" style={{ color: '#BABABA' }}>
+              <div className="flex items-center space-x-1.5">
+                <img src={lilLogo} alt="Bao Afrik" className="w-5 h-5" />
+                <span>©</span>
+                <span className="text-[11px]">All rights reserved</span>
+              </div>
+              <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
+                <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
+                <span style={{ color: '#BABABA' }}>|</span>
+                <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
     return (
         <ErrorBoundary
             fallback={
@@ -2260,6 +2817,10 @@ const MyListings: React.FC = () => {
                                 </button>
                                 <button
                                     type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsMobilePlusModalOpen(!isMobilePlusModalOpen);
+                                      }}
                                     className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
                                     style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
                                     aria-label="More options"
@@ -2271,6 +2832,549 @@ const MyListings: React.FC = () => {
                                     </svg>
                                 </button>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Mobile Plus Modal - Now triggered by More Options button - Hidden only when tertiary sort modal is open */}
+                    {isMobilePlusModalOpen && !mobileSortTertiaryOpen && (
+                        <div
+                            className="absolute top-full right-0 z-50 mt-2"
+                            style={{
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '12px',
+                                border: '1px solid #E9E9E9',
+                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                padding: '8px',
+                                minWidth: '160px'
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Sort by option */}
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    const newState = !mobileSortSecondaryOpen;
+                                    setMobileSortSecondaryOpen(newState);
+                                    if (newState) {
+                                        setIsStatusDropdownOpen(false);
+                                        setIsDraftsModalOpen(false);
+                                    }
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                                style={{
+                                    color: (mobileSortSecondaryOpen || mobileSortTertiaryOpen) ? '#64B5F6' : '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    backgroundColor: (mobileSortSecondaryOpen || mobileSortTertiaryOpen) ? '#F0F8FE' : 'transparent',
+                                    borderRadius: '8px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!mobileSortSecondaryOpen && !mobileSortTertiaryOpen) {
+                                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!mobileSortSecondaryOpen && !mobileSortTertiaryOpen) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }
+                                }}
+                            >
+                                <img
+                                    src={filterIcon}
+                                    alt="Sort"
+                                    className="w-4 h-4"
+                                    style={{
+                                        filter: (mobileSortSecondaryOpen || mobileSortTertiaryOpen)
+                                            ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                            : 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                                    }}
+                                />
+                                <span>Sort by</span>
+                            </button>
+
+                            {/* All Status option */}
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    const newState = !isStatusDropdownOpen;
+                                    setIsStatusDropdownOpen(newState);
+                                    if (newState) {
+                                        setIsSortDropdownOpen(false);
+                                        setIsDraftsModalOpen(false);
+                                        setMobileSortSecondaryOpen(false);
+                                        setMobileSortTertiaryOpen(false);
+                                        setMobileSelectedPrimaryKey(null);
+                                        setMobileSelectedSecondaryKey(null);
+                                    }
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                                style={{
+                                    color: isStatusDropdownOpen ? '#64B5F6' : '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    backgroundColor: isStatusDropdownOpen ? '#F0F8FE' : 'transparent',
+                                    borderRadius: '8px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isStatusDropdownOpen) {
+                                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!isStatusDropdownOpen) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }
+                                }}
+                            >
+                                <img
+                                    src={statusIcon}
+                                    alt="Status"
+                                    className="w-4 h-4"
+                                    style={{
+                                        filter: isStatusDropdownOpen
+                                            ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                            : 'none'
+                                    }}
+                                />
+                                <span>All Status</span>
+                            </button>
+
+                            {/* Status Dropdown - appears to the left of modal */}
+                            {isStatusDropdownOpen && (
+                                <div
+                                    className="absolute top-0 right-full mr-2 z-50"
+                                    style={{
+                                        backgroundColor: '#FFFFFF',
+                                        borderRadius: '12px',
+                                        border: '1px solid #E9E9E9',
+                                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                        padding: '6px',
+                                        minWidth: '120px'
+                                    }}
+                                >
+                                    {statusOptions.map((status) => {
+                                        const styles = badgeStyles(status);
+                                        return (
+                                            <button
+                                                key={status}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleStatusSelect(status);
+                                                    setIsStatusDropdownOpen(false);
+                                                    setIsMobilePlusModalOpen(false);
+                                                }}
+                                                className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
+                                                style={{
+                                                    color: styles.color,
+                                                    fontFamily: 'Poppins, sans-serif',
+                                                    fontSize: '12px',
+                                                    backgroundColor: 'transparent',
+                                                    borderRadius: '8px'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                            >
+                                                {styles.icon}
+                                                <span>{status}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {/* Drafts option */}
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (isMobile) {
+                                        setShowMobileDrafts(true);
+                                        setIsMobilePlusModalOpen(false);
+                                        setMobileSortSecondaryOpen(false);
+                                        setMobileSortTertiaryOpen(false);
+                                        setMobileSelectedPrimaryKey(null);
+                                        setMobileSelectedSecondaryKey(null);
+                                    } else {
+                                        setIsDraftsModalOpen(!isDraftsModalOpen);
+                                        if (!isDraftsModalOpen) {
+                                            setIsSortDropdownOpen(false);
+                                            setIsStatusDropdownOpen(false);
+                                        }
+                                    }
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                                style={{
+                                    color: isDraftsModalOpen ? '#64B5F6' : '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    backgroundColor: isDraftsModalOpen ? '#F0F8FE' : 'transparent',
+                                    borderRadius: '8px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isDraftsModalOpen) {
+                                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!isDraftsModalOpen) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }
+                                }}
+                            >
+                                <img
+                                    src={draftsIcon}
+                                    alt="Drafts"
+                                    className="w-4 h-4"
+                                    style={{
+                                        filter: isDraftsModalOpen
+                                            ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                            : 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                                    }}
+                                />
+                                <span>Drafts</span>
+                                <span
+                                    className="px-2 py-0.5 rounded-full font-medium ml-auto"
+                                    style={{
+                                        backgroundColor: '#F4F4F4',
+                                        color: '#939393',
+                                        fontSize: '11px',
+                                        fontFamily: 'Poppins, sans-serif'
+                                    }}
+                                >
+                                    {draftCount}
+                                </span>
+                            </button>
+
+                            {/* Close option */}
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMobilePlusModalOpen(false);
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded transition-colors"
+                                style={{
+                                    backgroundColor: '#FAFAFA',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontSize: '13px',
+                                    borderRadius: '8px'
+                                }}
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="#B0B0B0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span>Close</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Sort Secondary Dropdown - OUTSIDE primary, appears to the left of primary modal, moves to primary position when tertiary opens, hides when fourth level opens */}
+                    {mobileSortSecondaryOpen && !mobileSelectedSecondaryKey && (
+                        <div
+                            className="absolute z-50"
+                            style={{
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '12px',
+                                border: '1px solid #E9E9E9',
+                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                padding: mobileSortTertiaryOpen ? '8px' : '5px',
+                                paddingTop: mobileSortTertiaryOpen ? '6px' : '5px',
+                                minWidth: '148px',
+                                ...(mobileSortTertiaryOpen ? {
+                                    bottom: '0',
+                                    right: '0',
+                                    transform: 'translateY(68px)'
+                                } : {
+                                    bottom: '0',
+                                    right: '168px',
+                                    transform: 'translateY(68px)'
+                                })
+                            }}
+                        >
+                            {/* Back button at top right - only when tertiary is open */}
+                            {mobileSortTertiaryOpen && (
+                                <div className="flex items-center justify-end mb-1">
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setMobileSortTertiaryOpen(false);
+                                            setMobileSelectedPrimaryKey(null);
+                                            setMobileSelectedSecondaryKey(null);
+                                        }}
+                                        className="flex items-center gap-1 px-2 py-1"
+                                        style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                                    >
+                                        <span>Back</span>
+                                        <img
+                                            src={backArrowIcon}
+                                            alt="Back"
+                                            className="w-3 h-3"
+                                            style={{
+                                                transform: 'scaleX(-1)',
+                                                filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                                            }}
+                                        />
+                                    </button>
+                                </div>
+                            )}
+
+                            {sortOptions.map((option) => {
+                                const renderIcon = () => {
+                                    if (option.key === 'date') {
+                                        return (
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="M12 6v6l4 2" />
+                                            </svg>
+                                        );
+                                    }
+                                    if (option.icon) {
+                                        return <img src={option.icon} alt={option.label} className="w-3 h-3" style={{ filter: option.key === 'price' ? 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' : undefined }} />;
+                                    }
+                                    return null;
+                                };
+
+                                return (
+                                    <button
+                                        key={option.key}
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setMobileSelectedPrimaryKey(option.key);
+                                            setMobileSortTertiaryOpen(true);
+                                        }}
+                                        className="w-full flex items-center justify-between gap-1.5 px-2 py-1.5 rounded transition-colors"
+                                        style={{
+                                            color: '#939393',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            fontSize: '11px',
+                                            backgroundColor: 'transparent',
+                                            borderRadius: '8px',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                        }}
+                                    >
+                                        <span className="flex items-center gap-1.5">
+                                            {renderIcon()}
+                                            <span>{option.label}</span>
+                                        </span>
+                                        <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* Tertiary Sort Modal - OUTSIDE primary, appears to LEFT of secondary when it moves to primary position */}
+                    {mobileSortTertiaryOpen && mobileSelectedPrimaryKey && (
+                        <div
+                            className="absolute bottom-0 z-50"
+                            style={{
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '12px',
+                                border: '1px solid #E9E9E9',
+                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                padding: '8px',
+                                minWidth: mobileSelectedPrimaryKey === 'commitments' ? '140px' : (mobileSelectedPrimaryKey === 'price' ? '135px' : '100px'),
+                                right: mobileSelectedSecondaryKey ? '0' : '160px',
+                                transform: 'translateY(68px)'
+                            }}
+                        >
+                            {/* Tertiary options */}
+                            {(() => {
+                                const primaryOption = sortOptions.find(opt => opt.key === mobileSelectedPrimaryKey);
+                                if (!primaryOption) return null;
+
+                                // Check if ANY child has subChildren to determine if we need back button
+                                const hasComplexChildren = primaryOption.children.some(c => c.subChildren);
+
+                                return (
+                                    <>
+                                        {/* Back button - only when fourth level is open */}
+                                        {hasComplexChildren && mobileSelectedSecondaryKey && (
+                                            <div className="flex items-center justify-end mb-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setMobileSortTertiaryOpen(false);
+                                                        setMobileSelectedPrimaryKey(null);
+                                                        setMobileSelectedSecondaryKey(null);
+                                                    }}
+                                                    className="flex items-center gap-1 px-2 py-1"
+                                                    style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
+                                                >
+                                                    <span>Back</span>
+                                                    <img
+                                                        src={backArrowIcon}
+                                                        alt="Back"
+                                                        className="w-3 h-3"
+                                                        style={{
+                                                            transform: 'scaleX(-1)',
+                                                            filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)'
+                                                        }}
+                                                    />
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {primaryOption.children.map((child) => {
+                                            if (child.value) {
+                                                // Simple option - applies sort directly
+                                                return (
+                                                    <button
+                                                        key={child.key}
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (child.value) {
+                                                                setSelectedSort({ label: `${primaryOption.label}: ${child.label}`, value: child.value });
+                                                                setMobileSortTertiaryOpen(false);
+                                                                setMobileSortSecondaryOpen(false);
+                                                                setIsMobilePlusModalOpen(false);
+                                                                setMobileSelectedPrimaryKey(null);
+                                                                setMobileSelectedSecondaryKey(null);
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            color: '#939393',
+                                                            fontFamily: 'Poppins, sans-serif',
+                                                            fontSize: '12px',
+                                                            backgroundColor: 'transparent',
+                                                            borderRadius: '8px',
+                                                            whiteSpace: 'nowrap',
+                                                            width: '100%',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '8px',
+                                                            padding: '6px 8px',
+                                                            border: 'none',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                                        }}
+                                                    >
+                                                        <span style={{ whiteSpace: 'nowrap' }}>{child.label}</span>
+                                                    </button>
+                                                );
+                                            } else if (child.subChildren) {
+                                                // Has sub-children - opens another level
+                                                return (
+                                                    <button
+                                                        key={child.key}
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setMobileSelectedSecondaryKey(child.key);
+                                                        }}
+                                                        className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded transition-colors"
+                                                        style={{
+                                                            color: '#939393',
+                                                            fontFamily: 'Poppins, sans-serif',
+                                                            fontSize: '12px',
+                                                            backgroundColor: 'transparent',
+                                                            borderRadius: '8px',
+                                                            whiteSpace: 'nowrap'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                                        }}
+                                                    >
+                                                        <span>{child.label}</span>
+                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </button>
+                                                );
+                                            }
+                                            return null;
+                                        })}
+                                    </>
+                                );
+                            })()}
+
+                            {/* Fourth level dropdown for Reviews/Messages - appears to the left of tertiary */}
+                            {mobileSelectedSecondaryKey && (() => {
+                                const primaryOption = sortOptions.find(opt => opt.key === mobileSelectedPrimaryKey);
+                                const secondaryOption = primaryOption?.children.find(c => c.key === mobileSelectedSecondaryKey);
+                                return secondaryOption?.subChildren ? (
+                                    <div
+                                        className="absolute z-50"
+                                        style={{
+                                            backgroundColor: '#FFFFFF',
+                                            borderRadius: '12px',
+                                            border: '1px solid #E9E9E9',
+                                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                            padding: '6px',
+                                            minWidth: '120px',
+                                            right: '164px',
+                                            top: '50%',
+                                            transform: 'translate(0, calc(68px - 50%))'
+                                        }}
+                                    >
+                                        {secondaryOption.subChildren.map((subChild) => (
+                                            <button
+                                                key={subChild.key}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (subChild.value && primaryOption) {
+                                                        setSelectedSort({
+                                                            label: `${primaryOption.label}: ${secondaryOption.label}: ${subChild.label}`,
+                                                            value: subChild.value
+                                                        });
+                                                        setMobileSortTertiaryOpen(false);
+                                                        setMobileSortSecondaryOpen(false);
+                                                        setIsMobilePlusModalOpen(false);
+                                                        setMobileSelectedPrimaryKey(null);
+                                                        setMobileSelectedSecondaryKey(null);
+                                                    }
+                                                }}
+                                                className="w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors"
+                                                style={{
+                                                    color: '#939393',
+                                                    fontFamily: 'Poppins, sans-serif',
+                                                    fontSize: '12px',
+                                                    backgroundColor: 'transparent',
+                                                    borderRadius: '8px',
+                                                    whiteSpace: 'nowrap'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                            >
+                                                <span>{subChild.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : null;
+                            })()}
                         </div>
                     )}
 
@@ -2474,7 +3578,7 @@ const MyListings: React.FC = () => {
                                             type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setIsMobilePlusModalOpen(!isMobilePlusModalOpen);
+                                                navigate('/create-listing');
                                             }}
                                             className="flex items-center justify-center"
                                             style={{
@@ -3516,30 +4620,6 @@ const MyListings: React.FC = () => {
                             </div>
                         )}
                     </div>
-
-                    {showScrollToTop && (
-                        <button
-                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                            className="fixed bottom-8 right-8 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300"
-                            aria-label="Scroll to top"
-                            style={{ backgroundColor: 'red', padding: '20px' }}
-                        >
-                            <svg
-                                className="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 10l7-7m0 0l7 7m-7-7v18"
-                                ></path>
-                            </svg>
-                        </button>
-                    )}
 
                     {/* Footer */}
                     <footer className="bg-white">

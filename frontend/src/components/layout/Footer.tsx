@@ -8,13 +8,13 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
           {/* Brand */}
-          <div className="col-span-1 md:col-span-2">
+          <div className="col-span-1 md:col-span-2 text-center md:text-left">
             <div className="mb-6">
               <Link to="/" className="inline-block focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
                 <img
                   src={footerLogo}
                   alt="BaoAfrik - African Marketplace Logo"
-                  className="h-8 mb-4"
+                  className="h-8 mb-4 mx-auto md:mx-0"
                 />
               </Link>
               <p className="text-sm leading-relaxed" style={{ color: '#BABABA' }}>
@@ -24,19 +24,19 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Products */}
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Products</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li><Link to="/category/food-spices" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Food & Spices</Link></li>
-              <li><Link to="/category/fashion-textiles" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Fashion & Textiles</Link></li>
-              <li><Link to="/category/beauty-wellness" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Beauty & Wellness</Link></li>
-              <li><Link to="/category/home-decor" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Home & Decor</Link></li>
-              <li><Link to="/category/books-media" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Books & Media</Link></li>
+              <li><Link to="/?category=Food%20%26%20Spices" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Food & Spices</Link></li>
+              <li><Link to="/?category=Fashion%20%26%20Textiles" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Fashion & Textiles</Link></li>
+              <li><Link to="/?category=Beauty%20%26%20Wellness" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Beauty & Wellness</Link></li>
+              <li><Link to="/?category=Home%20%26%20Decor" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Home & Decor</Link></li>
+              <li><Link to="/?category=Books%20%26%20Media" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Books & Media</Link></li>
             </ul>
           </div>
 
           {/* About Us */}
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>About Us</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/contact" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact us</Link></li>
@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Resources */}
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Resources</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/help" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Help center</Link></li>
@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Get in touch */}
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Get in touch</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li>Questions or feedback?</li>
@@ -65,8 +65,8 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-sm mb-4 md:mb-0 space-x-6" style={{ color: '#BABABA' }}>
+        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+          <div className="text-sm mb-4 md:mb-0 flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" style={{ color: '#BABABA' }}>
             <Link to="/terms" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms of Use</Link>
             <Link to="/privacy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link>
           </div>

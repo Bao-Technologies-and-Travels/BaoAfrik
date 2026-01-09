@@ -20,6 +20,7 @@ router.get('/:id/saved', authenticateToken, productController.checkProductSaved)
 
 // Product CRUD routes - parameterized routes must come last
 router.get('/:id', productController.getProduct);
+router.post('/:id/view', productController.trackProductView);
 router.put('/:id', authenticateToken, validateUpdateProduct, productController.updateProduct);
 router.delete('/:id', authenticateToken, productController.deleteProduct);
 

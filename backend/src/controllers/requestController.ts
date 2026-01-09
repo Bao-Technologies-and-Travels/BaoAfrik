@@ -34,7 +34,7 @@ export const RequestController = {
 
     async getRequests(req: Request, res: Response) {
         try {
-            const { status, userId, page = 1, limit = 10 } = req.query;
+            const { status, userId, page = 1, limit = 10, origin, sellerLocation, minPrice, maxPrice } = req.query;
 
             // Determine target userId:
             // 1. If userId is explicitly provided in query, filter by that userId
@@ -51,6 +51,10 @@ export const RequestController = {
             const result = await requestService.getRequests({
                 status: status as string | undefined,
                 userId: targetUserId,
+                origin: origin as string | undefined,
+                sellerLocation: sellerLocation as string | undefined,
+                minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
+                maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
                 page: Number(page),
                 limit: Number(limit)
             });

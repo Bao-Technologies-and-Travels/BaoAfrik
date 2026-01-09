@@ -168,6 +168,32 @@ export class ProductController {
     }
   }
 
+  // Track product view/engagement
+  async trackProductView(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Product ID is required'
+        });
+      }
+
+      await productService.incrementViewCount(id);
+
+      return res.json({
+        success: true,
+        message: 'Product view tracked'
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
   // Update product
   async updateProduct(req: Request, res: Response) {
     try {

@@ -64,7 +64,7 @@ const CreateListing: React.FC = () => {
   const [category, setCategory] = useState('');
   const [origin, setOrigin] = useState('');
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
-  const [location, setLocation] = useState('London |  United Kingdom');
+  const [location, setLocation] = useState('London, United Kingdom');
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isImageLoading, setIsImageLoading] = useState(false);
@@ -121,12 +121,29 @@ const CreateListing: React.FC = () => {
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   const [draftToDelete, setDraftToDelete] = useState<DraftListing | null>(null);
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+  const locationDropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const ukCities = [
-    'London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool',
-    'Leeds', 'Newcastle', 'Sheffield', 'Bristol', 'Belfast',
-    'Edinburgh', 'Cardiff', 'Leicester', 'Coventry', 'Nottingham',
-    'Southampton', 'Plymouth', 'Derby', 'Reading', 'York'
+  const ukCities: Array<{ value: string; label: string }> = [
+    { value: 'london', label: 'London, United Kingdom' },
+    { value: 'birmingham', label: 'Birmingham, United Kingdom' },
+    { value: 'manchester', label: 'Manchester, United Kingdom' },
+    { value: 'glasgow', label: 'Glasgow, United Kingdom' },
+    { value: 'liverpool', label: 'Liverpool, United Kingdom' },
+    { value: 'leeds', label: 'Leeds, United Kingdom' },
+    { value: 'newcastle', label: 'Newcastle, United Kingdom' },
+    { value: 'sheffield', label: 'Sheffield, United Kingdom' },
+    { value: 'bristol', label: 'Bristol, United Kingdom' },
+    { value: 'belfast', label: 'Belfast, United Kingdom' },
+    { value: 'edinburgh', label: 'Edinburgh, United Kingdom' },
+    { value: 'cardiff', label: 'Cardiff, United Kingdom' },
+    { value: 'leicester', label: 'Leicester, United Kingdom' },
+    { value: 'coventry', label: 'Coventry, United Kingdom' },
+    { value: 'nottingham', label: 'Nottingham, United Kingdom' },
+    { value: 'southampton', label: 'Southampton, United Kingdom' },
+    { value: 'plymouth', label: 'Plymouth, United Kingdom' },
+    { value: 'derby', label: 'Derby, United Kingdom' },
+    { value: 'reading', label: 'Reading, United Kingdom' },
+    { value: 'york', label: 'York, United Kingdom' }
   ];
 
   const clearListingsCache = () => {
@@ -509,7 +526,7 @@ const CreateListing: React.FC = () => {
         setOrigin(product.origin || '');
         // setSaleType(product.saleType || 'Default');
         setDeliveryAvailable(product.deliveryAvailable || false);
-        setLocation(product.location || 'London | United Kingdom');
+        setLocation(product.location || 'London,  United Kingdom');
 
         if (product.images && product.images.length > 0) {
           const existingImageUrls = product.images.map((img: any) => img.url);
@@ -1323,7 +1340,7 @@ const CreateListing: React.FC = () => {
             onClick: () => navigate('/my-listings'),
             duration: 8000
           });
-        }, 10000);
+        }, 30000);
 
         setIsPostingListing(false);
       }
@@ -2540,23 +2557,63 @@ const CreateListing: React.FC = () => {
                   </div>
                   {/* Location Dropdown */}
                   {isLocationDropdownOpen && (
-                    <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
-                      <div className="p-2 max-h-60 overflow-auto">
-                        <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                        {ukCities.map((city) => (
+                    <div
+                      ref={locationDropdownRef}
+                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg location-dropdown-scroll"
+                      style={{
+                        borderRadius: '12px',
+                        top: '100%',
+                        right: 0,
+                        width: 'auto',
+                        minWidth: '280px',
+                        maxHeight: '200px',
+                        overflowY: 'auto',
+                        overflowX: 'hidden'
+                      }}
+                    >
+                      {ukCities.map((loc, index) => (
+                        <div
+                          key={loc.value}
+                          className={`w-full ${index === 0 ? 'rounded-t-xl' : ''
+                            } ${index === ukCities.length - 1 ? 'rounded-b-xl' : ''
+                            }`}
+                          style={{
+                            backgroundColor: 'transparent'
+                          }}
+                        >
                           <button
-                            key={city}
                             type="button"
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
                             onClick={() => {
-                              setLocation(`${city} | United Kingdom`);
+                              setLocation(loc.label);
                               setIsLocationDropdownOpen(false);
                             }}
+                            className="w-full text-left transition-colors relative"
+                            style={{
+                              color: '#6A6A6A',
+                              cursor: 'pointer',
+                              fontSize: '0.85rem',
+                              padding: '10px 16px',
+                              fontWeight: 500
+                            }}
                           >
-                            {city}
+                            {location === loc.label && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: '8px',
+                                  right: '8px',
+                                  top: '4px',
+                                  bottom: '4px',
+                                  backgroundColor: '#F0F8FE',
+                                  borderRadius: '8px',
+                                  zIndex: -1
+                                }}
+                              />
+                            )}
+                            <span style={{ position: 'relative', zIndex: 1 }}>{loc.label}</span>
                           </button>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -3004,12 +3061,12 @@ const CreateListing: React.FC = () => {
                 </div>
 
                 {/* Mobile Location Section */}
-                <div className="relative location-dropdown-container">
-                  <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
+                <div className="relative location-dropdown">
+                  <div className="flex items-start justify-between mt-24 mb-24">
                     <div className="flex flex-col">
-                      <div className="flex items-center space-x-1.5 mb-1">
-                        <img src={locIcon} alt="Location" className="w-4 h-4" />
-                        <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
+                      <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
+                        <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
+                        <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
                       </div>
                       <input
                         type="text"
@@ -3030,23 +3087,63 @@ const CreateListing: React.FC = () => {
                   </div>
                   {/* Location Dropdown */}
                   {isLocationDropdownOpen && (
-                    <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200">
-                      <div className="p-2 max-h-60 overflow-auto">
-                        <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                        {ukCities.map((city) => (
+                    <div
+                      ref={locationDropdownRef}
+                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg location-dropdown-scroll"
+                      style={{
+                        borderRadius: '12px',
+                        top: '100%',
+                        right: 0,
+                        width: 'auto',
+                        minWidth: '240px',
+                        maxHeight: '180px',
+                        overflowY: 'auto',
+                        overflowX: 'hidden'
+                      }}
+                    >
+                      {ukCities.map((loc, index) => (
+                        <div
+                          key={loc.value}
+                          className={`w-full ${index === 0 ? 'rounded-t-xl' : ''
+                            } ${index === ukCities.length - 1 ? 'rounded-b-xl' : ''
+                            }`}
+                          style={{
+                            backgroundColor: 'transparent'
+                          }}
+                        >
                           <button
-                            key={city}
                             type="button"
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
                             onClick={() => {
-                              setLocation(`${city} | United Kingdom`);
+                              setLocation(loc.label);
                               setIsLocationDropdownOpen(false);
                             }}
+                            className="w-full text-left transition-colors relative"
+                            style={{
+                              color: '#6A6A6A',
+                              cursor: 'pointer',
+                              fontSize: '0.75rem',
+                              padding: '10px 16px',
+                              fontWeight: 500
+                            }}
                           >
-                            {city}
+                            {location === loc.label && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: '8px',
+                                  right: '8px',
+                                  top: '4px',
+                                  bottom: '4px',
+                                  backgroundColor: '#F0F8FE',
+                                  borderRadius: '8px',
+                                  zIndex: -1
+                                }}
+                              />
+                            )}
+                            <span style={{ position: 'relative', zIndex: 1 }}>{loc.label}</span>
                           </button>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -3099,7 +3196,7 @@ const CreateListing: React.FC = () => {
                             style={{ color: '#E4E4E4', fontSize: '0.7rem', cursor: 'pointer' }}
                           >
                             <span>{currency}</span>
-                            <svg
+                            {/* <svg
                               className="w-2.5 h-2.5 ml-0.5"
                               fill="none"
                               stroke="currentColor"
@@ -3107,7 +3204,7 @@ const CreateListing: React.FC = () => {
                               style={{ color: '#6B7280' }}
                             >
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            </svg> */}
                           </button>
 
                           {/* Dropdown Menu */}
@@ -3205,7 +3302,15 @@ const CreateListing: React.FC = () => {
                       <input
                         type="number"
                         value={quantity}
-                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Clear leading zeros when user types
+                          if (value && value.startsWith('0') && value.length > 1) {
+                            setQuantity(parseInt(value.replace(/^0+/, '')) || 1);
+                          } else {
+                            setQuantity(parseInt(value) || 1);
+                          }
+                        }}
                         className="px-2.5 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ width: '100%', fontSize: '0.75rem' }}
                       />
@@ -4156,7 +4261,7 @@ const CreateListing: React.FC = () => {
                               style={{ color: '#E4E4E4', fontSize: '0.85rem', cursor: 'pointer' }}
                             >
                               <span className="font-bold">{currency}</span>
-                              <svg
+                              {/* <svg
                                 className="w-4 h-4 ml-1"
                                 fill="none"
                                 stroke="currentColor"
@@ -4164,7 +4269,7 @@ const CreateListing: React.FC = () => {
                                 style={{ color: '#6B7280' }}
                               >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
+                              </svg> */}
                             </button>
 
                             {/* Dropdown Menu */}
@@ -4253,7 +4358,7 @@ const CreateListing: React.FC = () => {
                       </label>
                       <div className="flex items-center space-x-2" style={{ maxWidth: '180px' }}>
                         <button
-                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          onClick={() => setQuantity(Math.max(0, quantity - 1))}
                           className="w-12 h-12 rounded-lg font-medium text-lg flex-shrink-0"
                           style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
                         >
@@ -4262,7 +4367,15 @@ const CreateListing: React.FC = () => {
                         <input
                           type="number"
                           value={quantity}
-                          onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Clear leading zeros when user types
+                            if (value && value.startsWith('0') && value.length > 1) {
+                              setQuantity(parseInt(value.replace(/^0+/, '')) || 0);
+                            } else {
+                              setQuantity(parseInt(value) || 0);
+                            }
+                          }}
                           className="px-4 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           style={{ width: '140px' }}
                         />

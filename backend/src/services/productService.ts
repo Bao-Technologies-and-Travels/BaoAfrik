@@ -164,6 +164,18 @@ export class ProductService {
         }
     }
 
+    // Increment view count for a product (for tracking from homepage)
+    async incrementViewCount(id: string): Promise<void> {
+        try {
+            await prisma.product.update({
+                where: { id },
+                data: { viewCount: { increment: 1 } }
+            });
+        } catch (error: any) {
+            throw new Error(`Error incrementing view count: ${error.message}`);
+        }
+    }
+
     // Get products with filtering and pagination
     async getProducts(filters: ProductFilters = {}, page: number = 1, limit: number = 10) {
         try {
