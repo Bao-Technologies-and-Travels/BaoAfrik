@@ -1,6 +1,6 @@
 import prisma from '../config/database';
 import { Product, ProductStatus, Prisma, ProductReview } from '../generated/client';
-import { s3Service } from './s3Service';
+// import { s3Service } from './s3Service';
 import { gcpStorageService } from './gcpStorageService';
 
 export interface CreateProductData {
@@ -411,12 +411,8 @@ export class ProductService {
             try {
                 await gcpStorageService.deleteFile(imageToRemove.key);
             } catch (err) {
-                // Fallback for legacy objects that might still be in S3
-                try {
-                    await s3Service.deleteFile(imageToRemove.key);
-                } catch {
-                    // Swallow secondary delete errors to avoid breaking UX
-                }
+                // Swallow secondary delete errors to avoid breaking UX
+                console.error('Error deleting image from GCS:', err);
             }
 
             // Remove from array
