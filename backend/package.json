@@ -26,8 +26,6 @@
   "author": "BaoAfrik Team",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.916.0",
-    "@aws-sdk/s3-request-presigner": "^3.916.0",
     "@google-cloud/storage": "^7.18.0",
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
@@ -35,7 +33,6 @@
     "@prisma/config": "^7.0.1",
     "@prisma/internals": "^7.0.1",
     "bcryptjs": "^2.4.3",
-    "client-s3": "github:aws-sdk/client-s3",
     "cloudinary": "^2.8.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
