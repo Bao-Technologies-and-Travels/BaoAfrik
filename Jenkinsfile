@@ -5,7 +5,7 @@ pipeline {
     environment {
         NODE_ENV = 'staging'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = 'ashprincepageo@34.51.243.86'
+        SSH_HOST = 'ashprincepageo@34.51.248.43'
         FRONTEND_DIR = '~/BaoAfrik/frontend'
         BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'frontend'
@@ -36,7 +36,7 @@ pipeline {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         # Install Node.js and npm if not already installed
-                        curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+                        curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
                         sudo apt install -y nodejs
                     '
                     """
