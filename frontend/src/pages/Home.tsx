@@ -436,7 +436,7 @@ const Home: React.FC = () => {
       }
     };
     fetchRequests();
-    return () => controller.abort();
+    // return () => controller.abort();
   }, [requestBuyerLocation, requestFilterCountry, requestFilterPrice]);
 
   const getDefaultProductImage = (category: string | undefined): any => {
@@ -3112,8 +3112,16 @@ const Home: React.FC = () => {
                                   }}
                                 >
                                   {savedProducts.has(product.id) ? (
-                                    <svg className="text-white" style={{ width: window.innerWidth < 640 ? '10px' : '12px', height: window.innerWidth < 640 ? '10px' : '12px' }} fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    <svg
+                                      style={{
+                                        width: window.innerWidth < 640 ? '16px' : '20px',
+                                        height: window.innerWidth < 640 ? '16px' : '20px',
+                                        fill: '#64B5F6'
+                                      }}
+                                      fill="#64B5F6"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M5 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H5zm0 2h14v16H5V4zm2 2v12l5-3 5 3V6H7z" />
                                     </svg>
                                   ) : (
                                     <img
@@ -3712,25 +3720,32 @@ const Home: React.FC = () => {
                                   e.preventDefault();
                                   handleSave(product.id);
                                 }}
-                                className="transition-colors touch-manipulation"
+                                className="transition-colors touch-manipulation rounded"
                                 style={{
                                   width: window.innerWidth < 640 ? '16px' : '20px',
                                   height: window.innerWidth < 640 ? '16px' : '20px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  marginLeft: window.innerWidth < 640 ? '4px' : '8px'
+                                  marginLeft: window.innerWidth < 640 ? '4px' : '8px',
+                                  backgroundColor: savedProducts.has(product.id) ? '#64B5F6' : 'transparent'
                                 }}
                               >
-                                <img
-                                  src={bookmarkIcon}
-                                  alt="Bookmark"
-                                  style={{
-                                    width: window.innerWidth < 640 ? '16px' : '20px',
-                                    height: window.innerWidth < 640 ? '16px' : '20px',
-                                    filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                                  }}
-                                />
+                                {savedProducts.has(product.id) ? (
+                                  <svg className="text-white" style={{ width: window.innerWidth < 640 ? '10px' : '12px', height: window.innerWidth < 640 ? '10px' : '12px' }} fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M5 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H5zm0 2h14v16H5V4zm2 2v12l5-3 5 3V6H7z" fill="currentColor" />
+                                  </svg>
+                                ) : (
+                                  <img
+                                    src={bookmarkIcon}
+                                    alt="Bookmark"
+                                    style={{
+                                      width: window.innerWidth < 640 ? '16px' : '20px',
+                                      height: window.innerWidth < 640 ? '16px' : '20px',
+                                      filter: 'grayscale(100%) opacity(0.5)'
+                                    }}
+                                  />
+                                )}
                               </button>
                             </div>
                           </div>

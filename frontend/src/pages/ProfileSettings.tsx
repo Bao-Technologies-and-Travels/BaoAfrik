@@ -60,7 +60,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { io, Socket } from "socket.io-client";
 import { useSocket } from '../contexts/socketContext'
 import { useToast } from "../contexts/ToastContext";
+import { useNotificationToast } from '../contexts/NotificationToastContext';
 import { countries } from '../utils/countries';
+import { gcpStorageService } from '../services/gcpStorageService';
+import { sortedCountryPhoneCodes } from '../utils/countryPhoneCodes';
 
 const currencyRates: Record<string, number> = {
   USD: 1,
@@ -182,6 +185,8 @@ const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { addToast } = useToast();
+  const { showNotification } = useNotificationToast();
+  const { user, updateUserProfile } = useAuth();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [languagePreference, setLanguagePreference] = useState<'en' | 'fr' | 'de' | 'es'>(() => {
@@ -221,7 +226,6 @@ const ProfileSettings: React.FC = () => {
   const [isBirthdayCalendarOpen, setIsBirthdayCalendarOpen] = useState(false);
   const birthdayCalendarRef = useRef<HTMLDivElement>(null);
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const { user } = useAuth();
   const contextSocket = useSocket();
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [notificationCount, setNotificationCount] = useState(0);
@@ -229,11 +233,12 @@ const ProfileSettings: React.FC = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
-  const [countries, setCountries] = useState<{ id: string; name: string; code: string; flag?: string }[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<{ code: string, name: string } | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<{ code: string; name: string } | null>(null);
   const [selectedCountryCode, setSelectedCountryCode] = useState<string | ''>('');
   const [isFetchingCountries, setIsFetchingCountries] = useState(false);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
   const [isGeolocationEnabled, setIsGeolocationEnabled] = useState(false);
+  const geolocationProcessingRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -452,6 +457,68 @@ const ProfileSettings: React.FC = () => {
     return avatar;
   };
 
+  // Function to reload user data from backend
+  const reloadUserData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+
+      const json = await res.json();
+      if (!json.success) return;
+
+      const u = json.data;
+
+      // Update local profile data state
+      setProfileData({
+        fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+        gender: u.gender || '',
+        birthDate: formatBirthDate(u.birthDate),
+        profileImage: u.profileImage || '',
+        phoneNumber: u.phoneNumber || '',
+        location: u.location || '',
+        bio: u.bio || ''
+      });
+
+      setProfileImage(u.profileImage || null);
+      setExistingImageUrl(u.profileImage || null);
+      // Initialize biography from user bio
+      setBiography(u.bio || '');
+      // Initialize selected country from user location
+      if (u.location) {
+        const foundCountry = countries.find(c =>
+          c.name.toLowerCase() === u.location.toLowerCase() ||
+          c.code.toLowerCase() === u.location.toLowerCase()
+        );
+        if (foundCountry) {
+          setSelectedCountry(foundCountry);
+          setSelectedCountryCode(foundCountry.code);
+        } else {
+          setSelectedCountryCode(u.location);
+        }
+      }
+
+      // Update AuthContext user
+      updateUserProfile({
+        firstName: u.firstName,
+        lastName: u.lastName,
+        gender: u.gender,
+        birthDate: u.birthDate,
+        profileImage: u.profileImage,
+        phoneNumber: u.phoneNumber,
+        location: u.location,
+        bio: u.bio,
+        emailVerified: u.emailVerified
+      });
+    } catch (e) {
+      console.warn('Failed to reload user data', e);
+    }
+  };
+
   // load user and countries on mount
   useEffect(() => {
     let mounted = true;
@@ -473,7 +540,7 @@ const ProfileSettings: React.FC = () => {
         setProfileData({
           fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
           gender: u.gender || '',
-          birthDate: u.birthDate ? (u.birthDate.split?.('T')?.[0] ?? new Date(u.birthDate).toISOString().slice(0, 10)) : '',
+          birthDate: formatBirthDate(u.birthDate),
           profileImage: u.profileImage || '',
           phoneNumber: u.phoneNumber || '',
           location: u.location || '',
@@ -481,80 +548,79 @@ const ProfileSettings: React.FC = () => {
         });
 
         setProfileImage(u.profileImage || null);
-        if (u.location) setSelectedCountryCode(u.location);
+        setExistingImageUrl(u.profileImage || null);
+        // Initialize biography from user bio
+        setBiography(u.bio || '');
+        // Initialize selected country from user location
+        if (u.location) {
+          const foundCountry = countries.find(c =>
+            c.name.toLowerCase() === u.location.toLowerCase() ||
+            c.code.toLowerCase() === u.location.toLowerCase()
+          );
+          if (foundCountry) {
+            setSelectedCountry(foundCountry);
+            setSelectedCountryCode(foundCountry.code);
+          } else {
+            setSelectedCountryCode(u.location);
+          }
+        }
+
+        // Update AuthContext user
+        updateUserProfile({
+          firstName: u.firstName,
+          lastName: u.lastName,
+          gender: u.gender,
+          birthDate: u.birthDate,
+          profileImage: u.profileImage,
+          phoneNumber: u.phoneNumber,
+          location: u.location,
+          bio: u.bio,
+          emailVerified: u.emailVerified
+        });
       } catch (e) {
         console.warn('Failed to load profile', e);
       }
     };
 
-    const loadCountries = async () => {
-      setIsFetchingCountries(true);
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/countries`);
-        if (!res.ok) return;
-
-        const json = await res.json();
-        if (!mounted || !json.success) return;
-
-        const list = (json.data || []).map((c: any) => ({ id: c.id, name: c.name, code: (c.code || c.iso2 || c.alpha2 || '').toString().toUpperCase(), flag: c.flag }));
-        setCountries(list);
-
-      } catch (e) {
-        console.warn('Failed to load countries', e);
-      } finally {
-        setIsFetchingCountries(false);
-      }
-    };
-
     loadProfile();
-    loadCountries();
 
     return () => { mounted = false; };
-  }, []);
-
-  // Load countries on component mount
-  useEffect(() => {
-    const loadCountries = async () => {
-      try {
-        setIsFetchingCountries(true);
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/countries`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setCountries(data.data || []);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load countries:', error);
-      } finally {
-        setIsFetchingCountries(false);
-      }
-    };
-
-    loadCountries();
   }, []);
 
   // Geolocation toggle
   useEffect(() => {
     if (!isGeolocationEnabled) {
+      geolocationProcessingRef.current = false;
+      setIsFetchingCountries(false);
+      return;
+    }
+
+    // Prevent multiple simultaneous geolocation requests
+    if (geolocationProcessingRef.current) {
       return;
     }
 
     if (!navigator.geolocation) {
       addToast({
         type: 'error',
-        title: 'error',
+        title: 'Error',
         message: 'Geolocation not supported by your browser',
         duration: 2000
       });
       setIsGeolocationEnabled(false);
+      setIsFetchingCountries(false);
       return;
     }
 
+    geolocationProcessingRef.current = true;
     setIsFetchingCountries(true);
+
+    let isMounted = true;
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        if (!isMounted || !geolocationProcessingRef.current) return;
+
         try {
           const { latitude, longitude } = position.coords;
           const response = await fetch(
@@ -565,12 +631,15 @@ const ProfileSettings: React.FC = () => {
 
           const data = await response.json();
 
-          if (data && data.countryName) {
-            const foundCountry = countries.find(
-              (c) => c.name.toLowerCase() === data.countryName.toLowerCase()
+          if (data && data.countryName && isMounted) {
+            // Find the country in the countries list
+            const foundCountry = countries.find(c =>
+              c.name.toLowerCase() === data.countryName.toLowerCase() ||
+              c.name.toLowerCase().includes(data.countryName.toLowerCase()) ||
+              data.countryName.toLowerCase().includes(c.name.toLowerCase())
             );
 
-            if (foundCountry) {
+            if (foundCountry && isMounted) {
               setSelectedCountryCode(foundCountry.code);
               setSelectedCountry(foundCountry);
               setFormData(prev => ({
@@ -578,44 +647,107 @@ const ProfileSettings: React.FC = () => {
                 location: foundCountry.name
               }));
 
-              addToast({
-                type: 'success',
-                title: 'Location updated',
-                message: 'Location updated successfully',
-                duration: 2000
-              });
+              // Auto-save location to backend - only one request
+              const token = localStorage.getItem('accessToken');
+              if (token && isMounted) {
+                try {
+                  const updateResponse = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                      location: foundCountry.name
+                    })
+                  });
+
+                  if (updateResponse.ok && isMounted) {
+                    const updateData = await updateResponse.json();
+                    if (updateData.success && isMounted) {
+                      setProfileData(prev => ({ ...prev, location: foundCountry.name }));
+                      // Reload user data from backend
+                      await reloadUserData();
+                      addToast({
+                        type: 'success',
+                        title: 'Location updated',
+                        message: 'Your location has been updated successfully',
+                        duration: 2000
+                      });
+                    }
+                  }
+                } catch (updateError) {
+                  console.error('Failed to update location in backend:', updateError);
+                  if (isMounted) {
+                    addToast({
+                      type: 'error',
+                      title: 'Save failed',
+                      message: 'Location detected but failed to save. Please try saving manually.',
+                      duration: 2000
+                    });
+                  }
+                }
+              }
+            } else if (isMounted) {
+              throw new Error('Country not found in our list');
             }
           }
         } catch (error) {
-          console.error('Geolocation error:', error);
-          addToast({
-            type: 'error',
-            title: 'Cannot update location',
-            message: 'Could not determine your location. Please select a country manually.',
-            duration: 2000
-          });
+          if (isMounted) {
+            console.error('Geolocation error:', error);
+            addToast({
+              type: 'error',
+              title: 'Cannot detect location',
+              message: 'Could not determine your location. Please select a country manually.',
+              duration: 2000
+            });
+          }
         } finally {
-          setIsFetchingCountries(false);
+          if (isMounted) {
+            setIsFetchingCountries(false);
+            geolocationProcessingRef.current = false;
+          }
         }
       },
-      (error) => {
+      (error: GeolocationPositionError) => {
+        if (!isMounted) return;
+
         console.error('Geolocation error:', error);
+        let errorMessage = 'Unable to access your location. Please enable location services or select a country manually.';
+        if (error.code === 1) { // PERMISSION_DENIED
+          errorMessage = 'Location access denied. Please allow location access in your browser settings.';
+        } else if (error.code === 3) { // TIMEOUT
+          errorMessage = 'Location request timed out. Please try again or select a country manually.';
+        } else if (error.code === 2) { // POSITION_UNAVAILABLE
+          errorMessage = 'Location information is unavailable. Please select a country manually.';
+        }
         addToast({
           type: 'error',
           title: 'Cannot access location',
-          message: 'Unable to access your location. Please enable location services or select a country manually.',
+          message: errorMessage,
           duration: 2000
         });
 
-        setIsGeolocationEnabled(false);
-        setIsFetchingCountries(false);
+        if (isMounted) {
+          setIsGeolocationEnabled(false);
+          setIsFetchingCountries(false);
+          geolocationProcessingRef.current = false;
+        }
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 60000 }
     );
-  }, [isGeolocationEnabled, countries, addToast]);
 
-  const handleCountrySelect = (country: { code: string, name: string }) => {
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      geolocationProcessingRef.current = false;
+      setIsFetchingCountries(false);
+    };
+  }, [isGeolocationEnabled]);
+
+  const handleCountrySelect = (country: { code: string; name: string }) => {
     setSelectedCountry(country);
+    setSelectedCountryCode(country.code);
     setFormData(prev => ({
       ...prev,
       location: country.name
@@ -649,6 +781,54 @@ const ProfileSettings: React.FC = () => {
     }
   };
 
+  // Format birth date to display only date (remove time) - returns YYYY-MM-DD for internal use
+  const formatBirthDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return '';
+    try {
+      // If it's already in YYYY-MM-DD format, return as is
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateString;
+      }
+      // If it includes time (ISO format), extract just the date part
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      // If parsing fails, try to extract date part if it contains 'T'
+      if (dateString.includes('T')) {
+        return dateString.split('T')[0];
+      }
+      return dateString;
+    }
+  };
+
+  // Format birth date for display as day/month/year
+  const formatBirthDateForDisplay = (dateString: string | null | undefined): string => {
+    if (!dateString) return '';
+    try {
+      let date: Date;
+      // If it's in YYYY-MM-DD format, parse it directly
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const parts = dateString.split('-');
+        date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      } else {
+        date = new Date(dateString);
+      }
+
+      if (isNaN(date.getTime())) return dateString;
+
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   // Profile editing state
   const formatUserData = () => {
     if (!user) {
@@ -666,7 +846,7 @@ const ProfileSettings: React.FC = () => {
     return {
       fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || '',
       gender: user.gender || '',
-      birthDate: user.birthDate || '',
+      birthDate: formatBirthDate(user.birthDate),
       profileImage: user.profileImage || '',
       phoneNumber: user.phoneNumber || '',
       location: user.location || '',
@@ -678,19 +858,22 @@ const ProfileSettings: React.FC = () => {
   const [formData, setFormData] = useState<ProfileData>(formatUserData());
   const [isEditing, setIsEditing] = useState(false);
 
-
   // Image upload state - use the user's profile image if available
   const [profileImage, setProfileImage] = useState<string | null>(user?.profileImage || null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Update profile image when user data changes
   useEffect(() => {
     if (user?.profileImage) {
       setProfileImage(user.profileImage);
+      setExistingImageUrl(user.profileImage);
     }
   }, [user]);
-  const [isImageLoading, setIsImageLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const genderOptions = ['Male', 'Female', 'Other'];
   const phoneDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -733,8 +916,6 @@ const ProfileSettings: React.FC = () => {
       setProfileData(formatUserData());
     }
   }, [user]);
-
-  const countryDropdownRef = useRef<HTMLDivElement>(null);
 
   // Calculate profile completion progress
   const calculateProfileProgress = () => {
@@ -786,18 +967,11 @@ const ProfileSettings: React.FC = () => {
   const isDescriptionComplete = useMemo(() => biography && biography.trim() !== '', [biography]);
   const isVerificationComplete = useMemo(() => verificationForm.email && verificationForm.email.trim() !== '', [verificationForm.email]);
   const [isPhoneCodeDropdownOpen, setIsPhoneCodeDropdownOpen] = useState(false);
-  const phoneCodes = [
-    { label: 'United States', code: '+1', flag: 'us' },
-    { label: 'United Kingdom', code: '+44', flag: 'gb' },
-    { label: 'France', code: '+33', flag: 'fr' },
-    { label: 'Cameroon', code: '+237', flag: 'cm' },
-    { label: 'South Africa', code: '+27', flag: 'za' },
-    { label: 'Algeria', code: '+213', flag: 'dz' },
-    { label: 'Angola', code: '+244', flag: 'ao' },
-    { label: 'Benin', code: '+229', flag: 'bj' },
-    { label: 'Congo', code: '+242', flag: 'cg' },
-    { label: 'Gabon', code: '+241', flag: 'ga' }
-  ];
+  const phoneCodes = sortedCountryPhoneCodes.map(c => ({
+    label: c.name,
+    code: c.dialCode,
+    flag: c.flag
+  }));
 
   const [socialConnections, setSocialConnections] = useState({
     whatsapp: false,
@@ -1041,34 +1215,351 @@ const ProfileSettings: React.FC = () => {
     setIsLanguageDropdownOpen(false);
   };
 
-  // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setIsImageLoading(true);
-      setUploadProgress(0);
+  // Image validation
+  const validateImageFile = (file: File): string | null => {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
 
-      // Simulate upload progress
-      const interval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsImageLoading(false);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              setProfileImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-            return 100;
+    if (!validTypes.includes(file.type)) {
+      return 'Please select a valid image (JPEG, PNG, GIF)';
+    }
+
+    if (file.size > maxSize) {
+      return 'Image size must be less than 5MB';
+    }
+
+    return null;
+  };
+
+  // Image upload function with progress tracking
+  const uploadImage = async (file: File, onProgress?: (progress: number) => void): Promise<string | null> => {
+    if (!file || !user) return null;
+
+    try {
+      const { uploadUrl, fileUrl } = await gcpStorageService.getPresignedUrlForProfile(
+        file,
+        user.id
+      );
+
+      // Track upload progress
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const progress = Math.round((e.loaded / e.total) * 100);
+            setUploadProgress(progress);
+            if (onProgress) onProgress(progress);
           }
-          return prev + 10;
         });
-      }, 200);
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200) {
+            setUploadProgress(100);
+            resolve(fileUrl);
+          } else {
+            reject(new Error(`Upload failed with status: ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Upload failed'));
+        });
+
+        xhr.addEventListener('abort', () => {
+          reject(new Error('Upload aborted'));
+        });
+
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.send(file);
+      });
+    } catch (error) {
+      throw new Error('Failed to upload image to storage');
+    }
+  };
+
+  // Handle image upload - auto-upload on selection
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      addToast({
+        type: 'error',
+        title: 'Invalid image',
+        message: validationError,
+        duration: 2000
+      });
+      return;
+    }
+
+    // Set loading state immediately (before FileReader)
+    setIsUploadingImage(true);
+    setUploadProgress(0);
+    setSelectedFile(file);
+    setImageRemoved(false);
+
+    // Show preview immediately using FileReader
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setProfileImage(event.target?.result as string);
+    };
+    reader.onerror = () => {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to read image file',
+        duration: 2000
+      });
+      setIsUploadingImage(false);
+      setUploadProgress(0);
+    };
+    reader.readAsDataURL(file);
+
+    // Auto-upload the image to GCP and then save to backend
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Authentication required',
+          message: 'You must be logged in to upload profile picture',
+          duration: 2000
+        });
+        setIsUploadingImage(false);
+        setUploadProgress(0);
+        return;
+      }
+
+      if (!user) {
+        setIsUploadingImage(false);
+        setUploadProgress(0);
+        return;
+      }
+
+      // Upload to GCP with progress tracking
+      const imageUrl = await uploadImage(file, (progress) => {
+        setUploadProgress(progress);
+      });
+
+      if (imageUrl) {
+        // Save to backend after GCP upload completes
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            profileImage: imageUrl
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Failed to save profile picture' }));
+          throw new Error(errorData.message || 'Failed to save profile picture');
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
+          setExistingImageUrl(imageUrl);
+          setSelectedFile(null);
+
+          // Reload user data from backend
+          await reloadUserData();
+
+          // Show notification toast
+          showNotification({
+            type: 'app',
+            mainText: 'Profile picture has been updated',
+            duration: 3000
+          });
+        }
+      }
+    } catch (error: any) {
+      console.error('Error uploading profile picture:', error);
+      addToast({
+        type: 'error',
+        title: 'Upload failed',
+        message: error.message || 'Failed to upload profile picture. Please try again.',
+        duration: 2000
+      });
+      // Reset on error
+      setProfileImage(existingImageUrl);
+      setSelectedFile(null);
+    } finally {
+      setIsUploadingImage(false);
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 500); // Delay to show 100% completion briefly
+    }
+
+    // Reset file input to allow re-selecting the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
   const handleUploadButtonClick = () => {
-    fileInputRef.current?.click();
+    // If there's already a profile image, remove it instead of uploading
+    if (profileImage) {
+      handleRemoveImage();
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Authentication required',
+          message: 'You must be logged in to remove profile picture',
+          duration: 2000
+        });
+        return;
+      }
+
+      setIsUploadingImage(true);
+
+      // Remove from backend
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          profileImage: null
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to remove profile picture' }));
+        throw new Error(errorData.message || 'Failed to remove profile picture');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setProfileImage(null);
+        setSelectedFile(null);
+        setImageRemoved(false);
+        setExistingImageUrl(null);
+        setProfileData(prev => ({ ...prev, profileImage: '' }));
+        // Reload user data from backend
+        await reloadUserData();
+        addToast({
+          type: 'success',
+          title: 'Profile picture removed',
+          message: 'Your profile picture has been removed successfully',
+          duration: 2000
+        });
+      }
+    } catch (error: any) {
+      console.error('Error removing profile picture:', error);
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to remove image',
+        duration: 2000
+      });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  // Handle profile picture save
+  const handleSaveProfilePicture = async () => {
+    if (!selectedFile && !imageRemoved) {
+      addToast({
+        type: 'info',
+        title: 'No changes',
+        message: 'No image changes to save',
+        duration: 2000
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Authentication required',
+          message: 'You must be logged in to save profile picture',
+          duration: 2000
+        });
+        return;
+      }
+
+      let imageUrl: string | null = null;
+
+      // Handle image upload/removal
+      if (selectedFile) {
+        // Upload new image
+        imageUrl = await uploadImage(selectedFile, (progress) => {
+          setUploadProgress(progress);
+        });
+
+        // Note: Old image deletion is handled by the backend or can be cleaned up separately
+        // For now, we just upload the new image
+      } else if (imageRemoved) {
+        // Image was removed
+        imageUrl = null;
+        // Note: Old image deletion can be handled separately if needed
+      } else {
+        // Keep existing image
+        imageUrl = existingImageUrl;
+      }
+
+      // Save to backend
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          profileImage: imageUrl
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to save profile picture' }));
+        throw new Error(errorData.message || 'Failed to save profile picture');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setProfileData(prev => ({ ...prev, profileImage: imageUrl || '' }));
+        setExistingImageUrl(imageUrl);
+        setSelectedFile(null);
+        setImageRemoved(false);
+        // Reload user data from backend
+        await reloadUserData();
+        addToast({
+          type: 'success',
+          title: 'Profile picture updated',
+          message: 'Your profile picture has been updated successfully',
+          duration: 2000
+        });
+      } else {
+        throw new Error(data.message || 'Failed to save profile picture');
+      }
+    } catch (error: any) {
+      console.error('Error saving profile picture:', error);
+      addToast({
+        type: 'error',
+        title: 'Save failed',
+        message: error.message || 'Failed to save profile picture. Please try again.',
+        duration: 2000
+      });
+    }
   };
 
   // Handle profile save
@@ -1085,11 +1576,11 @@ const ProfileSettings: React.FC = () => {
         firstName: nameParts.shift() || '',
         lastName: nameParts.join(' ') || undefined,
         gender: profileData.gender || undefined,
-        birthDate: profileData.birthDate || undefined,
+        birthDate: formData.birthDate || profileData.birthDate || undefined,
         bio: biography || undefined,
-        location: selectedCountryCode || profileData.location || undefined
+        location: selectedCountry?.name || formData.location || profileData.location || undefined
       };
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1102,7 +1593,21 @@ const ProfileSettings: React.FC = () => {
       }
       if (json.success && json.data) {
         // update local state
-        setProfileData(prev => ({ ...prev, profileImage: json.data.profileImage || prev.profileImage }));
+        const savedLocation = selectedCountry?.name || formData.location || profileData.location;
+        setProfileData(prev => ({
+          ...prev,
+          profileImage: json.data.profileImage || prev.profileImage,
+          location: savedLocation || prev.location,
+          birthDate: formData.birthDate || prev.birthDate
+        }));
+        // Reload user data from backend
+        await reloadUserData();
+        addToast && addToast({
+          type: 'success',
+          title: 'Profile updated',
+          message: 'Your profile has been updated successfully',
+          duration: 2000
+        });
       }
     } catch (e) {
       console.error('Save profile error', e);
@@ -1116,22 +1621,91 @@ const ProfileSettings: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/profile/bio`, {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({ message: 'You must be logged in to save bio', type: 'error', title: 'Authentication required', duration: 2000 });
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ bio: biography })
       });
 
-      if (!response.ok) throw new Error('Failed to save bio');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to save bio' }));
+        throw new Error(errorData.message || 'Failed to save bio');
+      }
 
-      addToast({ message: 'Bio updated successfully', type: 'success', title: 'Action completed', duration: 2000 });
-      setProfileData(prev => ({ ...prev, bio: biography }));
-    } catch (error) {
+      const data = await response.json();
+      if (data.success) {
+        setProfileData(prev => ({ ...prev, bio: biography }));
+        // Reload user data from backend
+        await reloadUserData();
+        addToast({ message: 'Bio updated successfully', type: 'success', title: 'Action completed', duration: 2000 });
+      } else {
+        throw new Error(data.message || 'Failed to save bio');
+      }
+    } catch (error: any) {
       console.error('Error saving bio:', error);
-      addToast({ message: 'Failed to save bio', type: 'error', title: 'Action failed', duration: 2000 });
+      addToast({
+        message: error.message || 'Failed to save bio',
+        type: 'error',
+        title: 'Action failed',
+        duration: 2000
+      });
+    }
+  };
+
+  const handleSaveLocation = async () => {
+    const locationToSave = selectedCountry?.name || formData.location;
+    if (!locationToSave || !locationToSave.trim()) {
+      addToast({ message: 'Please select a location', type: 'error', title: 'Action failed', duration: 2000 });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({ message: 'You must be logged in to save location', type: 'error', title: 'Authentication required', duration: 2000 });
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ location: locationToSave })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to save location' }));
+        throw new Error(errorData.message || 'Failed to save location');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setProfileData(prev => ({ ...prev, location: locationToSave }));
+        // Reload user data from backend
+        await reloadUserData();
+        addToast({ message: 'Location updated successfully', type: 'success', title: 'Action completed', duration: 2000 });
+      } else {
+        throw new Error(data.message || 'Failed to save location');
+      }
+    } catch (error: any) {
+      console.error('Error saving location:', error);
+      addToast({
+        message: error.message || 'Failed to save location',
+        type: 'error',
+        title: 'Action failed',
+        duration: 2000
+      });
     }
   };
 
@@ -1139,11 +1713,12 @@ const ProfileSettings: React.FC = () => {
     try {
       setIsSaving(true);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/profile`, {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           ...formData,
@@ -1156,8 +1731,10 @@ const ProfileSettings: React.FC = () => {
       if (!response.ok) throw new Error('Failed to update profile');
 
       const data = await response.json();
-      addToast({ message: 'Profile updated successfully', type: 'success', title: 'Profile updated', duration: 2000 });
       setProfileData(formData);
+      // Reload user data from backend
+      await reloadUserData();
+      addToast({ message: 'Profile updated successfully', type: 'success', title: 'Profile updated', duration: 2000 });
     } catch (error) {
       console.error('Error updating profile:', error);
       addToast({ message: 'Failed to update profile', type: 'error', title: 'Action failed', duration: 2000 });
@@ -1173,6 +1750,146 @@ const ProfileSettings: React.FC = () => {
   const handlePhoneCodeSelect = (code: { label: string; flag: string; code: string }) => {
     setSelectedPhoneCode(code);
     setIsPhoneCodeDropdownOpen(false);
+  };
+
+  const handleSavePhoneNumber = async () => {
+    const phoneNumber = verificationForm.phone?.trim();
+    if (!phoneNumber) {
+      addToast({
+        type: 'error',
+        title: 'Action failed',
+        message: 'Please enter a phone number',
+        duration: 2000
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Authentication required',
+          message: 'You must be logged in to save phone number',
+          duration: 2000
+        });
+        return;
+      }
+
+      const fullPhoneNumber = `${selectedPhoneCode.code}${phoneNumber}`;
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ phoneNumber: fullPhoneNumber })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to save phone number' }));
+        throw new Error(errorData.message || 'Failed to save phone number');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setProfileData(prev => ({ ...prev, phoneNumber: fullPhoneNumber }));
+        // Reload user data from backend
+        await reloadUserData();
+        addToast({
+          type: 'success',
+          title: 'Action completed',
+          message: 'Phone number updated successfully',
+          duration: 2000
+        });
+      } else {
+        throw new Error(data.message || 'Failed to save phone number');
+      }
+    } catch (error: any) {
+      console.error('Error saving phone number:', error);
+      addToast({
+        type: 'error',
+        title: 'Action failed',
+        message: error.message || 'Failed to save phone number',
+        duration: 2000
+      });
+    }
+  };
+
+  const handleChangeEmail = async () => {
+    const email = verificationForm.email?.trim();
+    if (!email) {
+      addToast({
+        type: 'error',
+        title: 'Action failed',
+        message: 'Please enter an email address',
+        duration: 2000
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      addToast({
+        type: 'error',
+        title: 'Invalid email',
+        message: 'Please enter a valid email address',
+        duration: 2000
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addToast({
+          type: 'error',
+          title: 'Authentication required',
+          message: 'You must be logged in to change email',
+          duration: 2000
+        });
+        return;
+      }
+
+      // Call API to update email (which should trigger verification email)
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to update email' }));
+        throw new Error(errorData.message || 'Failed to update email');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        // Navigate to email verification page
+        navigate('/verify-email', {
+          state: {
+            email: email,
+            fromSettings: true,
+            returnTo: '/profile-settings',
+            activeTab: 'verification'
+          }
+        });
+      } else {
+        throw new Error(data.message || 'Failed to update email');
+      }
+    } catch (error: any) {
+      console.error('Error changing email:', error);
+      addToast({
+        type: 'error',
+        title: 'Action failed',
+        message: error.message || 'Failed to change email',
+        duration: 2000
+      });
+    }
   };
 
   const handleSocialToggle = (key: keyof typeof socialConnections) => {
@@ -1315,22 +2032,6 @@ const ProfileSettings: React.FC = () => {
     setIsGenderDropdownOpen(false);
   };
 
-  const handleMonthChange = (direction: 'prev' | 'next') => {
-    setCalendarDate(prev => {
-      const newDate = new Date(prev);
-      newDate.setMonth(prev.getMonth() + (direction === 'next' ? 1 : -1));
-      return newDate;
-    });
-  };
-
-  const openBirthdayCalendar = () => {
-    const parsed = parseBirthday(profileData.birthDate);
-    if (parsed) {
-      setCalendarDate(parsed);
-    }
-    setIsBirthdayCalendarOpen(true);
-  };
-
   const generateCalendarDays = () => {
     const startOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
     const endOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
@@ -1408,7 +2109,7 @@ const ProfileSettings: React.FC = () => {
         setIsTwoFactorPhoneCodeDropdownOpen(false);
       }
 
-      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(target) && isCountryDropdownOpen) {
         setIsCountryDropdownOpen(false);
       }
     };
@@ -1417,7 +2118,7 @@ const ProfileSettings: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen, countryDropdownRef]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen, isCountryDropdownOpen]);
 
   // Handle navigation state to set selected sidebar option
   useEffect(() => {
@@ -2242,7 +2943,7 @@ const ProfileSettings: React.FC = () => {
               {/* Main Content */}
               <div className={`${mainLayoutClasses} ${isMobile ? '' : 'overflow-hidden'}`} style={mainLayoutStyle}>
                 {/* Left Content Area */}
-                <div className={`${leftPaneClasses} py-4 overflow-y-auto scrollbar-hide`}>
+                <div className={`${leftPaneClasses} py-4 overflow-y-auto profile-settings-content`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                   {(isMobileProfileView || isMobileSecurityView || isMobileLanguageView || isMobileNotificationsView) && (
                     <div className="flex items-center justify-between mb-4">
                       <button
@@ -2340,38 +3041,39 @@ const ProfileSettings: React.FC = () => {
                             {/* Upload Photo Section */}
                             <div className="flex items-center space-x-3">
                               <div
-                                className="w-24 h-24 border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden"
+                                className="w-24 h-24 border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden cursor-pointer"
+                                onClick={handleUploadButtonClick}
                                 style={{
-                                  borderColor: isImageLoading ? '#83C4F8' : '#E1E1E1',
+                                  borderColor: isUploadingImage ? '#83C4F8' : '#E1E1E1',
                                   borderRadius: '13px',
-                                  background: isImageLoading
+                                  background: isUploadingImage
                                     ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
                                     : (profileImage ? 'transparent' : 'transparent'),
-                                  border: isImageLoading ? '2px dashed #83C4F8' : (profileImage ? 'none' : '2px dashed #E1E1E1')
+                                  border: isUploadingImage ? '2px dashed #83C4F8' : (profileImage ? 'none' : '2px dashed #E1E1E1')
                                 }}
                               >
-                                {isImageLoading ? (
-                                  <div className="flex flex-col items-center justify-center">
-                                    <div className="relative mb-2">
-                                      {/* Gray base circle */}
-                                      <svg width="48" height="48" className="transform -rotate-90">
+                                {isUploadingImage ? (
+                                  <div className="flex flex-col items-center justify-center w-full h-full">
+                                    <div className="relative">
+                                      <svg width="64" height="64" className="transform -rotate-90">
+                                        {/* Gray base circle */}
                                         <circle
-                                          cx="24"
-                                          cy="24"
-                                          r="22"
+                                          cx="32"
+                                          cy="32"
+                                          r="28"
                                           fill="none"
                                           stroke="#E9E9E9"
                                           strokeWidth="2"
                                         />
                                         {/* Blue progress arc */}
                                         <circle
-                                          cx="24"
-                                          cy="24"
-                                          r="22"
+                                          cx="32"
+                                          cy="32"
+                                          r="28"
                                           fill="none"
                                           stroke="#83C4F8"
                                           strokeWidth="2"
-                                          strokeDasharray={`${(uploadProgress / 100) * 138} 138`}
+                                          strokeDasharray={`${(uploadProgress / 100) * 176} 176`}
                                           strokeLinecap="round"
                                         />
                                       </svg>
@@ -2381,14 +3083,14 @@ const ProfileSettings: React.FC = () => {
                                           src={loadIcon}
                                           alt="Loading"
                                           style={{
-                                            width: '20px',
-                                            height: '20px',
+                                            width: '24px',
+                                            height: '24px',
                                             filter: 'brightness(0) saturate(100%) invert(70%) sepia(36%) saturate(624%) hue-rotate(172deg) brightness(100%) contrast(96%)'
                                           }}
                                         />
                                       </div>
                                     </div>
-                                    <p className="text-[8px] font-medium" style={{ color: '#83C4F8' }}>
+                                    <p className="text-[10px] font-medium mt-2" style={{ color: '#83C4F8' }}>
                                       {uploadProgress}%
                                     </p>
                                   </div>
@@ -2426,9 +3128,15 @@ const ProfileSettings: React.FC = () => {
                                 <button
                                   onClick={handleUploadButtonClick}
                                   className="px-2 py-1.5 rounded-lg text-xs font-normal transition-colors border mb-1"
-                                  style={{ backgroundColor: 'white', color: '#6A6A6A', borderColor: '#D9D9D9', width: 'fit-content' }}
+                                  style={{
+                                    backgroundColor: 'white',
+                                    color: profileImage ? '#EF4444' : '#6A6A6A',
+                                    borderColor: '#D9D9D9',
+                                    width: 'fit-content'
+                                  }}
+                                  disabled={isUploadingImage}
                                 >
-                                  Upload a photo
+                                  {profileImage ? 'Remove photo' : 'Upload a photo'}
                                 </button>
                                 <p className="text-[10px]" style={{ color: '#ACAAAA' }}>
                                   At least 800 x 800 px recommanded.<br />
@@ -2492,7 +3200,7 @@ const ProfileSettings: React.FC = () => {
                                       </div>
                                       <div className="text-right">
                                         <label className="text-[10px] mb-0.5 block" style={{ color: '#6A6A6A' }}>Birthday</label>
-                                        <p className="text-xs font-medium" style={{ color: '#212121' }}>{profileData.birthDate}</p>
+                                        <p className="text-xs font-medium" style={{ color: '#212121' }}>{formatBirthDateForDisplay(profileData.birthDate)}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -2590,96 +3298,6 @@ const ProfileSettings: React.FC = () => {
                                       )}
                                     </div>
                                   </div>
-                                  {/* <div className="flex-1" ref={birthdayCalendarRef}>
-                                    <label className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>Birthday</label>
-                                    <div className="relative birthday-calendar">
-                                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                        <img
-                                          src={calendarIcon}
-                                          alt="Calendar"
-                                          style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(79%) sepia(6%) saturate(136%) hue-rotate(189deg) brightness(88%) contrast(89%)' }}
-                                        />
-                                      </span>
-                                      <input
-                                        type="text"
-                                        value={profileData.birthDate}
-                                        onChange={(e) => setProfileData({ ...profileData, birthDate: e.target.value })}
-                                        placeholder="13/09/2000"
-                                        className="w-full px-3 py-2 pl-9 rounded-lg text-xs focus:outline-none profile-edit-input-birthday"
-                                        style={{
-                                          backgroundColor: 'white',
-                                          border: '1px solid #E9E9E9',
-                                          color: profileData.birthDate ? '#212121' : '#BABABA'
-                                        }}
-                                        onFocus={(e) => {
-                                          e.target.style.borderColor = '#64B5F6';
-                                          e.target.style.caretColor = '#64B5F6';
-                                          openBirthdayCalendar();
-                                        }}
-                                        onClick={() => openBirthdayCalendar()}
-                                        onBlur={(e) => {
-                                          e.target.style.borderColor = '#E9E9E9';
-                                        }}
-                                        readOnly
-                                      />
-                                      {isBirthdayCalendarOpen && (
-                                        <div className="absolute z-20 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-lg p-3">
-                                          <div className="flex items-center justify-between mb-2">
-                                            <button
-                                              type="button"
-                                              className="w-6 h-6 flex items-center justify-center rounded-full"
-                                              style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}
-                                              onClick={() => handleMonthChange('prev')}
-                                            >
-                                              ‹
-                                            </button>
-                                            <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
-                                              {calendarDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                                            </span>
-                                            <button
-                                              type="button"
-                                              className="w-6 h-6 flex items-center justify-center rounded-full"
-                                              style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}
-                                              onClick={() => handleMonthChange('next')}
-                                            >
-                                              ›
-                                            </button>
-                                          </div>
-                                          <div className="grid grid-cols-7 gap-1 text-[10px] mb-1" style={{ color: '#B0B0B0' }}>
-                                            {daysOfWeek.map(day => (
-                                              <span key={day} className="text-center font-medium">{day}</span>
-                                            ))}
-                                          </div>
-                                          <div className="grid grid-cols-7 gap-1 text-[11px]">
-                                            {calendarDays.map((day, index) => {
-                                              if (!day) {
-                                                return <span key={index} className="h-7 flex items-center justify-center text-gray-300 text-[10px]"> </span>;
-                                              }
-                                              const value = formatDate(day);
-                                              const isSelected = profileData.birthDate === value;
-                                              return (
-                                                <button
-                                                  type="button"
-                                                  key={value}
-                                                  className="h-7 rounded-full flex items-center justify-center transition-colors"
-                                                  style={{
-                                                    backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
-                                                    color: isSelected ? '#64B5F6' : '#6A6A6A'
-                                                  }}
-                                                  onClick={() => {
-                                                    setProfileData(prev => ({ ...prev, birthday: value }));
-                                                    setIsBirthdayCalendarOpen(false);
-                                                  }}
-                                                >
-                                                  {day.getDate()}
-                                                </button>
-                                              );
-                                            })}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div> */}
                                   <div className="mt-4">
                                     <label htmlFor="birthday" className="text-[10px] mb-1 block" style={{ color: '#6A6A6A' }}>
                                       Birthday
@@ -2711,7 +3329,7 @@ const ProfileSettings: React.FC = () => {
                           </div>
 
                           {/* Location Section */}
-                          {/* <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
+                          <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className={`text-xs ${isMobileProfileView ? 'font-medium' : 'font-normal'}`} style={{ color: '#6A6A6A' }}>Location</h3>
                               <div className="flex items-center space-x-2">
@@ -2720,98 +3338,80 @@ const ProfileSettings: React.FC = () => {
                                   onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
                                   className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
                                   style={{ backgroundColor: isGeolocationEnabled ? '#4CD964' : '#D1D5DB' }}
+                                  disabled={isFetchingCountries}
                                 >
-                                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0.5'}`}>
+                                    {isFetchingCountries && (
+                                      <div className="flex h-full items-center justify-center">
+                                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+                                      </div>
+                                    )}
+                                  </span>
                                 </button>
                               </div>
                             </div>
-                          </div> */}
 
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-gray-700">Use my current location</p>
-                              <button
-                                type="button"
-                                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${isGeolocationEnabled ? 'bg-primary-600' : 'bg-gray-200'}`}
-                                role="switch"
-                                aria-checked={isGeolocationEnabled}
-                                onClick={() => setIsGeolocationEnabled(!isGeolocationEnabled)}
-                                disabled={isFetchingCountries}
-                              >
-                                <span className="sr-only">Use current location</span>
-                                <span
-                                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isGeolocationEnabled ? 'translate-x-5' : 'translate-x-0'}`}
+                            {/* Location Field */}
+                            <div className="relative" ref={countryDropdownRef}>
+                              <div className="flex items-center justify-between mb-1">
+                                <label className="text-[10px]" style={{ color: '#6A6A6A' }}></label>
+                                <button
+                                  onClick={handleSaveLocation}
+                                  className="flex items-center space-x-1"
+                                  style={{ color: '#BABABA' }}
                                 >
-                                  {isFetchingCountries && (
-                                    <div className="flex h-full items-center justify-center">
-                                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
-                                    </div>
-                                  )}
-                                </span>
-                              </button>
-                            </div>
-
-                            <div className="relative">
-                              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                                Country
-                              </label>
-                              <div className="relative">
-                                <input
-                                  type="text"
-                                  id="location"
-                                  name="location"
-                                  value={formData.location}
-                                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                                  onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                                  className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm"
-                                  placeholder="Select a country"
-                                  readOnly
-                                />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                  <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
+                                  <span className="text-[10px]">Save location</span>
+                                  <img src={arrowDownIcon} alt="Save" className="w-3 h-3" style={{ transform: 'rotate(180deg)' }} />
+                                </button>
                               </div>
-
-                              {isCountryDropdownOpen && (
-                                <div
-                                  ref={countryDropdownRef}
-                                  className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                                  className="w-full px-3 py-2 pr-8 rounded-lg text-xs text-left focus:outline-none"
+                                  style={{
+                                    backgroundColor: 'white',
+                                    border: '1px solid #E9E9E9',
+                                    color: (selectedCountry?.name || formData.location) ? '#212121' : '#B0B0B0'
+                                  }}
                                 >
-                                  {countries.length > 0 ? (
-                                    countries.map((country) => (
-                                      <div
-                                        key={country.code}
-                                        className={`cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100 ${selectedCountry?.code === country.code ? 'bg-primary-50 text-primary-900' : 'text-gray-900'}`}
-                                        onClick={() => handleCountrySelect(country)}
-                                      >
-                                        <div className="flex items-center">
-                                          <span className="ml-3 block font-normal truncate">
-                                            {country.name}
-                                          </span>
-                                        </div>
-                                        {selectedCountry?.code === country.code && (
-                                          <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
-                                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                            </svg>
-                                          </span>
-                                        )}
-                                      </div>
-                                    ))
-                                  ) : (
-                                    <div className="text-gray-500 py-2 px-3">No countries found</div>
-                                  )}
-                                </div>
-                              )}
+                                  {selectedCountry?.name || formData.location || 'Select a country'}
+                                </button>
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 9l6 6 6-6" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                </span>
+                                {isCountryDropdownOpen && (
+                                  <div className="absolute z-10 mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-lg py-2 max-h-60 overflow-auto custom-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                    {countries.length > 0 ? (
+                                      countries.map((country) => (
+                                        <button
+                                          type="button"
+                                          key={country.code}
+                                          onClick={() => handleCountrySelect(country)}
+                                          className="w-full text-left px-3 py-1.5 rounded-lg text-xs"
+                                          style={{
+                                            backgroundColor: selectedCountry?.code === country.code ? '#F0F8FE' : 'transparent',
+                                            color: selectedCountry?.code === country.code ? '#64B5F6' : '#212121'
+                                          }}
+                                        >
+                                          {country.name}
+                                        </button>
+                                      ))
+                                    ) : (
+                                      <div className="text-gray-500 py-2 px-3 text-xs">No countries found</div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
 
                           {/* Biography Section */}
                           {isMobileProfileView && (
                             <div className="mb-0.5 px-1">
-                              <h3 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Biographie</h3>
+                              <h3 className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Biography</h3>
                             </div>
                           )}
                           <div className={`bg-white p-3 ${isMobileProfileView ? '' : 'border rounded-2xl shadow-sm'}`} style={isMobileProfileView ? undefined : { borderColor: '#E1E1E1' }}>
@@ -2835,10 +3435,10 @@ const ProfileSettings: React.FC = () => {
                               />
                               <style>
                                 {`
-                          textarea::placeholder {
-                            color: #D9D9D9;
-                          }
-                        `}
+                                  textarea::placeholder {
+                                    color: #D9D9D9;
+                                  }
+                                `}
                               </style>
                               <div className="flex items-center justify-between mt-1.5">
                                 <span className="text-[10px]" style={{ color: '#D9D9D9' }}>
@@ -2846,18 +3446,11 @@ const ProfileSettings: React.FC = () => {
                                 </span>
                                 <button
                                   type="button"
-                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                  className="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors"
+                                  style={{ backgroundColor: '#E9E9E9', color: '#6A6A6A' }}
                                   onClick={handleSaveBio}
                                 >
                                   Save Bio
-                                </button>
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                                  onClick={handleUpdateProfile}
-                                  disabled={isSaving}
-                                >
-                                  {isSaving ? 'Saving...' : 'Update Profile'}
                                 </button>
                               </div>
                             </div>
@@ -2874,7 +3467,11 @@ const ProfileSettings: React.FC = () => {
                                 <label className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
                                   Email address
                                 </label>
-                                <button className="text-[10px] font-normal" style={{ color: '#64B5F6' }}>
+                                <button
+                                  onClick={handleChangeEmail}
+                                  className="text-[10px] font-normal"
+                                  style={{ color: '#64B5F6' }}
+                                >
                                   Change mail address
                                 </button>
                               </div>
@@ -2899,9 +3496,19 @@ const ProfileSettings: React.FC = () => {
                             </div>
 
                             <div>
-                              <label className="text-xs font-medium mb-1 block" style={{ color: '#6A6A6A' }}>
-                                Phone number
-                              </label>
+                              <div className="flex items-center justify-between mb-1">
+                                <label className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
+                                  Phone number
+                                </label>
+                                <button
+                                  onClick={handleSavePhoneNumber}
+                                  className="flex items-center space-x-1"
+                                  style={{ color: '#BABABA' }}
+                                >
+                                  <span className="text-[10px]">Save phone number</span>
+                                  <img src={arrowDownIcon} alt="Save" className="w-3 h-3" style={{ transform: 'rotate(180deg)' }} />
+                                </button>
+                              </div>
                               <div className="flex items-center space-x-2">
                                 <div className="relative" ref={phoneDropdownRef}>
                                   <button
@@ -2923,7 +3530,7 @@ const ProfileSettings: React.FC = () => {
                                     </svg>
                                   </button>
                                   {isPhoneCodeDropdownOpen && (
-                                    <div className="absolute z-30 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-lg py-2">
+                                    <div className="absolute z-30 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-lg py-2 max-h-60 overflow-y-auto phone-code-dropdown" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                                       {phoneCodes.map(code => (
                                         <button
                                           type="button"
@@ -5661,6 +6268,20 @@ const ProfileSettings: React.FC = () => {
             display: none;
           }
           .two-factor-dropdown {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .phone-code-dropdown::-webkit-scrollbar {
+            display: none;
+          }
+          .phone-code-dropdown {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .profile-settings-content::-webkit-scrollbar {
+            display: none;
+          }
+          .profile-settings-content {
             -ms-overflow-style: none;
             scrollbar-width: none;
           }

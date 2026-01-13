@@ -23,6 +23,9 @@ const EmailVerification: React.FC = () => {
   // Get email from navigation state
   const email = location.state?.email || 'your email';
   const fromRegistration = location.state?.fromRegistration || false;
+  const fromSettings = location.state?.fromSettings || false;
+  const returnTo = location.state?.returnTo || '/login';
+  const activeTab = location.state?.activeTab || null;
 
   // Auto-focus first input on component mount
   useEffect(() => {
@@ -95,6 +98,11 @@ const EmailVerification: React.FC = () => {
       if (response.success) {
         if (fromRegistration) {
           navigate('/email-verification-success');
+        } else if (fromSettings) {
+          // Return to settings with verification tab active
+          navigate(returnTo, {
+            state: { activeTab: activeTab || 'verification' }
+          });
         } else {
           navigate('/login');
         }

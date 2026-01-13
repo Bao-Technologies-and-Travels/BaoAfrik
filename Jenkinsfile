@@ -180,6 +180,7 @@ JWT_REFRESH_EXPIRE_TIME=7d
 EMAIL_SERVICE=resend
 RESEND_API_KEY="${RESEND_API_KEY}"
 EMAIL_FROM_NAME="BaoAfrik Team"
+EMAIL_FROM_ADDRESS="no-reply@baoafrik.com"
 
 # EMAIL_SERVICE="gmail"
 # SMTP_HOST="smtp.gmail.com"
@@ -306,7 +307,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>De-duplicate product data during product inquiry, voicemail sending, message status updates.</p>
+                            <p><strong>Changes made:</strong>Backend for profile settings management and slight changes to frontend. Update personal information, upload profile picture, update location, update biography.</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

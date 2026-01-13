@@ -466,7 +466,7 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
   if (profileImage !== undefined) updateData.profileImage = profileImage;
   if (gender !== undefined) updateData.gender = gender;
   if (birthDate !== undefined) updateData.birthDate = new Date(birthDate);
-  if (phoneNumber !== undefined) updateData.phoneNumber = new Date(phoneNumber);
+  if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
   if (bio !== undefined) updateData.bio = bio;
   if (location !== undefined) updateData.location = location;
 

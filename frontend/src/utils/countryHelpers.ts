@@ -1,4 +1,3 @@
-// Shared Country Flag/Info helper
 export interface CountryInfo {
   name: string;
   code: string; // 2-letter (lowercase)
@@ -78,8 +77,8 @@ const countryAliases: Record<string, string> = {
 };
 
 export function getProductCountry(
-  productOrigin?: string, // e.g. "Nigeria", "Ivory Coast", "Côte d'Ivoire"
-  productOriginCode?: string // e.g. "NG" or "NGA"
+  productOrigin?: string, 
+  productOriginCode?: string 
 ): CountryInfo {
   if (productOriginCode) {
     const c = countries.find(c =>

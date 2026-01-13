@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, useNavigate} from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -168,8 +168,8 @@ const UserAccount: React.FC = () => {
     avatar: user?.profileImage || sellerAvatar,
     coverPhoto: defaultCoverImage, // Can be updated when seller uploads cover photo
     isVerified: true,
-    bio: 'Passionate farmer and entrepreneur with over 15 years of experience in sustainable agriculture. Specializing in organic produce and traditional farming methods. Committed to providing fresh, high-quality products directly from farm to table.',
-    location: 'London | United Kingdom',
+    bio: user?.bio || 'Passionate farmer and entrepreneur with over 15 years of experience in sustainable agriculture. Specializing in organic produce and traditional farming methods. Committed to providing fresh, high-quality products directly from farm to table.',
+    location: user?.location || 'London | United Kingdom',
     memberSince: 'Depuis 2025',
     rating: 4.3,
     totalReviews: 456,
@@ -290,6 +290,16 @@ const UserAccount: React.FC = () => {
       </div>
     );
   }
+
+  const formatOwnerDate = (timestamp?: number) => {
+    if (!timestamp) return '';
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -524,7 +534,7 @@ const UserAccount: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
                 <div className="flex items-center space-x-2">
                   <img src={locationIcon} alt="Location" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#64B5F6' }}>London | United Kingdom</span>
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>{user?.location || 'London | United Kingdom'}</span>
                 </div>
               </div>
 
@@ -542,7 +552,7 @@ const UserAccount: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
                 <div className="flex items-center space-x-2">
                   <img src={profileIcon} alt="Profile" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#6A6A6A' }}>May 2025</span>
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{user?.createdAt ? formatOwnerDate(Number(user?.createdAt)) : ''}</span>
                 </div>
               </div>
             </div>
