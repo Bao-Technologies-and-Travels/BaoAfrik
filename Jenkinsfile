@@ -5,7 +5,7 @@ pipeline {
     environment {
         NODE_ENV = 'production'
         SSH_KEY_ID = 'baoafrik-key'
-        SSH_HOST = 'ashprincepageo@34.51.195.222'
+        SSH_HOST = 'ashprincepageo@34.51.139.89'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'coming-soon'
         APP_DIR = '~/BaoAfrik'
@@ -112,21 +112,21 @@ pipeline {
 
                         # Create .env file for backend with DATABASE_URL
                         cat > backend/.env << EOF
-                        # Database Configuration
-                        DATABASE_URL=${DATABASE_URL}
+# Database Configuration
+DATABASE_URL=${DATABASE_URL}
 
-                        # Email Configuration
-                        EMAIL_USER=${EMAIL_USER}
-                        EMAIL_PASS=${EMAIL_PASS}
-                        EXPORT_EMAIL=${EXPORT_EMAIL}
+# Email Configuration
+EMAIL_USER=${EMAIL_USER}
+EMAIL_PASS=${EMAIL_PASS}
+EXPORT_EMAIL=${EXPORT_EMAIL}
 
-                        # Server Configuration
-                        PORT=3001
-                        NODE_ENV=production
+# Server Configuration
+PORT=3001
+NODE_ENV=production
 
-                        # CORS Configuration
-                        FRONTEND_URL=${DOMAIN}
-                        EOF
+# CORS Configuration
+FRONTEND_URL=${DOMAIN}
+EOF
                     '
                     """
                 }
