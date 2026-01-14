@@ -97,6 +97,7 @@ const Home: React.FC = () => {
   const totalPages = 48;
   const paginationNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [isMobile, setIsMobile] = useState(false);
+  const [showCookiesModal, setShowCookiesModal] = useState(false);
   // Initialize search history from localStorage
   const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     try {
@@ -618,6 +619,17 @@ const Home: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Check if cookies modal should be shown (first visit after login/signup)
+  useEffect(() => {
+    // Only show if user is logged in (not visitor) and hasn't seen the modal
+    if (user && !isVisitor) {
+      const cookiesModalSeen = localStorage.getItem('cookiesModalSeen');
+      if (!cookiesModalSeen) {
+        setShowCookiesModal(true);
+      }
+    }
+  }, [user, isVisitor]);
 
   // Render price filter button with dropdown
   const renderPriceFilterButton = (position: 'relative' | 'absolute' = 'relative', sectionId: string = 'default') => {
@@ -6970,6 +6982,206 @@ const Home: React.FC = () => {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Cookies Modal */}
+      {showCookiesModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            fontFamily: 'Poppins, sans-serif'
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              padding: '20px',
+              maxWidth: '800px',
+              width: '90%',
+              position: 'relative'
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: '12px'
+              }}
+            >
+              <h2
+                style={{
+                  color: '#212121',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  margin: 0,
+                  flex: 1
+                }}
+              >
+                Accept the use of cookies
+              </h2>
+              <button
+                onClick={() => {
+                  setShowCookiesModal(false);
+                  localStorage.setItem('cookiesModalSeen', 'true');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#212121',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  padding: 0,
+                  marginLeft: '16px',
+                  lineHeight: 1,
+                  width: '20px',
+                  height: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{ marginBottom: '16px' }}>
+              <p
+                style={{
+                  color: '#9C9C9C',
+                  fontSize: '12px',
+                  lineHeight: '1.5',
+                  margin: 0,
+                  marginBottom: '12px'
+                }}
+              >
+                We use cookies to improve your browsing experience, serve personalized content and analyze our trafic.<br />
+                By clicking " Accept all cookies" you agree to the storing of cookies on your device.
+              </p>
+              <p
+                style={{
+                  color: '#9C9C9C',
+                  fontSize: '12px',
+                  lineHeight: '1.5',
+                  margin: 0
+                }}
+              >
+                You can customize your setting by clicking " Manage Preferences ". For more details see our{' '}
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // TODO: Navigate to cookies policy page
+                  }}
+                  style={{
+                    color: '#64B5F6',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Cookies Policy
+                </a>
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '16px'
+              }}
+            >
+              {/* Left side - Buttons */}
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  alignItems: 'center'
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setShowCookiesModal(false);
+                    localStorage.setItem('cookiesModalSeen', 'true');
+                    localStorage.setItem('cookiesAccepted', 'all');
+                    // TODO: Implement accept all cookies functionality
+                  }}
+                  style={{
+                    backgroundColor: '#F9A825',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    fontFamily: 'Poppins, sans-serif',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Accept all cookies
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCookiesModal(false);
+                    localStorage.setItem('cookiesModalSeen', 'true');
+                    // TODO: Navigate to manage preferences page
+                  }}
+                  style={{
+                    backgroundColor: '#F0F8FE',
+                    color: '#64B5F6',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    fontFamily: 'Poppins, sans-serif',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Manage preferences
+                </button>
+              </div>
+
+              {/* Right side - Decline text */}
+              <button
+                onClick={() => {
+                  setShowCookiesModal(false);
+                  localStorage.setItem('cookiesModalSeen', 'true');
+                  localStorage.setItem('cookiesAccepted', 'none');
+                  // TODO: Implement decline all cookies functionality
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#6A6A6A',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontFamily: 'Poppins, sans-serif',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Decline all cookies
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
