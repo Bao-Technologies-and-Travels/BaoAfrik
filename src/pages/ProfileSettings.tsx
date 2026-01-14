@@ -1015,7 +1015,7 @@ const shouldShowSessionHistory = isMobileSecurityView ? true : showSessionHistor
       <div className="flex items-center justify-between mb-8">
         <button
           type="button"
-          onClick={() => setIsMobileSidebarVisible(false)}
+          onClick={() => navigate('/')}
           className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
           style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
         >
