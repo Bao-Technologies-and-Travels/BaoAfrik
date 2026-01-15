@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import keyIcon from '../../assets/images/pre/key.svg';
 import backArrowIcon from '../../assets/images/pre/back arrow.svg';
 import arrowDownIcon from '../../assets/images/pre/arrow-down.svg';
+import { twoFactorService } from '../../services/twoFactorService';
+import { useToast } from '../../contexts/ToastContext';
 
 const phoneCodes = [
   { label: 'United States', code: '+1', flag: 'us' },
@@ -20,6 +22,7 @@ const phoneCodes = [
 const TwoFactorPhone: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   const fromProfileSettings = location.state?.fromProfileSettings || false;
   const email = location.state?.email || '';
   const password = location.state?.password || '';
@@ -31,6 +34,7 @@ const TwoFactorPhone: React.FC = () => {
   });
   const [isPhoneCodeDropdownOpen, setIsPhoneCodeDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const phoneCodeDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,17 +56,42 @@ const TwoFactorPhone: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/two-factor-code', {
-      state: {
-        fromProfileSettings: fromProfileSettings,
-        email: email,
-        password: password,
-        phone: phone,
-        phoneCode: selectedPhoneCode
-      }
-    });
+    if (!phone.trim()) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter your phone number',
+        duration: 3000
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Enable 2FA with phone method
+      await twoFactorService.enable('phone', phone, selectedPhoneCode.code);
+      
+      navigate('/two-factor-code', {
+        state: {
+          fromProfileSettings: fromProfileSettings,
+          email: email,
+          password: password,
+          phone: phone,
+          phoneCode: selectedPhoneCode
+        }
+      });
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to enable 2FA',
+        duration: 3000
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isMobileFromProfile = isMobile && fromProfileSettings;
@@ -233,14 +262,15 @@ const TwoFactorPhone: React.FC = () => {
                 <div className="pt-4">
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className={`${isMobileFromProfile ? 'w-full' : 'flex-1'} py-2 px-4 rounded-[12px] text-sm font-light transition-colors`}
                     style={{
-                      backgroundColor: '#F9A825',
-                      color: '#FFFFFF',
+                      backgroundColor: isSubmitting ? '#E9E9E9' : '#F9A825',
+                      color: isSubmitting ? '#6A6A6A' : '#FFFFFF',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    Continue
+                    {isSubmitting ? 'Processing...' : 'Continue'}
                   </button>
                 </div>
               </form>

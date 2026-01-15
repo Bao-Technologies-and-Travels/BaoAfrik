@@ -400,7 +400,10 @@ export const ModelName = {
   ConversationParticipant: 'ConversationParticipant',
   ConversationMetadata: 'ConversationMetadata',
   ProductRequest: 'ProductRequest',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  Session: 'Session',
+  TwoFactorAuth: 'TwoFactorAuth',
+  SocialAccount: 'SocialAccount'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "productReview" | "message" | "messageStatus" | "messageReaction" | "messageMetadata" | "category" | "country" | "conversation" | "conversationParticipant" | "conversationMetadata" | "productRequest" | "notification"
+    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "productReview" | "message" | "messageStatus" | "messageReaction" | "messageMetadata" | "category" | "country" | "conversation" | "conversationParticipant" | "conversationMetadata" | "productRequest" | "notification" | "session" | "twoFactorAuth" | "socialAccount"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1678,6 +1681,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Session: {
+      payload: Prisma.$SessionPayload<ExtArgs>
+      fields: Prisma.SessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        findFirst: {
+          args: Prisma.SessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        findMany: {
+          args: Prisma.SessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+        }
+        create: {
+          args: Prisma.SessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        createMany: {
+          args: Prisma.SessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+        }
+        delete: {
+          args: Prisma.SessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        update: {
+          args: Prisma.SessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionPayload>
+        }
+        aggregate: {
+          args: Prisma.SessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSession>
+        }
+        groupBy: {
+          args: Prisma.SessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    TwoFactorAuth: {
+      payload: Prisma.$TwoFactorAuthPayload<ExtArgs>
+      fields: Prisma.TwoFactorAuthFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TwoFactorAuthFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TwoFactorAuthFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>
+        }
+        findFirst: {
+          args: Prisma.TwoFactorAuthFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TwoFactorAuthFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>
+        }
+        findMany: {
+          args: Prisma.TwoFactorAuthFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>[]
+        }
+        create: {
+          args: Prisma.TwoFactorAuthCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>
+        }
+        createMany: {
+          args: Prisma.TwoFactorAuthCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TwoFactorAuthCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>[]
+        }
+        delete: {
+          args: Prisma.TwoFactorAuthDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>
+        }
+        update: {
+          args: Prisma.TwoFactorAuthUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>
+        }
+        deleteMany: {
+          args: Prisma.TwoFactorAuthDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TwoFactorAuthUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TwoFactorAuthUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>[]
+        }
+        upsert: {
+          args: Prisma.TwoFactorAuthUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TwoFactorAuthPayload>
+        }
+        aggregate: {
+          args: Prisma.TwoFactorAuthAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTwoFactorAuth>
+        }
+        groupBy: {
+          args: Prisma.TwoFactorAuthGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TwoFactorAuthGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TwoFactorAuthCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TwoFactorAuthCountAggregateOutputType> | number
+        }
+      }
+    }
+    SocialAccount: {
+      payload: Prisma.$SocialAccountPayload<ExtArgs>
+      fields: Prisma.SocialAccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SocialAccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SocialAccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>
+        }
+        findFirst: {
+          args: Prisma.SocialAccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SocialAccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>
+        }
+        findMany: {
+          args: Prisma.SocialAccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>[]
+        }
+        create: {
+          args: Prisma.SocialAccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>
+        }
+        createMany: {
+          args: Prisma.SocialAccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SocialAccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>[]
+        }
+        delete: {
+          args: Prisma.SocialAccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>
+        }
+        update: {
+          args: Prisma.SocialAccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.SocialAccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SocialAccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SocialAccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.SocialAccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SocialAccountPayload>
+        }
+        aggregate: {
+          args: Prisma.SocialAccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSocialAccount>
+        }
+        groupBy: {
+          args: Prisma.SocialAccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SocialAccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SocialAccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SocialAccountCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1994,6 +2219,65 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  refreshTokenId: 'refreshTokenId',
+  deviceName: 'deviceName',
+  deviceType: 'deviceType',
+  browser: 'browser',
+  browserVersion: 'browserVersion',
+  os: 'os',
+  osVersion: 'osVersion',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  country: 'country',
+  city: 'city',
+  userAgent: 'userAgent',
+  isActive: 'isActive',
+  lastActivityAt: 'lastActivityAt',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const TwoFactorAuthScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  isEnabled: 'isEnabled',
+  method: 'method',
+  phoneNumber: 'phoneNumber',
+  phoneCode: 'phoneCode',
+  verificationCode: 'verificationCode',
+  verificationExpires: 'verificationExpires',
+  backupCodes: 'backupCodes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TwoFactorAuthScalarFieldEnum = (typeof TwoFactorAuthScalarFieldEnum)[keyof typeof TwoFactorAuthScalarFieldEnum]
+
+
+export const SocialAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerId: 'providerId',
+  providerEmail: 'providerEmail',
+  providerName: 'providerName',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  isConnected: 'isConnected',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SocialAccountScalarFieldEnum = (typeof SocialAccountScalarFieldEnum)[keyof typeof SocialAccountScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2271,6 +2555,9 @@ export type GlobalOmitConfig = {
   conversationMetadata?: Prisma.ConversationMetadataOmit
   productRequest?: Prisma.ProductRequestOmit
   notification?: Prisma.NotificationOmit
+  session?: Prisma.SessionOmit
+  twoFactorAuth?: Prisma.TwoFactorAuthOmit
+  socialAccount?: Prisma.SocialAccountOmit
 }
 
 /* Types for Logging */

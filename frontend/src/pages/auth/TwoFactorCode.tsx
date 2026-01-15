@@ -2,10 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import keyIcon from '../../assets/images/pre/key.svg';
 import backArrowIcon from '../../assets/images/pre/back arrow.svg';
+import { twoFactorService } from '../../services/twoFactorService';
+import { useToast } from '../../contexts/ToastContext';
 
 const TwoFactorCode: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   const fromProfileSettings = location.state?.fromProfileSettings || false;
   const phone = location.state?.phone || '';
   const phoneCode = location.state?.phoneCode || { code: '+1', label: 'United States' };
@@ -13,6 +16,7 @@ const TwoFactorCode: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -34,11 +38,26 @@ const TwoFactorCode: React.FC = () => {
     }
   }, [countdown]);
 
-  const handleResendCode = () => {
+  const handleResendCode = async () => {
     if (!canResend) return;
-    setCountdown(60);
-    setCanResend(false);
-    // TODO: Implement resend API call
+    try {
+      await twoFactorService.resendCode();
+      setCountdown(60);
+      setCanResend(false);
+      addToast({
+        type: 'success',
+        title: 'Code sent',
+        message: 'A new verification code has been sent',
+        duration: 2000
+      });
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to resend code',
+        duration: 3000
+      });
+    }
   };
 
   const handleCodeInputChange = (index: number, value: string) => {
@@ -60,17 +79,44 @@ const TwoFactorCode: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = verificationCode.join('');
-    if (code.length === 6) {
-      navigate('/two-factor-success', {
-        state: {
-          fromProfileSettings: fromProfileSettings,
-          phone: phone,
-          phoneCode: phoneCode
-        }
+    if (code.length !== 6) return;
+
+    setIsSubmitting(true);
+    try {
+      await twoFactorService.verifyCode(code);
+      
+      if (fromProfileSettings) {
+        navigate('/two-factor-success', {
+          state: {
+            fromProfileSettings: true,
+            phone: phone,
+            phoneCode: phoneCode
+          }
+        });
+      } else {
+        navigate('/two-factor-success', {
+          state: {
+            fromProfileSettings: false,
+            phone: phone,
+            phoneCode: phoneCode
+          }
+        });
+      }
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Verification failed',
+        message: error.message || 'Invalid verification code',
+        duration: 3000
       });
+      // Clear the code inputs
+      setVerificationCode(['', '', '', '', '', '']);
+      codeInputRefs.current[0]?.focus();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,15 +230,15 @@ const TwoFactorCode: React.FC = () => {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    disabled={verificationCode.join('').length !== 6}
+                    disabled={verificationCode.join('').length !== 6 || isSubmitting}
                     className={`${isMobileFromProfile ? 'w-full' : 'flex-1'} py-2 px-4 rounded-[12px] text-sm font-light transition-colors`}
                     style={{
-                      backgroundColor: verificationCode.join('').length === 6 ? '#F9A825' : '#E9E9E9',
-                      color: verificationCode.join('').length === 6 ? '#FFFFFF' : '#6A6A6A',
+                      backgroundColor: verificationCode.join('').length === 6 && !isSubmitting ? '#F9A825' : '#E9E9E9',
+                      color: verificationCode.join('').length === 6 && !isSubmitting ? '#FFFFFF' : '#6A6A6A',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    Continue
+                    {isSubmitting ? 'Verifying...' : 'Continue'}
                   </button>
                 </div>
               </form>

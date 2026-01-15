@@ -3062,7 +3062,7 @@ const CreateListing: React.FC = () => {
 
                 {/* Mobile Location Section */}
                 <div className="relative location-dropdown">
-                  <div className="flex items-start justify-between mt-24 mb-24">
+                  <div className="flex items-start justify-between mt-4 mb-4">
                     <div className="flex flex-col">
                       <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
                         <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
@@ -3072,15 +3072,21 @@ const CreateListing: React.FC = () => {
                         type="text"
                         value={location}
                         readOnly
-                        className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
+                        className="text-xs font-medium border-none focus:outline-none cursor-default"
                         style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                      className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
-                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
+                      style={{
+                        backgroundColor: '#F0F8FE',
+                        color: '#64B5F6',
+                        fontSize: '0.7rem',
+                        border: isLocationDropdownOpen ? '1px solid #97CDF9' : 'none',
+                        boxShadow: isLocationDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
+                      }}
                     >
                       Change location
                     </button>

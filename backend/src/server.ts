@@ -26,6 +26,9 @@ import uploadRoutes from './routes/uploadRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import countryRoutes from '@/routes/countryRoutes';
 import requestRoutes from '@/routes/requestRoutes';
+import sessionRoutes from '@/routes/sessionRoutes';
+import twoFactorRoutes from '@/routes/twoFactorRoutes';
+import socialAccountRoutes from '@/routes/socialAccountRoutes';
 
 import { gcpStorageService } from './services/gcpStorageService';
 
@@ -190,6 +193,9 @@ app.use('/api/products', productRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/countries', countryRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/two-factor', twoFactorRoutes);
+app.use('/api/social-accounts', socialAccountRoutes);
 
 // 404 handler
 app.use(notFound);

@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import keyIcon from '../../assets/images/pre/key.svg';
 import backArrowIcon from '../../assets/images/pre/back arrow.svg';
+import { useToast } from '../../contexts/ToastContext';
 
 const TwoFactorEmail: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   const fromProfileSettings = location.state?.fromProfileSettings || false;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -20,8 +23,11 @@ const TwoFactorEmail: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Email and password validation is handled by the form
+    // This step just collects the info and moves to phone step
+    // The actual 2FA enable will happen in the phone step
     navigate('/two-factor-phone', {
       state: {
         fromProfileSettings: fromProfileSettings,

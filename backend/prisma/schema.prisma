@@ -48,10 +48,13 @@ model User {
   conversationParticipants ConversationParticipant[]
   conversationMetadata     ConversationMetadata[]
   sentMessageStatuses      MessageStatus[]
-  messageReactions          MessageReaction[]
+  messageReactions         MessageReaction[]
   messageMetadata          MessageMetadata[]
   notifications            Notification[]
   productRequests          ProductRequest[]
+  sessions                 Session[]
+  twoFactorAuth            TwoFactorAuth?
+  socialAccounts           SocialAccount[]
 
   @@map("users")
 }
@@ -63,7 +66,8 @@ model RefreshToken {
   expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session Session?
 
   @@map("refresh_tokens")
 }
@@ -182,15 +186,15 @@ model Message {
   tamperDetected Boolean @default(false)
 
   // Relations
-  sender                    User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  product                   Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
-  conversation              Conversation?   @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
-  replyTo                   Message?        @relation("MessageReplies", fields: [replyToId], references: [id])
-  replies                   Message[]       @relation("MessageReplies")
+  sender                    User              @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  product                   Product?          @relation(fields: [productId], references: [id], onDelete: SetNull)
+  conversation              Conversation?     @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  replyTo                   Message?          @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies                   Message[]         @relation("MessageReplies")
   statuses                  MessageStatus[]
   reactions                 MessageReaction[]
   metadata                  MessageMetadata[]
-  conversationAsLastMessage Conversation[]  @relation("ConversationLastMessage")
+  conversationAsLastMessage Conversation[]    @relation("ConversationLastMessage")
 
   @@index([encryptedAt])
   @@map("messages")
@@ -215,7 +219,7 @@ model MessageReaction {
   id        String   @id @default(uuid())
   messageId String   @map("message_id")
   userId    String   @map("user_id")
-  reaction  String   // emoji string
+  reaction  String // emoji string
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -227,15 +231,15 @@ model MessageReaction {
 }
 
 model MessageMetadata {
-  id        String   @id @default(uuid())
-  messageId String   @map("message_id")
-  userId    String   @map("user_id")
-  isPinned  Boolean  @default(false) @map("is_pinned")
-  isArchived Boolean @default(false) @map("is_archived")
-  isImportant Boolean @default(false) @map("is_important")
-  label     String?  // label name or null
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  messageId   String   @map("message_id")
+  userId      String   @map("user_id")
+  isPinned    Boolean  @default(false) @map("is_pinned")
+  isArchived  Boolean  @default(false) @map("is_archived")
+  isImportant Boolean  @default(false) @map("is_important")
+  label       String? // label name or null
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -314,7 +318,7 @@ model ConversationMetadata {
   isPinned       Boolean  @default(false) @map("is_pinned")
   isArchived     Boolean  @default(false) @map("is_archived")
   isMuted        Boolean  @default(false) @map("is_muted")
-  label          String?  // label name or null
+  label          String? // label name or null
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt @map("updated_at")
 
@@ -389,4 +393,71 @@ enum ProductStatus {
   SOLD
   EXPIRED
   DELETED
+}
+
+model Session {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  refreshTokenId String?   @unique @map("refresh_token_id")
+  deviceName     String?   @map("device_name")
+  deviceType     String?   @map("device_type") // 'desktop', 'mobile', 'tablet'
+  browser        String? // Browser name (e.g., 'Chrome', 'Safari', 'Firefox')
+  browserVersion String?   @map("browser_version")
+  os             String? // Operating system (e.g., 'Windows', 'macOS', 'iOS', 'Android')
+  osVersion      String?   @map("os_version")
+  ipAddress      String?   @map("ip_address")
+  location       String? // Location string (e.g., 'London, United Kingdom')
+  country        String? // Country code (e.g., 'GB', 'US')
+  city           String? // City name
+  userAgent      String?   @map("user_agent") @db.Text
+  isActive       Boolean   @default(true) @map("is_active")
+  lastActivityAt DateTime  @default(now()) @map("last_activity_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  expiresAt      DateTime? @map("expires_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken RefreshToken? @relation(fields: [refreshTokenId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("sessions")
+}
+
+model TwoFactorAuth {
+  id                  String    @id @default(uuid())
+  userId              String    @unique @map("user_id")
+  isEnabled           Boolean   @default(false) @map("is_enabled")
+  method              String? // 'email', 'phone', 'app'
+  phoneNumber         String?   @map("phone_number")
+  phoneCode           String?   @map("phone_code") // Country code
+  verificationCode    String?   @map("verification_code")
+  verificationExpires DateTime? @map("verification_expires")
+  backupCodes         String[]  @default([]) @map("backup_codes")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("two_factor_auth")
+}
+
+model SocialAccount {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  provider       String // 'whatsapp', 'facebook', 'instagram', 'linkedin', 'x', 'google', 'apple'
+  providerId     String?   @map("provider_id") // External provider user ID
+  providerEmail  String?   @map("provider_email")
+  providerName   String?   @map("provider_name")
+  accessToken    String?   @map("access_token") @db.Text
+  refreshToken   String?   @map("refresh_token") @db.Text
+  tokenExpiresAt DateTime? @map("token_expires_at")
+  isConnected    Boolean   @default(true) @map("is_connected")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("social_accounts")
 }

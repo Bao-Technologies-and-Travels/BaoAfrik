@@ -3,6 +3,7 @@ import { getProductCountry, countries } from '../utils/countryHelpers';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -94,12 +95,55 @@ interface Notification {
   product: NotificationProduct;
   timestamp: number;
   type: 'success' | 'error';
+  action?: 'added' | 'removed'; // Track whether bookmark was added or removed
 }
 
 const Home: React.FC = () => {
   const navigationLocation = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addToast } = useToast();
+
+  // BookmarkIcon component matching ProductDetail.tsx
+  const BookmarkIcon = ({ saved }: { saved: boolean }) => (
+    <div className="w-4 h-4 relative flex items-center justify-center">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {!saved && (
+          <>
+            <path
+              d="M12.0837 8.87549H7.91699"
+              stroke="#BABABA"
+              strokeWidth="1.25"
+              strokeMiterlimit="10"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 6.8418V11.0085"
+              stroke="#BABABA"
+              strokeWidth="1.25"
+              strokeMiterlimit="10"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </>
+        )}
+        <path
+          d="M14.0166 1.6665H5.98327C4.20827 1.6665 2.7666 3.1165 2.7666 4.88317V16.6248C2.7666 18.1248 3.8416 18.7582 5.15827 18.0332L9.22493 15.7748C9.65827 15.5332 10.3583 15.5332 10.7833 15.7748L14.8499 18.0332C16.1666 18.7665 17.2416 18.1332 17.2416 16.6248V4.88317C17.2333 3.1165 15.7916 1.6665 14.0166 1.6665Z"
+          stroke={saved ? '#64B5F6' : '#BABABA'}
+          strokeWidth="1.25"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill={saved ? '#64B5F6' : 'none'}
+        />
+      </svg>
+      {saved && (
+        <svg className="w-2 h-2 absolute text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+        </svg>
+      )}
+    </div>
+  );
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const productFeedRef = React.useRef<HTMLDivElement>(null);
   const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
@@ -1668,10 +1712,12 @@ const Home: React.FC = () => {
 
       const result = await response.json();
       if (result.success) {
+        const isNowSaved = result.data.saved;
+
         // Update state based on result
         setSavedProducts(prev => {
           const newSaved = new Set(prev);
-          if (result.data.saved) {
+          if (isNowSaved) {
             newSaved.add(productId);
           } else {
             newSaved.delete(productId);
@@ -1679,7 +1725,7 @@ const Home: React.FC = () => {
           return newSaved;
         });
 
-        // Show success notification
+        // Show success notification (keep existing notification system)
         setNotifications(prev => {
           const existingNotification = prev.find(notif => notif.product.id === productId);
           if (existingNotification) {
@@ -1696,7 +1742,8 @@ const Home: React.FC = () => {
               image: typeof product.image === 'string' ? product.image : ''
             },
             timestamp: Date.now(),
-            type: 'success'
+            type: 'success',
+            action: isNowSaved ? 'added' : 'removed'
           };
 
           setTimeout(() => {
@@ -2875,10 +2922,17 @@ const Home: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="text-sm">
                       {notification.type === 'success' ? (
-                        <>
-                          <span style={{ color: '#939393' }}>Added to </span>
-                          <Link to="/bookmarks" className="underline hover:opacity-70" style={{ color: '#64B5F6' }}>Bookmarks</Link>
-                        </>
+                        notification.action === 'removed' ? (
+                          <>
+                            <span style={{ color: '#939393' }}>Removed from </span>
+                            <Link to="/bookmarks" className="underline hover:opacity-70" style={{ color: '#64B5F6' }}>Bookmarks</Link>
+                          </>
+                        ) : (
+                          <>
+                            <span style={{ color: '#939393' }}>Added to </span>
+                            <Link to="/bookmarks" className="underline hover:opacity-70" style={{ color: '#64B5F6' }}>Bookmarks</Link>
+                          </>
+                        )
                       ) : (
                         <>
                           <span style={{ color: '#939393' }}>Failed to add to </span>
@@ -3085,8 +3139,8 @@ const Home: React.FC = () => {
                               </h3>
 
                               {/* Location and Bookmark Row */}
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center text-gray-500 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center text-gray-500 flex-1 min-w-0">
                                   <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
                                     width: window.innerWidth < 640 ? '8px' : '10px',
                                     height: window.innerWidth < 640 ? '8px' : '10px',
@@ -3100,40 +3154,15 @@ const Home: React.FC = () => {
                                     e.preventDefault();
                                     handleSave(product.id);
                                   }}
-                                  className="transition-colors touch-manipulation rounded"
+                                  className="transition-colors touch-manipulation flex-shrink-0"
                                   style={{
-                                    width: window.innerWidth < 640 ? '16px' : '20px',
-                                    height: window.innerWidth < 640 ? '16px' : '20px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    marginLeft: window.innerWidth < 640 ? '4px' : '8px',
-                                    backgroundColor: savedProducts.has(product.id) ? '#64B5F6' : 'transparent'
+                                    padding: '2px'
                                   }}
                                 >
-                                  {savedProducts.has(product.id) ? (
-                                    <svg
-                                      style={{
-                                        width: window.innerWidth < 640 ? '16px' : '20px',
-                                        height: window.innerWidth < 640 ? '16px' : '20px',
-                                        fill: '#64B5F6'
-                                      }}
-                                      fill="#64B5F6"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path d="M5 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H5zm0 2h14v16H5V4zm2 2v12l5-3 5 3V6H7z" />
-                                    </svg>
-                                  ) : (
-                                    <img
-                                      src={bookmarkIcon}
-                                      alt="Bookmark"
-                                      style={{
-                                        width: window.innerWidth < 640 ? '16px' : '20px',
-                                        height: window.innerWidth < 640 ? '16px' : '20px',
-                                        filter: 'grayscale(100%) opacity(0.5)'
-                                      }}
-                                    />
-                                  )}
+                                  <BookmarkIcon saved={savedProducts.has(product.id)} />
                                 </button>
                               </div>
                             </div>
@@ -3273,9 +3302,9 @@ const Home: React.FC = () => {
                                     }}>{product.name}</h3>
 
                                     {/* Location and Bookmark Row - Below Product Name */}
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between gap-2">
                                       {/* Location */}
-                                      <div className="flex items-center text-gray-500 flex-1">
+                                      <div className="flex items-center text-gray-500 flex-1 min-w-0">
                                         <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
                                           width: window.innerWidth < 640 ? '8px' : '10px',
                                           height: window.innerWidth < 640 ? '8px' : '10px',
@@ -3285,30 +3314,23 @@ const Home: React.FC = () => {
                                       </div>
 
                                       {/* Bookmark Button */}
-                                      <div style={{ marginLeft: window.innerWidth < 640 ? '4px' : '8px' }}>
-                                        <button
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            handleSave(product.id);
-                                          }}
-                                          className="transition-colors touch-manipulation"
-                                          title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                                          style={{
-                                            width: window.innerWidth < 640 ? '16px' : '20px',
-                                            height: window.innerWidth < 640 ? '16px' : '20px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                          }}
-                                        >
-                                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                                            width: window.innerWidth < 640 ? '16px' : '20px',
-                                            height: window.innerWidth < 640 ? '16px' : '20px',
-                                            filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                                          }} />
-                                        </button>
-                                      </div>
+                                      <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleSave(product.id);
+                                        }}
+                                        className="transition-colors touch-manipulation flex-shrink-0"
+                                        title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                        style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          padding: '2px'
+                                        }}
+                                      >
+                                        <BookmarkIcon saved={savedProducts.has(product.id)} />
+                                      </button>
                                     </div>
                                   </div>
                                 </div>
@@ -3484,21 +3506,35 @@ const Home: React.FC = () => {
                                             e.stopPropagation();
                                             handleSave(product.id);
                                           }}
-                                          className="transition-colors touch-manipulation"
+                                          className="transition-colors touch-manipulation rounded"
                                           title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
                                           style={{
                                             width: window.innerWidth < 640 ? '16px' : '20px',
                                             height: window.innerWidth < 640 ? '16px' : '20px',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            justifyContent: 'center'
+                                            justifyContent: 'center',
+                                            backgroundColor: savedProducts.has(product.id) ? '#64B5F6' : 'transparent'
                                           }}
                                         >
-                                          <img src={bookmarkIcon} alt="Bookmark" style={{
-                                            width: window.innerWidth < 640 ? '16px' : '20px',
-                                            height: window.innerWidth < 640 ? '16px' : '20px',
-                                            filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                                          }} />
+                                          {savedProducts.has(product.id) ? (
+                                            <svg
+                                              style={{
+                                                width: window.innerWidth < 640 ? '16px' : '20px',
+                                                height: window.innerWidth < 640 ? '16px' : '20px',
+                                                fill: 'white'
+                                              }}
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                            </svg>
+                                          ) : (
+                                            <img src={bookmarkIcon} alt="Bookmark" style={{
+                                              width: window.innerWidth < 640 ? '16px' : '20px',
+                                              height: window.innerWidth < 640 ? '16px' : '20px',
+                                              filter: 'grayscale(100%) opacity(0.5)'
+                                            }} />
+                                          )}
                                         </button>
                                       </div>
                                     </div>
@@ -3705,8 +3741,8 @@ const Home: React.FC = () => {
                             </h3>
 
                             {/* Location and Bookmark Row */}
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center text-gray-500 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center text-gray-500 flex-1 min-w-0">
                                 <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
                                   width: window.innerWidth < 640 ? '8px' : '10px',
                                   height: window.innerWidth < 640 ? '8px' : '10px',
@@ -3720,32 +3756,15 @@ const Home: React.FC = () => {
                                   e.preventDefault();
                                   handleSave(product.id);
                                 }}
-                                className="transition-colors touch-manipulation rounded"
+                                className="transition-colors touch-manipulation flex-shrink-0"
                                 style={{
-                                  width: window.innerWidth < 640 ? '16px' : '20px',
-                                  height: window.innerWidth < 640 ? '16px' : '20px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  marginLeft: window.innerWidth < 640 ? '4px' : '8px',
-                                  backgroundColor: savedProducts.has(product.id) ? '#64B5F6' : 'transparent'
+                                  padding: '2px'
                                 }}
                               >
-                                {savedProducts.has(product.id) ? (
-                                  <svg className="text-white" style={{ width: window.innerWidth < 640 ? '10px' : '12px', height: window.innerWidth < 640 ? '10px' : '12px' }} fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M5 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H5zm0 2h14v16H5V4zm2 2v12l5-3 5 3V6H7z" fill="currentColor" />
-                                  </svg>
-                                ) : (
-                                  <img
-                                    src={bookmarkIcon}
-                                    alt="Bookmark"
-                                    style={{
-                                      width: window.innerWidth < 640 ? '16px' : '20px',
-                                      height: window.innerWidth < 640 ? '16px' : '20px',
-                                      filter: 'grayscale(100%) opacity(0.5)'
-                                    }}
-                                  />
-                                )}
+                                <BookmarkIcon saved={savedProducts.has(product.id)} />
                               </button>
                             </div>
                           </div>
@@ -3809,30 +3828,31 @@ const Home: React.FC = () => {
                         <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
 
                         {/* Location and Bookmark Row - Below Product Name */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           {/* Location */}
-                          <div className="flex items-center text-gray-500 flex-1">
+                          <div className="flex items-center text-gray-500 flex-1 min-w-0">
                             <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
                             <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
                           </div>
 
                           {/* Bookmark Button */}
-                          <div className="ml-2">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleSave(product.id);
-                              }}
-                              className="transition-colors touch-manipulation"
-                              title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                              style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                              <img src={bookmarkIcon} alt="Bookmark" className="w-5 h-5" style={{
-                                filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                              }} />
-                            </button>
-                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleSave(product.id);
+                            }}
+                            className="transition-colors touch-manipulation flex-shrink-0"
+                            title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '2px'
+                            }}
+                          >
+                            <BookmarkIcon saved={savedProducts.has(product.id)} />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -6867,7 +6887,7 @@ const Home: React.FC = () => {
 
                                   {/* Location and Bookmark Row */}
                                   <div className="flex items-center justify-between">
-                                    <div className="flex items-center text-gray-500 flex-1">
+                                    <div className="flex items-center text-gray-500 flex-1 min-w-0">
                                       <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
                                         width: '8px',
                                         height: '8px',
@@ -6881,23 +6901,18 @@ const Home: React.FC = () => {
                                         e.preventDefault();
                                         handleSave(product.id);
                                       }}
-                                      className="flex-shrink-0"
+                                      className="flex-shrink-0 transition-colors touch-manipulation"
                                       style={{
                                         background: 'transparent',
                                         border: 'none',
                                         cursor: 'pointer',
-                                        padding: '2px'
+                                        padding: '2px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
                                       }}
                                     >
-                                      <img
-                                        src={savedProducts.has(product.id) ? bookmarkIcon : bookmarkIcon}
-                                        alt={savedProducts.has(product.id) ? 'Saved' : 'Save'}
-                                        style={{
-                                          width: '12px',
-                                          height: '12px',
-                                          filter: savedProducts.has(product.id) ? 'brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)' : 'none'
-                                        }}
-                                      />
+                                      <BookmarkIcon saved={savedProducts.has(product.id)} />
                                     </button>
                                   </div>
                                 </div>
@@ -7004,9 +7019,9 @@ const Home: React.FC = () => {
                               }}>{product.name}</h3>
 
                               {/* Location and Bookmark Row - Below Product Name */}
-                              <div className="flex items-center justify-between">
+                              <div className="flex items-center justify-between gap-2">
                                 {/* Location */}
-                                <div className="flex items-center text-gray-500 flex-1">
+                                <div className="flex items-center text-gray-500 flex-1 min-w-0">
                                   <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
                                     width: '8px',
                                     height: '8px',
@@ -7016,30 +7031,23 @@ const Home: React.FC = () => {
                                 </div>
 
                                 {/* Bookmark Button */}
-                                <div style={{ marginLeft: '4px' }}>
-                                  <button
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleSave(product.id);
-                                    }}
-                                    className="transition-colors touch-manipulation"
-                                    title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                                    style={{
-                                      width: '16px',
-                                      height: '16px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center'
-                                    }}
-                                  >
-                                    <img src={bookmarkIcon} alt="Bookmark" style={{
-                                      width: '16px',
-                                      height: '16px',
-                                      filter: savedProducts.has(product.id) ? 'none' : 'grayscale(100%) opacity(0.5)'
-                                    }} />
-                                  </button>
-                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleSave(product.id);
+                                  }}
+                                  className="transition-colors touch-manipulation flex-shrink-0"
+                                  title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '2px'
+                                  }}
+                                >
+                                  <BookmarkIcon saved={savedProducts.has(product.id)} />
+                                </button>
                               </div>
                             </div>
                           </Link>

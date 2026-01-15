@@ -64,6 +64,9 @@ import { useNotificationToast } from '../contexts/NotificationToastContext';
 import { countries } from '../utils/countries';
 import { gcpStorageService } from '../services/gcpStorageService';
 import { sortedCountryPhoneCodes } from '../utils/countryPhoneCodes';
+import { sessionService, Session } from '../services/sessionService';
+import { twoFactorService } from '../services/twoFactorService';
+import { socialAccountService } from '../services/socialAccountService';
 
 const currencyRates: Record<string, number> = {
   USD: 1,
@@ -877,9 +880,53 @@ const ProfileSettings: React.FC = () => {
   const genderOptions = ['Male', 'Female', 'Other'];
   const phoneDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Initialize phone number from user data
+  const parsePhoneNumber = (phoneNumber: string | undefined, phoneCode?: string) => {
+    if (!phoneNumber) return { code: '+1', number: '', flag: 'us', label: 'United States' };
+
+    // If phoneCode is provided, use it directly
+    if (phoneCode) {
+      const phoneCodeObj = sortedCountryPhoneCodes.find(c => c.dialCode === phoneCode);
+      if (phoneCodeObj) {
+        // Extract number by removing the country code from phoneNumber
+        const number = phoneNumber.startsWith(phoneCode)
+          ? phoneNumber.substring(phoneCode.length)
+          : phoneNumber;
+        return {
+          code: phoneCodeObj.dialCode,
+          number: number,
+          flag: phoneCodeObj.flag,
+          label: phoneCodeObj.name
+        };
+      }
+    }
+
+    // Fallback: Extract country code and number from phoneNumber (format: +1234567890)
+    const match = phoneNumber.match(/^(\+\d{1,4})(.+)$/);
+    if (match) {
+      const code = match[1];
+      const number = match[2];
+      // Find matching phone code
+      const phoneCodeObj = sortedCountryPhoneCodes.find(c => c.dialCode === code);
+      if (phoneCodeObj) {
+        return {
+          code: phoneCodeObj.dialCode,
+          number: number,
+          flag: phoneCodeObj.flag,
+          label: phoneCodeObj.name
+        };
+      }
+    }
+    return { code: '+1', number: phoneNumber, flag: 'us', label: 'United States' };
+  };
+
+  // Check if user has phoneCode field (from backend response)
+  const userPhoneCode = (user as any)?.phoneCode || (user as any)?.phone_code;
+  const parsedPhone = useMemo(() => parsePhoneNumber(user?.phoneNumber, userPhoneCode), [user?.phoneNumber, userPhoneCode]);
+
   const [verificationForm, setVerificationForm] = useState({
     email: user?.email,
-    phone: ''
+    phone: parsedPhone.number
   });
   // Notifications state
   const [allNotificationsEnabled, setAllNotificationsEnabled] = useState(false);
@@ -903,9 +950,9 @@ const ProfileSettings: React.FC = () => {
   const [mobileNotificationDetailView, setMobileNotificationDetailView] = useState<'general' | 'messages' | 'news' | null>(null);
 
   const [selectedPhoneCode, setSelectedPhoneCode] = useState({
-    label: 'United States',
-    code: '+1',
-    flag: 'us'
+    label: parsedPhone.label || 'United States',
+    code: parsedPhone.code || '+1',
+    flag: parsedPhone.flag || 'us'
   });
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
@@ -914,6 +961,17 @@ const ProfileSettings: React.FC = () => {
   useEffect(() => {
     if (user) {
       setProfileData(formatUserData());
+      // Update phone number in verification form
+      const userPhoneCode = (user as any)?.phoneCode || (user as any)?.phone_code;
+      const parsed = parsePhoneNumber(user.phoneNumber, userPhoneCode);
+      setVerificationForm(prev => ({ ...prev, phone: parsed.number }));
+      if (parsed.code && parsed.flag && parsed.label) {
+        setSelectedPhoneCode({
+          code: parsed.code,
+          flag: parsed.flag,
+          label: parsed.label
+        });
+      }
     }
   }, [user]);
 
@@ -933,8 +991,8 @@ const ProfileSettings: React.FC = () => {
       progress += 10;
     }
 
-    // Location (10%) - check if geolocation is enabled
-    if (isGeolocationEnabled) {
+    // Location (10%) - check if geolocation is enabled OR manual location is set
+    if (isGeolocationEnabled || (formData.location && formData.location.trim() !== '')) {
       progress += 10;
     }
 
@@ -954,7 +1012,7 @@ const ProfileSettings: React.FC = () => {
   };
 
   // Calculate profile completion progress and check criteria (recalculated on every render)
-  const profileProgress = useMemo(() => calculateProfileProgress(), [profileData, profileImage, isGeolocationEnabled, biography, verificationForm.email]);
+  const profileProgress = useMemo(() => calculateProfileProgress(), [profileData, profileImage, isGeolocationEnabled, formData.location, biography, verificationForm.email]);
 
   const isPersonalInfoComplete = useMemo(() =>
     profileData.fullName && profileData.fullName.trim() !== '' &&
@@ -963,7 +1021,7 @@ const ProfileSettings: React.FC = () => {
     [profileData]
   );
   const isPhotoUploaded = useMemo(() => !!profileImage, [profileImage]);
-  const isLocationSet = useMemo(() => isGeolocationEnabled, [isGeolocationEnabled]);
+  const isLocationSet = useMemo(() => isGeolocationEnabled || (formData.location && formData.location.trim() !== ''), [isGeolocationEnabled, formData.location]);
   const isDescriptionComplete = useMemo(() => biography && biography.trim() !== '', [biography]);
   const isVerificationComplete = useMemo(() => verificationForm.email && verificationForm.email.trim() !== '', [verificationForm.email]);
   const [isPhoneCodeDropdownOpen, setIsPhoneCodeDropdownOpen] = useState(false);
@@ -981,49 +1039,67 @@ const ProfileSettings: React.FC = () => {
     x: false
   });
   const [showSessionHistory, setShowSessionHistory] = useState(false);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
-  // Sessions state
-  const [sessions, setSessions] = useState([
-    {
-      id: 1,
-      browser: 'Chrome Browser',
-      icon: chromeIcon,
-      device: 'DESKTOP-6R899ET',
-      location: 'London | United Kingdom',
-      flag: 'gb',
-      isCurrent: true
-    }
-  ]);
+  // Sessions state - now using real API data
+  const [sessions, setSessions] = useState<Array<Session & { icon: string; flag: string; lastUsed?: string }>>([]);
 
-  const [inactiveSessions, setInactiveSessions] = useState([
-    {
-      id: 2,
-      browser: 'Safari Browser',
-      icon: safariIcon,
-      device: 'iPhone 15 Pro',
-      location: 'London | United Kingdom',
-      flag: 'gb',
-      lastUsed: '1 month ago'
-    },
-    {
-      id: 3,
-      browser: 'Edge Browser',
-      icon: edgeIcon,
-      device: 'DESKTOP-6R899ET',
-      location: 'Montpellier, France',
-      flag: 'fr',
-      lastUsed: 'Tue, 4 July 2025'
-    },
-    {
-      id: 4,
-      browser: 'Brave Browser',
-      icon: braveIcon,
-      device: 'A3113 MacBook Air M3',
-      location: 'Chicago, United States',
-      flag: 'us',
-      lastUsed: 'Mon, 20 May 2025'
-    }
-  ]);
+  // Helper function to get browser icon
+  const getBrowserIcon = (browser: string): string => {
+    const browserLower = browser.toLowerCase();
+    if (browserLower.includes('chrome')) return chromeIcon;
+    if (browserLower.includes('safari')) return safariIcon;
+    if (browserLower.includes('edge')) return edgeIcon;
+    if (browserLower.includes('brave')) return braveIcon;
+    if (browserLower.includes('firefox')) return chromeIcon; // Use chrome icon as fallback
+    return chromeIcon; // Default
+  };
+
+  // Helper function to format last used date
+  const formatLastUsed = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
+  };
+
+  // Fetch sessions from API
+  useEffect(() => {
+    const fetchSessions = async () => {
+      if (selectedSidebarOption === 'security') {
+        setIsLoadingSessions(true);
+        try {
+          const allSessions = await sessionService.getSessions();
+          const formattedSessions = allSessions.map(session => ({
+            ...session,
+            icon: getBrowserIcon(session.browser),
+            flag: session.country.toLowerCase() || 'us',
+            lastUsed: formatLastUsed(session.lastActivityAt),
+          }));
+          setSessions(formattedSessions);
+        } catch (error) {
+          console.error('Failed to fetch sessions:', error);
+          addToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Failed to load sessions',
+            duration: 3000
+          });
+        } finally {
+          setIsLoadingSessions(false);
+        }
+      }
+    };
+
+    fetchSessions();
+  }, [selectedSidebarOption]);
 
   // Password section state
   const [passwordStrength, setPasswordStrength] = useState<'weak' | 'strong'>('weak'); // Change to 'strong' to test
@@ -1080,16 +1156,74 @@ const ProfileSettings: React.FC = () => {
   };
 
   // Handler functions for sessions
-  const handleSignOutSession = (sessionId: number) => {
-    setSessions(sessions.filter(session => session.id !== sessionId));
+  const handleSignOutSession = async (sessionId: string) => {
+    try {
+      const sessionToRevoke = sessions.find(s => s.id === sessionId);
+      const isCurrentSession = sessionToRevoke?.isCurrent;
+
+      await sessionService.revokeSession(sessionId);
+      setSessions(sessions.filter(session => session.id !== sessionId));
+
+      // If revoking current session, log out the user
+      if (isCurrentSession) {
+        // Clear tokens and user data
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        sessionStorage.clear();
+
+        // Redirect to login
+        navigate('/login');
+        addToast({
+          type: 'info',
+          title: 'Logged out',
+          message: 'You have been logged out from this device',
+          duration: 2000
+        });
+      } else {
+        addToast({
+          type: 'success',
+          title: 'Success',
+          message: 'Session revoked successfully',
+          duration: 2000
+        });
+      }
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to revoke session',
+        duration: 3000
+      });
+    }
   };
 
-  const handleSignOutInactiveSession = (sessionId: number) => {
-    setInactiveSessions(inactiveSessions.filter(session => session.id !== sessionId));
-  };
-
-  const handleCloseAllInactiveSessions = () => {
-    setInactiveSessions([]);
+  const handleCloseAllInactiveSessions = async () => {
+    try {
+      await sessionService.revokeAllOtherSessions();
+      // Reload sessions
+      const allSessions = await sessionService.getSessions();
+      const formattedSessions = allSessions.map(session => ({
+        ...session,
+        icon: getBrowserIcon(session.browser),
+        flag: session.country.toLowerCase() || 'us',
+        lastUsed: formatLastUsed(session.lastActivityAt),
+      }));
+      setSessions(formattedSessions);
+      addToast({
+        type: 'success',
+        title: 'Success',
+        message: 'All other sessions revoked successfully',
+        duration: 2000
+      });
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to revoke sessions',
+        duration: 3000
+      });
+    }
   };
 
   const leftPaneClasses = isMobile
@@ -1783,7 +1917,10 @@ const ProfileSettings: React.FC = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ phoneNumber: fullPhoneNumber })
+        body: JSON.stringify({
+          phoneNumber: fullPhoneNumber,
+          phoneCode: selectedPhoneCode.code
+        })
       });
 
       if (!response.ok) {
@@ -2285,7 +2422,10 @@ const ProfileSettings: React.FC = () => {
       <div className="flex items-center justify-between mb-8">
         <button
           type="button"
-          onClick={() => setIsMobileSidebarVisible(false)}
+          onClick={() => {
+            // If in settings sidebar, go to home
+            navigate('/');
+          }}
           className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
           style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
         >
@@ -2952,12 +3092,13 @@ const ProfileSettings: React.FC = () => {
                           if (isMobileNotificationsView && mobileNotificationDetailView !== null) {
                             setMobileNotificationDetailView(null);
                           } else {
+                            // If in a tab, go back to settings (show sidebar)
                             setIsMobileSidebarVisible(true);
                           }
                         }}
                         className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
                         style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
-                        aria-label="Back to menu"
+                        aria-label="Back to settings"
                       >
                         <img src={backArrowIcon} alt="Back" className="w-4 h-4" />
                       </button>
@@ -3650,19 +3791,6 @@ const ProfileSettings: React.FC = () => {
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-semibold" style={{ color: '#6A6A6A' }}>Password</p>
-                                  <span
-                                    onClick={() => setPasswordStrength(passwordStrength === 'weak' ? 'strong' : 'weak')}
-                                    className="px-2.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity"
-                                    style={{
-                                      backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0',
-                                      color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964',
-                                      borderRadius: '6px',
-                                      fontSize: '10px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {passwordStrength === 'weak' ? 'Your password is weak' : 'Your password is strong'}
-                                  </span>
                                 </div>
                                 <p className="text-xs mt-1 font-normal" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
                               </div>
@@ -3698,19 +3826,6 @@ const ProfileSettings: React.FC = () => {
                               <div className="flex-1 space-y-1">
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Password</p>
-                                  <span
-                                    onClick={() => setPasswordStrength(passwordStrength === 'weak' ? 'strong' : 'weak')}
-                                    className="px-2.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity"
-                                    style={{
-                                      backgroundColor: passwordStrength === 'weak' ? '#FEF6E9' : '#EDFBF0',
-                                      color: passwordStrength === 'weak' ? '#F9A825' : '#4CD964',
-                                      borderRadius: '6px',
-                                      fontSize: '10px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {passwordStrength === 'weak' ? 'Your password is weak' : 'Your password is strong'}
-                                  </span>
                                 </div>
                                 <p className="text-xs" style={{ color: '#B0B0B0' }}>Set a password to protect your account.</p>
                               </div>
@@ -3851,21 +3966,65 @@ const ProfileSettings: React.FC = () => {
                                 className="rounded-lg border whitespace-nowrap transition-colors px-3 py-1.5 text-[10px]"
                                 style={{ borderColor: '#D9D9D9', color: '#6A6A6A', borderRadius: '6px' }}
                               >
-                                {shouldShowSessionHistory ? 'Hide mock session history' : 'Show mock session history'}
+                                {shouldShowSessionHistory ? 'Hide session history' : 'Show session history'}
                               </button>
                             )}
                           </div>
-                          <div className={isMobileSecurityView ? 'space-y-1' : 'space-y-3'}>
-                            {sessions.map((session) =>
-                              isMobileSecurityView ? (
-                                <div key={session.id} className="p-4 rounded-2xl space-y-1.5 bg-white" style={{ marginTop: '0' }}>
-                                  <div className="flex items-start gap-3">
-                                    <img src={session.icon} alt={session.browser} className="w-6 h-6 rounded-full object-cover" />
-                                    <div className="flex-1">
-                                      <div className="flex items-center justify-between">
-                                        <p className="text-[13px] font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                          {isLoadingSessions ? (
+                            <div className="text-center py-4">
+                              <p className="text-sm" style={{ color: '#B0B0B0' }}>Loading sessions...</p>
+                            </div>
+                          ) : sessions.length === 0 ? (
+                            <div className="text-center py-4">
+                              <p className="text-sm" style={{ color: '#B0B0B0' }}>No active sessions</p>
+                            </div>
+                          ) : (
+                            <div className={isMobileSecurityView ? 'space-y-1' : 'space-y-3'}>
+                              {sessions.filter(s => s.isCurrent).map((session) =>
+                                isMobileSecurityView ? (
+                                  <div key={session.id} className="p-4 rounded-2xl space-y-1.5 bg-white" style={{ marginTop: '0' }}>
+                                    <div className="flex items-start gap-3">
+                                      <img src={session.icon} alt={session.browser} className="w-6 h-6 rounded-full object-cover" />
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between">
+                                          <p className="text-[13px] font-medium" style={{ color: '#6A6A6A' }}>{session.browser}</p>
+                                          {session.isCurrent && (
+                                            <div className="inline-flex items-center gap-1">
+                                              <span
+                                                style={{
+                                                  width: '6px',
+                                                  height: '6px',
+                                                  borderRadius: '9999px',
+                                                  backgroundColor: '#4CD964',
+                                                  boxShadow: '0 0 0 2px #EDFBF0'
+                                                }}
+                                              ></span>
+                                              <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <p className="text-[10px]" style={{ color: '#939393' }}>{session.device}</p>
+                                        <div className="flex items-center justify-between" style={{ marginTop: '-2px' }}>
+                                          <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
+                                          <button
+                                            onClick={() => handleSignOutSession(session.id)}
+                                            className="text-[11px] font-medium hover:opacity-80 transition-opacity"
+                                            style={{ color: '#6A6A6A', textDecoration: 'underline' }}
+                                          >
+                                            Sign Out
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div key={session.id} className="flex items-center gap-6">
+                                    <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
+                                      <img src={session.icon} alt={session.browser} className="w-8 h-8 rounded-full object-cover" />
+                                      <div>
+                                        <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
                                         {session.isCurrent && (
-                                          <div className="inline-flex items-center gap-1">
+                                          <div className="inline-flex items-center gap-1" style={{ marginTop: '0px', lineHeight: '1' }}>
                                             <span
                                               style={{
                                                 width: '6px',
@@ -3879,68 +4038,34 @@ const ProfileSettings: React.FC = () => {
                                           </div>
                                         )}
                                       </div>
-                                      <p className="text-[10px]" style={{ color: '#939393' }}>{session.device}</p>
-                                      <div className="flex items-center justify-between" style={{ marginTop: '-2px' }}>
-                                        <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
-                                        <button
-                                          onClick={() => handleSignOutSession(session.id)}
-                                          className="text-[11px] font-medium hover:opacity-80 transition-opacity"
-                                          style={{ color: '#6A6A6A', textDecoration: 'underline' }}
-                                        >
-                                          Sign Out
-                                        </button>
-                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div key={session.id} className="flex items-center gap-6">
-                                  <div className="flex items-center gap-3" style={{ minWidth: '220px', flexShrink: 0 }}>
-                                    <img src={session.icon} alt={session.browser} className="w-8 h-8 rounded-full object-cover" />
-                                    <div>
-                                      <p className="text-xs font-medium" style={{ color: '#6A6A6A', marginBottom: '-4px' }}>{session.browser}</p>
-                                      {session.isCurrent && (
-                                        <div className="inline-flex items-center gap-1" style={{ marginTop: '0px', lineHeight: '1' }}>
-                                          <span
-                                            style={{
-                                              width: '6px',
-                                              height: '6px',
-                                              borderRadius: '9999px',
-                                              backgroundColor: '#4CD964',
-                                              boxShadow: '0 0 0 2px #EDFBF0'
-                                            }}
-                                          ></span>
-                                          <span className="text-[10px] font-medium" style={{ color: '#4CD964' }}>Current session</span>
-                                        </div>
-                                      )}
+                                    <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
+                                      <img src={isMobileDevice(session.device) ? mobileIcon : deviceIcon} alt="Device" className="w-4 h-4" />
+                                      <span>{session.device}</span>
                                     </div>
+                                    <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
+                                      <img
+                                        src={`https://flagcdn.com/24x18/${session.flag}.png`}
+                                        alt={session.location}
+                                        className="w-5 h-5 rounded-full object-cover"
+                                      />
+                                      <span>{session.location}</span>
+                                    </div>
+                                    <button
+                                      onClick={() => handleSignOutSession(session.id)}
+                                      className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity"
+                                      style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
+                                    >
+                                      Sign Out
+                                    </button>
                                   </div>
-                                  <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '180px', flexShrink: 0 }}>
-                                    <img src={isMobileDevice(session.device) ? mobileIcon : deviceIcon} alt="Device" className="w-4 h-4" />
-                                    <span>{session.device}</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-xs" style={{ color: '#939393', minWidth: '200px', flexShrink: 0 }}>
-                                    <img
-                                      src={`https://flagcdn.com/24x18/${session.flag}.png`}
-                                      alt={session.location}
-                                      className="w-5 h-5 rounded-full object-cover"
-                                    />
-                                    <span>{session.location}</span>
-                                  </div>
-                                  <button
-                                    onClick={() => handleSignOutSession(session.id)}
-                                    className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity"
-                                    style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
-                                  >
-                                    Sign Out
-                                  </button>
-                                </div>
-                              )
-                            )}
-                          </div>
+                                )
+                              )}
+                            </div>
+                          )}
                         </div>
 
-                        {shouldShowSessionHistory && (
+                        {shouldShowSessionHistory && sessions.filter(s => !s.isCurrent).length > 0 && (
                           <div className={isMobileSecurityView ? 'space-y-1 mt-1' : 'space-y-3 mt-8'}>
                             <div className={`flex items-center justify-between ${isMobileSecurityView ? 'px-1 gap-2 mb-0' : 'mb-5'}`}>
                               <p className={`${isMobileSecurityView ? 'text-[13px]' : 'text-sm'} font-medium`} style={{ color: '#6A6A6A' }}>Other Sessions</p>
@@ -3953,7 +4078,7 @@ const ProfileSettings: React.FC = () => {
                               </button>
                             </div>
                             <div className={isMobileSecurityView ? '' : 'space-y-3'}>
-                              {inactiveSessions.map((session, index) =>
+                              {sessions.filter(s => !s.isCurrent).map((session, index) =>
                                 isMobileSecurityView ? (
                                   <div key={session.id} className="p-4 rounded-2xl space-y-1 bg-white" style={{ marginTop: index === 0 ? '0' : '2px', marginBottom: '0' }}>
                                     <div className="flex items-start gap-3">
@@ -3967,7 +4092,7 @@ const ProfileSettings: React.FC = () => {
                                         <div className="flex items-center justify-between" style={{ marginTop: '-2px' }}>
                                           <p className="text-[9px]" style={{ color: '#939393' }}>{session.location}</p>
                                           <button
-                                            onClick={() => handleSignOutInactiveSession(session.id)}
+                                            onClick={() => handleSignOutSession(session.id)}
                                             className="text-[11px] font-medium hover:opacity-80 transition-opacity"
                                             style={{ color: '#6A6A6A', textDecoration: 'underline' }}
                                           >
@@ -3999,7 +4124,7 @@ const ProfileSettings: React.FC = () => {
                                       <span>{session.location}</span>
                                     </div>
                                     <button
-                                      onClick={() => handleSignOutInactiveSession(session.id)}
+                                      onClick={() => handleSignOutSession(session.id)}
                                       className="text-xs font-medium ml-auto hover:opacity-80 transition-opacity"
                                       style={{ color: '#6A6A6A', textDecoration: 'underline', flexShrink: 0 }}
                                     >
@@ -4042,7 +4167,7 @@ const ProfileSettings: React.FC = () => {
                           <div className={`flex items-center ${isMobileLanguageView ? 'gap-2' : 'gap-3'} flex-wrap`}>
                             {languageOptions.map((lang, index) => {
                               const isSelected = languagePreference === lang.code;
-                              const isSupported = lang.code === 'en' || lang.code === 'fr';
+                              const isSupported = lang.code === 'en';
                               return (
                                 <button
                                   key={lang.code}
@@ -4105,20 +4230,28 @@ const ProfileSettings: React.FC = () => {
                               { code: 'GBP', flag: 'gb', name: 'British Pound' }
                             ].map((currency) => {
                               const isSelected = currencyPreference === currency.code;
+                              const isSupported = currency.code === 'GBP';
                               return (
                                 <button
                                   key={currency.code}
-                                  onClick={() => setCurrencyPreference(currency.code as 'USD' | 'EUR' | 'CAD' | 'GBP')}
+                                  onClick={() => {
+                                    if (!isSupported) return;
+                                    setCurrencyPreference(currency.code as 'USD' | 'EUR' | 'CAD' | 'GBP');
+                                  }}
                                   className={`flex items-center gap-2 ${isMobileLanguageView ? 'px-3 py-1' : 'px-4 py-1'} rounded-full border transition-colors`}
                                   style={{
                                     backgroundColor: isSelected ? '#F0F8FE' : 'white',
                                     borderColor: isSelected ? '#CFE8FC' : '#E1E1E1',
                                     fontFamily: 'Poppins, sans-serif',
+                                    cursor: isSupported ? 'pointer' : 'not-allowed',
+                                    opacity: isSupported ? 1 : 0.6,
                                     ...(isMobileLanguageView && {
                                       flex: '1 1 0',
                                       minWidth: 0
                                     })
                                   }}
+                                  disabled={!isSupported}
+                                  title={!isSupported ? 'Coming soon' : undefined}
                                 >
                                   {isSelected ? (
                                     <div className={`${isMobileLanguageView ? 'w-3 h-3' : 'w-5 h-5'} rounded-full flex items-center justify-center`} style={{ backgroundColor: '#64B5F6' }}>

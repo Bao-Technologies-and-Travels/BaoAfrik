@@ -409,6 +409,9 @@ export type UserWhereInput = {
   messageMetadata?: Prisma.MessageMetadataListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   productRequests?: Prisma.ProductRequestListRelationFilter
+  sessions?: Prisma.SessionListRelationFilter
+  twoFactorAuth?: Prisma.XOR<Prisma.TwoFactorAuthNullableScalarRelationFilter, Prisma.TwoFactorAuthWhereInput> | null
+  socialAccounts?: Prisma.SocialAccountListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -452,6 +455,9 @@ export type UserOrderByWithRelationInput = {
   messageMetadata?: Prisma.MessageMetadataOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   productRequests?: Prisma.ProductRequestOrderByRelationAggregateInput
+  sessions?: Prisma.SessionOrderByRelationAggregateInput
+  twoFactorAuth?: Prisma.TwoFactorAuthOrderByWithRelationInput
+  socialAccounts?: Prisma.SocialAccountOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -498,6 +504,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   messageMetadata?: Prisma.MessageMetadataListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   productRequests?: Prisma.ProductRequestListRelationFilter
+  sessions?: Prisma.SessionListRelationFilter
+  twoFactorAuth?: Prisma.XOR<Prisma.TwoFactorAuthNullableScalarRelationFilter, Prisma.TwoFactorAuthWhereInput> | null
+  socialAccounts?: Prisma.SocialAccountListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -609,6 +618,9 @@ export type UserCreateInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -652,6 +664,9 @@ export type UserUncheckedCreateInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -695,6 +710,9 @@ export type UserUpdateInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -738,6 +756,9 @@ export type UserUncheckedUpdateInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1160,6 +1181,48 @@ export type UserUpdateOneWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type UserCreateNestedOneWithoutSessionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
+  upsert?: Prisma.UserUpsertWithoutSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+}
+
+export type UserCreateNestedOneWithoutTwoFactorAuthInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorAuthInput, Prisma.UserUncheckedCreateWithoutTwoFactorAuthInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTwoFactorAuthInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTwoFactorAuthNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorAuthInput, Prisma.UserUncheckedCreateWithoutTwoFactorAuthInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTwoFactorAuthInput
+  upsert?: Prisma.UserUpsertWithoutTwoFactorAuthInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTwoFactorAuthInput, Prisma.UserUpdateWithoutTwoFactorAuthInput>, Prisma.UserUncheckedUpdateWithoutTwoFactorAuthInput>
+}
+
+export type UserCreateNestedOneWithoutSocialAccountsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSocialAccountsInput, Prisma.UserUncheckedCreateWithoutSocialAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSocialAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSocialAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSocialAccountsInput, Prisma.UserUncheckedCreateWithoutSocialAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSocialAccountsInput
+  upsert?: Prisma.UserUpsertWithoutSocialAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSocialAccountsInput, Prisma.UserUpdateWithoutSocialAccountsInput>, Prisma.UserUncheckedUpdateWithoutSocialAccountsInput>
+}
+
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
@@ -1200,6 +1263,9 @@ export type UserCreateWithoutRefreshTokensInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -1242,6 +1308,9 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -1300,6 +1369,9 @@ export type UserUpdateWithoutRefreshTokensInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -1342,6 +1414,9 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductsInput = {
@@ -1384,6 +1459,9 @@ export type UserCreateWithoutProductsInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductsInput = {
@@ -1426,6 +1504,9 @@ export type UserUncheckedCreateWithoutProductsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductsInput = {
@@ -1484,6 +1565,9 @@ export type UserUpdateWithoutProductsInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductsInput = {
@@ -1526,6 +1610,9 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductLikesInput = {
@@ -1568,6 +1655,9 @@ export type UserCreateWithoutProductLikesInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductLikesInput = {
@@ -1610,6 +1700,9 @@ export type UserUncheckedCreateWithoutProductLikesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductLikesInput = {
@@ -1668,6 +1761,9 @@ export type UserUpdateWithoutProductLikesInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductLikesInput = {
@@ -1710,6 +1806,9 @@ export type UserUncheckedUpdateWithoutProductLikesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductSavesInput = {
@@ -1752,6 +1851,9 @@ export type UserCreateWithoutProductSavesInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductSavesInput = {
@@ -1794,6 +1896,9 @@ export type UserUncheckedCreateWithoutProductSavesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductSavesInput = {
@@ -1852,6 +1957,9 @@ export type UserUpdateWithoutProductSavesInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductSavesInput = {
@@ -1894,6 +2002,9 @@ export type UserUncheckedUpdateWithoutProductSavesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductReviewsInput = {
@@ -1936,6 +2047,9 @@ export type UserCreateWithoutProductReviewsInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductReviewsInput = {
@@ -1978,6 +2092,9 @@ export type UserUncheckedCreateWithoutProductReviewsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductReviewsInput = {
@@ -2036,6 +2153,9 @@ export type UserUpdateWithoutProductReviewsInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductReviewsInput = {
@@ -2078,6 +2198,9 @@ export type UserUncheckedUpdateWithoutProductReviewsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentMessagesInput = {
@@ -2120,6 +2243,9 @@ export type UserCreateWithoutSentMessagesInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -2162,6 +2288,9 @@ export type UserUncheckedCreateWithoutSentMessagesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -2220,6 +2349,9 @@ export type UserUpdateWithoutSentMessagesInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -2262,6 +2394,9 @@ export type UserUncheckedUpdateWithoutSentMessagesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentMessageStatusesInput = {
@@ -2304,6 +2439,9 @@ export type UserCreateWithoutSentMessageStatusesInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentMessageStatusesInput = {
@@ -2346,6 +2484,9 @@ export type UserUncheckedCreateWithoutSentMessageStatusesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentMessageStatusesInput = {
@@ -2404,6 +2545,9 @@ export type UserUpdateWithoutSentMessageStatusesInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentMessageStatusesInput = {
@@ -2446,6 +2590,9 @@ export type UserUncheckedUpdateWithoutSentMessageStatusesInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessageReactionsInput = {
@@ -2488,6 +2635,9 @@ export type UserCreateWithoutMessageReactionsInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessageReactionsInput = {
@@ -2530,6 +2680,9 @@ export type UserUncheckedCreateWithoutMessageReactionsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessageReactionsInput = {
@@ -2588,6 +2741,9 @@ export type UserUpdateWithoutMessageReactionsInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessageReactionsInput = {
@@ -2630,6 +2786,9 @@ export type UserUncheckedUpdateWithoutMessageReactionsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessageMetadataInput = {
@@ -2672,6 +2831,9 @@ export type UserCreateWithoutMessageMetadataInput = {
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessageMetadataInput = {
@@ -2714,6 +2876,9 @@ export type UserUncheckedCreateWithoutMessageMetadataInput = {
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessageMetadataInput = {
@@ -2772,6 +2937,9 @@ export type UserUpdateWithoutMessageMetadataInput = {
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessageMetadataInput = {
@@ -2814,6 +2982,9 @@ export type UserUncheckedUpdateWithoutMessageMetadataInput = {
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationParticipantsInput = {
@@ -2856,6 +3027,9 @@ export type UserCreateWithoutConversationParticipantsInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationParticipantsInput = {
@@ -2898,6 +3072,9 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationParticipantsInput = {
@@ -2956,6 +3133,9 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
@@ -2998,6 +3178,9 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationMetadataInput = {
@@ -3040,6 +3223,9 @@ export type UserCreateWithoutConversationMetadataInput = {
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMetadataInput = {
@@ -3082,6 +3268,9 @@ export type UserUncheckedCreateWithoutConversationMetadataInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMetadataInput = {
@@ -3140,6 +3329,9 @@ export type UserUpdateWithoutConversationMetadataInput = {
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMetadataInput = {
@@ -3182,6 +3374,9 @@ export type UserUncheckedUpdateWithoutConversationMetadataInput = {
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductRequestsInput = {
@@ -3224,6 +3419,9 @@ export type UserCreateWithoutProductRequestsInput = {
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductRequestsInput = {
@@ -3266,6 +3464,9 @@ export type UserUncheckedCreateWithoutProductRequestsInput = {
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductRequestsInput = {
@@ -3324,6 +3525,9 @@ export type UserUpdateWithoutProductRequestsInput = {
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductRequestsInput = {
@@ -3366,6 +3570,9 @@ export type UserUncheckedUpdateWithoutProductRequestsInput = {
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -3408,6 +3615,9 @@ export type UserCreateWithoutNotificationsInput = {
   messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
   messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
   productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -3450,6 +3660,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
   messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
   productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -3508,6 +3721,9 @@ export type UserUpdateWithoutNotificationsInput = {
   messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
   messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
   productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -3550,6 +3766,597 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
   messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
   productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSessionsInput = {
+  id?: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  passwordHash?: string | null
+  profileImage?: string | null
+  gender?: string | null
+  bio?: string | null
+  location?: string | null
+  birthDate?: Date | string | null
+  emailVerified?: boolean
+  emailVerificationCode?: string | null
+  emailVerificationExpires?: Date | string | null
+  passwordResetToken?: string | null
+  passwordResetTokenExpires?: Date | string | null
+  passwordResetCode?: string | null
+  passwordResetExpires?: Date | string | null
+  provider?: string | null
+  providerId?: string | null
+  isActive?: boolean
+  isVerifiedSeller?: boolean
+  rating?: number | null
+  totalSales?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
+  productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  conversationMetadata?: Prisma.ConversationMetadataCreateNestedManyWithoutUserInput
+  sentMessageStatuses?: Prisma.MessageStatusCreateNestedManyWithoutUserInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSessionsInput = {
+  id?: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  passwordHash?: string | null
+  profileImage?: string | null
+  gender?: string | null
+  bio?: string | null
+  location?: string | null
+  birthDate?: Date | string | null
+  emailVerified?: boolean
+  emailVerificationCode?: string | null
+  emailVerificationExpires?: Date | string | null
+  passwordResetToken?: string | null
+  passwordResetTokenExpires?: Date | string | null
+  passwordResetCode?: string | null
+  passwordResetExpires?: Date | string | null
+  provider?: string | null
+  providerId?: string | null
+  isActive?: boolean
+  isVerifiedSeller?: boolean
+  rating?: number | null
+  totalSales?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
+  productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversationMetadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutUserInput
+  sentMessageStatuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutUserInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSessionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
+}
+
+export type UserUpsertWithoutSessionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSessionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSessionsInput, Prisma.UserUncheckedUpdateWithoutSessionsInput>
+}
+
+export type UserUpdateWithoutSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerifiedSeller?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
+  productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  conversationMetadata?: Prisma.ConversationMetadataUpdateManyWithoutUserNestedInput
+  sentMessageStatuses?: Prisma.MessageStatusUpdateManyWithoutUserNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerifiedSeller?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
+  productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversationMetadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutUserNestedInput
+  sentMessageStatuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutUserNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTwoFactorAuthInput = {
+  id?: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  passwordHash?: string | null
+  profileImage?: string | null
+  gender?: string | null
+  bio?: string | null
+  location?: string | null
+  birthDate?: Date | string | null
+  emailVerified?: boolean
+  emailVerificationCode?: string | null
+  emailVerificationExpires?: Date | string | null
+  passwordResetToken?: string | null
+  passwordResetTokenExpires?: Date | string | null
+  passwordResetCode?: string | null
+  passwordResetExpires?: Date | string | null
+  provider?: string | null
+  providerId?: string | null
+  isActive?: boolean
+  isVerifiedSeller?: boolean
+  rating?: number | null
+  totalSales?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
+  productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  conversationMetadata?: Prisma.ConversationMetadataCreateNestedManyWithoutUserInput
+  sentMessageStatuses?: Prisma.MessageStatusCreateNestedManyWithoutUserInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTwoFactorAuthInput = {
+  id?: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  passwordHash?: string | null
+  profileImage?: string | null
+  gender?: string | null
+  bio?: string | null
+  location?: string | null
+  birthDate?: Date | string | null
+  emailVerified?: boolean
+  emailVerificationCode?: string | null
+  emailVerificationExpires?: Date | string | null
+  passwordResetToken?: string | null
+  passwordResetTokenExpires?: Date | string | null
+  passwordResetCode?: string | null
+  passwordResetExpires?: Date | string | null
+  provider?: string | null
+  providerId?: string | null
+  isActive?: boolean
+  isVerifiedSeller?: boolean
+  rating?: number | null
+  totalSales?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
+  productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversationMetadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutUserInput
+  sentMessageStatuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutUserInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  socialAccounts?: Prisma.SocialAccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTwoFactorAuthInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorAuthInput, Prisma.UserUncheckedCreateWithoutTwoFactorAuthInput>
+}
+
+export type UserUpsertWithoutTwoFactorAuthInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTwoFactorAuthInput, Prisma.UserUncheckedUpdateWithoutTwoFactorAuthInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorAuthInput, Prisma.UserUncheckedCreateWithoutTwoFactorAuthInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTwoFactorAuthInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTwoFactorAuthInput, Prisma.UserUncheckedUpdateWithoutTwoFactorAuthInput>
+}
+
+export type UserUpdateWithoutTwoFactorAuthInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerifiedSeller?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
+  productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  conversationMetadata?: Prisma.ConversationMetadataUpdateManyWithoutUserNestedInput
+  sentMessageStatuses?: Prisma.MessageStatusUpdateManyWithoutUserNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTwoFactorAuthInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerifiedSeller?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
+  productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversationMetadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutUserNestedInput
+  sentMessageStatuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutUserNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  socialAccounts?: Prisma.SocialAccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSocialAccountsInput = {
+  id?: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  passwordHash?: string | null
+  profileImage?: string | null
+  gender?: string | null
+  bio?: string | null
+  location?: string | null
+  birthDate?: Date | string | null
+  emailVerified?: boolean
+  emailVerificationCode?: string | null
+  emailVerificationExpires?: Date | string | null
+  passwordResetToken?: string | null
+  passwordResetTokenExpires?: Date | string | null
+  passwordResetCode?: string | null
+  passwordResetExpires?: Date | string | null
+  provider?: string | null
+  providerId?: string | null
+  isActive?: boolean
+  isVerifiedSeller?: boolean
+  rating?: number | null
+  totalSales?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
+  productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  conversationMetadata?: Prisma.ConversationMetadataCreateNestedManyWithoutUserInput
+  sentMessageStatuses?: Prisma.MessageStatusCreateNestedManyWithoutUserInput
+  messageReactions?: Prisma.MessageReactionCreateNestedManyWithoutUserInput
+  messageMetadata?: Prisma.MessageMetadataCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  productRequests?: Prisma.ProductRequestCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSocialAccountsInput = {
+  id?: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  passwordHash?: string | null
+  profileImage?: string | null
+  gender?: string | null
+  bio?: string | null
+  location?: string | null
+  birthDate?: Date | string | null
+  emailVerified?: boolean
+  emailVerificationCode?: string | null
+  emailVerificationExpires?: Date | string | null
+  passwordResetToken?: string | null
+  passwordResetTokenExpires?: Date | string | null
+  passwordResetCode?: string | null
+  passwordResetExpires?: Date | string | null
+  provider?: string | null
+  providerId?: string | null
+  isActive?: boolean
+  isVerifiedSeller?: boolean
+  rating?: number | null
+  totalSales?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
+  productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversationMetadata?: Prisma.ConversationMetadataUncheckedCreateNestedManyWithoutUserInput
+  sentMessageStatuses?: Prisma.MessageStatusUncheckedCreateNestedManyWithoutUserInput
+  messageReactions?: Prisma.MessageReactionUncheckedCreateNestedManyWithoutUserInput
+  messageMetadata?: Prisma.MessageMetadataUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  productRequests?: Prisma.ProductRequestUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSocialAccountsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSocialAccountsInput, Prisma.UserUncheckedCreateWithoutSocialAccountsInput>
+}
+
+export type UserUpsertWithoutSocialAccountsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSocialAccountsInput, Prisma.UserUncheckedUpdateWithoutSocialAccountsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSocialAccountsInput, Prisma.UserUncheckedCreateWithoutSocialAccountsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSocialAccountsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSocialAccountsInput, Prisma.UserUncheckedUpdateWithoutSocialAccountsInput>
+}
+
+export type UserUpdateWithoutSocialAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerifiedSeller?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
+  productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  conversationMetadata?: Prisma.ConversationMetadataUpdateManyWithoutUserNestedInput
+  sentMessageStatuses?: Prisma.MessageStatusUpdateManyWithoutUserNestedInput
+  messageReactions?: Prisma.MessageReactionUpdateManyWithoutUserNestedInput
+  messageMetadata?: Prisma.MessageMetadataUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  productRequests?: Prisma.ProductRequestUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSocialAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetTokenExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  provider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerifiedSeller?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
+  productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversationMetadata?: Prisma.ConversationMetadataUncheckedUpdateManyWithoutUserNestedInput
+  sentMessageStatuses?: Prisma.MessageStatusUncheckedUpdateManyWithoutUserNestedInput
+  messageReactions?: Prisma.MessageReactionUncheckedUpdateManyWithoutUserNestedInput
+  messageMetadata?: Prisma.MessageMetadataUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  productRequests?: Prisma.ProductRequestUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  twoFactorAuth?: Prisma.TwoFactorAuthUncheckedUpdateOneWithoutUserNestedInput
 }
 
 
@@ -3571,6 +4378,8 @@ export type UserCountOutputType = {
   messageMetadata: number
   notifications: number
   productRequests: number
+  sessions: number
+  socialAccounts: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3587,6 +4396,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   messageMetadata?: boolean | UserCountOutputTypeCountMessageMetadataArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   productRequests?: boolean | UserCountOutputTypeCountProductRequestsArgs
+  sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+  socialAccounts?: boolean | UserCountOutputTypeCountSocialAccountsArgs
 }
 
 /**
@@ -3690,6 +4501,20 @@ export type UserCountOutputTypeCountProductRequestsArgs<ExtArgs extends runtime.
   where?: Prisma.ProductRequestWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SessionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSocialAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SocialAccountWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3732,6 +4557,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   messageMetadata?: boolean | Prisma.User$messageMetadataArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   productRequests?: boolean | Prisma.User$productRequestsArgs<ExtArgs>
+  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  twoFactorAuth?: boolean | Prisma.User$twoFactorAuthArgs<ExtArgs>
+  socialAccounts?: boolean | Prisma.User$socialAccountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3840,6 +4668,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   messageMetadata?: boolean | Prisma.User$messageMetadataArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   productRequests?: boolean | Prisma.User$productRequestsArgs<ExtArgs>
+  sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  twoFactorAuth?: boolean | Prisma.User$twoFactorAuthArgs<ExtArgs>
+  socialAccounts?: boolean | Prisma.User$socialAccountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3861,6 +4692,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     messageMetadata: Prisma.$MessageMetadataPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     productRequests: Prisma.$ProductRequestPayload<ExtArgs>[]
+    sessions: Prisma.$SessionPayload<ExtArgs>[]
+    twoFactorAuth: Prisma.$TwoFactorAuthPayload<ExtArgs> | null
+    socialAccounts: Prisma.$SocialAccountPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4297,6 +5131,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   messageMetadata<T extends Prisma.User$messageMetadataArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messageMetadataArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageMetadataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   productRequests<T extends Prisma.User$productRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$productRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  twoFactorAuth<T extends Prisma.User$twoFactorAuthArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$twoFactorAuthArgs<ExtArgs>>): Prisma.Prisma__TwoFactorAuthClient<runtime.Types.Result.GetResult<Prisma.$TwoFactorAuthPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  socialAccounts<T extends Prisma.User$socialAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$socialAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocialAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5050,6 +5887,73 @@ export type User$productRequestsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ProductRequestScalarFieldEnum | Prisma.ProductRequestScalarFieldEnum[]
+}
+
+/**
+ * User.sessions
+ */
+export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Session
+   */
+  select?: Prisma.SessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Session
+   */
+  omit?: Prisma.SessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SessionInclude<ExtArgs> | null
+  where?: Prisma.SessionWhereInput
+  orderBy?: Prisma.SessionOrderByWithRelationInput | Prisma.SessionOrderByWithRelationInput[]
+  cursor?: Prisma.SessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * User.twoFactorAuth
+ */
+export type User$twoFactorAuthArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TwoFactorAuth
+   */
+  select?: Prisma.TwoFactorAuthSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TwoFactorAuth
+   */
+  omit?: Prisma.TwoFactorAuthOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TwoFactorAuthInclude<ExtArgs> | null
+  where?: Prisma.TwoFactorAuthWhereInput
+}
+
+/**
+ * User.socialAccounts
+ */
+export type User$socialAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SocialAccount
+   */
+  select?: Prisma.SocialAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SocialAccount
+   */
+  omit?: Prisma.SocialAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SocialAccountInclude<ExtArgs> | null
+  where?: Prisma.SocialAccountWhereInput
+  orderBy?: Prisma.SocialAccountOrderByWithRelationInput | Prisma.SocialAccountOrderByWithRelationInput[]
+  cursor?: Prisma.SocialAccountWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SocialAccountScalarFieldEnum | Prisma.SocialAccountScalarFieldEnum[]
 }
 
 /**

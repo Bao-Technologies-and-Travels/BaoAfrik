@@ -102,3 +102,18 @@ export type ProductRequest = Prisma.ProductRequestModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model Session
+ * 
+ */
+export type Session = Prisma.SessionModel
+/**
+ * Model TwoFactorAuth
+ * 
+ */
+export type TwoFactorAuth = Prisma.TwoFactorAuthModel
+/**
+ * Model SocialAccount
+ * 
+ */
+export type SocialAccount = Prisma.SocialAccountModel

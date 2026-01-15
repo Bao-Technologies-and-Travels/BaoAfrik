@@ -29,6 +29,7 @@ import {
 } from '@/types/auth';
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
 import logger from '@/config/logger';
+import { parseUserAgent, getClientIp, getLocationFromIp } from '@/utils/sessionUtils';
 
 interface VerifyResetCodeRequest {
   email: string;
@@ -167,11 +168,37 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
   const expiresAt = new Date(Date.now() + refreshTokenExpiresIn * 24 * 60 * 60 * 1000);
 
   // Store refresh token in database
-  await prisma.refreshToken.create({
+  const refreshTokenRecord = await prisma.refreshToken.create({
     data: {
       token: refreshToken,
       userId: user.id,
       expiresAt,
+    }
+  });
+
+  // Parse user agent and get location info
+  const userAgent = req.headers['user-agent'] || '';
+  const parsedUA = parseUserAgent(userAgent);
+  const clientIp = getClientIp(req);
+  const locationInfo = await getLocationFromIp(clientIp);
+
+  // Create session record
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshTokenId: refreshTokenRecord.id,
+      deviceName: parsedUA.deviceName,
+      deviceType: parsedUA.deviceType,
+      browser: parsedUA.browser,
+      browserVersion: parsedUA.browserVersion,
+      os: parsedUA.os,
+      osVersion: parsedUA.osVersion,
+      ipAddress: clientIp,
+      location: locationInfo.location,
+      country: locationInfo.country,
+      city: locationInfo.city,
+      userAgent: userAgent,
+      expiresAt: expiresAt,
     }
   });
 
@@ -223,15 +250,38 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   const refreshToken = req.body.refreshToken;
 
-  // If refresh token provided, remove it from database
+  // If refresh token provided, remove it and associated session
   if (refreshToken) {
-    await prisma.refreshToken.deleteMany({
+    // Find the refresh token
+    const tokenRecord = await prisma.refreshToken.findUnique({
       where: { token: refreshToken }
     });
+
+    if (tokenRecord) {
+      // Delete associated session
+      await prisma.session.deleteMany({
+        where: { refreshTokenId: tokenRecord.id }
+      });
+
+      // Delete refresh token
+      await prisma.refreshToken.delete({
+        where: { id: tokenRecord.id }
+      });
+    }
   }
 
-  // If user is authenticated, we can also remove all their refresh tokens
+  // If user is authenticated, we can also remove all their refresh tokens and sessions
   if (req.user) {
+    // Delete all sessions for this user
+    await prisma.session.deleteMany({
+      where: { userId: req.user.id }
+    });
+
+    // Delete all refresh tokens for this user
+    await prisma.refreshToken.deleteMany({
+      where: { userId: req.user.id }
+    });
+
     logger.info('User logged out', { userId: req.user.id });
   }
 

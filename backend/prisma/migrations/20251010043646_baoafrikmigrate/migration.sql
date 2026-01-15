@@ -523,3 +523,94 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
+-- 10. Add new tables for sessions, 2FA, and social accounts
+CREATE TABLE IF NOT EXISTS "sessions" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "refresh_token_id" TEXT,
+    "device_name" TEXT,
+    "device_type" TEXT,
+    "browser" TEXT,
+    "browser_version" TEXT,
+    "os" TEXT,
+    "os_version" TEXT,
+    "ip_address" TEXT,
+    "location" TEXT,
+    "country" TEXT,
+    "city" TEXT,
+    "user_agent" TEXT,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "last_activity_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expires_at" TIMESTAMP(3),
+
+    CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "two_factor_auth" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "is_enabled" BOOLEAN NOT NULL DEFAULT false,
+    "method" TEXT,
+    "phone_number" TEXT,
+    "phone_code" TEXT,
+    "verification_code" TEXT,
+    "verification_expires" TIMESTAMP(3),
+    "backup_codes" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "two_factor_auth_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "social_accounts" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "provider_id" TEXT,
+    "provider_email" TEXT,
+    "provider_name" TEXT,
+    "access_token" TEXT,
+    "refresh_token" TEXT,
+    "token_expires_at" TIMESTAMP(3),
+    "is_connected" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "social_accounts_pkey" PRIMARY KEY ("id")
+);
+
+-- 11. Add unique constraints and indexes for new tables
+CREATE UNIQUE INDEX IF NOT EXISTS "sessions_refresh_token_id_key" ON "sessions"("refresh_token_id") WHERE "refresh_token_id" IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS "two_factor_auth_user_id_key" ON "two_factor_auth"("user_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "social_accounts_user_id_provider_key" ON "social_accounts"("user_id", "provider");
+
+-- Indexes for sessions
+CREATE INDEX IF NOT EXISTS "sessions_user_id_idx" ON "sessions"("user_id");
+CREATE INDEX IF NOT EXISTS "sessions_user_id_is_active_idx" ON "sessions"("user_id", "is_active");
+
+-- Indexes for social accounts
+CREATE INDEX IF NOT EXISTS "social_accounts_user_id_idx" ON "social_accounts"("user_id");
+
+-- 12. Add foreign keys for new tables
+DO $$ BEGIN
+    -- Sessions foreign keys
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'sessions_user_id_fkey') THEN
+        ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'sessions_refresh_token_id_fkey') THEN
+        ALTER TABLE "sessions" ADD CONSTRAINT "sessions_refresh_token_id_fkey" FOREIGN KEY ("refresh_token_id") REFERENCES "refresh_tokens"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+    END IF;
+
+    -- Two factor auth foreign keys
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'two_factor_auth_user_id_fkey') THEN
+        ALTER TABLE "two_factor_auth" ADD CONSTRAINT "two_factor_auth_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+
+    -- Social accounts foreign keys
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'social_accounts_user_id_fkey') THEN
+        ALTER TABLE "social_accounts" ADD CONSTRAINT "social_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;

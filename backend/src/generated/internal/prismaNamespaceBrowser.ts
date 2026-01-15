@@ -67,7 +67,10 @@ export const ModelName = {
   ConversationParticipant: 'ConversationParticipant',
   ConversationMetadata: 'ConversationMetadata',
   ProductRequest: 'ProductRequest',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  Session: 'Session',
+  TwoFactorAuth: 'TwoFactorAuth',
+  SocialAccount: 'SocialAccount'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -361,6 +364,65 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  refreshTokenId: 'refreshTokenId',
+  deviceName: 'deviceName',
+  deviceType: 'deviceType',
+  browser: 'browser',
+  browserVersion: 'browserVersion',
+  os: 'os',
+  osVersion: 'osVersion',
+  ipAddress: 'ipAddress',
+  location: 'location',
+  country: 'country',
+  city: 'city',
+  userAgent: 'userAgent',
+  isActive: 'isActive',
+  lastActivityAt: 'lastActivityAt',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const TwoFactorAuthScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  isEnabled: 'isEnabled',
+  method: 'method',
+  phoneNumber: 'phoneNumber',
+  phoneCode: 'phoneCode',
+  verificationCode: 'verificationCode',
+  verificationExpires: 'verificationExpires',
+  backupCodes: 'backupCodes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TwoFactorAuthScalarFieldEnum = (typeof TwoFactorAuthScalarFieldEnum)[keyof typeof TwoFactorAuthScalarFieldEnum]
+
+
+export const SocialAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerId: 'providerId',
+  providerEmail: 'providerEmail',
+  providerName: 'providerName',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  isConnected: 'isConnected',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SocialAccountScalarFieldEnum = (typeof SocialAccountScalarFieldEnum)[keyof typeof SocialAccountScalarFieldEnum]
 
 
 export const SortOrder = {
