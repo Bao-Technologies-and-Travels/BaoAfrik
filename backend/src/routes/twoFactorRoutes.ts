@@ -22,4 +22,7 @@ router.post('/disable', twoFactorController.disableTwoFactor);
 // Resend verification code
 router.post('/resend-code', twoFactorController.resendTwoFactorCode);
 
+// Verify credentials (email/password) before enabling 2FA
+router.post('/verify-credentials', twoFactorController.verifyCredentials);
+
 export default router;

@@ -50,6 +50,7 @@ router.post('/resend-verification', authController.resendVerificationCode);
 router.post('/forgot-password', validateForgotPassword, authController.forgotPassword);
 router.post('/verify-reset-code', validateVerifyResetCode, authController.verifyResetCode);
 router.post('/reset-password', validateResetPassword, authController.resetPassword);
+router.post('/verify-login-otp', authController.verifyLoginOTP);
 
 // Token refresh
 router.post('/refresh', authController.refreshToken);

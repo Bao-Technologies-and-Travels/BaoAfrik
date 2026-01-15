@@ -216,6 +216,14 @@ const ProfileSettings: React.FC = () => {
   const [twoFactorVerificationCode, setTwoFactorVerificationCode] = useState(['', '', '', '', '', '']);
   const [twoFactorCountdown, setTwoFactorCountdown] = useState(60);
   const [canResendTwoFactorCode, setCanResendTwoFactorCode] = useState(false);
+  const [twoFactorErrors, setTwoFactorErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const [isTwoFactorSubmitting, setIsTwoFactorSubmitting] = useState(false);
+  const [isDisableTwoFactorModalOpen, setIsDisableTwoFactorModalOpen] = useState(false);
+  const [disableTwoFactorEmail, setDisableTwoFactorEmail] = useState('');
+  const [disableTwoFactorPassword, setDisableTwoFactorPassword] = useState('');
+  const [disableTwoFactorErrors, setDisableTwoFactorErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const [isDisablingTwoFactor, setIsDisablingTwoFactor] = useState(false);
+  const disableTwoFactorModalRef = useRef<HTMLDivElement>(null);
   const twoFactorModalRef = useRef<HTMLDivElement>(null);
   const twoFactorPhoneCodeDropdownRef = useRef<HTMLDivElement>(null);
   const twoFactorCodeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -975,6 +983,33 @@ const ProfileSettings: React.FC = () => {
     }
   }, [user]);
 
+  // Fetch 2FA status on mount and when user changes
+  useEffect(() => {
+    const fetchTwoFactorStatus = async () => {
+      if (user?.id) {
+        try {
+          const status = await twoFactorService.getStatus();
+          setIsTwoFactorEnabled(status.isEnabled);
+        } catch (error) {
+          console.error('Failed to fetch 2FA status:', error);
+          // Keep default state (false) on error
+        }
+      }
+    };
+
+    fetchTwoFactorStatus();
+  }, [user?.id]);
+
+  // Countdown timer for 2FA resend code
+  useEffect(() => {
+    if (twoFactorCountdown > 0 && twoFactorModalStep === 'code') {
+      const timer = setTimeout(() => setTwoFactorCountdown(twoFactorCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (twoFactorCountdown === 0 && twoFactorModalStep === 'code') {
+      setCanResendTwoFactorCode(true);
+    }
+  }, [twoFactorCountdown, twoFactorModalStep]);
+
   // Calculate profile completion progress
   const calculateProfileProgress = () => {
     if (!user) return 0;
@@ -1028,7 +1063,15 @@ const ProfileSettings: React.FC = () => {
   const phoneCodes = sortedCountryPhoneCodes.map(c => ({
     label: c.name,
     code: c.dialCode,
-    flag: c.flag
+    flag: c.flag,
+    isoCode: c.code // ISO country code for unique key
+  }));
+
+  const twoFactorPhoneCodes = sortedCountryPhoneCodes.map(c => ({
+    label: c.name,
+    code: c.dialCode,
+    flag: c.flag,
+    isoCode: c.code // ISO country code for unique key
   }));
 
   const [socialConnections, setSocialConnections] = useState({
@@ -2082,15 +2125,21 @@ const ProfileSettings: React.FC = () => {
 
   const handleCloseTwoFactorModal = () => {
     setIsTwoFactorModalOpen(false);
-    // If closing from the initial step, reset the toggle to default
+    // Refresh 2FA status when closing modal to ensure toggle reflects actual state
     if (twoFactorModalStep === 'email') {
-      setIsTwoFactorEnabled(false);
+      // If closing from initial step, fetch status to ensure toggle is correct
+      twoFactorService.getStatus().then(status => {
+        setIsTwoFactorEnabled(status.isEnabled);
+      }).catch(() => {
+        // Keep current state on error
+      });
     }
     setTwoFactorModalStep('email');
     setTwoFactorEmail('');
     setTwoFactorPassword('');
     setTwoFactorPhone('');
     setTwoFactorVerificationCode(['', '', '', '', '', '']);
+    setTwoFactorErrors({});
     setTwoFactorSelectedPhoneCode({
       label: 'United States',
       code: '+1',
@@ -2105,23 +2154,161 @@ const ProfileSettings: React.FC = () => {
     setTwoFactorModalStep('phone');
   };
 
-  const handleTwoFactorPhoneSubmit = (e: React.FormEvent) => {
+  const handleTwoFactorPhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTwoFactorModalStep('code');
-    setTwoFactorCountdown(60);
-    setCanResendTwoFactorCode(false);
+
+    if (!twoFactorPhone.trim()) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter your phone number',
+        duration: 3000
+      });
+      return;
+    }
+
+    setIsTwoFactorSubmitting(true);
+    try {
+      // Enable 2FA with phone method - this will send OTP
+      await twoFactorService.enable('phone', twoFactorPhone.trim(), twoFactorSelectedPhoneCode.code);
+
+      // Proceed to code step
+      setTwoFactorModalStep('code');
+      setTwoFactorCountdown(60);
+      setCanResendTwoFactorCode(false);
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to send verification code',
+        duration: 3000
+      });
+    } finally {
+      setIsTwoFactorSubmitting(false);
+    }
   };
 
-  const handleTwoFactorResendCode = () => {
+  const handleTwoFactorResendCode = async () => {
     if (!canResendTwoFactorCode) return;
-    setTwoFactorCountdown(60);
-    setCanResendTwoFactorCode(false);
-    // TODO: Implement resend API call
+
+    try {
+      await twoFactorService.resendCode();
+      setTwoFactorCountdown(60);
+      setCanResendTwoFactorCode(false);
+      addToast({
+        type: 'success',
+        title: 'Code sent',
+        message: 'A new verification code has been sent',
+        duration: 2000
+      });
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to resend code',
+        duration: 3000
+      });
+    }
   };
 
-  const handleTwoFactorCodeSubmit = (e: React.FormEvent) => {
+  const handleTwoFactorCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTwoFactorModalStep('success');
+    const code = twoFactorVerificationCode.join('');
+    if (code.length !== 6) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter the complete 6-digit code',
+        duration: 3000
+      });
+      return;
+    }
+
+    setIsTwoFactorSubmitting(true);
+    try {
+      // Verify the code
+      await twoFactorService.verifyCode(code);
+
+      // If successful, show success step
+      setTwoFactorModalStep('success');
+
+      // Refresh 2FA status
+      const status = await twoFactorService.getStatus();
+      setIsTwoFactorEnabled(status.isEnabled);
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Verification failed',
+        message: error.message || 'Invalid verification code',
+        duration: 3000
+      });
+      // Clear the code inputs
+      setTwoFactorVerificationCode(['', '', '', '', '', '']);
+      twoFactorCodeInputRefs.current[0]?.focus();
+    } finally {
+      setIsTwoFactorSubmitting(false);
+    }
+  };
+
+  // Handle disable 2FA email/password submission
+  const handleDisableTwoFactorEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate form
+    const newErrors: { email?: string; password?: string } = {};
+
+    if (!disableTwoFactorEmail.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(disableTwoFactorEmail)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!disableTwoFactorPassword) {
+      newErrors.password = 'Password is required';
+    }
+
+    setDisableTwoFactorErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      return;
+    }
+
+    setIsDisablingTwoFactor(true);
+    try {
+      // Verify credentials with backend
+      await twoFactorService.verifyCredentials(disableTwoFactorEmail.trim(), disableTwoFactorPassword);
+
+      // If successful, disable 2FA
+      await twoFactorService.disable();
+
+      // Update state
+      setIsTwoFactorEnabled(false);
+      setIsDisableTwoFactorModalOpen(false);
+      setDisableTwoFactorEmail('');
+      setDisableTwoFactorPassword('');
+      setDisableTwoFactorErrors({});
+
+      addToast({
+        type: 'success',
+        title: 'Success',
+        message: 'Two-step verification has been disabled',
+        duration: 3000
+      });
+    } catch (error: any) {
+      setDisableTwoFactorErrors({
+        general: error.message || 'Invalid email or password. Please check your credentials and try again.'
+      });
+    } finally {
+      setIsDisablingTwoFactor(false);
+    }
+  };
+
+  // Close disable 2FA modal
+  const handleCloseDisableTwoFactorModal = () => {
+    setIsDisableTwoFactorModalOpen(false);
+    setDisableTwoFactorEmail('');
+    setDisableTwoFactorPassword('');
+    setDisableTwoFactorErrors({});
   };
 
   const handleTwoFactorCodeInputChange = (index: number, value: string) => {
@@ -3675,7 +3862,7 @@ const ProfileSettings: React.FC = () => {
                                       {phoneCodes.map(code => (
                                         <button
                                           type="button"
-                                          key={code.code}
+                                          key={code.isoCode}
                                           onClick={() => handlePhoneCodeSelect(code)}
                                           className="w-full px-3 py-2 flex items-center space-x-2 text-left hover:bg-gray-50"
                                         >
@@ -3929,7 +4116,7 @@ const ProfileSettings: React.FC = () => {
                           <button
                             onClick={() => {
                               if (!isTwoFactorEnabled) {
-                                setIsTwoFactorEnabled(true);
+                                // Don't set to true yet - only after successful verification
                                 if (isMobileSecurityView) {
                                   // Navigate to mobile flow instead of opening modal
                                   navigate('/two-factor-email', { state: { fromProfileSettings: true } });
@@ -3938,7 +4125,11 @@ const ProfileSettings: React.FC = () => {
                                   setTwoFactorModalStep('email');
                                 }
                               } else {
-                                setIsTwoFactorEnabled(false);
+                                // Show disable modal with email/password verification
+                                setIsDisableTwoFactorModalOpen(true);
+                                setDisableTwoFactorEmail('');
+                                setDisableTwoFactorPassword('');
+                                setDisableTwoFactorErrors({});
                               }
                             }}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isMobileSecurityView ? 'shrink-0' : ''}`}
@@ -6016,11 +6207,16 @@ const ProfileSettings: React.FC = () => {
                       <input
                         type="email"
                         value={twoFactorEmail}
-                        onChange={(e) => setTwoFactorEmail(e.target.value)}
+                        onChange={(e) => {
+                          setTwoFactorEmail(e.target.value);
+                          if (twoFactorErrors.email) {
+                            setTwoFactorErrors(prev => ({ ...prev, email: undefined }));
+                          }
+                        }}
                         placeholder="Enter your mail address"
                         className="two-factor-input w-full px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
                         style={{
-                          borderColor: '#E9E9E9',
+                          borderColor: twoFactorErrors.email ? '#FF6E6E' : '#E9E9E9',
                           color: '#212121',
                           fontFamily: 'Poppins, sans-serif'
                         }}
@@ -6028,9 +6224,14 @@ const ProfileSettings: React.FC = () => {
                           e.currentTarget.style.borderColor = '#CFE8FC';
                         }}
                         onBlur={(e) => {
-                          e.currentTarget.style.borderColor = '#E9E9E9';
+                          e.currentTarget.style.borderColor = twoFactorErrors.email ? '#FF6E6E' : '#E9E9E9';
                         }}
                       />
+                      {twoFactorErrors.email && (
+                        <p className="text-[10px] mt-1" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                          {twoFactorErrors.email}
+                        </p>
+                      )}
                     </div>
 
                     {/* Password Input */}
@@ -6041,11 +6242,16 @@ const ProfileSettings: React.FC = () => {
                       <input
                         type="password"
                         value={twoFactorPassword}
-                        onChange={(e) => setTwoFactorPassword(e.target.value)}
+                        onChange={(e) => {
+                          setTwoFactorPassword(e.target.value);
+                          if (twoFactorErrors.password) {
+                            setTwoFactorErrors(prev => ({ ...prev, password: undefined }));
+                          }
+                        }}
                         placeholder="Enter your password"
                         className="two-factor-input w-full px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
                         style={{
-                          borderColor: '#E9E9E9',
+                          borderColor: twoFactorErrors.password ? '#FF6E6E' : '#E9E9E9',
                           color: '#212121',
                           fontFamily: 'Poppins, sans-serif'
                         }}
@@ -6053,10 +6259,22 @@ const ProfileSettings: React.FC = () => {
                           e.currentTarget.style.borderColor = '#CFE8FC';
                         }}
                         onBlur={(e) => {
-                          e.currentTarget.style.borderColor = '#E9E9E9';
+                          e.currentTarget.style.borderColor = twoFactorErrors.password ? '#FF6E6E' : '#E9E9E9';
                         }}
                       />
+                      {twoFactorErrors.password && (
+                        <p className="text-[10px] mt-1" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                          {twoFactorErrors.password}
+                        </p>
+                      )}
                     </div>
+
+                    {/* General Error Message */}
+                    {twoFactorErrors.general && (
+                      <div className="text-[11px] text-center" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                        {twoFactorErrors.general}
+                      </div>
+                    )}
 
                     {/* Buttons */}
                     <div className="flex items-center gap-3 pt-4">
@@ -6078,14 +6296,15 @@ const ProfileSettings: React.FC = () => {
                       {/* Continue Button */}
                       <button
                         type="submit"
+                        disabled={isTwoFactorSubmitting}
                         className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
                         style={{
-                          backgroundColor: '#F9A825',
-                          color: '#FFFFFF',
+                          backgroundColor: isTwoFactorSubmitting ? '#E9E9E9' : '#F9A825',
+                          color: isTwoFactorSubmitting ? '#6A6A6A' : '#FFFFFF',
                           fontFamily: 'Poppins, sans-serif'
                         }}
                       >
-                        Continue
+                        {isTwoFactorSubmitting ? 'Sending...' : 'Continue'}
                       </button>
                     </div>
                   </form>
@@ -6159,9 +6378,9 @@ const ProfileSettings: React.FC = () => {
                               }}
                             >
                               <div className="two-factor-dropdown" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                {phoneCodes.map((code) => (
+                                {twoFactorPhoneCodes.map((code) => (
                                   <button
-                                    key={code.code}
+                                    key={code.isoCode}
                                     type="button"
                                     onClick={() => {
                                       setTwoFactorSelectedPhoneCode(code);
@@ -6239,14 +6458,15 @@ const ProfileSettings: React.FC = () => {
                       {/* Continue Button */}
                       <button
                         type="submit"
+                        disabled={isTwoFactorSubmitting}
                         className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
                         style={{
-                          backgroundColor: '#F9A825',
-                          color: '#FFFFFF',
+                          backgroundColor: isTwoFactorSubmitting ? '#E9E9E9' : '#F9A825',
+                          color: isTwoFactorSubmitting ? '#6A6A6A' : '#FFFFFF',
                           fontFamily: 'Poppins, sans-serif'
                         }}
                       >
-                        Continue
+                        {isTwoFactorSubmitting ? 'Sending...' : 'Continue'}
                       </button>
                     </div>
                   </form>
@@ -6339,14 +6559,15 @@ const ProfileSettings: React.FC = () => {
                       {/* Continue Button */}
                       <button
                         type="submit"
+                        disabled={twoFactorVerificationCode.join('').length !== 6 || isTwoFactorSubmitting}
                         className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
                         style={{
-                          backgroundColor: '#F9A825',
-                          color: '#FFFFFF',
+                          backgroundColor: twoFactorVerificationCode.join('').length === 6 && !isTwoFactorSubmitting ? '#F9A825' : '#E9E9E9',
+                          color: twoFactorVerificationCode.join('').length === 6 && !isTwoFactorSubmitting ? '#FFFFFF' : '#6A6A6A',
                           fontFamily: 'Poppins, sans-serif'
                         }}
                       >
-                        Continue
+                        {isTwoFactorSubmitting ? 'Verifying...' : 'Continue'}
                       </button>
                     </div>
                   </form>
@@ -6380,8 +6601,13 @@ const ProfileSettings: React.FC = () => {
                     className="w-full max-w-xs mx-auto py-2.5 rounded-[12px] text-sm font-normal transition-colors"
                     style={{ backgroundColor: '#F9A825', color: '#FFFFFF', borderRadius: '12px' }}
                     onClick={() => {
-                      setIsTwoFactorEnabled(true);
                       handleCloseTwoFactorModal();
+                      // Refresh 2FA status to ensure toggle is correct
+                      twoFactorService.getStatus().then(status => {
+                        setIsTwoFactorEnabled(status.isEnabled);
+                      }).catch(() => {
+                        // Keep current state on error
+                      });
                     }}
                   >
                     Close
@@ -6417,6 +6643,179 @@ const ProfileSettings: React.FC = () => {
           .profile-settings-content {
             -ms-overflow-style: none;
             scrollbar-width: none;
+          }
+        `}</style>
+        </>
+      )}
+
+      {/* Disable Two Step Verification Modal */}
+      {isDisableTwoFactorModalOpen && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={handleCloseDisableTwoFactorModal}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              ref={disableTwoFactorModalRef}
+              className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-16 relative max-w-md w-full"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={handleCloseDisableTwoFactorModal}
+                className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
+              >
+                <img
+                  src={closeIcon}
+                  alt="Close"
+                  className="w-5 h-5"
+                  style={{ filter: 'brightness(0) saturate(100%) invert(79%) sepia(6%) saturate(178%) hue-rotate(169deg) brightness(88%) contrast(83%)' }}
+                />
+              </button>
+
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <img src={keyIcon} alt="Key" className="w-16 h-16" />
+              </div>
+
+              {/* Title */}
+              <h2
+                className="text-xl text-center mb-1.5"
+                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
+              >
+                Disable two step authentication
+              </h2>
+
+              {/* Description */}
+              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                Please enter your information to disable two-step verification
+              </p>
+
+              {/* Form */}
+              <form onSubmit={handleDisableTwoFactorEmailSubmit} className="space-y-4">
+                {/* Email Input */}
+                <div>
+                  <label className="block text-xs mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                    Email address
+                  </label>
+                  <input
+                    type="email"
+                    value={disableTwoFactorEmail}
+                    onChange={(e) => {
+                      setDisableTwoFactorEmail(e.target.value);
+                      if (disableTwoFactorErrors.email) {
+                        setDisableTwoFactorErrors(prev => ({ ...prev, email: undefined }));
+                      }
+                    }}
+                    placeholder="Enter your mail address"
+                    className="two-factor-input w-full px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                    style={{
+                      borderColor: disableTwoFactorErrors.email ? '#FF6E6E' : '#E9E9E9',
+                      color: '#212121',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#CFE8FC';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = disableTwoFactorErrors.email ? '#FF6E6E' : '#E9E9E9';
+                    }}
+                  />
+                  {disableTwoFactorErrors.email && (
+                    <p className="text-[10px] mt-1" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                      {disableTwoFactorErrors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* Password Input */}
+                <div>
+                  <label className="block text-xs mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={disableTwoFactorPassword}
+                    onChange={(e) => {
+                      setDisableTwoFactorPassword(e.target.value);
+                      if (disableTwoFactorErrors.password) {
+                        setDisableTwoFactorErrors(prev => ({ ...prev, password: undefined }));
+                      }
+                    }}
+                    placeholder="Enter your password"
+                    className="two-factor-input w-full px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                    style={{
+                      borderColor: disableTwoFactorErrors.password ? '#FF6E6E' : '#E9E9E9',
+                      color: '#212121',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#CFE8FC';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = disableTwoFactorErrors.password ? '#FF6E6E' : '#E9E9E9';
+                    }}
+                  />
+                  {disableTwoFactorErrors.password && (
+                    <p className="text-[10px] mt-1" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                      {disableTwoFactorErrors.password}
+                    </p>
+                  )}
+                </div>
+
+                {/* General Error Message */}
+                {disableTwoFactorErrors.general && (
+                  <div className="text-[11px] text-center" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                    {disableTwoFactorErrors.general}
+                  </div>
+                )}
+
+                {/* Buttons */}
+                <div className="flex items-center gap-3 pt-4">
+                  {/* Cancel Button */}
+                  <button
+                    type="button"
+                    onClick={handleCloseDisableTwoFactorModal}
+                    className="flex-1 py-2 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                    style={{
+                      backgroundColor: '#F1F1F1',
+                      color: '#6A6A6A',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    <span style={{ color: '#6A6A6A' }}>X</span>
+                    Cancel
+                  </button>
+
+                  {/* Continue Button */}
+                  <button
+                    type="submit"
+                    disabled={isDisablingTwoFactor}
+                    className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
+                    style={{
+                      backgroundColor: isDisablingTwoFactor ? '#E9E9E9' : '#F9A825',
+                      color: isDisablingTwoFactor ? '#6A6A6A' : '#FFFFFF',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {isDisablingTwoFactor ? 'Disabling...' : 'Disable'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <style>{`
+          .two-factor-input::placeholder {
+            color: #D9D9D9 !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            font-family: 'Poppins', sans-serif !important;
           }
         `}</style>
         </>

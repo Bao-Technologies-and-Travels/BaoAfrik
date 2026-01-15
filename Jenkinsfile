@@ -307,7 +307,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Backend session management: track where users are logging in from and what devices they are using and allow them to revoke sessions.</p>
+                            <p><strong>Changes made:</strong>Two step verification implemented in backend, users can now enable and disable two step verification (require an OTP from their phone number during login) in their profile settings.</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

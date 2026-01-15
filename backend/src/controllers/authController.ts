@@ -28,6 +28,7 @@ import {
   DeleteUserRequest
 } from '@/types/auth';
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/utils/emailService';
+import { sendOTP } from '@/utils/smsService';
 import logger from '@/config/logger';
 import { parseUserAgent, getClientIp, getLocationFromIp } from '@/utils/sessionUtils';
 
@@ -160,6 +161,62 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     throw createUnauthorizedError('Please verify your email before logging in');
   }
 
+  // Check if 2FA is enabled
+  const twoFactorAuth = await prisma.twoFactorAuth.findUnique({
+    where: { userId: user.id }
+  });
+
+  if (twoFactorAuth?.isEnabled) {
+    // Generate OTP for login
+    const loginOTP = generateVerificationCode();
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    // Store OTP temporarily (we'll use a temporary field or session)
+    // For now, we'll store it in the TwoFactorAuth record temporarily
+    await prisma.twoFactorAuth.update({
+      where: { userId: user.id },
+      data: {
+        verificationCode: loginOTP,
+        verificationExpires: otpExpires
+      }
+    });
+
+    // Send OTP based on method
+    if (twoFactorAuth.method === 'phone' && twoFactorAuth.phoneNumber && twoFactorAuth.phoneCode) {
+      const { sendOTP } = await import('@/utils/smsService');
+      const fullPhoneNumber = `${twoFactorAuth.phoneCode}${twoFactorAuth.phoneNumber}`;
+      try {
+        await sendOTP(fullPhoneNumber, loginOTP);
+        logger.info('Login OTP sent via Twilio', {
+          userId: user.id,
+          phoneNumber: fullPhoneNumber
+        });
+      } catch (error) {
+        logger.error('Failed to send login OTP via Twilio:', error);
+        throw new Error('Failed to send verification code. Please try again.');
+      }
+    } else if (twoFactorAuth.method === 'email') {
+      await sendVerificationEmail(user.email, loginOTP);
+      return logger.info('Login OTP sent via email', {
+        userId: user.id,
+        email: user.email
+      });
+    }
+
+    // Return response indicating 2FA is required
+    const response: ApiResponse = {
+      success: false,
+      message: 'Two-factor authentication required',
+      data: {
+        requires2FA: true,
+        method: twoFactorAuth.method,
+        expiresIn: 300 // 5 minutes
+      }
+    };
+
+    return res.status(200).json(response);
+  }
+
   // Generate tokens
   const { accessToken, refreshToken } = generateTokenPair(user.id, user.email);
 
@@ -226,6 +283,149 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     userId: user.id,
     email: user.email,
     rememberMe
+  });
+
+  const responseData: LoginResponse = {
+    accessToken,
+    refreshToken,
+    user: publicUser
+  };
+
+  const response: ApiResponse<LoginResponse> = {
+    success: true,
+    message: 'Login successful',
+    data: responseData
+  };
+
+  return res.json(response);
+});
+
+/**
+ * Verify login OTP (for 2FA during login)
+ */
+export const verifyLoginOTP = asyncHandler(async (req: Request, res: Response) => {
+  const { email, code } = req.body;
+
+  if (!email || !code) {
+    throw createValidationError('Email and verification code are required');
+  }
+
+  // Find user
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email.toLowerCase(),
+      isActive: true
+    },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      phoneNumber: true,
+      profileImage: true,
+      emailVerified: true,
+      isVerifiedSeller: true,
+      provider: true,
+      lastLoginAt: true,
+    }
+  });
+
+  if (!user) {
+    throw createUnauthorizedError('Invalid email');
+  }
+
+  // Get 2FA record
+  const twoFactorAuth = await prisma.twoFactorAuth.findUnique({
+    where: { userId: user.id }
+  });
+
+  if (!twoFactorAuth || !twoFactorAuth.isEnabled) {
+    throw createValidationError('Two-factor authentication is not enabled for this account');
+  }
+
+  // Verify OTP
+  if (twoFactorAuth.verificationCode !== code) {
+    throw createValidationError('Invalid verification code');
+  }
+
+  if (!twoFactorAuth.verificationExpires || twoFactorAuth.verificationExpires < new Date()) {
+    throw createValidationError('Verification code has expired. Please login again.');
+  }
+
+  // Clear OTP
+  await prisma.twoFactorAuth.update({
+    where: { userId: user.id },
+    data: {
+      verificationCode: null,
+      verificationExpires: null
+    }
+  });
+
+  // Generate tokens
+  const { accessToken, refreshToken } = generateTokenPair(user.id, user.email);
+
+  // Calculate refresh token expiration
+  const refreshTokenExpiresIn = 7; // 7 days
+  const expiresAt = new Date(Date.now() + refreshTokenExpiresIn * 24 * 60 * 60 * 1000);
+
+  // Store refresh token in database
+  const refreshTokenRecord = await prisma.refreshToken.create({
+    data: {
+      token: refreshToken,
+      userId: user.id,
+      expiresAt,
+    }
+  });
+
+  // Parse user agent and get location info
+  const userAgent = req.headers['user-agent'] || '';
+  const parsedUA = parseUserAgent(userAgent);
+  const clientIp = getClientIp(req);
+  const locationInfo = await getLocationFromIp(clientIp);
+
+  // Create session record
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      refreshTokenId: refreshTokenRecord.id,
+      deviceName: parsedUA.deviceName,
+      deviceType: parsedUA.deviceType,
+      browser: parsedUA.browser,
+      browserVersion: parsedUA.browserVersion,
+      os: parsedUA.os,
+      osVersion: parsedUA.osVersion,
+      ipAddress: clientIp,
+      location: locationInfo.location,
+      country: locationInfo.country,
+      city: locationInfo.city,
+      userAgent: userAgent,
+      expiresAt: expiresAt,
+    }
+  });
+
+  // Update last login timestamp
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLoginAt: new Date() }
+  });
+
+  // Create public user object
+  const publicUser: PublicUser = {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName || undefined,
+    lastName: user.lastName || undefined,
+    phoneNumber: user.phoneNumber || undefined,
+    profileImage: user.profileImage || undefined,
+    emailVerified: user.emailVerified,
+    isVerifiedSeller: user.isVerifiedSeller,
+    provider: user.provider || undefined,
+    lastLoginAt: user.lastLoginAt || undefined,
+  };
+
+  logger.info('User logged in successfully with 2FA', {
+    userId: user.id,
+    email: user.email
   });
 
   const responseData: LoginResponse = {
@@ -853,5 +1053,6 @@ export default {
   resetPassword,
   changePassword,
   verifyResetCode,
-  deleteUser
+  deleteUser,
+  verifyLoginOTP
 };

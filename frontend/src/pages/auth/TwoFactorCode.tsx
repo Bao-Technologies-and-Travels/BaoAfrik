@@ -4,14 +4,21 @@ import keyIcon from '../../assets/images/pre/key.svg';
 import backArrowIcon from '../../assets/images/pre/back arrow.svg';
 import { twoFactorService } from '../../services/twoFactorService';
 import { useToast } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../services/authService';
 
 const TwoFactorCode: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { addToast } = useToast();
+  const { login } = useAuth();
   const fromProfileSettings = location.state?.fromProfileSettings || false;
+  const fromLogin = location.state?.fromLogin || false;
+  const email = location.state?.email || '';
+  const password = location.state?.password || '';
   const phone = location.state?.phone || '';
   const phoneCode = location.state?.phoneCode || { code: '+1', label: 'United States' };
+  const method = location.state?.method || 'phone';
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [isMobile, setIsMobile] = useState(false);
   const [countdown, setCountdown] = useState(60);
@@ -41,15 +48,27 @@ const TwoFactorCode: React.FC = () => {
   const handleResendCode = async () => {
     if (!canResend) return;
     try {
-      await twoFactorService.resendCode();
-      setCountdown(60);
-      setCanResend(false);
-      addToast({
-        type: 'success',
-        title: 'Code sent',
-        message: 'A new verification code has been sent',
-        duration: 2000
-      });
+      if (fromLogin) {
+        // For login flow, we need to resend OTP by logging in again
+        // This will trigger a new OTP to be sent
+        addToast({
+          type: 'info',
+          title: 'Info',
+          message: 'Please login again to receive a new code',
+          duration: 3000
+        });
+        navigate('/login', { state: { email } });
+      } else {
+        await twoFactorService.resendCode();
+        setCountdown(60);
+        setCanResend(false);
+        addToast({
+          type: 'success',
+          title: 'Code sent',
+          message: 'A new verification code has been sent',
+          duration: 2000
+        });
+      }
     } catch (error: any) {
       addToast({
         type: 'error',
@@ -87,7 +106,7 @@ const TwoFactorCode: React.FC = () => {
     setIsSubmitting(true);
     try {
       await twoFactorService.verifyCode(code);
-      
+
       if (fromProfileSettings) {
         navigate('/two-factor-success', {
           state: {
@@ -178,7 +197,10 @@ const TwoFactorCode: React.FC = () => {
               {/* Description */}
               <p className="text-xs text-center mb-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
                 Enter the authentication code below we sent to<br />
-                {phoneCode.code} {maskPhone(phone)}
+                {fromLogin
+                  ? (method === 'phone' ? `your phone number` : email)
+                  : `${phoneCode.code} ${maskPhone(phone)}`
+                }
               </p>
               {!canResend ? (
                 <p className="text-[11px] mt-3 mb-6" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>

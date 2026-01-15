@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import logoSmall from "../../assets/images/logos/ba-brand-icon-colored.png";
@@ -6,6 +6,7 @@ import logoLarge from "../../assets/images/logos/Frame 656.png";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import { authService } from "../../services/authService";
 import { useToast } from "../../contexts/ToastContext";
+import keyIcon from "../../assets/images/pre/key.svg";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -19,6 +20,16 @@ const Login: React.FC = () => {
     "success"
   );
   const { addToast } = useToast();
+  
+  // 2FA Modal State
+  const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
+  const [twoFactorMethod, setTwoFactorMethod] = useState<'phone' | 'email'>('phone');
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
+  const [twoFactorCountdown, setTwoFactorCountdown] = useState(60);
+  const [canResendTwoFactor, setCanResendTwoFactor] = useState(false);
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+  const twoFactorCodeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const twoFactorModalRef = useRef<HTMLDivElement>(null);
 
   const { login, setVisitorMode } = useAuth();
   const navigate = useNavigate();
@@ -194,6 +205,22 @@ const Login: React.FC = () => {
         return;
       }
 
+      // Check if 2FA is required
+      const responseData = response.data as any;
+      if (responseData?.requires2FA) {
+        // Show 2FA modal instead of navigating
+        setTwoFactorMethod(responseData.method || 'phone');
+        setShowTwoFactorModal(true);
+        setTwoFactorCountdown(60);
+        setCanResendTwoFactor(false);
+        setVerificationCode(['', '', '', '', '', '']);
+        // Focus first input after modal opens
+        setTimeout(() => {
+          twoFactorCodeInputRefs.current[0]?.focus();
+        }, 100);
+        return;
+      }
+
       const loginData = response.data;
 
       if (!loginData) {
@@ -265,6 +292,180 @@ const Login: React.FC = () => {
     setVisitorMode(true);
     navigate("/");
   };
+
+  // Countdown timer for 2FA resend
+  useEffect(() => {
+    if (twoFactorCountdown > 0 && showTwoFactorModal) {
+      const timer = setTimeout(() => setTwoFactorCountdown(twoFactorCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (twoFactorCountdown === 0 && showTwoFactorModal) {
+      setCanResendTwoFactor(true);
+    }
+  }, [twoFactorCountdown, showTwoFactorModal]);
+
+  // Handle 2FA code input change
+  const handleTwoFactorCodeChange = (index: number, value: string) => {
+    if (value.length > 1) return;
+
+    const newCode = [...verificationCode];
+    newCode[index] = value;
+    setVerificationCode(newCode);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      twoFactorCodeInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  // Handle 2FA code key down
+  const handleTwoFactorCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
+      twoFactorCodeInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  // Handle 2FA OTP verification
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = verificationCode.join('');
+    if (code.length !== 6) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter the complete 6-digit code',
+        duration: 3000
+      });
+      return;
+    }
+
+    setIsVerifyingOTP(true);
+    try {
+      const response = await authService.verifyLoginOTP(email.toLowerCase(), code);
+      
+      if (response.success && response.data) {
+        const { user, accessToken, refreshToken } = response.data;
+        
+        // Store tokens and user data
+        localStorage.setItem('accessToken', accessToken);
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+        }
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        // Update auth context
+        login(
+          {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName || undefined,
+            lastName: user.lastName || undefined,
+            profileImage: user.profileImage || undefined,
+          },
+          accessToken,
+          refreshToken
+        );
+        
+        // Close modal
+        setShowTwoFactorModal(false);
+        setVerificationCode(['', '', '', '', '', '']);
+        
+        // Check if profile is incomplete
+        const profileIncomplete = !user.firstName || !user.lastName;
+        
+        if (profileIncomplete) {
+          navigate('/profile-setup');
+          addToast({
+            type: 'info',
+            title: 'Action needed!',
+            message: 'Please complete your profile',
+            duration: 2500
+          });
+        } else {
+          navigate('/');
+          addToast({
+            type: 'success',
+            title: 'Login successful',
+            message: `Welcome back, ${user?.firstName && user?.lastName
+              ? `${user.firstName} ${user.lastName}`
+              : user?.firstName
+                ? user.firstName
+                : user?.email?.split('@')[0] || 'User'
+              }!`,
+            duration: 2000
+          });
+        }
+      } else {
+        throw new Error(response.message || 'Invalid verification code');
+      }
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Verification failed',
+        message: error.message || 'Invalid verification code',
+        duration: 3000
+      });
+      // Clear the code inputs
+      setVerificationCode(['', '', '', '', '', '']);
+      twoFactorCodeInputRefs.current[0]?.focus();
+    } finally {
+      setIsVerifyingOTP(false);
+    }
+  };
+
+  // Handle resend 2FA code
+  const handleResendTwoFactorCode = async () => {
+    if (!canResendTwoFactor) return;
+    
+    try {
+      // Re-login to trigger new OTP
+      setIsLoading(true);
+      const response = await authService.login({
+        email: email.toLowerCase(),
+        password,
+        rememberMe,
+      });
+      
+      if (response.success) {
+        const responseData = response.data as any;
+        if (responseData?.requires2FA) {
+          setTwoFactorCountdown(60);
+          setCanResendTwoFactor(false);
+          addToast({
+            type: 'success',
+            title: 'Code sent',
+            message: 'A new verification code has been sent',
+            duration: 2000
+          });
+        }
+      }
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to resend code',
+        duration: 3000
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Close modal on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (twoFactorModalRef.current && !twoFactorModalRef.current.contains(event.target as Node)) {
+        // Don't close on outside click - user must verify
+      }
+    };
+    
+    if (showTwoFactorModal) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTwoFactorModal]);
 
   return (
     <div className="min-h-screen bg-white flex" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -624,6 +825,107 @@ const Login: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 2FA Verification Modal */}
+      {showTwoFactorModal && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              ref={twoFactorModalRef}
+              className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-16 relative max-w-md w-full"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+            >
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <img src={keyIcon} alt="Key" className="w-16 h-16" />
+              </div>
+
+              {/* Title */}
+              <h2
+                className="text-xl text-center mb-1.5"
+                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
+              >
+                Two step authentication
+              </h2>
+
+              {/* Description */}
+              <p className="text-xs text-center mb-2" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                Enter the authentication code below we sent to<br />
+                {twoFactorMethod === 'phone' ? 'your phone number' : email}
+              </p>
+              {!canResendTwoFactor ? (
+                <p className="text-[11px] mt-3 mb-6 text-center" style={{ color: '#FF6E6E', fontFamily: 'Poppins, sans-serif' }}>
+                  Request another code 0:{twoFactorCountdown.toString().padStart(2, '0')}
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResendTwoFactorCode}
+                  className="text-[11px] mb-6 mx-auto block focus:outline-none"
+                  style={{ color: '#64B5F6', textDecoration: 'underline', fontFamily: 'Poppins, sans-serif' }}
+                >
+                  Request a new digital code
+                </button>
+              )}
+
+              {/* Form */}
+              <form onSubmit={handleVerifyOTP} className="space-y-4">
+                {/* 6-Digit Code Input */}
+                <div className="flex justify-center gap-2 mt-8 mb-8">
+                  {verificationCode.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => (twoFactorCodeInputRefs.current[index] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleTwoFactorCodeChange(index, e.target.value)}
+                      onKeyDown={(e) => handleTwoFactorCodeKeyDown(index, e)}
+                      className="w-12 h-12 text-center text-lg font-medium bg-white border rounded-lg"
+                      style={{
+                        borderColor: '#E9E9E9',
+                        color: '#212121',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#CFE8FC';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = '#E9E9E9';
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Continue Button */}
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={verificationCode.join('').length !== 6 || isVerifyingOTP}
+                    className="w-full py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
+                    style={{
+                      backgroundColor: verificationCode.join('').length === 6 && !isVerifyingOTP ? '#F9A825' : '#E9E9E9',
+                      color: verificationCode.join('').length === 6 && !isVerifyingOTP ? '#FFFFFF' : '#6A6A6A',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {isVerifyingOTP ? 'Verifying...' : 'Continue'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

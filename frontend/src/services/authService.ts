@@ -203,6 +203,11 @@ export class AuthService {
   }): Promise<ApiResponse<{ message: string }>> {
     return apiClient.post('/auth/reset-password', data);
   }
+
+  // Verify login OTP (for 2FA during login)
+  async verifyLoginOTP(email: string, code: string): Promise<ApiResponse<LoginResponse>> {
+    return apiClient.post('/auth/verify-login-otp', { email, code });
+  }
 }
 
 export const authService = new AuthService();

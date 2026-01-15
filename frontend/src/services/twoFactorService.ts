@@ -62,4 +62,17 @@ export const twoFactorService = {
       throw new Error(response.message || 'Failed to resend code');
     }
   },
+
+  /**
+   * Verify credentials (email/password) before enabling 2FA
+   */
+  async verifyCredentials(email: string, password: string): Promise<void> {
+    const response = await apiClient.post('/two-factor/verify-credentials', {
+      email,
+      password
+    });
+    if (!response.success) {
+      throw new Error(response.message || 'Invalid credentials');
+    }
+  },
 };

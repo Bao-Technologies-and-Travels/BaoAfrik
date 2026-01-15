@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
 import prisma from '@/config/database';
 import { asyncHandler } from '@/middleware/errorMiddleware';
 import { createUnauthorizedError, createValidationError } from '@/middleware/errorMiddleware';
@@ -6,6 +7,7 @@ import { generateVerificationCode } from '@/utils/jwtUtils';
 import { ApiResponse } from '@/types/auth';
 import logger from '@/config/logger';
 import { sendVerificationEmail } from '@/utils/emailService';
+import { sendOTP } from '@/utils/smsService';
 
 /**
  * Enable two-factor authentication
@@ -39,7 +41,7 @@ export const enableTwoFactor = asyncHandler(async (req: Request, res: Response) 
 
   // Generate verification code
   const verificationCode = generateVerificationCode();
-  const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const verificationExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
   // Create or update 2FA record
   const twoFactorAuth = await prisma.twoFactorAuth.upsert({
@@ -79,11 +81,17 @@ export const enableTwoFactor = asyncHandler(async (req: Request, res: Response) 
       }
     }
   } else if (method === 'phone') {
-    // TODO: Implement SMS sending service
-    logger.info('2FA phone verification code generated', {
-      userId: req.user.id,
-      phoneNumber: phoneNumber
-    });
+    const fullPhoneNumber = `${phoneCode}${phoneNumber}`;
+    try {
+      await sendOTP(fullPhoneNumber, verificationCode);
+      logger.info('2FA phone verification code sent via Twilio', {
+        userId: req.user.id,
+        phoneNumber: fullPhoneNumber
+      });
+    } catch (error) {
+      logger.error('Failed to send 2FA OTP via Twilio:', error);
+      throw new Error('Failed to send verification code. Please try again.');
+    }
   }
 
   logger.info('2FA setup initiated', {
@@ -96,7 +104,7 @@ export const enableTwoFactor = asyncHandler(async (req: Request, res: Response) 
     message: 'Verification code sent. Please verify to enable 2FA.',
     data: {
       method,
-      expiresIn: 600 // 10 minutes in seconds
+      expiresIn: 300 // 5 minutes in seconds
     }
   };
 
@@ -237,7 +245,7 @@ export const resendTwoFactorCode = asyncHandler(async (req: Request, res: Respon
 
   // Generate new verification code
   const verificationCode = generateVerificationCode();
-  const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const verificationExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
   await prisma.twoFactorAuth.update({
     where: { userId: req.user.id },
@@ -263,18 +271,80 @@ export const resendTwoFactorCode = asyncHandler(async (req: Request, res: Respon
       }
     }
   } else if (twoFactorAuth.method === 'phone') {
-    // TODO: Implement SMS sending service
-    logger.info('2FA phone verification code resent', {
-      userId: req.user.id
-    });
+    if (!twoFactorAuth.phoneNumber || !twoFactorAuth.phoneCode) {
+      throw createValidationError('Phone number not configured for 2FA');
+    }
+    const fullPhoneNumber = `${twoFactorAuth.phoneCode}${twoFactorAuth.phoneNumber}`;
+    try {
+      await sendOTP(fullPhoneNumber, verificationCode);
+      logger.info('2FA phone verification code resent via Twilio', {
+        userId: req.user.id,
+        phoneNumber: fullPhoneNumber
+      });
+    } catch (error) {
+      logger.error('Failed to resend 2FA OTP via Twilio:', error);
+      throw new Error('Failed to send verification code. Please try again.');
+    }
   }
 
   const response: ApiResponse = {
     success: true,
     message: 'Verification code resent successfully',
     data: {
-      expiresIn: 600 // 10 minutes in seconds
+      expiresIn: 300 // 5 minutes in seconds
     }
+  };
+
+  res.json(response);
+});
+
+/**
+ * Verify user credentials (email and password)
+ * Used before enabling 2FA
+ */
+export const verifyCredentials = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw createUnauthorizedError('User not authenticated');
+  }
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw createValidationError('Email and password are required');
+  }
+
+  // Get current user
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    select: {
+      email: true,
+      passwordHash: true
+    }
+  });
+
+  if (!user) {
+    throw createUnauthorizedError('User not found');
+  }
+
+  // Verify email matches
+  if (user.email.toLowerCase() !== email.toLowerCase()) {
+    throw createUnauthorizedError('Invalid email');
+  }
+
+  // Verify password
+  if (!user.passwordHash) {
+    throw createUnauthorizedError('Password not set for this account');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+  
+  if (!isPasswordValid) {
+    throw createUnauthorizedError('Invalid password');
+  }
+
+  const response: ApiResponse = {
+    success: true,
+    message: 'Credentials verified successfully'
   };
 
   res.json(response);
@@ -285,5 +355,6 @@ export default {
   verifyTwoFactorCode,
   disableTwoFactor,
   getTwoFactorStatus,
-  resendTwoFactorCode
+  resendTwoFactorCode,
+  verifyCredentials
 };
