@@ -157,8 +157,25 @@ export async function getLocationFromIp(ip: string): Promise<{
   }
 
   try {
-    // Using ip-api.com (free tier: 45 requests/minute)
-    const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,city,regionName`);
+    // Using ip-api.com (free tier: 45 requests/minute) - use HTTPS
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const response = await fetch(`https://ip-api.com/json/${ip}?fields=status,country,countryCode,city,regionName`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      },
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const data = await response.json() as {
       status?: string;
       country?: string;
@@ -178,9 +195,22 @@ export async function getLocationFromIp(ip: string): Promise<{
         country: data.countryCode || '',
         city: city || ''
       };
+    } else {
+      // If status is not success, return default
+      return {
+        location: 'Unknown Location',
+        country: '',
+        city: ''
+      };
     }
   } catch (error) {
     console.error('Failed to get location from IP:', error);
+    // Return default location on error
+    return {
+      location: 'Unknown Location',
+      country: '',
+      city: ''
+    };
   }
 
   return {

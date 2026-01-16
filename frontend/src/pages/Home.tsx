@@ -448,12 +448,17 @@ const Home: React.FC = () => {
           }
         }
 
+        // Only include auth header if token exists
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json'
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch(`${process.env.REACT_APP_API_URL}/requests?${queryParams.toString()}`, {
           method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
+          headers,
           signal: controller.signal
         });
 

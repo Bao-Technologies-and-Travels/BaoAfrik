@@ -189,7 +189,7 @@ const ProfileSettings: React.FC = () => {
   const location = useLocation();
   const { addToast } = useToast();
   const { showNotification } = useNotificationToast();
-  const { user, updateUserProfile } = useAuth();
+  const { user, updateUserProfile, logout } = useAuth();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [languagePreference, setLanguagePreference] = useState<'en' | 'fr' | 'de' | 'es'>(() => {
@@ -252,6 +252,11 @@ const ProfileSettings: React.FC = () => {
   const geolocationProcessingRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   // fetch notifications on mount
   useEffect(() => {
@@ -1000,6 +1005,29 @@ const ProfileSettings: React.FC = () => {
     fetchTwoFactorStatus();
   }, [user?.id]);
 
+  // Fetch social account status on mount and when user changes
+  useEffect(() => {
+    const fetchSocialAccountStatus = async () => {
+      if (user?.id) {
+        try {
+          const status = await socialAccountService.getStatus();
+          setSocialConnections({
+            whatsapp: status.status.whatsapp || false,
+            facebook: status.status.facebook || false,
+            instagram: status.status.instagram || false,
+            linkedin: status.status.linkedin || false,
+            x: status.status.x || false
+          });
+        } catch (error) {
+          console.error('Failed to fetch social account status:', error);
+          // Keep default state on error
+        }
+      }
+    };
+
+    fetchSocialAccountStatus();
+  }, [user?.id]);
+
   // Countdown timer for 2FA resend code
   useEffect(() => {
     if (twoFactorCountdown > 0 && twoFactorModalStep === 'code') {
@@ -1026,8 +1054,12 @@ const ProfileSettings: React.FC = () => {
       progress += 10;
     }
 
-    // Location (10%) - check if geolocation is enabled OR manual location is set
-    if (isGeolocationEnabled || (formData.location && formData.location.trim() !== '')) {
+    // Location (10%) - check if geolocation is enabled OR manual location is set OR user.location from backend
+    const hasLocation = isGeolocationEnabled ||
+      (formData.location && formData.location.trim() !== '') ||
+      (user.location && user.location.trim() !== '') ||
+      (profileData.location && profileData.location.trim() !== '');
+    if (hasLocation) {
       progress += 10;
     }
 
@@ -1047,7 +1079,7 @@ const ProfileSettings: React.FC = () => {
   };
 
   // Calculate profile completion progress and check criteria (recalculated on every render)
-  const profileProgress = useMemo(() => calculateProfileProgress(), [profileData, profileImage, isGeolocationEnabled, formData.location, biography, verificationForm.email]);
+  const profileProgress = useMemo(() => calculateProfileProgress(), [user, profileData, profileImage, isGeolocationEnabled, formData.location, biography, verificationForm.email]);
 
   const isPersonalInfoComplete = useMemo(() =>
     profileData.fullName && profileData.fullName.trim() !== '' &&
@@ -1056,7 +1088,12 @@ const ProfileSettings: React.FC = () => {
     [profileData]
   );
   const isPhotoUploaded = useMemo(() => !!profileImage, [profileImage]);
-  const isLocationSet = useMemo(() => isGeolocationEnabled || (formData.location && formData.location.trim() !== ''), [isGeolocationEnabled, formData.location]);
+  const isLocationSet = useMemo(() => {
+    return isGeolocationEnabled ||
+      (formData.location && formData.location.trim() !== '') ||
+      (user?.location && user.location.trim() !== '') ||
+      (profileData.location && profileData.location.trim() !== '');
+  }, [isGeolocationEnabled, formData.location, user?.location, profileData.location]);
   const isDescriptionComplete = useMemo(() => biography && biography.trim() !== '', [biography]);
   const isVerificationComplete = useMemo(() => verificationForm.email && verificationForm.email.trim() !== '', [verificationForm.email]);
   const [isPhoneCodeDropdownOpen, setIsPhoneCodeDropdownOpen] = useState(false);
@@ -1081,6 +1118,20 @@ const ProfileSettings: React.FC = () => {
     linkedin: false,
     x: false
   });
+  const [isSocialAccountModalOpen, setIsSocialAccountModalOpen] = useState(false);
+  const [selectedSocialProvider, setSelectedSocialProvider] = useState<'whatsapp' | 'facebook' | 'instagram' | 'linkedin' | 'x' | null>(null);
+  const [isConnectingSocial, setIsConnectingSocial] = useState(false);
+  const socialAccountModalRef = useRef<HTMLDivElement>(null);
+
+  // WhatsApp connection state
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [whatsappPhoneCode, setWhatsappPhoneCode] = useState({
+    label: 'United States',
+    code: '+1',
+    flag: 'us'
+  });
+  const [isWhatsappPhoneCodeDropdownOpen, setIsWhatsappPhoneCodeDropdownOpen] = useState(false);
+  const whatsappPhoneCodeDropdownRef = useRef<HTMLDivElement>(null);
   const [showSessionHistory, setShowSessionHistory] = useState(false);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
@@ -2072,8 +2123,298 @@ const ProfileSettings: React.FC = () => {
     }
   };
 
-  const handleSocialToggle = (key: keyof typeof socialConnections) => {
-    setSocialConnections(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleSocialToggle = async (key: keyof typeof socialConnections) => {
+    const isCurrentlyConnected = socialConnections[key];
+
+    if (isCurrentlyConnected) {
+      // Disconnect
+      try {
+        await socialAccountService.disconnect(key);
+        setSocialConnections(prev => ({ ...prev, [key]: false }));
+        addToast({
+          type: 'success',
+          title: 'Disconnected',
+          message: `${key.charAt(0).toUpperCase() + key.slice(1)} account disconnected successfully`,
+          duration: 3000
+        });
+
+        // Refresh status
+        const status = await socialAccountService.getStatus();
+        setSocialConnections({
+          whatsapp: status.status.whatsapp || false,
+          facebook: status.status.facebook || false,
+          instagram: status.status.instagram || false,
+          linkedin: status.status.linkedin || false,
+          x: status.status.x || false
+        });
+      } catch (error: any) {
+        addToast({
+          type: 'error',
+          title: 'Error',
+          message: error.message || 'Failed to disconnect account',
+          duration: 3000
+        });
+      }
+    } else {
+      // Connect - open modal
+      setSelectedSocialProvider(key as 'whatsapp' | 'facebook' | 'instagram' | 'linkedin' | 'x');
+      setIsSocialAccountModalOpen(true);
+    }
+  };
+
+  // Handle social account connection
+  const handleConnectSocialAccount = async (provider: 'whatsapp' | 'facebook' | 'instagram' | 'linkedin' | 'x') => {
+    setIsConnectingSocial(true);
+
+    try {
+      if (provider === 'whatsapp') {
+        // WhatsApp requires phone number verification
+        if (!whatsappPhone.trim()) {
+          addToast({
+            type: 'error',
+            title: 'Error',
+            message: 'Please enter your WhatsApp phone number',
+            duration: 3000
+          });
+          setIsConnectingSocial(false);
+          return;
+        }
+
+        // For WhatsApp, we'll use phone number as providerId
+        // In a real implementation, you'd verify the phone number via OTP
+        const fullPhoneNumber = `${whatsappPhoneCode.code}${whatsappPhone.trim()}`;
+        await socialAccountService.connect(
+          'whatsapp',
+          fullPhoneNumber, // Using phone as providerId
+          undefined, // No email for WhatsApp
+          `WhatsApp: ${fullPhoneNumber}`, // Name
+          undefined, // No access token
+          undefined // No refresh token
+        );
+      } else {
+        // OAuth providers - initiate OAuth flow
+        await initiateOAuthFlow(provider);
+        setIsConnectingSocial(false);
+        return; // OAuth will handle the rest via callback
+      }
+
+      // Success - close modal and refresh status
+      setIsSocialAccountModalOpen(false);
+      setSelectedSocialProvider(null);
+      setWhatsappPhone('');
+
+      // Refresh social account status
+      const status = await socialAccountService.getStatus();
+      setSocialConnections({
+        whatsapp: status.status.whatsapp || false,
+        facebook: status.status.facebook || false,
+        instagram: status.status.instagram || false,
+        linkedin: status.status.linkedin || false,
+        x: status.status.x || false
+      });
+
+      addToast({
+        type: 'success',
+        title: 'Connected',
+        message: `${provider.charAt(0).toUpperCase() + provider.slice(1)} account connected successfully`,
+        duration: 3000
+      });
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || `Failed to connect ${provider} account`,
+        duration: 3000
+      });
+    } finally {
+      setIsConnectingSocial(false);
+    }
+  };
+
+  // Initiate OAuth flow for social providers
+  const initiateOAuthFlow = async (provider: 'facebook' | 'instagram' | 'linkedin' | 'x') => {
+    try {
+      // Get OAuth URL from backend
+      // The redirect URI should point to the backend callback endpoint, not the frontend
+      // The backend will handle the OAuth callback and then redirect to frontend
+      const backendCallbackUri = `${process.env.REACT_APP_API_URL}/auth/callback?provider=${provider}`;
+      
+      console.log(`[OAuth] Initiating ${provider} OAuth flow`);
+      console.log(`[OAuth] Backend callback URI: ${backendCallbackUri}`);
+      
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/auth/${provider}/connect?redirect_uri=${encodeURIComponent(backendCallbackUri)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error(`[OAuth] Failed to initiate ${provider} OAuth:`, errorData);
+        throw new Error(errorData.message || `Failed to initiate ${provider} OAuth flow (${response.status})`);
+      }
+
+      const data = await response.json();
+      const authUrl = data.data?.authUrl;
+
+      if (!authUrl) {
+        console.error(`[OAuth] No auth URL in response:`, data);
+        throw new Error('OAuth URL not received from server');
+      }
+      
+      console.log(`[OAuth] Opening OAuth URL for ${provider}`);
+
+      // Open in popup window
+      const width = 600;
+      const height = 700;
+      const left = (window.innerWidth - width) / 2;
+      const top = (window.innerHeight - height) / 2;
+
+      const popup = window.open(
+        authUrl,
+        `${provider} OAuth`,
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      );
+
+      if (!popup) {
+        throw new Error('Popup blocked. Please allow popups for this site.');
+      }
+
+      // Poll for popup to close (OAuth complete) or listen for message
+      const pollTimer = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(pollTimer);
+          // Check if connection was successful by fetching status
+          setTimeout(async () => {
+            try {
+              const status = await socialAccountService.getStatus();
+              const wasConnected = status.status[provider];
+
+              if (wasConnected) {
+                setSocialConnections({
+                  whatsapp: status.status.whatsapp || false,
+                  facebook: status.status.facebook || false,
+                  instagram: status.status.instagram || false,
+                  linkedin: status.status.linkedin || false,
+                  x: status.status.x || false
+                });
+
+                setIsSocialAccountModalOpen(false);
+                setSelectedSocialProvider(null);
+
+                addToast({
+                  type: 'success',
+                  title: 'Connected',
+                  message: `${provider.charAt(0).toUpperCase() + provider.slice(1)} account connected successfully`,
+                  duration: 3000
+                });
+              } else {
+                // User might have cancelled - don't show error, just close modal
+                setIsSocialAccountModalOpen(false);
+                setSelectedSocialProvider(null);
+              }
+            } catch (error) {
+              console.error('Failed to check connection status:', error);
+              setIsSocialAccountModalOpen(false);
+              setSelectedSocialProvider(null);
+            }
+          }, 1500);
+        }
+      }, 500);
+
+      // Listen for postMessage from OAuth callback page
+      const handleMessage = async (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+
+        console.log('[OAuth] Received message:', event.data);
+
+        if (event.data.type === 'SOCIAL_ACCOUNT_ERROR') {
+          clearInterval(pollTimer);
+          window.removeEventListener('message', handleMessage);
+          popup.close();
+          addToast({
+            type: 'error',
+            title: 'Connection Failed',
+            message: event.data.error || `Failed to connect ${provider} account`,
+            duration: 5000
+          });
+          setIsConnectingSocial(false);
+          return;
+        }
+
+        if (event.data.type === 'SOCIAL_ACCOUNT_CONNECTED' && event.data.provider === provider) {
+          clearInterval(pollTimer);
+          window.removeEventListener('message', handleMessage);
+          popup.close();
+
+          try {
+            // Connect account with received data
+            await socialAccountService.connect(
+              provider,
+              event.data.providerId,
+              event.data.providerEmail,
+              event.data.providerName,
+              event.data.accessToken,
+              event.data.refreshToken
+            );
+
+            // Refresh status
+            const status = await socialAccountService.getStatus();
+            setSocialConnections({
+              whatsapp: status.status.whatsapp || false,
+              facebook: status.status.facebook || false,
+              instagram: status.status.instagram || false,
+              linkedin: status.status.linkedin || false,
+              x: status.status.x || false
+            });
+
+            setIsSocialAccountModalOpen(false);
+            setSelectedSocialProvider(null);
+
+            addToast({
+              type: 'success',
+              title: 'Connected',
+              message: `${provider.charAt(0).toUpperCase() + provider.slice(1)} account connected successfully`,
+              duration: 3000
+            });
+          } catch (error: any) {
+            addToast({
+              type: 'error',
+              title: 'Error',
+              message: error.message || `Failed to connect ${provider} account`,
+              duration: 3000
+            });
+          }
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: error.message || `Failed to initiate ${provider} connection`,
+        duration: 3000
+      });
+      setIsConnectingSocial(false);
+    }
+  };
+
+  // Close social account modal
+  const handleCloseSocialAccountModal = () => {
+    setIsSocialAccountModalOpen(false);
+    setSelectedSocialProvider(null);
+    setWhatsappPhone('');
+    setWhatsappPhoneCode({
+      label: 'United States',
+      code: '+1',
+      flag: 'us'
+    });
   };
 
   const handlePasswordEditClick = () => {
@@ -2436,13 +2777,17 @@ const ProfileSettings: React.FC = () => {
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(target) && isCountryDropdownOpen) {
         setIsCountryDropdownOpen(false);
       }
+
+      if (whatsappPhoneCodeDropdownRef.current && !whatsappPhoneCodeDropdownRef.current.contains(target) && isWhatsappPhoneCodeDropdownOpen) {
+        setIsWhatsappPhoneCodeDropdownOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen, isCountryDropdownOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, isNotificationOpen, isGenderDropdownOpen, isBirthdayCalendarOpen, isPhoneCodeDropdownOpen, isPasswordModalOpen, isTwoFactorModalOpen, isTwoFactorPhoneCodeDropdownOpen, isCountryDropdownOpen, isWhatsappPhoneCodeDropdownOpen]);
 
   // Handle navigation state to set selected sidebar option
   useEffect(() => {
@@ -3244,7 +3589,10 @@ const ProfileSettings: React.FC = () => {
                               {/* Log Out */}
                               <div className="px-3 pt-3 border-t border-gray-100">
                                 <button
-                                  onClick={() => setIsMenuDropdownOpen(false)}
+                                  onClick={() => {
+                                    handleLogout();
+                                    setIsMenuDropdownOpen(false);
+                                  }}
                                   className="w-full bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                                 >
                                   <div className="flex items-center space-x-2">
@@ -6808,6 +7156,255 @@ const ProfileSettings: React.FC = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+          <style>{`
+          .two-factor-input::placeholder {
+            color: #D9D9D9 !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            font-family: 'Poppins', sans-serif !important;
+          }
+        `}</style>
+        </>
+      )}
+
+      {/* Social Account Connection Modal */}
+      {isSocialAccountModalOpen && selectedSocialProvider && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={handleCloseSocialAccountModal}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              ref={socialAccountModalRef}
+              className="bg-white rounded-[30px] pt-12 sm:pt-14 px-6 sm:px-8 pb-16 relative max-w-md w-full"
+              style={{ boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={handleCloseSocialAccountModal}
+                className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center"
+              >
+                <img
+                  src={closeIcon}
+                  alt="Close"
+                  className="w-5 h-5"
+                  style={{ filter: 'brightness(0) saturate(100%) invert(79%) sepia(6%) saturate(178%) hue-rotate(169deg) brightness(88%) contrast(83%)' }}
+                />
+              </button>
+
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                {selectedSocialProvider === 'whatsapp' && <img src={zapIcon} alt="WhatsApp" className="w-16 h-16" />}
+                {selectedSocialProvider === 'facebook' && <img src={fbIcon} alt="Facebook" className="w-16 h-16" />}
+                {selectedSocialProvider === 'instagram' && <img src={igIcon} alt="Instagram" className="w-16 h-16" />}
+                {selectedSocialProvider === 'linkedin' && (
+                  <svg width="64" height="64" viewBox="0 0 448 512">
+                    <rect width="448" height="512" rx="90" fill="#0A66C2" />
+                    <path
+                      d="M100.28 448H7.4V148.9h92.88zm-46.44-340a53.79 53.79 0 1153.79-53.79 53.79 53.79 0 01-53.79 53.79zM447.9 448h-92.68V302.4c0-34.7-.7-79.3-48.3-79.3-48.3 0-55.7 37.7-55.7 76.7V448h-92.7V148.9h89v40.8h1.3c12.4-23.6 42.6-48.3 87.7-48.3 93.8 0 111.1 61.8 111.1 142.3z"
+                      fill="#fff"
+                    />
+                  </svg>
+                )}
+                {selectedSocialProvider === 'x' && <img src={xIcon} alt="X" className="w-16 h-16" />}
+              </div>
+
+              {/* Title */}
+              <h2
+                className="text-xl text-center mb-1.5"
+                style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}
+              >
+                Connect {selectedSocialProvider.charAt(0).toUpperCase() + selectedSocialProvider.slice(1)}
+              </h2>
+
+              {/* Description */}
+              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>
+                {selectedSocialProvider === 'whatsapp'
+                  ? 'Enter your WhatsApp phone number to connect your account'
+                  : `Connect your ${selectedSocialProvider} account to verify your identity`
+                }
+              </p>
+
+              {/* Form */}
+              {selectedSocialProvider === 'whatsapp' ? (
+                <form onSubmit={(e) => { e.preventDefault(); handleConnectSocialAccount('whatsapp'); }} className="space-y-4">
+                  {/* Phone Number Input */}
+                  <div>
+                    <label className="block text-xs mb-2" style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>
+                      Phone number
+                    </label>
+                    <div className="flex gap-2">
+                      {/* Country Code Dropdown */}
+                      <div className="relative flex-shrink-0" ref={whatsappPhoneCodeDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={() => setIsWhatsappPhoneCodeDropdownOpen(!isWhatsappPhoneCodeDropdownOpen)}
+                          className="flex items-center gap-2 px-3 py-3 border rounded-[12px] bg-white focus:outline-none"
+                          style={{
+                            borderColor: '#E9E9E9',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}
+                        >
+                          <img
+                            src={`https://flagcdn.com/w20/${whatsappPhoneCode.flag}.png`}
+                            alt={whatsappPhoneCode.label}
+                            className="w-5 h-5 rounded-full"
+                            style={{ objectFit: 'cover' }}
+                          />
+                          <span className="text-xs" style={{ color: '#939393' }}>
+                            {whatsappPhoneCode.code}
+                          </span>
+                          <img
+                            src={arrowDownIcon}
+                            alt="Arrow"
+                            className="w-4 h-4"
+                            style={{ filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }}
+                          />
+                        </button>
+
+                        {/* Dropdown */}
+                        {isWhatsappPhoneCodeDropdownOpen && (
+                          <div
+                            className="absolute top-full left-0 mt-1 bg-white z-50 w-48"
+                            style={{
+                              borderRadius: '20px',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <div className="two-factor-dropdown" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                              {twoFactorPhoneCodes.map((code) => (
+                                <button
+                                  key={code.isoCode}
+                                  type="button"
+                                  onClick={() => {
+                                    setWhatsappPhoneCode(code);
+                                    setIsWhatsappPhoneCodeDropdownOpen(false);
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-2 transition-colors"
+                                  style={{
+                                    backgroundColor: whatsappPhoneCode.code === code.code ? '#F0F8FE' : 'transparent',
+                                    borderRadius: whatsappPhoneCode.code === code.code ? '8px' : '0',
+                                    margin: whatsappPhoneCode.code === code.code ? '4px 8px' : '0',
+                                    width: whatsappPhoneCode.code === code.code ? 'calc(100% - 16px)' : '100%'
+                                  }}
+                                >
+                                  <img
+                                    src={`https://flagcdn.com/w20/${code.flag}.png`}
+                                    alt={code.label}
+                                    className="w-4 h-4 rounded-full"
+                                    style={{ objectFit: 'cover' }}
+                                  />
+                                  <span
+                                    className="text-xs flex-1 text-left"
+                                    style={{
+                                      color: whatsappPhoneCode.code === code.code ? '#64B5F6' : '#BABABA',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}
+                                  >
+                                    {code.code} <span style={{ margin: '0 2px' }}>·</span> {code.label}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Phone Number Input */}
+                      <input
+                        type="tel"
+                        value={whatsappPhone}
+                        onChange={(e) => setWhatsappPhone(e.target.value)}
+                        placeholder="Enter your phone number"
+                        className="two-factor-input flex-1 px-4 py-3 border rounded-[12px] text-sm bg-white focus:outline-none"
+                        style={{
+                          borderColor: '#E9E9E9',
+                          color: '#212121',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = '#CFE8FC';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = '#E9E9E9';
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex items-center gap-3 pt-4">
+                    {/* Cancel Button */}
+                    <button
+                      type="button"
+                      onClick={handleCloseSocialAccountModal}
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: '#F1F1F1',
+                        color: '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      <span style={{ color: '#6A6A6A' }}>X</span>
+                      Cancel
+                    </button>
+
+                    {/* Connect Button */}
+                    <button
+                      type="submit"
+                      disabled={!whatsappPhone.trim() || isConnectingSocial}
+                      className="flex-1 py-2 px-4 rounded-[12px] text-sm font-light transition-colors"
+                      style={{
+                        backgroundColor: whatsappPhone.trim() && !isConnectingSocial ? '#F9A825' : '#E9E9E9',
+                        color: whatsappPhone.trim() && !isConnectingSocial ? '#FFFFFF' : '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      {isConnectingSocial ? 'Connecting...' : 'Connect'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-4">
+                  {/* OAuth Connection Button */}
+                  <button
+                    onClick={() => handleConnectSocialAccount(selectedSocialProvider)}
+                    disabled={isConnectingSocial}
+                    className="w-full py-2.5 px-4 rounded-[12px] text-sm font-light transition-colors"
+                    style={{
+                      backgroundColor: isConnectingSocial ? '#E9E9E9' : '#F9A825',
+                      color: isConnectingSocial ? '#6A6A6A' : '#FFFFFF',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {isConnectingSocial ? 'Connecting...' : `Connect with ${selectedSocialProvider.charAt(0).toUpperCase() + selectedSocialProvider.slice(1)}`}
+                  </button>
+
+                  {/* Cancel Button */}
+                  <button
+                    type="button"
+                    onClick={handleCloseSocialAccountModal}
+                    className="w-full py-2 px-4 rounded-[12px] text-sm font-normal flex items-center justify-center gap-2"
+                    style={{
+                      backgroundColor: '#F1F1F1',
+                      color: '#6A6A6A',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    <span style={{ color: '#6A6A6A' }}>X</span>
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           <style>{`

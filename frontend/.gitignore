@@ -30,3 +30,6 @@ yarn-error.log*
 
 # Lock files
 package-lock.json
+
+OAUTH_DEBUGGING.md
+OAUTH_SETUP_GUIDE.md

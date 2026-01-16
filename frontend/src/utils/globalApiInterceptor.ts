@@ -29,22 +29,46 @@ const isAuthEndpoint = (url: string): boolean => {
   }
 };
 
-const isPublicEndpoint = (url: string): boolean => {
-  const publicEndpoints = [
-    '/api/products',
-    '/api/categories',
-    '/api/chat',
-    '/api/upload'
-  ];
-
+const isPublicEndpoint = (url: string, method: string = 'GET'): boolean => {
   try {
     const urlObj = new URL(url, window.location.origin);
     const path = urlObj.pathname;
 
-    return publicEndpoints.some(endpoint =>
-      path === endpoint ||
-      (path.startsWith(endpoint + '/') && endpoint !== '/')
-    );
+    // For GET requests, allow public access to these endpoints
+    if (method === 'GET') {
+      // Allow GET /api/products (listings) - public
+      if (path === '/api/products' || path.startsWith('/api/products?')) {
+        return true;
+      }
+      // Allow GET /api/products/:id (view product details) - public
+      // But exclude authenticated endpoints like /save, /saved, /view (POST)
+      if (path.match(/^\/api\/products\/[^/]+$/) && 
+          !path.includes('/save') && 
+          !path.includes('/saved') && 
+          !path.includes('/view') &&
+          !path.includes('/my-products')) {
+        return true;
+      }
+      // Allow GET /api/categories - public
+      if (path === '/api/categories' || path.startsWith('/api/categories/')) {
+        return true;
+      }
+      // Allow GET /api/requests (public requests listing) - public
+      if (path === '/api/requests' || path.startsWith('/api/requests?')) {
+        return true;
+      }
+    }
+
+    // Always public endpoints (all methods)
+    const alwaysPublicEndpoints = [
+      '/api/upload' // Upload might be public in some cases
+    ];
+    
+    if (alwaysPublicEndpoints.some(endpoint => path === endpoint || path.startsWith(endpoint + '/'))) {
+      return true;
+    }
+
+    return false;
   } catch (e) {
     console.error('Error checking public endpoint:', e);
     return false;
@@ -89,11 +113,12 @@ if (!window.__originalFetch) {
   // Override global fetch
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const urlString = getUrlString(input);
+    const method = (init?.method || 'GET').toUpperCase();
 
     // Skip non-API and public/auth endpoints
     const isOurApi = urlString.includes(process.env.REACT_APP_API_URL || '');
     const isAuth = isAuthEndpoint(urlString);
-    const isPublic = isPublicEndpoint(urlString);
+    const isPublic = isPublicEndpoint(urlString, method);
     const shouldSkip = !isOurApi || isAuth || isPublic;
 
     if (shouldSkip) {
@@ -105,11 +130,20 @@ if (!window.__originalFetch) {
       return window.__originalFetch!.call(window, input, init);
     }
 
+    // Check if we're on the homepage - allow public access without redirecting
+    const isHomePage = window.location.pathname === '/' || window.location.pathname === '/home';
+    
     // Check token
     const token = TokenManager.getAccessToken();
     const isExpired = token ? TokenManager.isTokenExpired(token) : true;
 
-    // Handle missing/expired token
+    // If on homepage and no token, allow the request without auth header (don't redirect)
+    // This allows users to browse the homepage without logging in
+    if (isHomePage && (!token || isExpired)) {
+      return window.__originalFetch!.call(window, input, init);
+    }
+
+    // Handle missing/expired token - only redirect if not on homepage
     if (!token || isExpired) {
       console.log('Token missing or expired, redirecting to login');
       return redirectToLogin();
@@ -126,10 +160,16 @@ if (!window.__originalFetch) {
         credentials: 'include'
       });
 
-      // Handle 401 responses
+      // Handle 401 responses - only redirect if not on homepage
       if (response.status === 401) {
-        console.log('Received 401, redirecting to login');
-        return redirectToLogin();
+        const currentPath = window.location.pathname;
+        const isHomePage = currentPath === '/' || currentPath === '/home';
+        if (!isHomePage) {
+          console.log('Received 401, redirecting to login');
+          return redirectToLogin();
+        }
+        // On homepage, just return the 401 response without redirecting
+        // This allows the page to handle the error gracefully (e.g., show products without bookmarks)
       }
 
       return response;
@@ -137,7 +177,12 @@ if (!window.__originalFetch) {
       console.error('Fetch error:', error);
       if (error instanceof Error &&
         (error.message.includes('401') || error.message.includes('Unauthorized'))) {
-        return redirectToLogin();
+        // Only redirect if not on homepage
+        const isHomePage = window.location.pathname === '/' || window.location.pathname === '/home';
+        if (!isHomePage) {
+          return redirectToLogin();
+        }
+        // On homepage, re-throw the error so the component can handle it
       }
       throw error;
     }

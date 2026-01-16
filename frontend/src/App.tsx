@@ -20,6 +20,7 @@ import TwoFactorEmail from './pages/auth/TwoFactorEmail';
 import TwoFactorPhone from './pages/auth/TwoFactorPhone';
 import TwoFactorCode from './pages/auth/TwoFactorCode';
 import TwoFactorSuccess from './pages/auth/TwoFactorSuccess';
+import SocialAccountCallback from './pages/auth/SocialAccountCallback';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetail';
 import SellerProfile from './pages/SellerProfile';
@@ -70,6 +71,7 @@ function AppContent() {
           <Route path="/two-factor-phone" element={<TwoFactorPhone />} />
           <Route path="/two-factor-code" element={<TwoFactorCode />} />
           <Route path="/two-factor-success" element={<TwoFactorSuccess />} />
+          <Route path="/social-account-callback" element={<SocialAccountCallback />} />
         </Routes>
       </div>
     );

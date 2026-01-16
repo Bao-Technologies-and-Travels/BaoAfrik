@@ -29,6 +29,7 @@ import requestRoutes from '@/routes/requestRoutes';
 import sessionRoutes from '@/routes/sessionRoutes';
 import twoFactorRoutes from '@/routes/twoFactorRoutes';
 import socialAccountRoutes from '@/routes/socialAccountRoutes';
+import oauthRoutes from '@/routes/oauthRoutes';
 
 import { gcpStorageService } from './services/gcpStorageService';
 
@@ -196,6 +197,7 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/two-factor', twoFactorRoutes);
 app.use('/api/social-accounts', socialAccountRoutes);
+app.use('/api/auth', oauthRoutes);
 
 // 404 handler
 app.use(notFound);
