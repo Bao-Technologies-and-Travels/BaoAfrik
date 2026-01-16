@@ -247,7 +247,7 @@ const AdminDashboard: React.FC = () => {
                       gap: '10px',
                       padding: '8px',
                       borderRadius: '12px',
-                      backgroundColor: isActive ? '#F0F8FE' : 'transparent',
+                      backgroundColor: (isActive && option.value !== 'overview') ? '#F0F8FE' : 'transparent',
                       color: isActive ? '#64B5F6' : '#6A6A6A',
                       fontSize: '12px',
                       fontWeight: isActive ? 500 : 400,
@@ -258,12 +258,12 @@ const AdminDashboard: React.FC = () => {
                       fontFamily: 'Poppins, sans-serif'
                     }}
                     onMouseEnter={(e) => {
-                      if (!isActive) {
+                      if (!isActive || option.value === 'overview') {
                         (e.target as HTMLElement).style.backgroundColor = '#F9F9F9';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (!isActive) {
+                      if (!isActive || option.value === 'overview') {
                         (e.target as HTMLElement).style.backgroundColor = 'transparent';
                       }
                     }}
@@ -322,7 +322,7 @@ const AdminDashboard: React.FC = () => {
             marginBottom: '16px'
           }}>
             {/* Search Bar */}
-            <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+            <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
               <input
                 type="text"
                 placeholder="Search, press &quot;/&quot; for commands"
@@ -355,7 +355,7 @@ const AdminDashboard: React.FC = () => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '6px 10px',
+                    padding: '4px 10px',
                     backgroundColor: '#FFFFFF',
                     border: '1px solid #E4E4E4',
                     borderRadius: '8px',
@@ -417,31 +417,31 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                   style={{
                     position: 'relative',
-                    width: '36px',
-                    height: '36px',
+                    width: 'auto',
+                    height: 'auto',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'transparent',
                     border: 'none',
-                    borderRadius: '50%',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    padding: '4px'
                   }}
                 >
                   <img 
                     src={notificationIcon} 
                     alt="Notifications" 
                     style={{ 
-                      width: '20px', 
-                      height: '20px',
+                      width: '24px', 
+                      height: '24px',
                       filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
                     }}
                   />
                   {unreadCount > 0 && (
                     <div style={{
                       position: 'absolute',
-                      bottom: '2px',
-                      right: '2px',
+                      bottom: '0',
+                      right: '0',
                       width: '18px',
                       height: '18px',
                       backgroundColor: '#FF0000',
@@ -767,10 +767,8 @@ const AdminDashboard: React.FC = () => {
                       color: '#171717'
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 4" fill="none">
-                      <circle cx="4" cy="2" r="2" fill="currentColor" />
-                      <circle cx="12" cy="2" r="2" fill="currentColor" />
-                      <circle cx="20" cy="2" r="2" fill="currentColor" />
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                   </button>
                 </div>
@@ -785,10 +783,10 @@ const AdminDashboard: React.FC = () => {
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              marginBottom: '16px'
+              marginBottom: '8px'
             }}>
               <h1 style={{ 
-                fontSize: '20px', 
+                fontSize: '18px', 
                 fontWeight: 600, 
                 color: '#212121',
                 margin: 0,
@@ -833,137 +831,158 @@ const AdminDashboard: React.FC = () => {
               {/* Visitors Card */}
               <div style={{
                 backgroundColor: '#FFFFFF',
-                borderRadius: '12px',
-                padding: '16px',
+                borderRadius: '18px',
+                padding: '12px',
                 border: '1px solid #F1F1F1'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '11px',
-                      margin: '0 0 6px 0',
+                      fontSize: '10px',
+                      margin: '0 0 4px 0',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Visitors number
                     </p>
                     <p style={{ 
-                      fontSize: '24px',
+                      fontSize: '20px',
                       fontWeight: 600,
                       color: '#212121',
-                      margin: '0 0 6px 0',
+                      margin: '0 0 4px 0',
                       fontFamily: 'Bricolage Grotesque, sans-serif'
                     }}>
                       569
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                         <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span style={{ color: '#22C55E', fontSize: '11px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                      <span style={{ color: '#22C55E', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                     </div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '10px',
-                      margin: '6px 0 0 0',
+                      fontSize: '9px',
+                      margin: '4px 0 0 0',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Last month: 2094
                     </p>
                   </div>
-                  <img src={peopleIcon} alt="Visitors" style={{ width: '36px', height: '36px' }} />
+                  <img src={peopleIcon} alt="Visitors" style={{ width: '28px', height: '28px' }} />
                 </div>
               </div>
 
               {/* Active Users Card */}
               <div style={{
                 backgroundColor: '#FFFFFF',
-                borderRadius: '12px',
-                padding: '16px',
+                borderRadius: '18px',
+                padding: '12px',
                 border: '1px solid #F1F1F1'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '11px',
-                      margin: '0 0 6px 0',
+                      fontSize: '10px',
+                      margin: '0 0 4px 0',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Active users
                     </p>
                     <p style={{ 
-                      fontSize: '24px',
+                      fontSize: '20px',
                       fontWeight: 600,
                       color: '#212121',
-                      margin: '0 0 6px 0',
+                      margin: '0 0 4px 0',
                       fontFamily: 'Bricolage Grotesque, sans-serif'
                     }}>
                       201
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                         <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span style={{ color: '#EF4444', fontSize: '11px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                      <span style={{ color: '#EF4444', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
                     </div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '10px',
-                      margin: '6px 0 0 0',
+                      fontSize: '9px',
+                      margin: '4px 0 0 0',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Last month: 2094
                     </p>
                   </div>
-                  <img src={activeusersIcon} alt="Active Users" style={{ width: '36px', height: '36px' }} />
+                  <img src={activeusersIcon} alt="Active Users" style={{ width: '28px', height: '28px' }} />
                 </div>
               </div>
 
               {/* Active Listings Card */}
               <div style={{
                 backgroundColor: '#FFFFFF',
-                borderRadius: '12px',
-                padding: '16px',
+                borderRadius: '18px',
+                padding: '12px',
                 border: '1px solid #F1F1F1'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '11px',
-                      margin: '0 0 6px 0',
+                      fontSize: '10px',
+                      margin: '0 0 4px 0',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Active listings
                     </p>
                     <p style={{ 
-                      fontSize: '24px',
+                      fontSize: '20px',
                       fontWeight: 600,
                       color: '#212121',
-                      margin: '0 0 6px 0',
+                      margin: '0 0 4px 0',
                       fontFamily: 'Bricolage Grotesque, sans-serif'
                     }}>
                       714
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                         <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span style={{ color: '#22C55E', fontSize: '11px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+109</span>
+                      <span style={{ color: '#22C55E', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+109</span>
                     </div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '10px',
-                      margin: '6px 0 0 0',
+                      fontSize: '9px',
+                      margin: '4px 0 0 0',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Last month: 2094
                     </p>
                   </div>
-                  <img src={activelistingsIcon} alt="Active Listings" style={{ width: '36px', height: '36px' }} />
+                  <img src={activelistingsIcon} alt="Active Listings" style={{ width: '28px', height: '28px' }} />
                 </div>
               </div>
+            </div>
+
+            {/* Dropdown above Active Listings */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'flex-end',
+              marginBottom: '12px',
+              marginTop: '-4px'
+            }}>
+              <select style={{
+                padding: '6px 10px',
+                borderRadius: '8px',
+                border: '1px solid #E4E4E4',
+                fontSize: '11px',
+                color: '#212121',
+                backgroundColor: '#FFFFFF',
+                cursor: 'pointer',
+                fontFamily: 'Poppins, sans-serif'
+              }}>
+                <option>This week</option>
+              </select>
             </div>
 
             {/* Main Content Grid */}
@@ -971,7 +990,7 @@ const AdminDashboard: React.FC = () => {
               {/* Left: Performance Overview */}
               <div style={{
                 backgroundColor: '#FFFFFF',
-                borderRadius: '12px',
+                borderRadius: '24px',
                 padding: '16px',
                 border: '1px solid #F1F1F1'
               }}>
@@ -979,7 +998,7 @@ const AdminDashboard: React.FC = () => {
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
-                  marginBottom: '16px'
+                  marginBottom: '8px'
                 }}>
                   <h2 style={{ 
                     fontSize: '16px',
@@ -993,25 +1012,37 @@ const AdminDashboard: React.FC = () => {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <select style={{
                       padding: '6px 10px',
+                      paddingRight: '28px',
                       borderRadius: '8px',
                       border: '1px solid #E4E4E4',
                       fontSize: '11px',
-                      color: '#212121',
+                      color: '#6A6A6A',
                       backgroundColor: '#FFFFFF',
                       cursor: 'pointer',
-                      fontFamily: 'Poppins, sans-serif'
+                      fontFamily: 'Poppins, sans-serif',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '12px'
                     }}>
                       <option>Listings</option>
                     </select>
                     <select style={{
                       padding: '6px 10px',
+                      paddingRight: '28px',
                       borderRadius: '8px',
                       border: '1px solid #E4E4E4',
                       fontSize: '11px',
-                      color: '#212121',
+                      color: '#6A6A6A',
                       backgroundColor: '#FFFFFF',
                       cursor: 'pointer',
-                      fontFamily: 'Poppins, sans-serif'
+                      fontFamily: 'Poppins, sans-serif',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '12px'
                     }}>
                       <option>Month</option>
                     </select>
@@ -1046,21 +1077,31 @@ const AdminDashboard: React.FC = () => {
                   display: 'flex',
                   alignItems: 'flex-end',
                   gap: '6px',
-                  padding: '12px',
+                  padding: '12px 12px 0 12px',
                   backgroundColor: '#FAFAFA',
                   borderRadius: '8px'
                 }}>
-                  {['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
-                    <div key={month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {[
+                    { month: 'Apr', height: 75 },
+                    { month: 'May', height: 90 },
+                    { month: 'Jun', height: 60 },
+                    { month: 'Jul', height: 50 },
+                    { month: 'Aug', height: 30 },
+                    { month: 'Sep', height: 70 },
+                    { month: 'Oct', height: 85 },
+                    { month: 'Nov', height: 35 },
+                    { month: 'Dec', height: 55, isCurrent: true }
+                  ].map((item) => (
+                    <div key={item.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{
                         width: '100%',
-                        height: `${20 + Math.random() * 60}%`,
-                        backgroundColor: month === 'Dec' ? '#F9A825' : '#9C9C9C',
+                        height: `${item.height}%`,
+                        backgroundColor: item.isCurrent ? '#F9A825' : '#9C9C9C',
                         borderRadius: '4px 4px 0 0',
                         marginBottom: '6px',
                         position: 'relative'
                       }}>
-                        {month === 'Dec' && (
+                        {item.isCurrent && (
                           <div style={{
                             position: 'absolute',
                             top: '-6px',
@@ -1073,7 +1114,7 @@ const AdminDashboard: React.FC = () => {
                           }} />
                         )}
                       </div>
-                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>{month}</span>
+                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>{item.month}</span>
                     </div>
                   ))}
                 </div>
@@ -1084,14 +1125,11 @@ const AdminDashboard: React.FC = () => {
                 {/* Reported Issues */}
                 <div style={{
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  border: '1px solid #F1F1F1'
+                  borderRadius: '20px',
+                  padding: '12px',
+                  border: '0.5px solid #F1F1F1'
                 }}>
                   <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
                     marginBottom: '12px'
                   }}>
                     <h2 style={{ 
@@ -1103,44 +1141,43 @@ const AdminDashboard: React.FC = () => {
                     }}>
                       Reported Issues
                     </h2>
-                    <select style={{
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      border: '1px solid #E4E4E4',
-                      fontSize: '10px',
-                      color: '#212121',
-                      backgroundColor: '#FFFFFF',
-                      cursor: 'pointer',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      <option>This week</option>
-                    </select>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {[
-                      { name: 'Clara Vanstone', issue: 'Phishing attempt', time: '30 min ago', avatar: avatar },
-                      { name: 'Robert OWEN', issue: 'Phishing attempt', time: '2h ago', avatar: avatar },
-                      { name: 'Kalhesi Doumbia', issue: 'Phishing attempt', time: 'Yesterday', avatar: avatar }
+                      { name: 'Clara Vanstone', issue: 'Phishing attempt', time: '30 min ago', avatar: avatar, bgColor: '#E3F2FD' },
+                      { name: 'Robert OWEN', issue: 'Phishing attempt', time: '2h ago', avatar: avatar, bgColor: '#FFF3E0' },
+                      { name: 'Kalhesi Doumbia', issue: 'Phishing attempt', time: 'Yesterday', avatar: avatar, bgColor: '#F3E5F5' }
                     ].map((item, index) => (
                       <div key={index} style={{ 
                         display: 'flex', 
-                        alignItems: 'center', 
+                        alignItems: 'flex-start', 
                         gap: '10px',
                         paddingBottom: index < 2 ? '12px' : '0',
                         borderBottom: index < 2 ? '1px solid #F1F1F1' : 'none'
                       }}>
-                        <img 
-                          src={item.avatar} 
-                          alt={item.name} 
-                          style={{ 
-                            width: '32px', 
-                            height: '32px', 
-                            borderRadius: '50%',
-                            objectFit: 'cover'
-                          }} 
-                        />
-                        <div style={{ flex: 1 }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: item.bgColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <img 
+                            src={item.avatar} 
+                            alt={item.name} 
+                            style={{ 
+                              width: '24px', 
+                              height: '24px', 
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }} 
+                          />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ 
                             fontSize: '12px',
                             fontWeight: 500,
@@ -1153,75 +1190,77 @@ const AdminDashboard: React.FC = () => {
                           <p style={{ 
                             fontSize: '10px',
                             color: '#9C9C9C',
-                            margin: '0 0 2px 0',
+                            margin: '0 0 4px 0',
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             {item.issue}
                           </p>
-                          <p style={{ 
-                            fontSize: '9px',
-                            color: '#B0B0B0',
-                            margin: 0,
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            {item.time}
-                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <p style={{ 
+                              fontSize: '9px',
+                              color: '#B0B0B0',
+                              margin: 0,
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {item.time}
+                            </p>
+                            <div style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              backgroundColor: '#64B5F6'
+                            }} />
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <div style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            backgroundColor: '#64B5F6'
-                          }} />
-                          <button style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '2px'
-                          }}>
-                            <svg width="12" height="12" viewBox="0 0 24 4" fill="none">
-                              <circle cx="4" cy="2" r="2" fill="#9C9C9C" />
-                              <circle cx="12" cy="2" r="2" fill="#9C9C9C" />
-                              <circle cx="20" cy="2" r="2" fill="#9C9C9C" />
-                            </svg>
-                          </button>
-                        </div>
+                        <button style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '2px',
+                          alignSelf: 'flex-start',
+                          marginTop: '2px'
+                        }}>
+                          <svg width="12" height="12" viewBox="0 0 24 4" fill="none">
+                            <circle cx="4" cy="2" r="2" fill="#9C9C9C" />
+                            <circle cx="12" cy="2" r="2" fill="#9C9C9C" />
+                            <circle cx="20" cy="2" r="2" fill="#9C9C9C" />
+                          </svg>
+                        </button>
                       </div>
                     ))}
                   </div>
 
-                  <button style={{
-                    marginTop: '12px',
-                    color: '#64B5F6',
-                    fontSize: '11px',
-                    fontWeight: 500,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    padding: 0,
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    See all reported issues →
-                  </button>
+                  <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                    <button style={{
+                      color: '#64B5F6',
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      See all reported issues →
+                    </button>
+                  </div>
                 </div>
 
                 {/* User per country */}
                 <div style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '12px',
-                  padding: '16px',
+                  padding: '12px',
                   border: '1px solid #F1F1F1'
                 }}>
                   <div style={{ 
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center',
-                    marginBottom: '12px'
+                    marginBottom: '10px'
                   }}>
                     <h2 style={{ 
-                      fontSize: '16px',
+                      fontSize: '14px',
                       fontWeight: 600,
                       color: '#212121',
                       margin: 0,
@@ -1248,13 +1287,13 @@ const AdminDashboard: React.FC = () => {
                     display: 'flex', 
                     justifyContent: 'center', 
                     alignItems: 'center',
-                    marginBottom: '12px'
+                    marginBottom: '10px'
                   }}>
                     <div style={{
-                      width: '100px',
-                      height: '100px',
+                      width: '80px',
+                      height: '80px',
                       borderRadius: '50%',
-                      border: '16px solid #E4E4E4',
+                      border: '12px solid #E4E4E4',
                       borderTopColor: '#64B5F6',
                       borderRightColor: '#64B5F6',
                       transform: 'rotate(-45deg)',
@@ -1266,7 +1305,7 @@ const AdminDashboard: React.FC = () => {
                       <div style={{
                         position: 'absolute',
                         transform: 'rotate(45deg)',
-                        fontSize: '20px',
+                        fontSize: '16px',
                         fontWeight: 600,
                         color: '#212121',
                         fontFamily: 'Bricolage Grotesque, sans-serif'
@@ -1277,44 +1316,44 @@ const AdminDashboard: React.FC = () => {
                   </div>
 
                   {/* Legend */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div style={{ 
-                        width: '10px', 
-                        height: '10px', 
+                        width: '8px', 
+                        height: '8px', 
                         borderRadius: '50%', 
                         backgroundColor: '#64B5F6' 
                       }} />
-                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
+                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div style={{ 
-                        width: '10px', 
-                        height: '10px', 
+                        width: '8px', 
+                        height: '8px', 
                         borderRadius: '50%', 
                         backgroundColor: '#E4E4E4' 
                       }} />
-                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
+                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
                     </div>
                   </div>
 
                   <div style={{ 
-                    padding: '12px',
+                    padding: '10px',
                     backgroundColor: '#FAFAFA',
-                    borderRadius: '8px',
-                    marginBottom: '12px'
+                    borderRadius: '6px',
+                    marginBottom: '10px'
                   }}>
                     <p style={{ 
-                      fontSize: '12px',
+                      fontSize: '11px',
                       color: '#212121',
-                      margin: '0 0 4px 0',
+                      margin: '0 0 3px 0',
                       fontWeight: 500,
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Must users: 104
                     </p>
                     <p style={{ 
-                      fontSize: '10px',
+                      fontSize: '9px',
                       color: '#9C9C9C',
                       margin: 0,
                       fontFamily: 'Poppins, sans-serif'
@@ -1325,27 +1364,27 @@ const AdminDashboard: React.FC = () => {
 
                   {/* France Map */}
                   <div style={{
-                    padding: '12px',
+                    padding: '10px',
                     backgroundColor: '#FAFAFA',
-                    borderRadius: '8px',
+                    borderRadius: '6px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '10px'
+                    gap: '8px'
                   }}>
                     <div style={{
-                      width: '48px',
-                      height: '48px',
+                      width: '40px',
+                      height: '40px',
                       backgroundColor: '#E4E4E4',
                       borderRadius: '6px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
-                      <img src={flagIcon} alt="France" style={{ width: '32px', height: '32px' }} />
+                      <img src={flagIcon} alt="France" style={{ width: '28px', height: '28px' }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ 
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 500,
                         color: '#212121',
                         margin: '0 0 2px 0',
@@ -1354,12 +1393,12 @@ const AdminDashboard: React.FC = () => {
                         France
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '12px', color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>67 Users</span>
+                        <span style={{ fontSize: '11px', color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>67 Users</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                             <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          <span style={{ color: '#22C55E', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>89%</span>
+                          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>89%</span>
                         </div>
                       </div>
                     </div>
