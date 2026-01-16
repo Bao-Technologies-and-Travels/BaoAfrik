@@ -807,7 +807,7 @@ const AdminDashboard: React.FC = () => {
               </h1>
             </div>
 
-            {/* Last Update */}
+            {/* Last Update with Dropdown and Title */}
             <div style={{ 
               marginBottom: '16px',
               display: 'flex',
@@ -835,24 +835,35 @@ const AdminDashboard: React.FC = () => {
                   Refresh
                 </button>
               </p>
-              <select style={{
-                padding: '6px 10px',
-                paddingRight: '28px',
-                borderRadius: '8px',
-                border: '1px solid #E4E4E4',
-                fontSize: '11px',
-                color: '#6A6A6A',
-                backgroundColor: '#FFFFFF',
-                cursor: 'pointer',
-                fontFamily: 'Poppins, sans-serif',
-                appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 8px center',
-                backgroundSize: '12px'
-              }}>
-                <option>This week</option>
-              </select>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <select style={{
+                  padding: '6px 10px',
+                  paddingRight: '28px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '11px',
+                  color: '#6A6A6A',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  fontFamily: 'Poppins, sans-serif',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 8px center',
+                  backgroundSize: '12px'
+                }}>
+                  <option>This week</option>
+                </select>
+                <h2 style={{ 
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#212121',
+                  margin: 0,
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Reported Issues
+                </h2>
+              </div>
             </div>
 
             {/* Metrics Cards and Reported Issues Container */}
@@ -1027,16 +1038,6 @@ const AdminDashboard: React.FC = () => {
 
               {/* Reported Issues - aligned with Active Listings */}
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {/* Reported Issues Title - outside the area */}
-                <h2 style={{ 
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: '#212121',
-                  margin: '0 0 12px 0',
-                  fontFamily: 'Bricolage Grotesque, sans-serif'
-                }}>
-                  Reported Issues
-                </h2>
                 {/* Reported Issues */}
                 <div style={{
                   backgroundColor: '#FFFFFF',
@@ -1158,8 +1159,9 @@ const AdminDashboard: React.FC = () => {
               borderRadius: '24px',
               padding: '16px',
               border: '1px solid #F1F1F1',
-              marginTop: '12px',
-              marginBottom: '12px'
+              marginTop: '0',
+              marginBottom: '12px',
+              maxWidth: '70%'
             }}>
                 <div style={{ 
                   display: 'flex', 
@@ -1293,6 +1295,7 @@ const AdminDashboard: React.FC = () => {
               display: 'grid', 
               gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
               gap: '10px',
+              marginTop: '0',
               marginBottom: '12px',
               alignItems: 'start'
             }}>
@@ -1327,14 +1330,20 @@ const AdminDashboard: React.FC = () => {
                       User per country
                     </h2>
                     <select style={{
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      border: '1px solid #E4E4E4',
-                      fontSize: '10px',
-                      color: '#212121',
+                      padding: '6px 10px',
+                      paddingRight: '28px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '11px',
+                      color: '#6A6A6A',
                       backgroundColor: '#FFFFFF',
                       cursor: 'pointer',
-                      fontFamily: 'Poppins, sans-serif'
+                      fontFamily: 'Poppins, sans-serif',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '12px'
                     }}>
                       <option>This week</option>
                     </select>
