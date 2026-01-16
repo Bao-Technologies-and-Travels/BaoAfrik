@@ -156,6 +156,9 @@ EOF
                     string(credentialsId: 'gcp_storage_bucket',  variable: 'GCP_STORAGE_BUCKET'),
                     string(credentialsId: 'email_from_address',  variable: 'EMAIL_FROM_ADDRESS'),
                     string(credentialsId: 'email_password',  variable: 'EMAIL_PASSWORD'),
+                    string(credentialsId: 'twilio_account_sid', variable: 'TWILIO_ACCOUNT_SID'),
+                    string(credentialsId: 'twilio_auth_token', variable: 'TWILIO_AUTH_TOKEN'),
+                    string(credentialsId: 'twilio_phone_number', variable: 'TWILIO_PHONE_NUMBER'),
                 ]) {
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
@@ -207,6 +210,10 @@ CORS_ORIGINS="https://${DOMAIN}"
 BCRYPT_ROUNDS=12
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
+
+TWILIO_ACCOUNT_SID="${TWILIO_ACCOUNT_SID}"
+TWILIO_AUTH_TOKEN="${TWILIO_AUTH_TOKEN}"
+TWILIO_PHONE_NUMBER="${TWILIO_PHONE_NUMBER}"
 EOF
 
                             chmod 600 .env
