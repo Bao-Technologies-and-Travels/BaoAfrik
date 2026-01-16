@@ -646,7 +646,7 @@ const Messages: React.FC = () => {
   // Handle clicks outside dropdowns to close them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+        const target = event.target as HTMLElement;
       const notificationDropdown = target.closest('.notification-dropdown');
       const menuDropdown = target.closest('.menu-dropdown');
 
@@ -3560,7 +3560,7 @@ const Messages: React.FC = () => {
                         <span className="text-white text-xs font-medium">{unreadCount}</span>
                       </div>
                     )}
-                  </button>
+                </button>
 
                   {/* Notification Dropdown */}
                   {isNotificationOpen && (

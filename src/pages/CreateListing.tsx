@@ -188,7 +188,7 @@ const CreateListing: React.FC = () => {
     { value: 'southampton', label: 'Southampton, United Kingdom' },
     { value: 'portsmouth', label: 'Portsmouth, United Kingdom' },
     { value: 'norwich', label: 'Norwich, United Kingdom' }
-  ];
+    ];
 
   const countries = [
     { value: 'algeria', label: 'Algeria', flagCode: 'dz' },
@@ -1542,24 +1542,24 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               {/* Location Section */}
               <div className="relative location-dropdown" style={{ maxWidth: '560px' }}>
                 <div className="flex items-start justify-between mt-4">
-                  <div className="flex flex-col">
-                    <div className="flex items-center space-x-1.5 mb-1">
-                      <img src={locIcon} alt="Location" className="w-4 h-4" />
-                      <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
-                    </div>
-                    <input
-                      type="text"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="text-xs font-medium border-none focus:outline-none ml-6"
-                      style={{ color: '#64B5F6' }}
-                      readOnly
-                    />
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-1.5 mb-1">
+                    <img src={locIcon} alt="Location" className="w-4 h-4" />
+                    <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
                   </div>
-                  <button
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="text-xs font-medium border-none focus:outline-none ml-6"
+                    style={{ color: '#64B5F6' }}
+                      readOnly
+                  />
+                </div>
+                <button
                     type="button"
                     onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                    className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                  className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
                     style={{ 
                       backgroundColor: '#F0F8FE', 
                       color: '#64B5F6',
@@ -1746,7 +1746,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                            />
                            <span
                              className="px-4 py-1.5 rounded-lg font-medium cursor-pointer inline-block text-xs"
-                             style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                  style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
                            >
                              Upload Photos
                            </span>
@@ -2105,10 +2105,10 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                       border: isLocationDropdownOpen ? '1px solid #97CDF9' : 'none',
                       boxShadow: isLocationDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
                     }}
-                  >
-                    Change location
-                  </button>
-                </div>
+                >
+                  Change location
+                </button>
+              </div>
                 {/* Location Dropdown Menu */}
                 {isLocationDropdownOpen && (
                   <div 
@@ -2172,7 +2172,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                     ))}
                   </div>
                 )}
-              </div>
+            </div>
 
               {/* Mobile Title Input */}
               <div>

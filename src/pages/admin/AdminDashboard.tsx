@@ -745,22 +745,33 @@ const AdminDashboard: React.FC = () => {
                     Main Admin
                   </p>
                 </div>
-                <img 
-                  src={avatar} 
-                  alt="Profile" 
-                  style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    borderRadius: '50%',
-                    objectFit: 'cover'
-                  }} 
-                />
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#E3F2FD',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <img 
+                    src={avatar} 
+                    alt="Profile" 
+                    style={{ 
+                      width: '28px', 
+                      height: '28px', 
+                      borderRadius: '50%',
+                      objectFit: 'cover'
+                    }} 
+                  />
+                </div>
                 <div className="relative menu-dropdown" ref={menuDropdownRef}>
                   <button
                     onClick={() => setIsMenuDropdownOpen(!isMenuDropdownOpen)}
                     style={{
                       padding: '8px',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: 'transparent',
                       border: 'none',
                       borderRadius: '8px',
                       cursor: 'pointer',
@@ -797,7 +808,12 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Last Update */}
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ 
+              marginBottom: '16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
               <p style={{ 
                 color: '#9C9C9C',
                 fontSize: '12px',
@@ -819,20 +835,39 @@ const AdminDashboard: React.FC = () => {
                   Refresh
                 </button>
               </p>
+              <select style={{
+                padding: '6px 10px',
+                paddingRight: '28px',
+                borderRadius: '8px',
+                border: '1px solid #E4E4E4',
+                fontSize: '11px',
+                color: '#6A6A6A',
+                backgroundColor: '#FFFFFF',
+                cursor: 'pointer',
+                fontFamily: 'Poppins, sans-serif',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+                backgroundSize: '12px'
+              }}>
+                <option>This week</option>
+              </select>
             </div>
 
-            {/* Metrics Cards */}
+            {/* Metrics Cards and Reported Issues Container */}
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '12px',
-              marginBottom: '20px'
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginBottom: '12px',
+              alignItems: 'start'
             }}>
               {/* Visitors Card */}
               <div style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '18px',
-                padding: '12px',
+                padding: '10px',
                 border: '1px solid #F1F1F1'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -845,31 +880,40 @@ const AdminDashboard: React.FC = () => {
                     }}>
                       Visitors number
                     </p>
-                    <p style={{ 
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: '#212121',
-                      margin: '0 0 4px 0',
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                    }}>
-                      569
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span style={{ color: '#22C55E', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <p style={{ 
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: 0,
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        569
+                      </p>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: '#EDFBF0',
+                        padding: '2px 6px',
+                        borderRadius: '12px'
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                      </div>
                     </div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '9px',
-                      margin: '4px 0 0 0',
+                      fontSize: '8px',
+                      margin: 0,
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Last month: 2094
                     </p>
                   </div>
-                  <img src={peopleIcon} alt="Visitors" style={{ width: '28px', height: '28px' }} />
+                  <img src={peopleIcon} alt="Visitors" style={{ width: '24px', height: '24px' }} />
                 </div>
               </div>
 
@@ -877,7 +921,7 @@ const AdminDashboard: React.FC = () => {
               <div style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '18px',
-                padding: '12px',
+                padding: '10px',
                 border: '1px solid #F1F1F1'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -890,31 +934,40 @@ const AdminDashboard: React.FC = () => {
                     }}>
                       Active users
                     </p>
-                    <p style={{ 
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: '#212121',
-                      margin: '0 0 4px 0',
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                    }}>
-                      201
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                        <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span style={{ color: '#EF4444', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <p style={{ 
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: 0,
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        201
+                      </p>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: '#FFE9E9',
+                        padding: '2px 6px',
+                        borderRadius: '12px'
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span style={{ color: '#EF4444', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                      </div>
                     </div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '9px',
-                      margin: '4px 0 0 0',
+                      fontSize: '8px',
+                      margin: 0,
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Last month: 2094
                     </p>
                   </div>
-                  <img src={activeusersIcon} alt="Active Users" style={{ width: '28px', height: '28px' }} />
+                  <img src={activeusersIcon} alt="Active Users" style={{ width: '24px', height: '24px' }} />
                 </div>
               </div>
 
@@ -922,7 +975,7 @@ const AdminDashboard: React.FC = () => {
               <div style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '18px',
-                padding: '12px',
+                padding: '10px',
                 border: '1px solid #F1F1F1'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -935,70 +988,185 @@ const AdminDashboard: React.FC = () => {
                     }}>
                       Active listings
                     </p>
-                    <p style={{ 
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      color: '#212121',
-                      margin: '0 0 4px 0',
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                    }}>
-                      714
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span style={{ color: '#22C55E', fontSize: '10px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+109</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <p style={{ 
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: 0,
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        714
+                      </p>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: '#EDFBF0',
+                        padding: '2px 6px',
+                        borderRadius: '12px'
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+109</span>
+                      </div>
                     </div>
                     <p style={{ 
                       color: '#9C9C9C',
-                      fontSize: '9px',
-                      margin: '4px 0 0 0',
+                      fontSize: '8px',
+                      margin: 0,
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Last month: 2094
                     </p>
                   </div>
-                  <img src={activelistingsIcon} alt="Active Listings" style={{ width: '28px', height: '28px' }} />
+                  <img src={activelistingsIcon} alt="Active Listings" style={{ width: '24px', height: '24px' }} />
+                </div>
+              </div>
+
+              {/* Reported Issues - aligned with Active Listings */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {/* Reported Issues Title - outside the area */}
+                <h2 style={{ 
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#212121',
+                  margin: '0 0 12px 0',
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Reported Issues
+                </h2>
+                {/* Reported Issues */}
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  padding: '12px',
+                  border: '0.5px solid #F1F1F1',
+                  width: '100%',
+                  maxWidth: '320px'
+                }}>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {[
+                      { name: 'Clara Vanstone', issue: 'Phishing attempt', time: '30 min ago', avatar: avatar, bgColor: '#E3F2FD' },
+                      { name: 'Robert OWEN', issue: 'Phishing attempt', time: '2h ago', avatar: avatar, bgColor: '#FFF3E0' },
+                      { name: 'Kalhesi Doumbia', issue: 'Phishing attempt', time: 'Yesterday', avatar: avatar, bgColor: '#F3E5F5' }
+                    ].map((item, index) => (
+                      <div key={index} style={{ 
+                        display: 'flex', 
+                        alignItems: 'flex-start', 
+                        gap: '10px'
+                      }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: item.bgColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <img 
+                            src={item.avatar} 
+                            alt={item.name} 
+                            style={{ 
+                              width: '24px', 
+                              height: '24px', 
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }} 
+                          />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                            <p style={{ 
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              color: '#212121',
+                              margin: 0,
+                              fontFamily: 'Poppins, sans-serif',
+                              flex: 1
+                            }}>
+                              {item.name}
+                            </p>
+                            <button style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              flexShrink: 0
+                            }}>
+                              <svg width="12" height="12" viewBox="0 0 24 4" fill="none">
+                                <circle cx="4" cy="2" r="2" fill="#9C9C9C" />
+                                <circle cx="12" cy="2" r="2" fill="#9C9C9C" />
+                                <circle cx="20" cy="2" r="2" fill="#9C9C9C" />
+                              </svg>
+                            </button>
+                          </div>
+                          <p style={{ 
+                            fontSize: '10px',
+                            color: '#9C9C9C',
+                            margin: 0,
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            {item.issue}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
+                            <p style={{ 
+                              fontSize: '9px',
+                              color: '#B0B0B0',
+                              margin: 0,
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {item.time}
+                            </p>
+                            <div style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              backgroundColor: '#64B5F6'
+                            }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                    <button style={{
+                      color: '#64B5F6',
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      See all reported issues →
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Dropdown above Active Listings */}
+            {/* Performance Overview - directly below metrics */}
             <div style={{ 
-              display: 'flex', 
-              justifyContent: 'flex-end',
-              marginBottom: '12px',
-              marginTop: '-4px'
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              padding: '16px',
+              border: '1px solid #F1F1F1',
+              marginTop: '12px',
+              marginBottom: '12px'
             }}>
-              <select style={{
-                padding: '6px 10px',
-                borderRadius: '8px',
-                border: '1px solid #E4E4E4',
-                fontSize: '11px',
-                color: '#212121',
-                backgroundColor: '#FFFFFF',
-                cursor: 'pointer',
-                fontFamily: 'Poppins, sans-serif'
-              }}>
-                <option>This week</option>
-              </select>
-            </div>
-
-            {/* Main Content Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
-              {/* Left: Performance Overview */}
-              <div style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
-                padding: '16px',
-                border: '1px solid #F1F1F1'
-              }}>
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
-                  marginBottom: '8px'
+                  marginBottom: '8px',
+                  marginTop: '0'
                 }}>
                   <h2 style={{ 
                     fontSize: '16px',
@@ -1073,7 +1241,7 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Chart Placeholder */}
                 <div style={{
-                  height: '200px',
+                  height: '120px',
                   display: 'flex',
                   alignItems: 'flex-end',
                   gap: '6px',
@@ -1118,149 +1286,39 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+            </div>
 
-              {/* Right: Reported Issues & User per country */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {/* Reported Issues */}
+            {/* User per country - positioned like Reported Issues */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginBottom: '12px',
+              alignItems: 'start'
+            }}>
+              {/* Empty space for first 3 columns */}
+              <div></div>
+              <div></div>
+              <div></div>
+              
+              {/* User per country */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
                   padding: '12px',
-                  border: '0.5px solid #F1F1F1'
-                }}>
-                  <div style={{ 
-                    marginBottom: '12px'
-                  }}>
-                    <h2 style={{ 
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#212121',
-                      margin: 0,
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                    }}>
-                      Reported Issues
-                    </h2>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {[
-                      { name: 'Clara Vanstone', issue: 'Phishing attempt', time: '30 min ago', avatar: avatar, bgColor: '#E3F2FD' },
-                      { name: 'Robert OWEN', issue: 'Phishing attempt', time: '2h ago', avatar: avatar, bgColor: '#FFF3E0' },
-                      { name: 'Kalhesi Doumbia', issue: 'Phishing attempt', time: 'Yesterday', avatar: avatar, bgColor: '#F3E5F5' }
-                    ].map((item, index) => (
-                      <div key={index} style={{ 
-                        display: 'flex', 
-                        alignItems: 'flex-start', 
-                        gap: '10px',
-                        paddingBottom: index < 2 ? '12px' : '0',
-                        borderBottom: index < 2 ? '1px solid #F1F1F1' : 'none'
-                      }}>
-                        <div style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: item.bgColor,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          <img 
-                            src={item.avatar} 
-                            alt={item.name} 
-                            style={{ 
-                              width: '24px', 
-                              height: '24px', 
-                              borderRadius: '50%',
-                              objectFit: 'cover'
-                            }} 
-                          />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ 
-                            fontSize: '12px',
-                            fontWeight: 500,
-                            color: '#212121',
-                            margin: '0 0 2px 0',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            {item.name}
-                          </p>
-                          <p style={{ 
-                            fontSize: '10px',
-                            color: '#9C9C9C',
-                            margin: '0 0 4px 0',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            {item.issue}
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <p style={{ 
-                              fontSize: '9px',
-                              color: '#B0B0B0',
-                              margin: 0,
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              {item.time}
-                            </p>
-                            <div style={{
-                              width: '6px',
-                              height: '6px',
-                              borderRadius: '50%',
-                              backgroundColor: '#64B5F6'
-                            }} />
-                          </div>
-                        </div>
-                        <button style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: '2px',
-                          alignSelf: 'flex-start',
-                          marginTop: '2px'
-                        }}>
-                          <svg width="12" height="12" viewBox="0 0 24 4" fill="none">
-                            <circle cx="4" cy="2" r="2" fill="#9C9C9C" />
-                            <circle cx="12" cy="2" r="2" fill="#9C9C9C" />
-                            <circle cx="20" cy="2" r="2" fill="#9C9C9C" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                    <button style={{
-                      color: '#64B5F6',
-                      fontSize: '11px',
-                      fontWeight: 500,
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: 0,
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      See all reported issues →
-                    </button>
-                  </div>
-                </div>
-
-                {/* User per country */}
-                <div style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  border: '1px solid #F1F1F1'
+                  border: '0.5px solid #F1F1F1',
+                  width: '100%',
+                  maxWidth: '320px'
                 }}>
                   <div style={{ 
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center',
-                    marginBottom: '10px'
+                    marginBottom: '12px'
                   }}>
                     <h2 style={{ 
-                      fontSize: '14px',
+                      fontSize: '16px',
                       fontWeight: 600,
                       color: '#212121',
                       margin: 0,
@@ -1287,13 +1345,13 @@ const AdminDashboard: React.FC = () => {
                     display: 'flex', 
                     justifyContent: 'center', 
                     alignItems: 'center',
-                    marginBottom: '10px'
+                    marginBottom: '12px'
                   }}>
                     <div style={{
-                      width: '80px',
-                      height: '80px',
+                      width: '100px',
+                      height: '100px',
                       borderRadius: '50%',
-                      border: '12px solid #E4E4E4',
+                      border: '16px solid #E4E4E4',
                       borderTopColor: '#64B5F6',
                       borderRightColor: '#64B5F6',
                       transform: 'rotate(-45deg)',
@@ -1305,7 +1363,7 @@ const AdminDashboard: React.FC = () => {
                       <div style={{
                         position: 'absolute',
                         transform: 'rotate(45deg)',
-                        fontSize: '16px',
+                        fontSize: '20px',
                         fontWeight: 600,
                         color: '#212121',
                         fontFamily: 'Bricolage Grotesque, sans-serif'
@@ -1316,44 +1374,44 @@ const AdminDashboard: React.FC = () => {
                   </div>
 
                   {/* Legend */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div style={{ 
-                        width: '8px', 
-                        height: '8px', 
+                        width: '10px', 
+                        height: '10px', 
                         borderRadius: '50%', 
                         backgroundColor: '#64B5F6' 
                       }} />
-                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
+                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div style={{ 
-                        width: '8px', 
-                        height: '8px', 
+                        width: '10px', 
+                        height: '10px', 
                         borderRadius: '50%', 
                         backgroundColor: '#E4E4E4' 
                       }} />
-                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
+                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
                     </div>
                   </div>
 
                   <div style={{ 
-                    padding: '10px',
+                    padding: '12px',
                     backgroundColor: '#FAFAFA',
-                    borderRadius: '6px',
-                    marginBottom: '10px'
+                    borderRadius: '8px',
+                    marginBottom: '12px'
                   }}>
                     <p style={{ 
-                      fontSize: '11px',
+                      fontSize: '12px',
                       color: '#212121',
-                      margin: '0 0 3px 0',
+                      margin: '0 0 4px 0',
                       fontWeight: 500,
                       fontFamily: 'Poppins, sans-serif'
                     }}>
                       Must users: 104
                     </p>
                     <p style={{ 
-                      fontSize: '9px',
+                      fontSize: '10px',
                       color: '#9C9C9C',
                       margin: 0,
                       fontFamily: 'Poppins, sans-serif'
@@ -1364,27 +1422,27 @@ const AdminDashboard: React.FC = () => {
 
                   {/* France Map */}
                   <div style={{
-                    padding: '10px',
+                    padding: '12px',
                     backgroundColor: '#FAFAFA',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '10px'
                   }}>
                     <div style={{
-                      width: '40px',
-                      height: '40px',
+                      width: '48px',
+                      height: '48px',
                       backgroundColor: '#E4E4E4',
                       borderRadius: '6px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
-                      <img src={flagIcon} alt="France" style={{ width: '28px', height: '28px' }} />
+                      <img src={flagIcon} alt="France" style={{ width: '32px', height: '32px' }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ 
-                        fontSize: '11px',
+                        fontSize: '12px',
                         fontWeight: 500,
                         color: '#212121',
                         margin: '0 0 2px 0',
@@ -1393,7 +1451,7 @@ const AdminDashboard: React.FC = () => {
                         France
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '11px', color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>67 Users</span>
+                        <span style={{ fontSize: '12px', color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>67 Users</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                             <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
