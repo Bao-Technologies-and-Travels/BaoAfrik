@@ -21,6 +21,9 @@ import avatar from '../../assets/images/logos/avatar.png';
 import logoIcon from '../../assets/images/logos/ba-brand-icon-colored.png';
 import messageAvatarIcon from '../../assets/images/pre/main.png';
 import appNotificationIcon from '../../assets/images/pre/nof.svg';
+import bar1Icon from '../../assets/images/admin/bar1.svg';
+import bar2Icon from '../../assets/images/admin/bar2.svg';
+import visualIcon from '../../assets/images/admin/visual.svg';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -30,9 +33,20 @@ const AdminDashboard: React.FC = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
   const [isMenuDropdownOpen, setIsMenuDropdownOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('France');
   const languageDropdownRef = useRef<HTMLDivElement>(null);
   const notificationDropdownRef = useRef<HTMLDivElement>(null);
   const menuDropdownRef = useRef<HTMLDivElement>(null);
+  const globeRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+
+  // Country positions for the blue dot (x, y coordinates)
+  const countryPositions: { [key: string]: { x: number; y: number } } = {
+    'France': { x: 50, y: 45 },
+    'United Kingdom': { x: 48, y: 35 },
+    'Germany': { x: 52, y: 40 },
+    'Spain': { x: 45, y: 50 }
+  };
 
   // Mock notification data
   const [notifications, setNotifications] = useState([
@@ -174,10 +188,27 @@ const AdminDashboard: React.FC = () => {
     return `${day}, ${date} ${month}. ${year} - ${displayHours}:${displayMinutes} ${ampm}`;
   };
 
+  // Update dot position when country changes
+  useEffect(() => {
+    if (dotRef.current && countryPositions[selectedCountry]) {
+      const { x, y } = countryPositions[selectedCountry];
+      dotRef.current.style.left = `${x}%`;
+      dotRef.current.style.top = `${y}%`;
+    }
+  }, [selectedCountry]);
+
   return (
     <div style={{ backgroundColor: '#FAFAFA', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
       <style>
         {`
+          @keyframes rotateGlobe {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
           .admin-sidebar-scroll::-webkit-scrollbar {
             display: none;
           }
@@ -1312,7 +1343,7 @@ const AdminDashboard: React.FC = () => {
                     marginBottom: '12px'
                   }}>
                     <h2 style={{ 
-                      fontSize: '16px',
+                      fontSize: '14px',
                       fontWeight: 600,
                       color: '#212121',
                       margin: 0,
@@ -1326,7 +1357,7 @@ const AdminDashboard: React.FC = () => {
                       borderRadius: '8px',
                       border: 'none',
                       fontSize: '11px',
-                      color: '#6A6A6A',
+                      color: '#B0B0B0',
                       backgroundColor: '#FFFFFF',
                       cursor: 'pointer',
                       fontFamily: 'Poppins, sans-serif',
@@ -1340,125 +1371,215 @@ const AdminDashboard: React.FC = () => {
                     </select>
                   </div>
 
-                  {/* Chart */}
+                  {/* Progress Chart */}
                   <div style={{ 
                     display: 'flex', 
                     justifyContent: 'center', 
                     alignItems: 'center',
-                    marginBottom: '12px'
+                    marginBottom: '12px',
+                    position: 'relative',
+                    height: '140px'
                   }}>
+                    {/* Semi-circular progress bars */}
                     <div style={{
-                      width: '100px',
-                      height: '100px',
-                      borderRadius: '50%',
-                      border: '16px solid #E4E4E4',
-                      borderTopColor: '#64B5F6',
-                      borderRightColor: '#64B5F6',
-                      transform: 'rotate(-45deg)',
+                      position: 'relative',
+                      width: '240px',
+                      height: '120px',
                       display: 'flex',
-                      alignItems: 'center',
                       justifyContent: 'center',
-                      position: 'relative'
+                      alignItems: 'flex-end'
                     }}>
+                      {/* 18 progress bars arranged in semi-circle */}
+                      {Array.from({ length: 18 }).map((_, index) => {
+                        // First 12 bars are UK (blue shades), last 6 are other countries (grey)
+                        const isUK = index < 12;
+                        let barColor = '#F4F4F4'; // default empty
+                        if (isUK) {
+                          // Use different shades of blue for UK bars
+                          if (index < 4) barColor = '#83C4F8';
+                          else if (index < 8) barColor = '#B8DDFB';
+                          else barColor = '#CFE8FC';
+                        } else {
+                          barColor = '#F4F4F4';
+                        }
+                        
+                        // Calculate rotation angle for semi-circle (0 to 180 degrees)
+                        const angle = (index * 180) / 17; // 0 to 180 degrees
+                        const rotation = angle - 90; // Start from left (-90) to right (90)
+                        const radius = 90; // Distance from center
+                        
+                        // Bar path for UK bars (from bar1.svg)
+                        const ukBarPath = "M7.88646 0.109009C4.63222 -0.515968 1.47175 1.61414 1.01088 4.89565C0.522854 8.37051 0.188118 11.8652 0.00764532 15.3695C-0.162785 18.6788 2.53587 21.3701 5.84958 21.3743L44.9405 21.423C48.2542 21.4271 50.9165 18.7391 51.2109 15.4384C51.2374 15.1414 51.2658 14.8445 51.2962 14.5477C51.6337 11.2513 49.5301 8.10672 46.2758 7.48174L7.88646 0.109009Z";
+                        // Bar path for other countries (from bar2.svg)
+                        const otherBarPath = "M45.4727 21.375C48.7864 21.375 51.4884 18.687 51.3221 15.3775C51.146 11.873 50.8156 8.37788 50.3319 4.90241C49.8751 1.62034 46.7173 -0.51371 43.4623 0.107224L5.06372 7.43213C1.80872 8.05306 -0.298859 11.195 0.0345459 14.4919C0.0645599 14.7886 0.0926361 15.0856 0.118759 15.3827C0.409027 18.6837 3.06801 21.375 6.38171 21.375H45.4727Z";
+                        
+                        return (
+                          <div
+                            key={index}
+                            style={{
+                              position: 'absolute',
+                              left: '50%',
+                              bottom: '0',
+                              transformOrigin: '50% 100%',
+                              transform: `translateX(-50%) rotate(${rotation}deg) translateY(-${radius}px)`,
+                              width: '52px',
+                              height: '22px'
+                            }}
+                          >
+                            <svg width="52" height="22" viewBox="0 0 52 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path 
+                                d={isUK ? ukBarPath : otherBarPath} 
+                                fill={barColor}
+                              />
+                            </svg>
+                          </div>
+                        );
+                      })}
+                      
+                      {/* Center percentage */}
                       <div style={{
                         position: 'absolute',
-                        transform: 'rotate(45deg)',
-                        fontSize: '20px',
-                        fontWeight: 600,
-                        color: '#212121',
-                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        textAlign: 'center',
+                        zIndex: 10
                       }}>
-                        67.56%
+                        <p style={{
+                          fontSize: '24px',
+                          fontWeight: 600,
+                          color: '#212121',
+                          margin: 0,
+                          fontFamily: 'Bricolage Grotesque, sans-serif'
+                        }}>
+                          67.56%
+                        </p>
+                        <p style={{
+                          fontSize: '10px',
+                          color: '#B0B0B0',
+                          margin: '4px 0 0 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Must users: 104
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Legend */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {/* Legend - United Kingdom and Other countries side by side */}
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <div style={{ 
-                        width: '10px', 
-                        height: '10px', 
+                        width: '8px', 
+                        height: '8px', 
                         borderRadius: '50%', 
-                        backgroundColor: '#64B5F6' 
+                        backgroundColor: '#83C4F8' 
                       }} />
-                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
+                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <div style={{ 
-                        width: '10px', 
-                        height: '10px', 
+                        width: '8px', 
+                        height: '8px', 
                         borderRadius: '50%', 
-                        backgroundColor: '#E4E4E4' 
+                        backgroundColor: '#F4F4F4' 
                       }} />
-                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
+                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
                     </div>
                   </div>
 
-                  <div style={{ 
-                    padding: '12px',
-                    backgroundColor: '#FAFAFA',
-                    borderRadius: '8px',
-                    marginBottom: '12px'
-                  }}>
-                    <p style={{ 
-                      fontSize: '12px',
-                      color: '#212121',
-                      margin: '0 0 4px 0',
-                      fontWeight: 500,
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      Must users: 104
-                    </p>
-                    <p style={{ 
-                      fontSize: '10px',
-                      color: '#9C9C9C',
-                      margin: 0,
-                      fontFamily: 'Poppins, sans-serif'
-                    }}>
-                      Less users: 2.89%
-                    </p>
-                  </div>
-
-                  {/* France Map */}
+                  {/* Country Breakdown Section */}
                   <div style={{
                     padding: '12px',
                     backgroundColor: '#FAFAFA',
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '10px'
+                    gap: '12px',
+                    position: 'relative'
                   }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      backgroundColor: '#E4E4E4',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <img src={flagIcon} alt="France" style={{ width: '32px', height: '32px' }} />
-                    </div>
                     <div style={{ flex: 1 }}>
+                      {/* Less users at top left */}
                       <p style={{ 
-                        fontSize: '12px',
-                        fontWeight: 500,
-                        color: '#212121',
-                        margin: '0 0 2px 0',
+                        fontSize: '10px',
+                        color: '#6A6A6A',
+                        margin: '0 0 8px 0',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        Less users: 2.89%
+                      </p>
+                      
+                      {/* France text */}
+                      <p style={{ 
+                        fontSize: '11px',
+                        color: '#939393',
+                        margin: '0 0 4px 0',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
                         France
                       </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '12px', color: '#212121', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>67 Users</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      
+                      {/* Users count and badge */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
+                        <span style={{ 
+                          fontSize: '12px', 
+                          color: '#202224', 
+                          fontWeight: 500, 
+                          fontFamily: 'Bricolage Grotesque, sans-serif' 
+                        }}>
+                          67 Users
+                        </span>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '4px',
+                          backgroundColor: '#EDFBF0',
+                          padding: '2px 6px',
+                          borderRadius: '12px'
+                        }}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                             <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>89%</span>
+                          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                         </div>
                       </div>
+                    </div>
+                    
+                    {/* Globe visualization */}
+                    <div 
+                      ref={globeRef}
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        position: 'relative',
+                        flexShrink: 0
+                      }}
+                    >
+                      <img 
+                        src={visualIcon} 
+                        alt="Globe" 
+                        style={{ 
+                          width: '100%',
+                          height: '100%',
+                          animation: 'rotateGlobe 20s linear infinite'
+                        }} 
+                      />
+                      {/* Blue dot that moves based on selected country */}
+                      <div
+                        ref={dotRef}
+                        style={{
+                          position: 'absolute',
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: '#64B5F6',
+                          left: `${countryPositions[selectedCountry]?.x || 50}%`,
+                          top: `${countryPositions[selectedCountry]?.y || 45}%`,
+                          transform: 'translate(-50%, -50%)',
+                          transition: 'left 0.5s ease, top 0.5s ease',
+                          zIndex: 10
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
