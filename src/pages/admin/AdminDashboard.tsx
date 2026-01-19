@@ -834,7 +834,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Row for dropdown and title above Active Listings and Reported Issues */}
-              <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0', marginTop: '22px' }}>
+              <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0', marginTop: '8px' }}>
                 <select style={{
                   padding: '6px 10px',
                   paddingRight: '28px',
@@ -854,7 +854,7 @@ const AdminDashboard: React.FC = () => {
                   <option>This week</option>
                 </select>
               </div>
-              <div style={{ gridColumn: '4', marginBottom: '0', marginTop: '22px' }}>
+              <div style={{ gridColumn: '4', marginBottom: '0', marginTop: '8px' }}>
                 <h2 style={{ 
                   fontSize: '14px',
                   fontWeight: 600,
@@ -1028,7 +1028,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Reported Issues - aligned with Active Listings */}
-              <div style={{ display: 'flex', flexDirection: 'column', marginTop: '-16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', marginTop: '-24px' }}>
                 {/* Reported Issues */}
                 <div style={{
                   backgroundColor: '#FFFFFF',
@@ -1150,7 +1150,7 @@ const AdminDashboard: React.FC = () => {
               borderRadius: '24px',
               padding: '16px',
               border: '1px solid #F1F1F1',
-              marginTop: '-24px',
+              marginTop: '-64px',
               marginBottom: '12px',
               maxWidth: '70%'
             }}>
