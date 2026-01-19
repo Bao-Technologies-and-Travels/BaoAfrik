@@ -794,7 +794,7 @@ const AdminDashboard: React.FC = () => {
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              marginBottom: '8px'
+              marginBottom: '4px'
             }}>
               <h1 style={{ 
                 fontSize: '18px', 
@@ -807,12 +807,9 @@ const AdminDashboard: React.FC = () => {
               </h1>
             </div>
 
-            {/* Last Update with Dropdown and Title */}
+            {/* Last Update */}
             <div style={{ 
-              marginBottom: '16px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
+              marginBottom: '0'
             }}>
               <p style={{ 
                 color: '#9C9C9C',
@@ -835,7 +832,19 @@ const AdminDashboard: React.FC = () => {
                   Refresh
                 </button>
               </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            </div>
+
+            {/* Metrics Cards and Reported Issues Container */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginTop: '0',
+              marginBottom: '12px',
+              alignItems: 'start'
+            }}>
+              {/* Row for dropdown and title above Active Listings and Reported Issues */}
+              <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0' }}>
                 <select style={{
                   padding: '6px 10px',
                   paddingRight: '28px',
@@ -854,6 +863,8 @@ const AdminDashboard: React.FC = () => {
                 }}>
                   <option>This week</option>
                 </select>
+              </div>
+              <div style={{ gridColumn: '4', marginBottom: '0' }}>
                 <h2 style={{ 
                   fontSize: '16px',
                   fontWeight: 600,
@@ -864,16 +875,6 @@ const AdminDashboard: React.FC = () => {
                   Reported Issues
                 </h2>
               </div>
-            </div>
-
-            {/* Metrics Cards and Reported Issues Container */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
-              gap: '10px',
-              marginBottom: '12px',
-              alignItems: 'start'
-            }}>
               {/* Visitors Card */}
               <div style={{
                 backgroundColor: '#FFFFFF',
