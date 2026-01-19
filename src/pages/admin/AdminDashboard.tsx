@@ -1286,7 +1286,7 @@ const AdminDashboard: React.FC = () => {
               display: 'grid', 
               gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
               gap: '10px',
-              marginTop: '0',
+              marginTop: '-120px',
               marginBottom: '12px',
               alignItems: 'start'
             }}>
