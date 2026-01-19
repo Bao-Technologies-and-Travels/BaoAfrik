@@ -789,62 +789,52 @@ const AdminDashboard: React.FC = () => {
 
           {/* Dashboard Content */}
           <div>
-            {/* Dashboard Title */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: '4px'
-            }}>
-              <h1 style={{ 
-                fontSize: '18px', 
-                fontWeight: 600, 
-                color: '#212121',
-                margin: 0,
-                fontFamily: 'Bricolage Grotesque, sans-serif'
-              }}>
-                Dashboard
-              </h1>
-            </div>
-
-            {/* Last Update */}
-            <div style={{ 
-              marginBottom: '0'
-            }}>
-              <p style={{ 
-                color: '#9C9C9C',
-                fontSize: '12px',
-                margin: 0,
-                fontFamily: 'Poppins, sans-serif'
-              }}>
-                Last update: {getLastUpdate()}{' '}
-                <button
-                  style={{
-                    color: '#64B5F6',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    fontSize: '12px',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}
-                >
-                  Refresh
-                </button>
-              </p>
-            </div>
-
             {/* Metrics Cards and Reported Issues Container */}
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
               gap: '10px',
               marginTop: '0',
-              marginBottom: '12px',
+              marginBottom: '0',
               alignItems: 'start'
             }}>
+              {/* Row for title/description + dropdown + reported issues title */}
+              <div style={{ gridColumn: '1 / 3', marginBottom: '0' }}>
+                <h1 style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 600, 
+                  color: '#212121',
+                  margin: 0,
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Dashboard
+                </h1>
+                <p style={{ 
+                  color: '#9C9C9C',
+                  fontSize: '12px',
+                  margin: '2px 0 0 0',
+                  fontFamily: 'Poppins, sans-serif'
+                }}>
+                  Last update: {getLastUpdate()}{' '}
+                  <button
+                    style={{
+                      color: '#64B5F6',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      padding: 0
+                    }}
+                  >
+                    Refresh
+                  </button>
+                </p>
+              </div>
+
               {/* Row for dropdown and title above Active Listings and Reported Issues */}
-              <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0' }}>
+              <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0', marginTop: '22px' }}>
                 <select style={{
                   padding: '6px 10px',
                   paddingRight: '28px',
@@ -864,9 +854,9 @@ const AdminDashboard: React.FC = () => {
                   <option>This week</option>
                 </select>
               </div>
-              <div style={{ gridColumn: '4', marginBottom: '0' }}>
+              <div style={{ gridColumn: '4', marginBottom: '0', marginTop: '22px' }}>
                 <h2 style={{ 
-                  fontSize: '16px',
+                  fontSize: '14px',
                   fontWeight: 600,
                   color: '#212121',
                   margin: 0,
@@ -1038,7 +1028,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Reported Issues - aligned with Active Listings */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', marginTop: '-16px' }}>
                 {/* Reported Issues */}
                 <div style={{
                   backgroundColor: '#FFFFFF',
@@ -1160,7 +1150,7 @@ const AdminDashboard: React.FC = () => {
               borderRadius: '24px',
               padding: '16px',
               border: '1px solid #F1F1F1',
-              marginTop: '0',
+              marginTop: '-24px',
               marginBottom: '12px',
               maxWidth: '70%'
             }}>
