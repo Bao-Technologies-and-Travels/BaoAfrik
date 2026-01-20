@@ -24,6 +24,52 @@ import appNotificationIcon from '../../assets/images/pre/nof.svg';
 import visualIcon from '../../assets/images/admin/visual.svg';
 import MustUsersArc from '../../components/ui/MustUsersArc';
 
+// Suggestion Option Component with hover state
+const SuggestionOption: React.FC<{
+  option: { key: string; label: string; icon: string };
+  selectedCategory: string | null;
+  onSelect: (category: 'users' | 'listings' | 'requests') => void;
+}> = ({ option, selectedCategory, onSelect }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  const isActive = selectedCategory === option.key || isHovered;
+  
+  return (
+    <div
+      onClick={() => onSelect(option.key as 'users' | 'listings' | 'requests')}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px',
+        borderRadius: '8px',
+        backgroundColor: isActive ? '#F0F8FE' : 'transparent',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s'
+      }}
+    >
+      <img 
+        src={option.icon} 
+        alt={option.label} 
+        style={{ 
+          width: '16px', 
+          height: '16px',
+          filter: isActive ? 'none' : 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)',
+          opacity: isActive ? 1 : 0.58
+        }} 
+      />
+      <span style={{
+        fontSize: '11px',
+        color: isActive ? '#64B5F6' : '#939393',
+        fontFamily: 'Poppins, sans-serif'
+      }}>
+        {option.label}
+      </span>
+    </div>
+  );
+};
+
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [selectedSidebarOption, setSelectedSidebarOption] = useState('overview');
@@ -446,30 +492,59 @@ const AdminDashboard: React.FC = () => {
           }}>
             {/* Search Bar */}
             <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onFocus={() => setIsSearchFocused(true)}
-                placeholder={selectedCategory ? `@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/` : 'Search, press "/" for commands'}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  backgroundColor: '#F1F1F1',
-                  borderRadius: '12px',
-                  border: isSearchFocused ? '1px solid #CFE8FC' : 'none',
-                  outline: 'none',
-                  color: '#212121',
-                  fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif',
-                  caretColor: '#CFE8FC'
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                {selectedCategory && (
+                  <span style={{
+                    position: 'absolute',
+                    left: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    fontSize: '12px',
+                    color: '#D9D9D9',
+                    fontFamily: 'Poppins, sans-serif',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}>
+                    @{selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/
+                  </span>
+                )}
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={selectedCategory && searchValue.startsWith(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`) 
+                    ? searchValue.replace(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`, '')
+                    : searchValue}
+                  onChange={(e) => {
+                    if (selectedCategory) {
+                      const prefix = `@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`;
+                      setSearchValue(prefix + e.target.value);
+                    } else {
+                      setSearchValue(e.target.value);
+                    }
+                  }}
+                  onFocus={() => setIsSearchFocused(true)}
+                  placeholder={selectedCategory ? '' : 'Search, press "/" for commands'}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    paddingLeft: selectedCategory 
+                      ? `calc(12px + ${`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`.length * 7}px)`
+                      : '12px',
+                    backgroundColor: '#F1F1F1',
+                    borderRadius: '12px',
+                    border: isSearchFocused ? '1px solid #CFE8FC' : 'none',
+                    outline: 'none',
+                    color: '#6A6A6A',
+                    fontSize: '12px',
+                    fontFamily: 'Poppins, sans-serif',
+                    caretColor: '#CFE8FC'
+                  }}
+                />
+              </div>
               <style>
                 {`
                   .search-container input::placeholder {
-                    color: ${selectedCategory ? '#D9D9D9' : '#B2B2B2'};
+                    color: #B2B2B2;
                   }
                   .search-container input:focus {
                     border: 1px solid #CFE8FC !important;
@@ -483,57 +558,40 @@ const AdminDashboard: React.FC = () => {
                   position: 'absolute',
                   top: '100%',
                   left: 0,
-                  right: 0,
+                  ...(searchMode === 'suggestions' ? { width: 'auto', minWidth: '200px' } : { right: 0 }),
                   marginTop: '4px',
                   backgroundColor: '#FFFFFF',
                   borderRadius: '10px',
                   border: '1px solid #F1F1F1',
                   boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                   zIndex: 1000,
-                  maxHeight: '400px',
+                  maxHeight: searchMode === 'suggestions' ? '150px' : '400px',
                   overflowY: 'auto'
                 }}>
-                  {/* Suggestions Mode */}
-                  {searchMode === 'suggestions' && (
-                    <div style={{ padding: '12px' }}>
+                  {/* Suggestions Mode - Only show when "/" is typed */}
+                  {searchMode === 'suggestions' && searchValue === '/' && (
+                    <div style={{ padding: '8px' }}>
                       <p style={{
                         fontSize: '8px',
                         color: '#B0B0B0',
-                        margin: '0 0 8px 0',
+                        margin: '0 0 6px 0',
                         fontFamily: 'Poppins, sans-serif',
                         textTransform: 'uppercase'
                       }}>
                         SUGGESTED
                       </p>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         {[
                           { key: 'users', label: 'Users', icon: userIcon },
                           { key: 'listings', label: 'Listings', icon: listingboxIcon },
                           { key: 'requests', label: 'Requests', icon: requesticonIcon }
                         ].map((option) => (
-                          <div
+                          <SuggestionOption
                             key={option.key}
-                            onClick={() => handleCategorySelect(option.key as 'users' | 'listings' | 'requests')}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              padding: '8px',
-                              borderRadius: '8px',
-                              backgroundColor: selectedCategory === option.key ? '#F0F8FE' : 'transparent',
-                              cursor: 'pointer',
-                              transition: 'background-color 0.2s'
-                            }}
-                          >
-                            <img src={option.icon} alt={option.label} style={{ width: '20px', height: '20px' }} />
-                            <span style={{
-                              fontSize: '12px',
-                              color: selectedCategory === option.key ? '#64B5F6' : '#939393',
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              {option.label}
-                            </span>
-                          </div>
+                            option={option}
+                            selectedCategory={selectedCategory}
+                            onSelect={handleCategorySelect}
+                          />
                         ))}
                       </div>
                     </div>
@@ -541,18 +599,18 @@ const AdminDashboard: React.FC = () => {
 
                   {/* Category Search Results */}
                   {searchMode === 'category' && selectedCategory && (
-                    <div style={{ padding: '12px' }}>
+                    <div style={{ padding: '8px' }}>
                       {selectedCategory === 'users' && searchResults.map((user: any) => (
                         <div key={user.id} style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
-                          padding: '8px',
+                          gap: '10px',
+                          padding: '6px',
                           cursor: 'pointer'
                         }}>
                           <div style={{
-                            width: '40px',
-                            height: '40px',
+                            width: '32px',
+                            height: '32px',
                             borderRadius: '50%',
                             backgroundColor: '#E3F2FD',
                             display: 'flex',
@@ -560,29 +618,29 @@ const AdminDashboard: React.FC = () => {
                             justifyContent: 'center',
                             flexShrink: 0
                           }}>
-                            <img src={user.avatar} alt={user.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <img src={user.avatar} alt={user.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#6A6A6A',
-                              margin: '0 0 4px 0',
+                              margin: '0 0 3px 0',
                               fontFamily: 'Bricolage Grotesque, sans-serif',
                               fontWeight: 500
                             }}>
                               {user.name}
                             </p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexWrap: 'wrap' }}>
                               <span style={{
-                                fontSize: '10px',
+                                fontSize: '9px',
                                 color: '#64B5F6',
                                 fontFamily: 'Poppins, sans-serif'
                               }}>
                                 {user.plan}
                               </span>
-                              <span style={{ color: '#B0B0B0', fontSize: '10px' }}>•</span>
+                              <span style={{ color: '#B0B0B0', fontSize: '9px' }}>•</span>
                               <span style={{
-                                fontSize: '10px',
+                                fontSize: '9px',
                                 color: '#B0B0B0',
                                 fontFamily: 'Poppins, sans-serif'
                               }}>
@@ -596,13 +654,13 @@ const AdminDashboard: React.FC = () => {
                         <div key={listing.id} style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
-                          padding: '8px',
+                          gap: '10px',
+                          padding: '6px',
                           cursor: 'pointer'
                         }}>
                           <div style={{
-                            width: '40px',
-                            height: '40px',
+                            width: '32px',
+                            height: '32px',
                             borderRadius: '50%',
                             backgroundColor: '#E3F2FD',
                             display: 'flex',
@@ -610,11 +668,11 @@ const AdminDashboard: React.FC = () => {
                             justifyContent: 'center',
                             flexShrink: 0
                           }}>
-                            <img src={listing.image} alt={listing.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <img src={listing.image} alt={listing.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#6A6A6A',
                               margin: 0,
                               fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -629,13 +687,13 @@ const AdminDashboard: React.FC = () => {
                         <div key={request.id} style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
-                          padding: '8px',
+                          gap: '10px',
+                          padding: '6px',
                           cursor: 'pointer'
                         }}>
                           <div style={{
-                            width: '40px',
-                            height: '40px',
+                            width: '32px',
+                            height: '32px',
                             borderRadius: '50%',
                             backgroundColor: '#E3F2FD',
                             display: 'flex',
@@ -643,11 +701,11 @@ const AdminDashboard: React.FC = () => {
                             justifyContent: 'center',
                             flexShrink: 0
                           }}>
-                            <img src={request.image} alt={request.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <img src={request.image} alt={request.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#6A6A6A',
                               margin: 0,
                               fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -663,13 +721,13 @@ const AdminDashboard: React.FC = () => {
 
                   {/* Direct Search Results */}
                   {searchMode === 'direct' && searchResults.length > 0 && (
-                    <div style={{ padding: '12px' }}>
-                      {searchResults.map((result: any, index: number) => (
+                    <div style={{ padding: '8px' }}>
+                      {searchResults.slice(0, 3).map((result: any, index: number) => (
                         <div key={`${result.type}-${result.id}-${index}`} style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
-                          padding: '8px',
+                          gap: '10px',
+                          padding: '6px',
                           cursor: 'pointer'
                         }}>
                           <div style={{
@@ -683,33 +741,53 @@ const AdminDashboard: React.FC = () => {
                             flexShrink: 0,
                             position: 'relative'
                           }}>
-                            <img src={result.avatar || result.image} alt={result.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <img 
+                              src={result.image || result.avatar} 
+                              alt={result.name} 
+                              style={{ 
+                                width: '36px', 
+                                height: '36px', 
+                                borderRadius: '50%', 
+                                objectFit: 'cover' 
+                              }} 
+                            />
                             <span style={{
                               position: 'absolute',
-                              top: '-4px',
-                              right: '-4px',
-                              fontSize: '8px',
+                              top: '-2px',
+                              right: '-2px',
+                              fontSize: '7px',
                               color: '#64B5F6',
                               fontFamily: 'Poppins, sans-serif',
                               whiteSpace: 'nowrap',
                               backgroundColor: '#FFFFFF',
-                              padding: '1px 3px',
-                              borderRadius: '3px',
-                              lineHeight: 1.2
+                              padding: '1px 2px',
+                              borderRadius: '2px',
+                              lineHeight: 1.1,
+                              maxWidth: '70px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
                             }}>
                               {result.path}
                             </span>
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{
-                              fontSize: '12px',
+                            <span style={{
+                              position: 'absolute',
+                              bottom: '-2px',
+                              right: '-2px',
+                              fontSize: '10px',
                               color: '#6A6A6A',
-                              margin: 0,
                               fontFamily: 'Bricolage Grotesque, sans-serif',
-                              fontWeight: 500
+                              fontWeight: 500,
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              padding: '1px 3px',
+                              borderRadius: '2px',
+                              lineHeight: 1.2,
+                              maxWidth: '90px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
                             }}>
                               {result.name}
-                            </p>
+                            </span>
                           </div>
                         </div>
                       ))}
