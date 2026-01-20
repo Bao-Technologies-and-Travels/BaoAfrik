@@ -1636,19 +1636,30 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Recent Activities */}
-            <div style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '12px',
-              padding: '16px',
-              border: '1px solid #F1F1F1',
-              marginTop: '12px'
+            {/* Recent Activities - Full width to align with cards above */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginTop: '12px',
+              marginBottom: '0',
+              alignItems: 'start'
             }}>
+              <div style={{
+                gridColumn: '1 / 5',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '12px',
+                padding: '10px 6px 10px 12px',
+                border: '1px solid #F1F1F1',
+                boxSizing: 'border-box',
+                width: 'calc(100% - 20px)',
+                maxWidth: 'calc(100% - 20px)'
+              }}>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center',
-                marginBottom: '16px'
+                marginBottom: '10px'
               }}>
                 <h2 style={{ 
                   fontSize: '16px',
@@ -1661,26 +1672,42 @@ const AdminDashboard: React.FC = () => {
                 </h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <select style={{
-                    padding: '6px 10px',
+                    padding: '4px 10px',
+                    paddingRight: '28px',
                     borderRadius: '8px',
                     border: '1px solid #E4E4E4',
                     fontSize: '11px',
-                    color: '#212121',
+                    color: '#6A6A6A',
                     backgroundColor: '#FFFFFF',
                     cursor: 'pointer',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 8px center',
+                    backgroundSize: '12px'
                   }}>
                     <option>All</option>
                   </select>
                   <select style={{
-                    padding: '6px 10px',
+                    padding: '4px 10px',
+                    paddingRight: '28px',
                     borderRadius: '8px',
                     border: '1px solid #E4E4E4',
                     fontSize: '11px',
-                    color: '#212121',
+                    color: '#6A6A6A',
                     backgroundColor: '#FFFFFF',
                     cursor: 'pointer',
-                    fontFamily: 'Poppins, sans-serif'
+                    fontFamily: 'Poppins, sans-serif',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 8px center',
+                    backgroundSize: '12px'
                   }}>
                     <option>Sort by</option>
                   </select>
@@ -1693,31 +1720,59 @@ const AdminDashboard: React.FC = () => {
                   <thead>
                     <tr style={{ borderBottom: '1px solid #F1F1F1' }}>
                       <th style={{ 
-                        padding: '8px',
+                        padding: '5px 8px',
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 500,
-                        color: '#9C9C9C',
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
-                        Date ocreationf
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          Users
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8l-6-6-6 6" />
+                            <path d="M18 16l-6 6-6-6" />
+                          </svg>
+                        </div>
                       </th>
                       <th style={{ 
-                        padding: '8px',
+                        padding: '5px 8px',
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 500,
-                        color: '#9C9C9C',
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
-                        Activity
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          Date of creation
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8l-6-6-6 6" />
+                            <path d="M18 16l-6 6-6-6" />
+                          </svg>
+                        </div>
                       </th>
                       <th style={{ 
-                        padding: '8px',
+                        padding: '5px 8px',
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 500,
-                        color: '#9C9C9C',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          Activity
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8l-6-6-6 6" />
+                            <path d="M18 16l-6 6-6-6" />
+                          </svg>
+                        </div>
+                      </th>
+                      <th style={{ 
+                        padding: '5px 8px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 500,
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
                         Actions
@@ -1726,82 +1781,146 @@ const AdminDashboard: React.FC = () => {
                   </thead>
                   <tbody>
                     {[
-                      { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'New user', description: 'Joined BAO Afrik' },
-                      { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post new listing', description: '' }
+                      { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined BAO Afrik', isNewUser: true, avatar: avatar },
+                      { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post new listing', isNewUser: false, avatar: avatar }
                     ].map((item, index) => (
                       <tr key={index} style={{ borderBottom: index < 1 ? '1px solid #F1F1F1' : 'none' }}>
-                        <td style={{ padding: '12px 8px' }}>
-                          <p style={{ 
-                            fontSize: '11px',
-                            color: '#212121',
-                            margin: '0 0 2px 0',
-                            fontWeight: 500,
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            {item.name}
-                          </p>
+                        {/* Users Column */}
+                        <td style={{ padding: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                            {/* Square Profile Image */}
+                            <div style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '4px',
+                              backgroundColor: '#E3F2FD',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}>
+                              <img 
+                                src={item.avatar} 
+                                alt={item.name} 
+                                style={{ 
+                                  width: '26px', 
+                                  height: '26px', 
+                                  borderRadius: '4px',
+                                  objectFit: 'cover'
+                                }} 
+                              />
+                            </div>
+                            {/* User Info */}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' }}>
+                                <p style={{ 
+                                  fontSize: '10px',
+                                  color: '#212121',
+                                  margin: 0,
+                                  fontWeight: 500,
+                                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                                }}>
+                                  {item.name}
+                                </p>
+                                {item.isNewUser && (
+                                  <span style={{
+                                    backgroundColor: '#F0F8FE',
+                                    color: '#64B5F6',
+                                    fontSize: '8px',
+                                    fontWeight: 500,
+                                    padding: '2px 5px',
+                                    borderRadius: '4px',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    whiteSpace: 'nowrap'
+                                  }}>
+                                    New user
+                                  </span>
+                                )}
+                              </div>
+                              <p style={{ 
+                                fontSize: '9px',
+                                color: '#939393',
+                                margin: 0,
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                {item.email}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        {/* Date of creation Column */}
+                        <td style={{ padding: '8px' }}>
                           <p style={{ 
                             fontSize: '10px',
-                            color: '#9C9C9C',
-                            margin: '0 0 2px 0',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            {item.email}
-                          </p>
-                          <p style={{ 
-                            fontSize: '10px',
-                            color: '#B0B0B0',
+                            color: '#939393',
                             margin: 0,
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             {item.date}
                           </p>
                         </td>
-                        <td style={{ padding: '12px 8px' }}>
+                        {/* Activity Column */}
+                        <td style={{ padding: '8px' }}>
                           <p style={{ 
-                            fontSize: '11px',
-                            color: '#212121',
-                            margin: '0 0 2px 0',
-                            fontWeight: 500,
+                            fontSize: '10px',
+                            color: '#939393',
+                            margin: 0,
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             {item.activity}
                           </p>
-                          {item.description && (
-                            <p style={{ 
-                              fontSize: '10px',
-                              color: '#9C9C9C',
-                              margin: 0,
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              {item.description}
-                            </p>
-                          )}
                         </td>
-                        <td style={{ padding: '12px 8px' }}>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            {[1, 2, 3].map((i) => (
-                              <div key={i} style={{
-                                width: '24px',
-                                height: '24px',
-                                borderRadius: '50%',
-                                backgroundColor: '#F1F1F1',
+                        {/* Actions Column */}
+                        <td style={{ padding: '8px' }}>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            {/* Eye Icon Button */}
+                            <button
+                              style={{
+                                width: '28px',
+                                height: '28px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                cursor: 'pointer'
-                              }}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                  <circle cx="12" cy="12" r="2" fill="#9C9C9C" />
-                                </svg>
-                              </div>
-                            ))}
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                padding: 0
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                            </button>
+                            {/* More Options Button */}
+                            <button
+                              type="button"
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                border: '0.5px solid #B0B0B0',
+                                backgroundColor: '#FFFFFF',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                padding: 0
+                              }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                                <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                                <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                              </svg>
+                            </button>
                           </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
               </div>
             </div>
           </div>
