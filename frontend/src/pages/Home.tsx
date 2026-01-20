@@ -562,7 +562,9 @@ const Home: React.FC = () => {
   };
 
   const getAllProducts = (): FrontendProduct[] => {
-    return transformToFrontendProducts(products);
+     // Filter to only show products with PUBLISHED status
+    const activeProducts = products.filter(product => product.status === 'PUBLISHED');
+    return transformToFrontendProducts(activeProducts);
   };
 
   const getAllProductsByCategory = (): CategoryProducts => {
@@ -3107,7 +3109,7 @@ const Home: React.FC = () => {
                                 <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
                                   ${product.price}
                                 </div>
-                                {product.verified ? (
+                                {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                     display: 'flex',
                                     padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -3131,7 +3133,7 @@ const Home: React.FC = () => {
                                     <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                     <span>Unverified Seller</span>
                                   </div>
-                                )}
+                                )} */}
                               </div>
 
                               {/* Product Name */}
@@ -3272,7 +3274,7 @@ const Home: React.FC = () => {
                                       <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
                                         ${product.price}
                                       </div>
-                                      {product.verified ? (
+                                      {/* {product.verified ? (
                                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                           display: 'flex',
                                           padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -3296,7 +3298,7 @@ const Home: React.FC = () => {
                                           <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                           <span>Unverified Seller</span>
                                         </div>
-                                      )}
+                                      )} */}
                                     </div>
 
                                     {/* Product Name */}
@@ -3457,7 +3459,7 @@ const Home: React.FC = () => {
                                       <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
                                         ${product.price}
                                       </div>
-                                      {product.verified ? (
+                                      {/* {product.verified ? (
                                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                           display: 'flex',
                                           padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -3481,7 +3483,7 @@ const Home: React.FC = () => {
                                           <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                           <span>Unverified Seller</span>
                                         </div>
-                                      )}
+                                      )} */}
                                     </div>
 
                                     {/* Product Name */}
@@ -3709,7 +3711,7 @@ const Home: React.FC = () => {
                               <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
                                 ${product.price}
                               </div>
-                              {product.verified ? (
+                              {/* {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                   display: 'flex',
                                   padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -3733,7 +3735,7 @@ const Home: React.FC = () => {
                                   <img src={unverifyIcon} alt="Unverified" style={{ width: window.innerWidth < 640 ? '6px' : '8px', height: window.innerWidth < 640 ? '6px' : '8px' }} />
                                   <span>Unverified Seller</span>
                                 </div>
-                              )}
+                              )} */}
                             </div>
 
                             {/* Product Name */}
@@ -3816,7 +3818,7 @@ const Home: React.FC = () => {
                           <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
                             ${product.price}
                           </div>
-                          {product.verified ? (
+                          {/* {product.verified ? (
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
                               <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
                               <span>Verified seller</span>
@@ -3826,7 +3828,7 @@ const Home: React.FC = () => {
                               <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
                               <span>Unverified Seller</span>
                             </div>
-                          )}
+                          )} */}
                         </div>
 
                         {/* Product Name */}
@@ -6854,7 +6856,7 @@ const Home: React.FC = () => {
                                     <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
                                       ${product.price}
                                     </div>
-                                    {product.verified ? (
+                                    {/* {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                         display: 'flex',
                                         padding: '1px 3px',
@@ -6878,7 +6880,7 @@ const Home: React.FC = () => {
                                         <img src={unverifyIcon} alt="Unverified" style={{ width: '6px', height: '6px' }} />
                                         <span>Unverified Seller</span>
                                       </div>
-                                    )}
+                                    )} */}
                                   </div>
 
                                   {/* Product Name */}
@@ -6989,7 +6991,7 @@ const Home: React.FC = () => {
                                 <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
                                   ${product.price}
                                 </div>
-                                {product.verified ? (
+                                {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                     display: 'flex',
                                     padding: '1px 3px',
@@ -7013,7 +7015,7 @@ const Home: React.FC = () => {
                                     <img src={unverifyIcon} alt="Unverified" style={{ width: '6px', height: '6px' }} />
                                     <span>Unverified Seller</span>
                                   </div>
-                                )}
+                                )} */}
                               </div>
 
                               {/* Product Name */}

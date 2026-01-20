@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 import Header from '../components/layout/Header';
@@ -25,42 +25,49 @@ import igIcon from '../assets/images/pre/IG1.svg';
 import xIcon from '../assets/images/pre/x.svg';
 import tgIcon from '../assets/images/pre/tg.svg';
 import zapIcon from '../assets/images/pre/zap1.svg';
-// Import product images from pre folder
-import pre1 from '../assets/images/pre/1.png';
-import pre2 from '../assets/images/pre/2.png';
-import pre3 from '../assets/images/pre/3.png';
-import pre4 from '../assets/images/pre/4.png';
-import pre5 from '../assets/images/pre/5.png';
-import pre6 from '../assets/images/pre/6.png';
-import pre7 from '../assets/images/pre/7.png';
-import pre8 from '../assets/images/pre/8.png';
 
-// Country mapping for products
-const getProductCountry = (productId: number) => {
-  const countryMap: { [key: number]: { name: string; code: string; flag: string; abbreviation: string } } = {
-    1: { name: 'Cameroon', code: 'cm', flag: 'https://flagcdn.com/w20/cm.png', abbreviation: 'CMR' },
-    2: { name: 'Chad', code: 'td', flag: 'https://flagcdn.com/w20/td.png', abbreviation: 'TCD' },
-    3: { name: 'Ivory Coast', code: 'ci', flag: 'https://flagcdn.com/w20/ci.png', abbreviation: 'CIV' },
-    4: { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' },
-    5: { name: 'Ghana', code: 'gh', flag: 'https://flagcdn.com/w20/gh.png', abbreviation: 'GHA' },
-    6: { name: 'Kenya', code: 'ke', flag: 'https://flagcdn.com/w20/ke.png', abbreviation: 'KEN' },
-    7: { name: 'South Africa', code: 'za', flag: 'https://flagcdn.com/w20/za.png', abbreviation: 'ZAF' },
-    8: { name: 'Egypt', code: 'eg', flag: 'https://flagcdn.com/w20/eg.png', abbreviation: 'EGY' },
-    9: { name: 'Morocco', code: 'ma', flag: 'https://flagcdn.com/w20/ma.png', abbreviation: 'MAR' },
-    10: { name: 'Ethiopia', code: 'et', flag: 'https://flagcdn.com/w20/et.png', abbreviation: 'ETH' },
-    11: { name: 'Tanzania', code: 'tz', flag: 'https://flagcdn.com/w20/tz.png', abbreviation: 'TZA' },
-    12: { name: 'Uganda', code: 'ug', flag: 'https://flagcdn.com/w20/ug.png', abbreviation: 'UGA' },
-    13: { name: 'Senegal', code: 'sn', flag: 'https://flagcdn.com/w20/sn.png', abbreviation: 'SEN' },
-    14: { name: 'Mali', code: 'ml', flag: 'https://flagcdn.com/w20/ml.png', abbreviation: 'MLI' },
-    15: { name: 'Burkina Faso', code: 'bf', flag: 'https://flagcdn.com/w20/bf.png', abbreviation: 'BFA' },
-    16: { name: 'Niger', code: 'ne', flag: 'https://flagcdn.com/w20/ne.png', abbreviation: 'NER' },
-    17: { name: 'Sudan', code: 'sd', flag: 'https://flagcdn.com/w20/sd.png', abbreviation: 'SDN' },
-    18: { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
-    19: { name: 'Tunisia', code: 'tn', flag: 'https://flagcdn.com/w20/tn.png', abbreviation: 'TUN' },
-    20: { name: 'Libya', code: 'ly', flag: 'https://flagcdn.com/w20/ly.png', abbreviation: 'LBY' }
-  };
-  return countryMap[productId] || { name: 'Nigeria', code: 'ng', flag: 'https://flagcdn.com/w20/ng.png', abbreviation: 'NGR' };
-};
+// Interfaces for API responses
+interface UserProfile {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  profileImage: string | null;
+  bio: string | null;
+  location: string | null;
+  isVerifiedSeller: boolean;
+  createdAt: string;
+  rating: number;
+  totalReviews: number;
+}
+
+interface ReviewUser {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  profileImage: string | null;
+}
+
+interface SellerReview {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+  productId: string;
+  productTitle: string;
+  user: ReviewUser;
+  helpfulYesCount: number;
+  helpfulNoCount: number;
+}
+
+interface SellerReviewsSummary {
+  reviews: SellerReview[];
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: { [rating: number]: number };
+  totalPages: number;
+  currentPage: number;
+}
 
 const UserAccount: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -70,6 +77,16 @@ const UserAccount: React.FC = () => {
   const [sharedProducts, setSharedProducts] = useState<Set<string>>(new Set());
   const [wishlistProducts, setWishlistProducts] = useState<Set<string>>(new Set());
   const { user } = useAuth();
+
+  // Profile and reviews state from backend
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [reviewsSummary, setReviewsSummary] = useState<SellerReviewsSummary | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const reviewsPerPage = 10;
+
+  const API_BASE = process.env.REACT_APP_API_URL;
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -120,24 +137,131 @@ const UserAccount: React.FC = () => {
     setSharedProducts(newSet);
   };
 
-  const [likes, setLikes] = useState({ review1: 5, review2: 5, review3: 5 });
-  const [likedReviews, setLikedReviews] = useState<string[]>([]);
   const [expandedDiscussions, setExpandedDiscussions] = useState<{ [key: string]: boolean }>({});
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('The most relevant');
   const [userRating, setUserRating] = useState(0);
   const [userReviewText, setUserReviewText] = useState('');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{ [key: string]: 'yes' | 'no' | null }>({});
-  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({
-    review1: { yes: 27, no: 2 },
-    review2: { yes: 15, no: 3 },
-    review3: { yes: 8, no: 12 }
-  });
+  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({});
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const optionsModalRef = useRef<HTMLDivElement>(null);
   const { sellerId } = useParams<{ sellerId: string }>();
+
+  // Determine the user ID to fetch - either from URL param or current user
+  const profileUserId = sellerId || user?.id;
+
+  // Fetch user profile from backend
+  const loadUserProfile = useCallback(async () => {
+    if (!profileUserId) return;
+
+    try {
+      setIsLoadingProfile(true);
+      const response = await fetch(`${API_BASE}/products/user/${profileUserId}/profile`);
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setUserProfile(result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  }, [profileUserId, API_BASE]);
+
+  // Fetch seller reviews from backend
+  const loadSellerReviews = useCallback(async (page: number = 1) => {
+    if (!profileUserId) return;
+
+    try {
+      setIsLoadingReviews(true);
+      const token = localStorage.getItem('accessToken');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `${API_BASE}/products/user/${profileUserId}/reviews?page=${page}&limit=${reviewsPerPage}`,
+        { headers }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setReviewsSummary(result.data);
+
+          // Initialize helpfulness counts from backend data
+          const counts: { [key: string]: { yes: number; no: number } } = {};
+          result.data.reviews.forEach((review: SellerReview) => {
+            counts[review.id] = {
+              yes: review.helpfulYesCount,
+              no: review.helpfulNoCount
+            };
+          });
+          setReviewHelpfulCounts(counts);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading seller reviews:', error);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  }, [profileUserId, API_BASE, reviewsPerPage]);
+
+  // Load profile and reviews on mount
+  useEffect(() => {
+    loadUserProfile();
+    loadSellerReviews(currentPage);
+  }, [loadUserProfile, loadSellerReviews, currentPage]);
+
+  // Handle review helpfulness vote
+  const handleHelpfulnessVote = async (reviewId: string, isHelpful: boolean) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      // User not logged in - could show a login prompt
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/products/reviews/${reviewId}/helpfulness`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ isHelpful })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Update local state with new counts
+          setReviewHelpfulCounts(prev => ({
+            ...prev,
+            [reviewId]: {
+              yes: result.data.helpfulYesCount,
+              no: result.data.helpfulNoCount
+            }
+          }));
+          setReviewHelpfulness(prev => ({
+            ...prev,
+            [reviewId]: result.data.userVote
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error voting on review helpfulness:', error);
+    }
+  };
 
   // Filter options
   const filterOptions = [
@@ -161,105 +285,20 @@ const UserAccount: React.FC = () => {
     }));
   };
 
-  // Mock seller data - in real app this would come from API
-  const seller = {
-    id: sellerId || '1',
-    name: `${user?.firstName} ${user?.lastName}` || 'Joaquin EDIMO',
-    avatar: user?.profileImage || sellerAvatar,
-    coverPhoto: defaultCoverImage, // Can be updated when seller uploads cover photo
-    isVerified: true,
-    bio: user?.bio || 'Passionate farmer and entrepreneur with over 15 years of experience in sustainable agriculture. Specializing in organic produce and traditional farming methods. Committed to providing fresh, high-quality products directly from farm to table.',
-    location: user?.location || 'London | United Kingdom',
-    memberSince: 'Depuis 2025',
-    rating: 4.3,
-    totalReviews: 456,
-    reviews: [
-      {
-        id: 1,
-        reviewerName: 'Miles KENEDY',
-        reviewerAvatar: sellerAvatar,
-        rating: 5,
-        date: 'Publié le 04 Août 2025',
-        comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
-        helpful: 5
-      },
-      {
-        id: 2,
-        reviewerName: 'Samine Herald',
-        reviewerAvatar: sellerAvatar,
-        rating: 4,
-        date: 'Publié le 04 Août 2025',
-        comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
-        helpful: 5
-      },
-      {
-        id: 3,
-        reviewerName: 'Samine Herald',
-        reviewerAvatar: sellerAvatar,
-        rating: 4,
-        date: 'Publié le 04 Août 2025',
-        comment: 'Lorem ipsum dolor sit amet consectetur. Lobortis velit magna sit turpis mi dignissim. Tellus pharetra eu dui et nit. Imperdiet adipiscing dictum morbi quam. Vivamus in vitae diam eget eget sed mi commodo. Id ornare diam ultrices facilisis vitae. Dignissim suscipit bibendum.',
-        helpful: 5
-      }
-    ]
-  };
+  // Computed seller data from backend or current user
+  const sellerName = userProfile
+    ? `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || 'User'
+    : user
+      ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User'
+      : 'User';
 
-  const reviewDiscussionData: { [key: string]: Array<{ id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string }> } = {
-    review1: [
-      {
-        id: 'user-review1-comment1',
-        author: seller.name,
-        role: 'Profile Owner',
-        date: '2 Jan 2025',
-        text: 'Thank you for your feedback, Miles! We always strive to provide the best service.',
-        isOwner: true,
-        avatar: seller.avatar
-      }
-    ],
-    review2: [
-      {
-        id: 'user-review2-comment1',
-        author: seller.name,
-        role: 'Profile Owner',
-        date: '4 Aug 2025',
-        text: 'I appreciate your review, Samine. Your feedback helps us improve.',
-        isOwner: true,
-        avatar: seller.avatar
-      },
-      {
-        id: 'user-review2-comment2',
-        author: 'Miles KENEDY',
-        date: '5 Aug 2025',
-        text: 'Great response time!',
-        avatar: sellerAvatar
-      },
-      {
-        id: 'user-review2-comment3',
-        author: 'Alex Johnson',
-        date: '6 Aug 2025',
-        text: 'I had a similar experience.',
-        avatar: sellerAvatar
-      }
-    ],
-    review3: [
-      {
-        id: 'user-review3-comment1',
-        author: seller.name,
-        role: 'Profile Owner',
-        date: '4 Aug 2025',
-        text: 'Thanks for sharing, Samine. We will work on improving those areas.',
-        isOwner: true,
-        avatar: seller.avatar
-      },
-      {
-        id: 'user-review3-comment2',
-        author: 'Kael Otto',
-        date: '5 Aug 2025',
-        text: 'I agree with your points.',
-        avatar: sellerAvatar
-      }
-    ]
-  };
+  const sellerAvatar2 = userProfile?.profileImage || user?.profileImage || sellerAvatar;
+  const sellerBio = userProfile?.bio || user?.bio || '';
+  const sellerLocation = userProfile?.location || user?.location || '';
+  const sellerRating = reviewsSummary?.averageRating || userProfile?.rating || 0;
+  const sellerTotalReviews = reviewsSummary?.totalReviews || userProfile?.totalReviews || 0;
+  const sellerMemberSince = userProfile?.createdAt || user?.createdAt;
+  const isVerifiedSeller = userProfile?.isVerifiedSeller || user?.isVerifiedSeller || false;
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -274,11 +313,44 @@ const UserAccount: React.FC = () => {
     ));
   };
 
-  if (!seller) {
+  // Format date for display
+  const formatReviewDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  const formatMemberSinceDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  // Show loading state or not found
+  if (isLoadingProfile) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Seller not found</h2>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userProfile && !user) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">User not found</h2>
           <button
             onClick={() => navigate('/')}
             className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
@@ -290,16 +362,6 @@ const UserAccount: React.FC = () => {
       </div>
     );
   }
-
-  const formatOwnerDate = (timestamp?: number) => {
-    if (!timestamp) return '';
-    return new Date(timestamp).toLocaleDateString('en-US', {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  };
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -353,8 +415,8 @@ const UserAccount: React.FC = () => {
             <div className="absolute left-6 bottom-[-68px]">
               <div className="w-28 h-28 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
                 <img
-                  src={seller.avatar}
-                  alt={seller.name}
+                  src={sellerAvatar2}
+                  alt={sellerName}
                   className="w-24 h-24 rounded-xl object-cover"
                 />
               </div>
@@ -393,6 +455,7 @@ const UserAccount: React.FC = () => {
                     fontWeight: '400',
                     fontSize: '14px'
                   }}
+                  onClick={() => navigate('/settings')}
                 >
                   <span>Edit your profile</span>
                 </button>
@@ -401,8 +464,8 @@ const UserAccount: React.FC = () => {
 
             {/* Name and Status - Positioned next to avatar */}
             <div className="absolute left-40 bottom-[-65px]">
-              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{seller.name}</h1>
-              {seller.isVerified && (
+              <h1 className="text-base font-semibold text-gray-900 mb-1.5">{sellerName}</h1>
+              {isVerifiedSeller && (
                 <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                   <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
                   <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
@@ -418,7 +481,7 @@ const UserAccount: React.FC = () => {
         {/* Cover Photo Background */}
         <div className="bg-orange-100 h-32 md:h-40 relative overflow-hidden">
           <img
-            src={seller.coverPhoto || defaultCoverImage}
+            src={defaultCoverImage}
             alt="Cover Photo"
             className="w-full h-full object-cover"
           />
@@ -440,8 +503,8 @@ const UserAccount: React.FC = () => {
           <div className="absolute left-4 md:left-6 -top-8">
             <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
               <img
-                src={seller.avatar}
-                alt={seller.name}
+                src={sellerAvatar2}
+                alt={sellerName}
                 className="w-14 h-14 md:w-16 md:h-16 rounded-xl object-cover"
               />
             </div>
@@ -449,7 +512,7 @@ const UserAccount: React.FC = () => {
 
           {/* Verified Badge - Moved Down */}
           <div className="absolute right-4 md:right-6 top-2">
-            {seller.isVerified && (
+            {isVerifiedSeller && (
               <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
                 <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
@@ -459,7 +522,7 @@ const UserAccount: React.FC = () => {
 
           {/* Name and Info - Below Avatar */}
           <div className="pt-10 md:pt-12">
-            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{seller.name}</h1>
+            <h1 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{sellerName}</h1>
 
             {/* Location, Member Info, and Rating */}
             <div className="flex items-start justify-between mb-3">
@@ -470,7 +533,7 @@ const UserAccount: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>London | United Kingdom</span>
+                  <span>{sellerLocation || 'Location not set'}</span>
                 </div>
 
                 {/* Member Info */}
@@ -478,19 +541,19 @@ const UserAccount: React.FC = () => {
                   <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>Member since 2025</span>
+                  <span>Member since {formatMemberSinceDate(sellerMemberSince)}</span>
                 </div>
               </div>
 
               {/* Rating - Right Side */}
               <div className="flex flex-col items-end">
                 <div className="flex items-center space-x-1 mb-1">
-                  <span className="text-lg font-semibold text-gray-900">4.3</span>
+                  <span className="text-lg font-semibold text-gray-900">{sellerRating.toFixed(1)}</span>
                   <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-500">Reviews (456)</span>
+                <span className="text-sm text-gray-500">Reviews ({sellerTotalReviews})</span>
               </div>
             </div>
           </div>
@@ -510,7 +573,7 @@ const UserAccount: React.FC = () => {
             <div className="xl:col-span-2 pl-8">
               <h3 className="text-xl font-semibold mb-1.5" style={{ color: '#6A6A6A' }}>Bio</h3>
               <p className="leading-relaxed text-sm" style={{ color: '#B0B0B0' }}>
-                {seller.bio}
+                {sellerBio || 'No bio available.'}
               </p>
 
               {/* Social Media Icons */}
@@ -534,7 +597,7 @@ const UserAccount: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Location</h4>
                 <div className="flex items-center space-x-2">
                   <img src={locationIcon} alt="Location" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#64B5F6' }}>{user?.location || 'London | United Kingdom'}</span>
+                  <span className="text-sm" style={{ color: '#64B5F6' }}>{sellerLocation || 'Location not set'}</span>
                 </div>
               </div>
 
@@ -552,7 +615,7 @@ const UserAccount: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
                 <div className="flex items-center space-x-2">
                   <img src={profileIcon} alt="Profile" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{user?.createdAt ? formatOwnerDate(Number(user?.createdAt)) : ''}</span>
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{formatMemberSinceDate(sellerMemberSince)}</span>
                 </div>
               </div>
             </div>
@@ -564,7 +627,7 @@ const UserAccount: React.FC = () => {
       <div className="lg:hidden bg-white px-4 md:px-6 py-3 md:py-4">
         <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Bio</h3>
         <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-          {seller.bio}
+          {sellerBio || 'No bio available.'}
         </p>
       </div>
 
@@ -655,508 +718,144 @@ const UserAccount: React.FC = () => {
 
                 {/* Review Cards */}
                 <div className="space-y-4">
-                  {/* Review 1 - Samine Herald */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Samine Herald</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
-                        </div>
-                      </div>
+                  {isLoadingReviews ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                      <p className="text-gray-500 mt-2">Loading reviews...</p>
                     </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
-                    </p>
+                  ) : reviewsSummary?.reviews && reviewsSummary.reviews.length > 0 ? (
+                    reviewsSummary.reviews.map((review) => {
+                      const reviewerName = `${review.user.firstName || ''} ${review.user.lastName || ''}`.trim() || 'Anonymous';
+                      const counts = reviewHelpfulCounts[review.id] || { yes: review.helpfulYesCount, no: review.helpfulNoCount };
+                      const userVote = reviewHelpfulness[review.id];
 
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {!reviewHelpfulness.review1 && (
-                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'yes' ? null : 'yes' }));
-                              if (reviewHelpfulness.review1 !== 'yes') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review1: { ...prev.review1, yes: prev.review1.yes + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{
-                              border: `1px solid ${reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review1 === 'yes' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.yes : 'Yes'}
-                            </span>
-                            <img
-                              src={likeIcon}
-                              alt="Like"
-                              className="w-3.5 h-3.5"
-                              style={{
-                                filter: reviewHelpfulness.review1 === 'yes'
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                  : 'none'
-                              }}
-                            />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review1: prev.review1 === 'no' ? null : 'no' }));
-                              if (reviewHelpfulness.review1 !== 'no') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review1: { ...prev.review1, no: prev.review1.no + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{
-                              border: `1px solid ${reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review1 === 'no' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review1 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review1 ? reviewHelpfulCounts.review1.no : 'No'}
-                            </span>
-                            <img
-                              src={dislikeIcon}
-                              alt="Dislike"
-                              className="w-3.5 h-3.5"
-                              style={{
-                                filter: reviewHelpfulness.review1 === 'no'
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                  : 'none'
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review1')}
-                      >
-                        {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
-                      </button>
-                    </div>
-                  </div>
-                  {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
-                    <div className="mt-4 space-y-4">
-                      {reviewDiscussionData.review1.map((comment) => (
-                        <div key={comment.id} className="flex space-x-3">
-                          <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                          <div className="flex-1 pl-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                {comment.avatar ? (
-                                  <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                ) : (
-                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                  </svg>
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
-                                    {comment.isOwner && (
-                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                        {comment.role || 'Profile Owner'}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                </div>
-                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                              </div>
+                      return (
+                        <div key={review.id} className="pb-6">
+                          <div className="flex items-start space-x-3 mb-3">
+                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                              {review.user.profileImage ? (
+                                <img src={review.user.profileImage} alt={reviewerName} className="w-full h-full object-cover" />
+                              ) : (
+                                <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                </svg>
+                              )}
                             </div>
-                            <div className="mt-3 pl-12">
-                              <div className="flex items-center space-x-3">
-                                <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 mb-2">{reviewerName}</h4>
+                              <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                  <button className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors" style={{ border: '1px solid #E1E1E1', backgroundColor: 'white' }}>
-                                    <span className="text-xs" style={{ color: '#6A6A6A' }}>Yes</span>
-                                    <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors" style={{ border: '1px solid #E1E1E1', backgroundColor: 'white' }}>
-                                    <span className="text-xs" style={{ color: '#6A6A6A' }}>No</span>
-                                    <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Review 2 - Kael Otto */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Kael Otto</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition.
-                    </p>
-
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {!reviewHelpfulness.review2 && (
-                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'yes' ? null : 'yes' }));
-                              if (reviewHelpfulness.review2 !== 'yes') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review2: { ...prev.review2, yes: prev.review2.yes + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{
-                              border: `1px solid ${reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review2 === 'yes' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.yes : 'Yes'}
-                            </span>
-                            <img
-                              src={likeIcon}
-                              alt="Like"
-                              className="w-3.5 h-3.5"
-                              style={{
-                                filter: reviewHelpfulness.review2 === 'yes'
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                  : 'none'
-                              }}
-                            />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review2: prev.review2 === 'no' ? null : 'no' }));
-                              if (reviewHelpfulness.review2 !== 'no') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review2: { ...prev.review2, no: prev.review2.no + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{
-                              border: `1px solid ${reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review2 === 'no' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review2 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review2 ? reviewHelpfulCounts.review2.no : 'No'}
-                            </span>
-                            <img
-                              src={dislikeIcon}
-                              alt="Dislike"
-                              className="w-3.5 h-3.5"
-                              style={{
-                                filter: reviewHelpfulness.review2 === 'no'
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                  : 'none'
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review2')}
-                      >
-                        {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
-                      </button>
-                    </div>
-                  </div>
-                  {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
-                    <div className="mt-4 space-y-4">
-                      {reviewDiscussionData.review2.map((comment) => (
-                        <div key={comment.id} className="flex space-x-3">
-                          <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                          <div className="flex-1 pl-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                {comment.avatar ? (
-                                  <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                ) : (
-                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                  </svg>
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
-                                    {comment.isOwner && (
-                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                        {comment.role || 'Profile Owner'}
-                                      </span>
-                                    )}
+                                  <div className="flex items-center">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <svg
+                                        key={star}
+                                        className={`w-3.5 h-3.5 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'} fill-current`}
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                      </svg>
+                                    ))}
                                   </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
+                                  <span className="text-sm font-medium" style={{ color: '#939393' }}>{review.rating.toFixed(1)}</span>
                                 </div>
-                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                              </div>
-                            </div>
-                            <div className="mt-3 pl-12">
-                              <div className="flex items-center space-x-3">
-                                <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                                <div className="flex items-center space-x-2">
-                                  <button className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors" style={{ border: '1px solid #E1E1E1', backgroundColor: 'white' }}>
-                                    <span className="text-xs" style={{ color: '#6A6A6A' }}>Yes</span>
-                                    <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors" style={{ border: '1px solid #E1E1E1', backgroundColor: 'white' }}>
-                                    <span className="text-xs" style={{ color: '#6A6A6A' }}>No</span>
-                                    <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
+                                <span className="text-xs" style={{ color: '#939393' }}>Posted on {formatReviewDate(review.createdAt)}</span>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                            {review.comment || 'No comment provided.'}
+                          </p>
 
-                  {/* Review 3 - Alex Johnson */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                              {[1, 2, 3].map((star) => (
-                                <svg key={`empty-${star}`} className="w-3.5 h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
-                    </p>
-
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {!reviewHelpfulness.review3 && (
-                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'yes' ? null : 'yes' }));
-                              if (reviewHelpfulness.review3 !== 'yes') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review3: { ...prev.review3, yes: prev.review3.yes + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{
-                              border: `1px solid ${reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review3 === 'yes' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.yes : 'Yes'}
-                            </span>
-                            <img
-                              src={likeIcon}
-                              alt="Like"
-                              className="w-3.5 h-3.5"
-                              style={{
-                                filter: reviewHelpfulness.review3 === 'yes'
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                  : 'none'
-                              }}
-                            />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setReviewHelpfulness(prev => ({ ...prev, review3: prev.review3 === 'no' ? null : 'no' }));
-                              if (reviewHelpfulness.review3 !== 'no') {
-                                setReviewHelpfulCounts(prev => ({
-                                  ...prev,
-                                  review3: { ...prev.review3, no: prev.review3.no + 1 }
-                                }));
-                              }
-                            }}
-                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                            style={{
-                              border: `1px solid ${reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
-                              backgroundColor: reviewHelpfulness.review3 === 'no' ? '#F0F8FE' : 'white'
-                            }}
-                          >
-                            <span className="text-xs" style={{ color: reviewHelpfulness.review3 === 'no' ? '#64B5F6' : '#6A6A6A' }}>
-                              {reviewHelpfulness.review3 ? reviewHelpfulCounts.review3.no : 'No'}
-                            </span>
-                            <img
-                              src={dislikeIcon}
-                              alt="Dislike"
-                              className="w-3.5 h-3.5"
-                              style={{
-                                filter: reviewHelpfulness.review3 === 'no'
-                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                  : 'none'
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review3')}
-                      >
-                        {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
-                      </button>
-                    </div>
-                  </div>
-                  {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
-                    <div className="mt-4 space-y-4">
-                      {reviewDiscussionData.review3.map((comment) => (
-                        <div key={comment.id} className="flex space-x-3">
-                          <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                          <div className="flex-1 pl-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                {comment.avatar ? (
-                                  <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                ) : (
-                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                  </svg>
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
-                                    {comment.isOwner && (
-                                      <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                        {comment.role || 'Profile Owner'}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                </div>
-                                <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                              </div>
-                            </div>
-                            <div className="mt-3 pl-12">
-                              <div className="flex items-center space-x-3">
+                          {/* Helpfulness Section */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              {!userVote && (
                                 <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                                <div className="flex items-center space-x-2">
-                                  <button className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors" style={{ border: '1px solid #E1E1E1', backgroundColor: 'white' }}>
-                                    <span className="text-xs" style={{ color: '#6A6A6A' }}>Yes</span>
-                                    <img src={likeIcon} alt="Like" className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors" style={{ border: '1px solid #E1E1E1', backgroundColor: 'white' }}>
-                                    <span className="text-xs" style={{ color: '#6A6A6A' }}>No</span>
-                                    <img src={dislikeIcon} alt="Dislike" className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
+                              )}
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => handleHelpfulnessVote(review.id, true)}
+                                  className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+                                  style={{
+                                    border: `1px solid ${userVote === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
+                                    backgroundColor: userVote === 'yes' ? '#F0F8FE' : 'white'
+                                  }}
+                                >
+                                  <span className="text-xs" style={{ color: userVote === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
+                                    {userVote ? counts.yes : 'Yes'}
+                                  </span>
+                                  <img
+                                    src={likeIcon}
+                                    alt="Like"
+                                    className="w-3.5 h-3.5"
+                                    style={{
+                                      filter: userVote === 'yes'
+                                        ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                        : 'none'
+                                    }}
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => handleHelpfulnessVote(review.id, false)}
+                                  className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+                                  style={{
+                                    border: `1px solid ${userVote === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
+                                    backgroundColor: userVote === 'no' ? '#F0F8FE' : 'white'
+                                  }}
+                                >
+                                  <span className="text-xs" style={{ color: userVote === 'no' ? '#64B5F6' : '#6A6A6A' }}>
+                                    {userVote ? counts.no : 'No'}
+                                  </span>
+                                  <img
+                                    src={dislikeIcon}
+                                    alt="Dislike"
+                                    className="w-3.5 h-3.5"
+                                    style={{
+                                      filter: userVote === 'no'
+                                        ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                        : 'none'
+                                    }}
+                                  />
+                                </button>
                               </div>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No reviews yet.</p>
                     </div>
                   )}
                 </div>
 
                 {/* Pagination */}
-                <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
-                    <div className="flex items-center space-x-1">
-                      <button
-                        disabled
-                        className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
-                      >
-                        <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
-                      </button>
-                      <button
-                        className="transition-opacity hover:opacity-80"
-                      >
-                        <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
-                      </button>
+                {reviewsSummary && reviewsSummary.totalReviews > 0 && (
+                  <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm" style={{ color: '#BABABA' }}>
+                        {((currentPage - 1) * reviewsPerPage) + 1} - {Math.min(currentPage * reviewsPerPage, reviewsSummary.totalReviews)} out of {reviewsSummary.totalReviews}
+                      </span>
+                      <div className="flex items-center space-x-1">
+                        <button
+                          disabled={currentPage === 1}
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
+                        >
+                          <img src={currentPage === 1 ? grayArrowIcon : blackArrowIcon} alt="Previous" style={{ width: '20px', height: '20px', transform: 'rotate(180deg)' }} />
+                        </button>
+                        <button
+                          disabled={currentPage >= (reviewsSummary.totalPages || 1)}
+                          onClick={() => setCurrentPage(prev => prev + 1)}
+                          className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
+                        >
+                          <img src={currentPage >= (reviewsSummary.totalPages || 1) ? grayArrowIcon : blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* RIGHT COLUMN - Rating Summary & Give Your Opinion */}
@@ -1164,30 +863,28 @@ const UserAccount: React.FC = () => {
                 {/* Overall Rating Summary */}
                 <div className="mb-8 text-center">
                   <div className="flex items-center justify-center space-x-2 mb-3">
-                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{sellerRating.toFixed(1)}</div>
                     <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   </div>
-                  <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+                  <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates ({sellerTotalReviews})</div>
 
                   {/* Rating Bars */}
                   <div className="space-y-2">
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '70%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '60%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '40%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '20%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '10%' }}></div>
-                    </div>
+                    {[5, 4, 3, 2, 1].map((rating) => {
+                      const count = reviewsSummary?.ratingDistribution?.[rating] || 0;
+                      const percentage = sellerTotalReviews > 0 ? (count / sellerTotalReviews) * 100 : 0;
+                      return (
+                        <div key={rating} className="flex items-center space-x-2">
+                          <span className="text-xs w-3" style={{ color: '#939393' }}>{rating}</span>
+                          <div className="flex-1 bg-gray-200 rounded-full h-1">
+                            <div className="bg-yellow-400 h-1 rounded-full" style={{ width: `${percentage}%` }}></div>
+                          </div>
+                          <span className="text-xs w-6 text-right" style={{ color: '#939393' }}>{count}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1251,8 +948,8 @@ const UserAccount: React.FC = () => {
               <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '-40px' }}>
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
                   <img
-                    src={seller.avatar}
-                    alt={seller.name}
+                    src={sellerAvatar2}
+                    alt={sellerName}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                 </div>

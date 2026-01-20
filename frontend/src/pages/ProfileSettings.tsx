@@ -518,6 +518,20 @@ const ProfileSettings: React.FC = () => {
         }
       }
 
+      // Update phone code and number display
+      const parsed = parsePhoneNumber(u.phoneNumber, u.phoneCode);
+      setVerificationForm(prev => ({
+        ...prev,
+        phone: parsed.number
+      }));
+      if (parsed.code && parsed.flag && parsed.label) {
+        setSelectedPhoneCode({
+          code: parsed.code,
+          flag: parsed.flag,
+          label: parsed.label
+        });
+      }
+
       // Update AuthContext user
       updateUserProfile({
         firstName: u.firstName,
@@ -526,6 +540,7 @@ const ProfileSettings: React.FC = () => {
         birthDate: u.birthDate,
         profileImage: u.profileImage,
         phoneNumber: u.phoneNumber,
+        phoneCode: u.phoneCode,
         location: u.location,
         bio: u.bio,
         emailVerified: u.emailVerified
@@ -581,6 +596,21 @@ const ProfileSettings: React.FC = () => {
           }
         }
 
+        // Update phone code and number display
+        const parsed = parsePhoneNumber(u.phoneNumber, u.phoneCode);
+        setVerificationForm(prev => ({
+          ...prev,
+          email: u.email,
+          phone: parsed.number
+        }));
+        if (parsed.code && parsed.flag && parsed.label) {
+          setSelectedPhoneCode({
+            code: parsed.code,
+            flag: parsed.flag,
+            label: parsed.label
+          });
+        }
+
         // Update AuthContext user
         updateUserProfile({
           firstName: u.firstName,
@@ -589,6 +619,7 @@ const ProfileSettings: React.FC = () => {
           birthDate: u.birthDate,
           profileImage: u.profileImage,
           phoneNumber: u.phoneNumber,
+          phoneCode: u.phoneCode,
           location: u.location,
           bio: u.bio,
           emailVerified: u.emailVerified
@@ -933,13 +964,12 @@ const ProfileSettings: React.FC = () => {
     return { code: '+1', number: phoneNumber, flag: 'us', label: 'United States' };
   };
 
-  // Check if user has phoneCode field (from backend response)
-  const userPhoneCode = (user as any)?.phoneCode || (user as any)?.phone_code;
-  const parsedPhone = useMemo(() => parsePhoneNumber(user?.phoneNumber, userPhoneCode), [user?.phoneNumber, userPhoneCode]);
+  // Use phoneCode directly from user (now properly typed)
+  const parsedPhone = useMemo(() => parsePhoneNumber(user?.phoneNumber, user?.phoneCode), [user?.phoneNumber, user?.phoneCode]);
 
   const [verificationForm, setVerificationForm] = useState({
     email: user?.email,
-    phone: parsedPhone.number
+    phone: '' // Will be set by useEffect when user data loads
   });
   // Notifications state
   const [allNotificationsEnabled, setAllNotificationsEnabled] = useState(false);
@@ -963,9 +993,9 @@ const ProfileSettings: React.FC = () => {
   const [mobileNotificationDetailView, setMobileNotificationDetailView] = useState<'general' | 'messages' | 'news' | null>(null);
 
   const [selectedPhoneCode, setSelectedPhoneCode] = useState({
-    label: parsedPhone.label || 'United States',
-    code: parsedPhone.code || '+1',
-    flag: parsedPhone.flag || 'us'
+    label: 'United States',
+    code: '+1',
+    flag: 'us'
   });
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
@@ -974,10 +1004,14 @@ const ProfileSettings: React.FC = () => {
   useEffect(() => {
     if (user) {
       setProfileData(formatUserData());
-      // Update phone number in verification form
-      const userPhoneCode = (user as any)?.phoneCode || (user as any)?.phone_code;
-      const parsed = parsePhoneNumber(user.phoneNumber, userPhoneCode);
-      setVerificationForm(prev => ({ ...prev, phone: parsed.number }));
+      // Update verification form with email and parsed phone number
+      const parsed = parsePhoneNumber(user.phoneNumber, user.phoneCode);
+      setVerificationForm(prev => ({
+        ...prev,
+        email: user.email,
+        phone: parsed.number // Only the local number without country code
+      }));
+      // Update selected phone code dropdown
       if (parsed.code && parsed.flag && parsed.label) {
         setSelectedPhoneCode({
           code: parsed.code,

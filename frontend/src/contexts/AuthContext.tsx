@@ -12,6 +12,7 @@ interface User {
   gender?: string;
   birthDate?: string;
   phoneNumber?: string;
+  phoneCode?: string;
   location?: string;
   bio?: string;
   emailVerified?: boolean;

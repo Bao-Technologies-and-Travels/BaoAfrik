@@ -390,6 +390,7 @@ export const ModelName = {
   ProductLike: 'ProductLike',
   ProductSave: 'ProductSave',
   ProductReview: 'ProductReview',
+  ReviewHelpfulness: 'ReviewHelpfulness',
   Message: 'Message',
   MessageStatus: 'MessageStatus',
   MessageReaction: 'MessageReaction',
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "productReview" | "message" | "messageStatus" | "messageReaction" | "messageMetadata" | "category" | "country" | "conversation" | "conversationParticipant" | "conversationMetadata" | "productRequest" | "notification" | "session" | "twoFactorAuth" | "socialAccount"
+    modelProps: "user" | "refreshToken" | "product" | "productLike" | "productSave" | "productReview" | "reviewHelpfulness" | "message" | "messageStatus" | "messageReaction" | "messageMetadata" | "category" | "country" | "conversation" | "conversationParticipant" | "conversationMetadata" | "productRequest" | "notification" | "session" | "twoFactorAuth" | "socialAccount"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -864,6 +865,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductReviewCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductReviewCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReviewHelpfulness: {
+      payload: Prisma.$ReviewHelpfulnessPayload<ExtArgs>
+      fields: Prisma.ReviewHelpfulnessFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReviewHelpfulnessFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReviewHelpfulnessFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>
+        }
+        findFirst: {
+          args: Prisma.ReviewHelpfulnessFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReviewHelpfulnessFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>
+        }
+        findMany: {
+          args: Prisma.ReviewHelpfulnessFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>[]
+        }
+        create: {
+          args: Prisma.ReviewHelpfulnessCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>
+        }
+        createMany: {
+          args: Prisma.ReviewHelpfulnessCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReviewHelpfulnessCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>[]
+        }
+        delete: {
+          args: Prisma.ReviewHelpfulnessDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>
+        }
+        update: {
+          args: Prisma.ReviewHelpfulnessUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReviewHelpfulnessDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReviewHelpfulnessUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReviewHelpfulnessUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReviewHelpfulnessUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewHelpfulnessPayload>
+        }
+        aggregate: {
+          args: Prisma.ReviewHelpfulnessAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReviewHelpfulness>
+        }
+        groupBy: {
+          args: Prisma.ReviewHelpfulnessGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReviewHelpfulnessGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReviewHelpfulnessCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReviewHelpfulnessCountAggregateOutputType> | number
         }
       }
     }
@@ -1948,6 +2023,7 @@ export const UserScalarFieldEnum = {
   firstName: 'firstName',
   lastName: 'lastName',
   phoneNumber: 'phoneNumber',
+  phoneCode: 'phoneCode',
   passwordHash: 'passwordHash',
   profileImage: 'profileImage',
   gender: 'gender',
@@ -2044,6 +2120,18 @@ export const ProductReviewScalarFieldEnum = {
 } as const
 
 export type ProductReviewScalarFieldEnum = (typeof ProductReviewScalarFieldEnum)[keyof typeof ProductReviewScalarFieldEnum]
+
+
+export const ReviewHelpfulnessScalarFieldEnum = {
+  id: 'id',
+  reviewId: 'reviewId',
+  userId: 'userId',
+  isHelpful: 'isHelpful',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReviewHelpfulnessScalarFieldEnum = (typeof ReviewHelpfulnessScalarFieldEnum)[keyof typeof ReviewHelpfulnessScalarFieldEnum]
 
 
 export const MessageScalarFieldEnum = {
@@ -2544,6 +2632,7 @@ export type GlobalOmitConfig = {
   productLike?: Prisma.ProductLikeOmit
   productSave?: Prisma.ProductSaveOmit
   productReview?: Prisma.ProductReviewOmit
+  reviewHelpfulness?: Prisma.ReviewHelpfulnessOmit
   message?: Prisma.MessageOmit
   messageStatus?: Prisma.MessageStatusOmit
   messageReaction?: Prisma.MessageReactionOmit

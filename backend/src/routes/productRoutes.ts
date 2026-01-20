@@ -13,10 +13,18 @@ router.get('/my-products', authenticateToken, productController.getUserProducts)
 router.get('/user/:userId', productController.getUserProductsPublic);
 router.post('/search', productController.getProducts);
 
+// Public user profile and seller reviews
+router.get('/user/:userId/profile', productController.getPublicUserProfile);
+router.get('/user/:userId/reviews', productController.getSellerReviews);
+
 // Bookmark/Save routes - must come before /:id routes
 router.get('/saved', authenticateToken, productController.getSavedProducts);
 router.post('/:id/save', authenticateToken, productController.toggleSaveProduct);
 router.get('/:id/saved', authenticateToken, productController.checkProductSaved);
+
+// Review helpfulness routes
+router.post('/reviews/:reviewId/helpfulness', authenticateToken, productController.voteReviewHelpfulness);
+router.get('/reviews/:reviewId/helpfulness', productController.getReviewHelpfulnessCounts);
 
 // Product CRUD routes - parameterized routes must come last
 router.get('/:id', productController.getProduct);

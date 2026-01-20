@@ -68,6 +68,11 @@ export type ProductSave = Prisma.ProductSaveModel
  */
 export type ProductReview = Prisma.ProductReviewModel
 /**
+ * Model ReviewHelpfulness
+ * 
+ */
+export type ReviewHelpfulness = Prisma.ReviewHelpfulnessModel
+/**
  * Model Message
  * 
  */

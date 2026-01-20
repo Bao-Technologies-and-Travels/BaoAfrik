@@ -283,7 +283,7 @@ const Header: React.FC<HeaderProps> = ({
         day: getDayLabel(created),
         time: payload.time || formatTime(created),
         title: isOwnListing ? 'Your listing is available on the platform' : (payload.sellerName || 'A seller'),
-        body: isOwnListing 
+        body: isOwnListing
           ? `Your listing "${payload.productTitle || 'a new product'}" is now available on the marketplace`
           : `just listed "${payload.productTitle || 'a new product'}"`,
         meta: {
@@ -1094,7 +1094,7 @@ const Header: React.FC<HeaderProps> = ({
                               </h3>
                             </div>
                           </div>
-                          <div style={{ position: 'relative', zIndex: 999 }}>
+                          {/* <div style={{ position: 'relative', zIndex: 999 }}>
                             <button
                               onClick={() => {
                                 handleProfileSetup();
@@ -1115,7 +1115,7 @@ const Header: React.FC<HeaderProps> = ({
                                 />
                               </svg>
                             </button>
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Create a new listing button */}
@@ -1827,14 +1827,15 @@ const Header: React.FC<HeaderProps> = ({
                                 ? user.lastName
                                 : user?.email
                                   ? user.email.split("@")[0]
-                                  : "User"}</h3>
-                          <Link to='/profile-setup'>
+                                  : "User"}
+                          </h3>
+                          {/* <Link to='/profile-setup'>
                             <div className="w-6 h-6 rounded flex items-center justify-center" style={{ backgroundColor: '#E3F2FD' }}>
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#64B5F6' }}>
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </div>
-                          </Link>
+                          </Link> */}
                         </div>
                       </div>
                     </div>

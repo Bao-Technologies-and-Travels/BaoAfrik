@@ -46,7 +46,7 @@ export class ProductController {
         title,
         description,
         price,
-        currency = 'USD',
+        currency = 'GBP',
         quantity,
         category,
         origin,
@@ -896,6 +896,145 @@ export class ProductController {
       return res.status(200).json({
         success: true,
         data: { saved: isSaved }
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get public user profile
+  async getPublicUserProfile(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'User ID is required'
+        });
+      }
+
+      const profile = await productService.getPublicUserProfile(userId);
+
+      if (!profile) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: profile
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get reviews for a seller (reviews on all their products)
+  async getSellerReviews(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+      const { page = '1', limit = '10' } = req.query;
+
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'User ID is required'
+        });
+      }
+
+      const result = await productService.getSellerReviews(
+        userId,
+        parseInt(page as string),
+        parseInt(limit as string)
+      );
+
+      return res.json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Vote on review helpfulness
+  async voteReviewHelpfulness(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { reviewId } = req.params;
+      const { isHelpful } = req.body;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      if (!reviewId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Review ID is required'
+        });
+      }
+
+      if (typeof isHelpful !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          message: 'isHelpful must be a boolean'
+        });
+      }
+
+      const result = await productService.voteReviewHelpfulness(reviewId, userId, isHelpful);
+
+      return res.json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      if (error.message === 'Review not found') {
+        return res.status(404).json({
+          success: false,
+          message: error.message
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get helpfulness counts for a review
+  async getReviewHelpfulnessCounts(req: Request, res: Response) {
+    try {
+      const { reviewId } = req.params;
+
+      if (!reviewId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Review ID is required'
+        });
+      }
+
+      const counts = await productService.getReviewHelpfulnessCounts(reviewId);
+
+      return res.json({
+        success: true,
+        data: counts
       });
     } catch (error: any) {
       return res.status(500).json({

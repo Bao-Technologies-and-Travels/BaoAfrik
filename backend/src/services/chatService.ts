@@ -104,7 +104,9 @@ export class ChatService {
                                     profileImage: true,
                                     email: true,
                                     location: true,
-                                    createdAt: true
+                                    createdAt: true,
+                                    bio: true,
+                                    rating: true
                                 }
                             }
                         }
@@ -183,6 +185,23 @@ export class ChatService {
                     }
                 }
 
+                // Extract voice message properties from productData for lastMessage
+                let voiceDuration = null;
+                let waveformData = null;
+                if (lastMessage?.productData) {
+                    try {
+                        const parsedProductData = typeof lastMessage.productData === 'string' 
+                            ? JSON.parse(lastMessage.productData) 
+                            : lastMessage.productData;
+                        if (parsedProductData && typeof parsedProductData === 'object') {
+                            voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
+                            waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
+                        }
+                    } catch (e) {
+                        // Ignore parsing errors
+                    }
+                }
+
                 return {
                     id: conversation.id,
                     product: conversation.product,
@@ -195,7 +214,9 @@ export class ChatService {
                     },
                     lastMessage: lastMessage ? {
                         ...lastMessage,
-                        content: decryptedContent
+                        content: decryptedContent,
+                        duration: voiceDuration,
+                        waveformData: waveformData
                     } : null,
                     unreadCount: unreadCountMap.get(conversation.id) || 0,
                     updatedAt: conversation.updatedAt
@@ -317,13 +338,32 @@ export class ChatService {
                     }
                 }
 
+                // Extract voice message properties from productData for lastMessage
+                let voiceDuration = null;
+                let waveformData = null;
+                if (lastMessage?.productData) {
+                    try {
+                        const parsedProductData = typeof lastMessage.productData === 'string' 
+                            ? JSON.parse(lastMessage.productData) 
+                            : lastMessage.productData;
+                        if (parsedProductData && typeof parsedProductData === 'object') {
+                            voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
+                            waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
+                        }
+                    } catch (e) {
+                        // Ignore parsing errors
+                    }
+                }
+
                 return {
                     id: conversation.id,
                     buyer: buyer || null,
                     lastMessage: lastMessage ? {
                         ...lastMessage,
                         content: decryptedContent,
-                        preview: decryptedContent.length > 50 ? decryptedContent.substring(0, 50) + '...' : decryptedContent
+                        preview: decryptedContent.length > 50 ? decryptedContent.substring(0, 50) + '...' : decryptedContent,
+                        duration: voiceDuration,
+                        waveformData: waveformData
                     } : null,
                     messageState,
                     timestamp: lastMessage?.createdAt ? this.formatMessageTimestamp(lastMessage.createdAt) : '',
@@ -462,18 +502,31 @@ export class ChatService {
                 // Extract voice message properties from productData if present
                 let voiceDuration = null;
                 let waveformData = null;
+                
+                // Debug: Log raw productData from database for voice messages
+                if (message.messageType === 'VOICE') {
+                    console.log('[VOICE] getConversationMessages - raw message from DB:', {
+                        messageId: message.id,
+                        messageType: message.messageType,
+                        audioUrl: message.audioUrl,
+                        fileUrl: message.fileUrl,
+                        rawProductData: message.productData,
+                        parsedProductData: parsedProductData
+                    });
+                }
+                
                 if (parsedProductData && typeof parsedProductData === 'object') {
                     voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
                     waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
-                    // Clean up temporary voice properties from productData
-                    if (parsedProductData._voiceDuration || parsedProductData._waveformData) {
-                        delete parsedProductData._voiceDuration;
-                        delete parsedProductData._waveformData;
-                        // If productData is now empty, set to null
-                        if (Object.keys(parsedProductData).length === 0) {
-                            parsedProductData = null;
-                        }
-                    }
+                    console.log('[VOICE] getConversationMessages - extracted from productData:', {
+                        messageId: message.id,
+                        hasVoiceDuration: !!voiceDuration,
+                        hasWaveformData: !!waveformData,
+                        waveformLength: waveformData?.length || 0,
+                        productDataKeys: Object.keys(parsedProductData)
+                    });
+                    // Keep voice properties in productData for the response, don't delete them
+                    // This allows them to persist across page loads
                 }
 
                 return {
@@ -830,7 +883,11 @@ export class ChatService {
 
             let normalizedMessageType: MessageType;
             if (typeof data.messageType === 'string') {
-                const upperCaseType = data.messageType.toUpperCase();
+                let upperCaseType = data.messageType.toUpperCase();
+                // Map VOICE to AUDIO since VOICE is not in the Prisma enum
+                if (upperCaseType === 'VOICE') {
+                    upperCaseType = 'AUDIO';
+                }
                 if (upperCaseType in MessageType) {
                     normalizedMessageType = MessageType[upperCaseType as keyof typeof MessageType];
                 } else {
@@ -844,6 +901,17 @@ export class ChatService {
 
             // encryption at app level
             const appEncrypted = this.encryptMessage(data.content);
+
+            // Debug: Log productData before storage
+            if (data.productData) {
+                console.log('[VOICE] sendMessage - productData before storage:', {
+                    hasVoiceDuration: !!data.productData._voiceDuration,
+                    hasWaveformData: !!data.productData._waveformData,
+                    waveformLength: data.productData._waveformData?.length || 0,
+                    productDataKeys: Object.keys(data.productData),
+                    stringifiedLength: JSON.stringify(data.productData).length
+                });
+            }
 
             // Create message
             const message = await tx.message.create({
@@ -916,8 +984,15 @@ export class ChatService {
             try {
                 if (message.productData) {
                     parsedProductData = JSON.parse(message.productData);
+                    console.log('[VOICE] sendMessage - parsed productData:', {
+                        hasVoiceDuration: !!parsedProductData?._voiceDuration,
+                        hasWaveformData: !!parsedProductData?._waveformData,
+                        waveformLength: parsedProductData?._waveformData?.length || 0,
+                        productDataKeys: parsedProductData ? Object.keys(parsedProductData) : []
+                    });
                 }
             } catch (error) {
+                console.error('[VOICE] sendMessage - failed to parse productData:', error);
                 parsedProductData = null;
             }
 
@@ -1010,11 +1085,34 @@ export class ChatService {
                 }
             }
         });
-        // Decrypt messages
-        return messages.map(msg => ({
-            ...msg,
-            content: this.decryptMessage(msg.content, msg.encryptionIv, msg.encryptionAuthTag)
-        }));
+        // Decrypt messages and parse productData for voice messages
+        return messages.map(msg => {
+            let parsedProductData = null;
+            let voiceDuration = null;
+            let waveformData = null;
+            
+            // Parse productData if present
+            if (msg.productData) {
+                try {
+                    parsedProductData = JSON.parse(msg.productData);
+                    // Extract voice message properties
+                    if (parsedProductData && typeof parsedProductData === 'object') {
+                        voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
+                        waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
+                    }
+                } catch (e) {
+                    // Ignore parse errors
+                }
+            }
+            
+            return {
+                ...msg,
+                content: this.decryptMessage(msg.content, msg.encryptionIv, msg.encryptionAuthTag),
+                productData: parsedProductData,
+                duration: voiceDuration || null,
+                waveformData: waveformData || null
+            };
+        });
     }
 
     async getConversationParticipants(conversationId: string) {
@@ -1254,17 +1352,22 @@ export class ChatService {
 
     async deleteConversation(conversationId: string, userId: string) {
         try {
-            // Check if user is a participant
-            const participant = await prisma.conversationParticipant.findUnique({
-                where: {
-                    conversationId_userId: {
-                        conversationId,
-                        userId
+            // Check if conversation exists first
+            const conversation = await prisma.conversation.findUnique({
+                where: { id: conversationId },
+                include: {
+                    participants: {
+                        where: { userId }
                     }
                 }
             });
 
-            if (!participant) {
+            if (!conversation) {
+                // Conversation already deleted, return success
+                return { success: true, alreadyDeleted: true };
+            }
+
+            if (conversation.participants.length === 0) {
                 throw new Error('User is not a participant in this conversation');
             }
 
@@ -1276,7 +1379,11 @@ export class ChatService {
             });
 
             return { success: true };
-        } catch (error) {
+        } catch (error: any) {
+            // Handle "record not found" error gracefully
+            if (error?.code === 'P2025' || error?.message?.includes('not found')) {
+                return { success: true, alreadyDeleted: true };
+            }
             throw new Error('Failed to delete conversation');
         }
     }

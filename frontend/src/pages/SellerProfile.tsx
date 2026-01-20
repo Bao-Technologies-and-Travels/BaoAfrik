@@ -59,17 +59,50 @@ const SellerProfile: React.FC = () => {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [likes, setLikes] = useState({ review1: 5, review2: 5, review3: 5 });
-  const [likedReviews, setLikedReviews] = useState<string[]>([]);
   const [expandedDiscussions, setExpandedDiscussions] = useState<{ [key: string]: boolean }>({});
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('The most relevant');
   const [reviewHelpfulness, setReviewHelpfulness] = useState<{ [key: string]: 'yes' | 'no' | null }>({});
-  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({
-    review1: { yes: 27, no: 2 },
-    review2: { yes: 15, no: 3 },
-    review3: { yes: 8, no: 12 }
-  });
+  const [reviewHelpfulCounts, setReviewHelpfulCounts] = useState<{ [key: string]: { yes: number; no: number } }>({});
+
+  // Seller profile data from backend
+  const [sellerProfile, setSellerProfile] = useState<{
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    profileImage: string | null;
+    bio: string | null;
+    location: string | null;
+    isVerifiedSeller: boolean;
+    createdAt: string;
+    rating: number;
+    totalReviews: number;
+  } | null>(null);
+
+  // Seller reviews from backend
+  const [sellerReviews, setSellerReviews] = useState<Array<{
+    id: string;
+    rating: number;
+    comment: string | null;
+    createdAt: string;
+    productId: string;
+    productTitle: string;
+    user: {
+      id: string;
+      firstName: string | null;
+      lastName: string | null;
+      profileImage: string | null;
+    };
+    helpfulYes: number;
+    helpfulNo: number;
+  }>>([]);
+  const [reviewsSummary, setReviewsSummary] = useState<{
+    averageRating: number;
+    totalReviews: number;
+    ratingDistribution: { [key: number]: number };
+  } | null>(null);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [isStartingConversation, setIsStartingConversation] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
@@ -94,7 +127,7 @@ const SellerProfile: React.FC = () => {
     }
   }, [tabFromUrl]);
 
-  // fetch seller data
+  // fetch seller data and profile
   useEffect(() => {
     const fetchSellerData = async () => {
       if (!sellerId) {
@@ -121,8 +154,27 @@ const SellerProfile: React.FC = () => {
         }
 
         const token = localStorage.getItem("accessToken");
-        const apiUrl = `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}`;
 
+        // Fetch seller profile from backend
+        const profileResponse = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}/profile`,
+          { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
+        );
+
+        if (profileResponse.ok) {
+          const profileResult = await profileResponse.json();
+          if (profileResult.success && profileResult.data) {
+            setSellerProfile(profileResult.data);
+            // Also update seller state with profile data
+            setSeller((prev: any) => ({
+              ...prev,
+              ...profileResult.data
+            }));
+          }
+        }
+
+        // Fetch seller products
+        const apiUrl = `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}`;
         const response = await fetch(apiUrl, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
@@ -148,6 +200,67 @@ const SellerProfile: React.FC = () => {
 
     fetchSellerData();
 
+  }, [sellerId]);
+
+  // Fetch seller reviews
+  useEffect(() => {
+    const fetchSellerReviews = async () => {
+      if (!sellerId) return;
+
+      const realSellerId = sessionStorage.getItem(`seller_${sellerId}_id`);
+      if (!realSellerId) return;
+
+      try {
+        setIsLoadingReviews(true);
+        const token = localStorage.getItem("accessToken");
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}/reviews`,
+          { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            // Map reviews to match frontend interface
+            const mappedReviews = (result.data.reviews || []).map((review: any) => ({
+              id: review.id,
+              rating: review.rating,
+              comment: review.comment,
+              createdAt: review.createdAt,
+              productId: review.productId,
+              productTitle: review.productTitle,
+              user: review.user,
+              helpfulYes: review.helpfulYesCount || 0,
+              helpfulNo: review.helpfulNoCount || 0
+            }));
+
+            setSellerReviews(mappedReviews);
+            setReviewsSummary({
+              averageRating: result.data.averageRating || 0,
+              totalReviews: result.data.totalReviews || 0,
+              ratingDistribution: result.data.ratingDistribution || {}
+            });
+
+            // Initialize helpfulness counts from reviews
+            const helpfulCounts: { [key: string]: { yes: number; no: number } } = {};
+            mappedReviews.forEach((review: any) => {
+              helpfulCounts[review.id] = {
+                yes: review.helpfulYes || 0,
+                no: review.helpfulNo || 0
+              };
+            });
+            setReviewHelpfulCounts(helpfulCounts);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching seller reviews:', error);
+      } finally {
+        setIsLoadingReviews(false);
+      }
+    };
+
+    fetchSellerReviews();
   }, [sellerId]);
 
   // Fetch seller's products
@@ -312,26 +425,66 @@ const SellerProfile: React.FC = () => {
     }));
   };
 
-  const handleHelpfulnessClick = (itemId: string, choice: 'yes' | 'no') => {
-    setReviewHelpfulness(prevSelection => {
-      const currentSelection = prevSelection[itemId];
-      const nextSelection = currentSelection === choice ? null : choice;
+  const handleHelpfulnessClick = async (itemId: string, choice: 'yes' | 'no') => {
+    const currentSelection = reviewHelpfulness[itemId];
+    const nextSelection = currentSelection === choice ? null : choice;
 
-      if (currentSelection !== choice) {
-        setReviewHelpfulCounts(prevCounts => {
-          const existing = prevCounts[itemId] || { yes: 0, no: 0 };
-          return {
+    // Optimistically update UI
+    setReviewHelpfulness(prev => ({ ...prev, [itemId]: nextSelection }));
+
+    // Update counts optimistically
+    if (currentSelection !== choice) {
+      setReviewHelpfulCounts(prevCounts => {
+        const existing = prevCounts[itemId] || { yes: 0, no: 0 };
+        const newCounts = { ...existing };
+
+        // If changing vote, decrement old choice
+        if (currentSelection) {
+          newCounts[currentSelection] = Math.max(0, newCounts[currentSelection] - 1);
+        }
+
+        // Increment new choice
+        newCounts[choice] = newCounts[choice] + 1;
+
+        return { ...prevCounts, [itemId]: newCounts };
+      });
+    }
+
+    // Call backend API
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/products/reviews/${itemId}/helpfulness`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isHelpful: choice === 'yes' })
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Update with actual counts from server
+          setReviewHelpfulCounts(prevCounts => ({
             ...prevCounts,
             [itemId]: {
-              ...existing,
-              [choice]: existing[choice] + 1
+              yes: result.data.helpfulYesCount || 0,
+              no: result.data.helpfulNoCount || 0
             }
-          };
-        });
+          }));
+        }
       }
-
-      return { ...prevSelection, [itemId]: nextSelection };
-    });
+    } catch (error) {
+      console.error('Error voting on review helpfulness:', error);
+      // Revert on error
+      setReviewHelpfulness(prev => ({ ...prev, [itemId]: currentSelection }));
+    }
   };
 
   const renderHelpfulnessControls = (
@@ -402,82 +555,176 @@ const SellerProfile: React.FC = () => {
     );
   };
 
+  // Handle message seller button click
+  const handleMessageSeller = async () => {
+    const realSellerId = sessionStorage.getItem(`seller_${sellerId}_id`);
+
+    if (!realSellerId) {
+      console.error('No seller ID found');
+      return;
+    }
+
+    // Check if user is logged in
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      // Redirect to login
+      navigate('/login', { state: { from: `/seller/${sellerId}` } });
+      return;
+    }
+
+    // Check if user is trying to message themselves
+    if (user?.id === realSellerId) {
+      alert('You cannot message yourself');
+      return;
+    }
+
+    setIsStartingConversation(true);
+
+    try {
+      // Try to create or get existing conversation with this seller
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/chat/conversations`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            participantId: realSellerId
+          })
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Navigate to messages with the conversation ID
+          navigate('/messages', {
+            state: {
+              conversationId: result.data.id,
+              sellerId: realSellerId
+            }
+          });
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to create conversation:', errorData);
+
+        // If conversation already exists, we might get it in the error response
+        // Or we can try to find it in the conversations list
+        // For now, just navigate to messages - the user can find the conversation there
+        navigate('/messages');
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+      // Navigate to messages anyway
+      navigate('/messages');
+    } finally {
+      setIsStartingConversation(false);
+    }
+  };
+
   const getSellerName = (sellerData: any): string => {
-    if (!sellerData) return "Unknown Seller";
-    if (sellerData.businessName) return sellerData.businessName;
-    return `${sellerData.firstName || ''} ${sellerData.lastName || ''}`.trim() || "Unknown Seller";
+    // Prefer sellerProfile data from backend
+    const data = sellerProfile || sellerData;
+    if (!data) return "Unknown Seller";
+    if (data.businessName) return data.businessName;
+    return `${data.firstName || ''} ${data.lastName || ''}`.trim() || "Unknown Seller";
   };
 
   const getSellerAvatar = (sellerData: any): string => {
-    return sellerData?.profileImage || sellerAvatar;
+    // Prefer sellerProfile data from backend
+    return sellerProfile?.profileImage || sellerData?.profileImage || sellerAvatar;
   };
 
   const getSellerLocation = (sellerData: any): string => {
-    return sellerData?.location || "Location not specified";
+    // Prefer sellerProfile data from backend
+    const location = sellerProfile?.location || sellerData?.location;
+    if (location) return location;
+    return isLoading ? "Loading..." : "Location not specified";
   };
 
   const isSellerVerified = (sellerData: any): boolean => {
-    return sellerData?.verified || false;
+    // Prefer sellerProfile data from backend
+    return sellerProfile?.isVerifiedSeller || sellerData?.verified || sellerData?.isVerifiedSeller || false;
   };
 
   const getSellerJoinDate = (sellerData: any): string => {
-    if (!sellerData?.createdAt) return "Recently joined";
+    // Prefer sellerProfile data from backend
+    const createdAt = sellerProfile?.createdAt || sellerData?.createdAt;
+    if (!createdAt) return isLoading ? "Loading..." : "Recently joined";
 
-    const joinDate = new Date(sellerData.createdAt);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - joinDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const joinDate = new Date(createdAt);
+    const formattedDate = joinDate.toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric'
+    });
 
-    if (diffDays < 30) return "Recently joined";
-    if (diffDays < 365) return `Joined ${Math.ceil(diffDays / 30)} months ago`;
-    return `Joined ${Math.ceil(diffDays / 365)} years ago`;
+    return formattedDate;
+  };
+
+  // Format the member since date for display
+  const getMemberSinceDate = (): string => {
+    const createdAt = sellerProfile?.createdAt || seller?.createdAt;
+    if (!createdAt) return isLoading ? "Loading..." : "N/A";
+
+    const date = new Date(createdAt);
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    });
   };
 
   const getSellerBio = (sellerData: any): string => {
-    return sellerData?.description || sellerData?.bio || "No bio available.";
+    // Prefer sellerProfile data from backend
+    const bio = sellerProfile?.bio || sellerData?.description || sellerData?.bio;
+    if (bio) return bio;
+    return isLoading ? "Loading..." : "No bio available.";
   };
 
-  const reviewDiscussionData: { [key: string]: Array<{ id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string }> } = {
-    review1: [
-      {
-        id: 'seller-review1-comment1',
-        author: getSellerName(seller),
-        role: 'Product Owner',
-        date: '2 Jan 2025',
-        text: 'Thank you, Samine! We always make sure our packaging keeps everything fresh until it reaches you.',
-        isOwner: true,
-        avatar: getSellerAvatar(seller)
-      }
-    ],
-    review2: [
-      {
-        id: 'seller-review2-comment1',
-        author: getSellerName(seller),
-        role: 'Product Owner',
-        date: '12 Dec 2024',
-        text: 'So happy to hear that, Kael. Reach out anytime you want to restock or need special requests.',
-        isOwner: true,
-        avatar: getSellerAvatar(seller)
-      }
-    ],
-    review3: [
-      {
-        id: 'seller-review3-comment1',
-        author: getSellerName(seller),
-        role: 'Product Owner',
-        date: '9 Nov 2024',
-        text: 'Sorry about the delay, Alex. I would love to offer you an express replacement—please send me a DM.',
-        isOwner: true,
-        avatar: getSellerAvatar(seller)
-      },
-      {
-        id: 'seller-review3-comment2',
-        author: 'Nia Okoye',
-        date: '10 Nov 2024',
-        text: 'I had a smoother delivery this week, maybe check if your courier had a strike? Hope it gets sorted!',
-        avatar: sellerAvatar
-      }
-    ]
+  // Get seller rating from backend
+  const getSellerRating = (): number => {
+    return reviewsSummary?.averageRating || sellerProfile?.rating || 0;
+  };
+
+  // Get total reviews count from backend
+  const getTotalReviews = (): number => {
+    return reviewsSummary?.totalReviews || sellerProfile?.totalReviews || 0;
+  };
+
+  // Get rating distribution percentages
+  const getRatingDistribution = (): { [key: number]: number } => {
+    if (!reviewsSummary?.ratingDistribution || !reviewsSummary.totalReviews) {
+      return { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    }
+
+    const total = reviewsSummary.totalReviews;
+    const distribution: { [key: number]: number } = {};
+
+    for (let i = 5; i >= 1; i--) {
+      const count = reviewsSummary.ratingDistribution[i] || 0;
+      distribution[i] = total > 0 ? Math.round((count / total) * 100) : 0;
+    }
+
+    return distribution;
+  };
+
+  // Helper function to format review date
+  const formatReviewDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
+  // Helper function to get reviewer name
+  const getReviewerName = (user: { firstName: string | null; lastName: string | null }): string => {
+    const firstName = user.firstName || '';
+    const lastName = user.lastName || '';
+    return `${firstName} ${lastName}`.trim() || 'Anonymous';
   };
 
   const renderStars = (rating: number) => {
@@ -581,7 +828,9 @@ const SellerProfile: React.FC = () => {
             <div className="absolute right-0 bottom-[-62px]">
               <div className="flex items-center space-x-3">
                 <button
-                  className="hover:opacity-90 transition-opacity"
+                  onClick={handleMessageSeller}
+                  disabled={isStartingConversation}
+                  className="hover:opacity-90 transition-opacity disabled:opacity-50"
                   style={{
                     display: 'flex',
                     height: '40px',
@@ -596,8 +845,10 @@ const SellerProfile: React.FC = () => {
                     fontSize: '14px'
                   }}
                 >
-                  <span>Message the seller</span>
-                  <img src={basketIcon} alt="Cart" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
+                  <span>{isStartingConversation ? 'Opening chat...' : 'Message the seller'}</span>
+                  {!isStartingConversation && (
+                    <img src={basketIcon} alt="Cart" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} />
+                  )}
                 </button>
                 <div className="relative" ref={optionsModalRef}>
                   <button
@@ -693,12 +944,12 @@ const SellerProfile: React.FC = () => {
             {/* Name and Status - Positioned next to avatar */}
             <div className="absolute left-40 bottom-[-65px]">
               <h1 className="text-base font-semibold text-gray-900 mb-1.5">{getSellerName(seller)}</h1>
-              {isSellerVerified(seller) && (
+              {/* {isSellerVerified(seller) && (
                 <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                   <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
                   <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -756,12 +1007,12 @@ const SellerProfile: React.FC = () => {
 
           {/* Verified Badge - Moved Down */}
           <div className="absolute right-4 md:right-6 top-2">
-            {isSellerVerified(seller) && (
+            {/* {isSellerVerified(seller) && (
               <div className="inline-flex items-center space-x-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-lg text-xs md:text-sm whitespace-nowrap" style={{ backgroundColor: '#EDFBF0' }}>
                 <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 <span className="font-medium" style={{ color: '#45C55B' }}>Verified Seller</span>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Name and Info - Below Avatar */}
@@ -792,12 +1043,12 @@ const SellerProfile: React.FC = () => {
               {/* Rating - Right Side */}
               <div className="flex flex-col items-end">
                 <div className="flex items-center space-x-1 mb-1">
-                  <span className="text-lg font-semibold text-gray-900">4.3</span>
+                  <span className="text-lg font-semibold text-gray-900">{getSellerRating().toFixed(1)}</span>
                   <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-500">Reviews (456)</span>
+                <span className="text-sm text-gray-500">Reviews ({getTotalReviews()})</span>
               </div>
             </div>
           </div>
@@ -859,7 +1110,7 @@ const SellerProfile: React.FC = () => {
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Member Since</h4>
                 <div className="flex items-center space-x-2">
                   <img src={profileIcon} alt="Profile" className="w-4 h-4" />
-                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{getSellerJoinDate(seller)}</span>
+                  <span className="text-sm" style={{ color: '#6A6A6A' }}>{getMemberSinceDate()}</span>
                 </div>
               </div>
             </div>
@@ -984,261 +1235,96 @@ const SellerProfile: React.FC = () => {
                   )}
                 </div>
 
-                {/* Review Cards */}
+                {/* Review Cards - Dynamic from Backend */}
                 <div className="space-y-4">
-                  {/* Review 1 - Samine Herald */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Samine Herald</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
+                  {isLoadingReviews ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="mt-2 text-sm text-gray-500">Loading reviews...</p>
+                    </div>
+                  ) : sellerReviews.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-gray-500">No reviews yet.</p>
+                    </div>
+                  ) : (
+                    sellerReviews.map((review) => (
+                      <div key={review.id} className="pb-6">
+                        <div className="flex items-start space-x-3 mb-3">
+                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                            {review.user.profileImage ? (
+                              <img src={review.user.profileImage} alt={getReviewerName(review.user)} className="w-full h-full object-cover" />
+                            ) : (
+                              <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                              </svg>
+                            )}
                           </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 2 Jan 2025</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      Outstanding experience! This seller goes above and beyond to ensure customer satisfaction. The product was beautifully packaged and arrived ahead of schedule. Great attention to detail and very responsive to messages.
-                    </p>
-
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {renderHelpfulnessControls('review1')}
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review1')}
-                      >
-                        {expandedDiscussions.review1 ? 'View less' : `View the discussion (${reviewDiscussionData.review1?.length || 0})`}
-                      </button>
-                    </div>
-                    {expandedDiscussions.review1 && reviewDiscussionData.review1 && (
-                      <div className="mt-4 space-y-4">
-                        {reviewDiscussionData.review1.map((comment) => (
-                          <div key={comment.id} className="flex space-x-3">
-                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-4">
-                              <div className="flex items-start space-x-3">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                  {comment.avatar ? (
-                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900 mb-2">{getReviewerName(review.user)}</h4>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <div className="flex items-center">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <svg
+                                      key={star}
+                                      className={`w-3.5 h-3.5 fill-current ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                     </svg>
-                                  )}
+                                  ))}
                                 </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
-                                      {comment.isOwner && (
-                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                          {comment.role || 'Product Owner'}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
-                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
+                                <span className="text-sm font-medium" style={{ color: '#939393' }}>{review.rating.toFixed(1)}</span>
                               </div>
-                              <div className="mt-3 pl-12">
-                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
+                              <span className="text-xs" style={{ color: '#939393' }}>Posted on {formatReviewDate(review.createdAt)}</span>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Review 2 - Kael Otto */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Kael Otto</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>5.0</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 12 Dec 2024</span>
                         </div>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      Amazing seller! The product quality exceeded my expectations. Fast shipping and excellent communication throughout the process. The item was exactly as described and arrived in perfect condition.
-                    </p>
 
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {renderHelpfulnessControls('review2')}
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review2')}
-                      >
-                        {expandedDiscussions.review2 ? 'View less' : `View the discussion (${reviewDiscussionData.review2?.length || 0})`}
-                      </button>
-                    </div>
-                    {expandedDiscussions.review2 && reviewDiscussionData.review2 && (
-                      <div className="mt-4 space-y-4">
-                        {reviewDiscussionData.review2.map((comment) => (
-                          <div key={comment.id} className="flex space-x-3">
-                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-4">
-                              <div className="flex items-start space-x-3">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                  {comment.avatar ? (
-                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                    </svg>
-                                  )}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
-                                      {comment.isOwner && (
-                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                          {comment.role || 'Product Owner'}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
-                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
-                              <div className="mt-3 pl-12">
-                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                        {/* Review Comment */}
+                        {review.comment && (
+                          <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                            {review.comment}
+                          </p>
+                        )}
 
-                  {/* Review 3 - Alex Johnson */}
-                  <div className="pb-6">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Alex Johnson</h4>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              {[1, 2].map((star) => (
-                                <svg key={star} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                              {[1, 2, 3].map((star) => (
-                                <svg key={`empty-${star}`} className="w-3.5 h-3.5 text-gray-300 fill-current" viewBox="0 0 24 24">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium" style={{ color: '#939393' }}>2.1</span>
-                          </div>
-                          <span className="text-xs" style={{ color: '#939393' }}>Posted on 8 Nov 2024</span>
+                        {/* Product Reference */}
+                        <p className="text-xs mb-4" style={{ color: '#64B5F6' }}>
+                          Review for: {review.productTitle}
+                        </p>
+
+                        {/* Helpfulness Section */}
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                          {renderHelpfulnessControls(review.id)}
+                          <button
+                            className="text-xs hover:underline"
+                            style={{ color: '#64B5F6' }}
+                            onClick={() => handleDiscussionToggle(review.id)}
+                          >
+                            {expandedDiscussions[review.id] ? 'View less' : 'View discussion'}
+                          </button>
                         </div>
-                      </div>
-                    </div>
-                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
-                      The product was okay, but not exactly what I expected. Shipping took longer than anticipated. Communication could have been better.
-                    </p>
 
-                    {/* Helpfulness Section */}
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {renderHelpfulnessControls('review3')}
-                      <button
-                        className="text-xs hover:underline"
-                        style={{ color: '#64B5F6' }}
-                        onClick={() => handleDiscussionToggle('review3')}
-                      >
-                        {expandedDiscussions.review3 ? 'View less' : `View the discussion (${reviewDiscussionData.review3?.length || 0})`}
-                      </button>
-                    </div>
-                    {expandedDiscussions.review3 && reviewDiscussionData.review3 && (
-                      <div className="mt-4 space-y-4">
-                        {reviewDiscussionData.review3.map((comment) => (
-                          <div key={comment.id} className="flex space-x-3">
-                            <div className="w-px self-stretch" style={{ backgroundColor: '#E1E1E1' }} />
-                            <div className="flex-1 pl-4">
-                              <div className="flex items-start space-x-3">
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                  {comment.avatar ? (
-                                    <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                    </svg>
-                                  )}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-sm font-semibold text-gray-900">{comment.author}</span>
-                                      {comment.isOwner && (
-                                        <span className="text-[10px] font-medium px-2 py-0.5" style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', borderRadius: '4px' }}>
-                                          {comment.role || 'Product Owner'}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <span className="text-xs" style={{ color: '#939393' }}>{comment.date}</span>
-                                  </div>
-                                  <p className="text-sm leading-relaxed mt-1" style={{ color: '#939393' }}>{comment.text}</p>
-                                </div>
-                              </div>
-                              <div className="mt-3 pl-12">
-                                {renderHelpfulnessControls(comment.id, 'Was this review helpful to you?')}
-                              </div>
-                            </div>
+                        {/* Discussion Section - Placeholder for future backend support */}
+                        {expandedDiscussions[review.id] && (
+                          <div className="mt-4 pl-4 border-l-2" style={{ borderColor: '#E1E1E1' }}>
+                            <p className="text-sm text-gray-500">No discussion yet.</p>
                           </div>
-                        ))}
+                        )}
                       </div>
-                    )}
-                  </div>
+                    ))
+                  )}
                 </div>
 
                 {/* Pagination */}
                 <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm" style={{ color: '#BABABA' }}>1 - 4 out of 23</span>
+                    <span className="text-sm" style={{ color: '#BABABA' }}>
+                      {sellerReviews.length > 0
+                        ? `1 - ${sellerReviews.length} out of ${getTotalReviews()}`
+                        : 'No reviews'
+                      }
+                    </span>
                     <div className="flex items-center space-x-1">
                       <button
                         disabled
@@ -1261,30 +1347,23 @@ const SellerProfile: React.FC = () => {
                 {/* Overall Rating Summary */}
                 <div className="mb-8 text-center">
                   <div className="flex items-center justify-center space-x-2 mb-3">
-                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.3</div>
+                    <div className="text-4xl font-semibold text-gray-900" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{getSellerRating().toFixed(1)}</div>
                     <svg className="w-7 h-7 text-yellow-400 fill-current" viewBox="0 0 24 24">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   </div>
-                  <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates (456)</div>
+                  <div className="text-sm mb-8" style={{ color: '#6A6A6A' }}>Review & Rates ({getTotalReviews()})</div>
 
-                  {/* Rating Bars */}
+                  {/* Rating Bars - 5 stars to 1 star */}
                   <div className="space-y-2">
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '70%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '60%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '40%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '20%' }}></div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1">
-                      <div className="bg-yellow-400 h-1 rounded-full" style={{ width: '10%' }}></div>
-                    </div>
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <div key={star} className="w-full bg-gray-200 rounded-full h-1">
+                        <div
+                          className="bg-yellow-400 h-1 rounded-full"
+                          style={{ width: `${getRatingDistribution()[star]}%` }}
+                        ></div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -1374,7 +1453,7 @@ const SellerProfile: React.FC = () => {
                           onClick={() => {
                             if (userRating > 0 && userReviewText.trim()) {
                               const today = new Date();
-                              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                              const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                               const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
                               setPostedReview({
                                 rating: userRating,
@@ -1548,12 +1627,12 @@ const SellerProfile: React.FC = () => {
                           <div className="font-semibold text-gray-900" style={{ fontSize: '16px' }}>
                             {product.currency} {product.price}
                           </div>
-                          {seller?.isVerified && (
+                          {/* {seller?.isVerified && (
                             <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#EDFBF0' }}>
                               <img src={verifyIcon} alt="Verified" className="w-2.5 h-2.5" />
                               <span className="text-xs" style={{ color: '#45C55B', fontWeight: '300' }}>Verified Seller</span>
                             </div>
-                          )}
+                          )} */}
                         </div>
 
                         {/* Product Name */}

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getProductCountry } from '../utils/countryHelpers';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -320,6 +320,7 @@ const buildListingPrefillPayload = (listing: Listing) => {
 
 const MyListings: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const { addToast } = useToast();
 
@@ -406,12 +407,30 @@ const MyListings: React.FC = () => {
     }, []);
 
     // fetch listings with pagination
+    // Handle forceRefresh from navigation state (e.g., after posting a new listing)
+    useEffect(() => {
+        const state = location.state as { forceRefresh?: boolean; newListingId?: string } | null;
+        if (state?.forceRefresh) {
+            // Clear all listings cache
+            const keys = Object.keys(sessionStorage);
+            keys.forEach(key => {
+                if (key.startsWith('listings-')) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+            // Clear the state to prevent repeated refreshes
+            navigate(location.pathname, { replace: true, state: {} });
+            // Fetch fresh data
+            fetchMyListings(1, itemsPerPage);
+        }
+    }, [location.state]);
+
     useEffect(() => {
         setCurrentPage(1);
         fetchMyListings(1, itemsPerPage);
     }, [activeTab, , itemsPerPage]);
 
-    const fetchMyListings = async (page: number = 1, limit: number = itemsPerPage) => {
+    const fetchMyListings = async (page: number = 1, limit: number = itemsPerPage, skipCache: boolean = false) => {
         if (!user) return;
         setLoading(true);
 
@@ -428,7 +447,8 @@ const MyListings: React.FC = () => {
             const cachedData = sessionStorage.getItem(cacheKey);
             const now = new Date().getTime();
 
-            if (cachedData) {
+            // Skip cache if skipCache flag is set
+            if (!skipCache && cachedData) {
                 const { data, timestamp } = JSON.parse(cachedData);
                 if (now - timestamp < 5 * 60 * 1000) { // 5 mins cache
                     processApiResponse(data);
@@ -494,7 +514,7 @@ const MyListings: React.FC = () => {
                     id: product.id,
                     title: product.title || 'Undefined',
                     price: product.price?.toString() || 'N/A',
-                    currency: product.currency || 'USD',
+                    currency: product.currency || 'GCP',
                     image: product.images?.[0]?.url || a1,
                     description: product.description || '',
                     country: product.origin || 'Cameroon',
@@ -607,7 +627,7 @@ const MyListings: React.FC = () => {
                                 id: product.id,
                                 title: product.title || 'Undefined',
                                 price: product.price?.toString() || 'N/A',
-                                currency: product.currency || 'USD',
+                                currency: product.currency || 'GCP',
                                 image: product.images?.[0]?.url || a1,
                                 description: product.description || '',
                                 country: product.origin || 'Cameroon',
@@ -640,7 +660,7 @@ const MyListings: React.FC = () => {
             rating: product.averageRating || 0,
             reviews: product.reviewCount || 0,
             price: product.price?.toString() || '0',
-            currency: product.currency || 'USD',
+            currency: product.currency || 'GCP',
             createdAt: new Date(product.createdAt).getTime(),
             priceValue: product.price || 0,
             messages: 0,
@@ -657,9 +677,10 @@ const MyListings: React.FC = () => {
                             daysLeft: undefined
                         };
                     }
+                    // Only show daysLeft when 3 days or less remaining
                     return {
                         status: 'active' as const,
-                        daysLeft: daysLeft
+                        daysLeft: (daysLeft !== undefined && daysLeft <= 3) ? daysLeft : undefined
                     };
                 }
                 return {
@@ -4506,6 +4527,7 @@ const MyListings: React.FC = () => {
                                                         ×
                                                     </span>
                                                 </button>
+
                                             )}
 
                                             {isStatusDropdownOpen && (

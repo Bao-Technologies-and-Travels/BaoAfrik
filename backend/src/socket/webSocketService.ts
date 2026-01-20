@@ -514,16 +514,31 @@ export class WebSocketService {
       }
 
 
-      if (finalMessageType === 'VOICE' && (data.voiceDuration || data.waveformData)) {
+      // Always store voice properties in productData for VOICE messages
+      if (finalMessageType === 'VOICE') {
+        console.log('[VOICE] Processing voice message:', {
+          hasVoiceDuration: !!data.voiceDuration,
+          hasWaveformData: !!data.waveformData,
+          waveformLength: data.waveformData?.length || 0,
+          existingProductData: !!normalizedProductData
+        });
+        
         if (!normalizedProductData) {
           normalizedProductData = {};
         }
         if (data.voiceDuration) {
           normalizedProductData._voiceDuration = data.voiceDuration;
         }
-        if (data.waveformData) {
+        if (data.waveformData && Array.isArray(data.waveformData)) {
           normalizedProductData._waveformData = data.waveformData;
+          console.log('[VOICE] Stored waveformData in normalizedProductData, length:', data.waveformData.length);
         }
+        
+        console.log('[VOICE] normalizedProductData after processing:', {
+          hasVoiceDuration: !!normalizedProductData._voiceDuration,
+          hasWaveformData: !!normalizedProductData._waveformData,
+          waveformLength: normalizedProductData._waveformData?.length || 0
+        });
       }
 
       if (allFiles.length > 1 && normalizedProductData) {
@@ -532,6 +547,8 @@ export class WebSocketService {
         normalizedProductData = { _files: allFiles };
       }
 
+      // For voice messages, also set audioUrl
+      const audioUrl = finalMessageType === 'VOICE' ? finalFileUrl : undefined;
       
       const message = await this.chatService.sendMessage({
         content: content || '', // Allow empty content if files are present
@@ -541,6 +558,7 @@ export class WebSocketService {
         fileUrl: finalFileUrl,
         fileName: finalFileName,
         fileSize: finalFileSize,
+        audioUrl: audioUrl,
         replyToId,
         productData: normalizedProductData
       });
@@ -595,7 +613,9 @@ export class WebSocketService {
       // Include voice message properties if this is a voice message
       if (finalMessageType === 'VOICE' && data.voiceDuration) {
         messageResponse.type = 'voice';
+        messageResponse.messageType = 'VOICE';
         messageResponse.duration = data.voiceDuration;
+        messageResponse.voiceDuration = data.voiceDuration;
         messageResponse.waveformData = data.waveformData || [];
         // Set audioUrl from files if available
         if (allFiles.length > 0 && allFiles[0].fileUrl) {
@@ -859,15 +879,23 @@ export class WebSocketService {
 
       const result = await this.chatService.addReaction(messageId, userId, reaction);
       
-      // Get conversation ID from message
+      // Get conversation ID and participants from message
       const message = await prisma.message.findUnique({
         where: { id: messageId },
-        select: { conversationId: true }
+        select: { 
+          conversationId: true,
+          conversation: {
+            include: {
+              participants: {
+                select: { userId: true }
+              }
+            }
+          }
+        }
       });
 
       if (message?.conversationId) {
-        // Broadcast reaction to all participants in the conversation
-        this.io.to(`conversation:${message.conversationId}`).emit('reaction_added', {
+        const reactionData = {
           messageId,
           conversationId: message.conversationId,
           userId: result.user.id,
@@ -879,7 +907,19 @@ export class WebSocketService {
             profileImage: result.user.profileImage
           },
           allReactions: result.message.reactions
-        });
+        };
+
+        // Broadcast reaction to the conversation room
+        this.io.to(`conversation:${message.conversationId}`).emit('reaction_added', reactionData);
+        
+        // Also broadcast to each participant's personal room to ensure they receive it
+        if (message.conversation?.participants) {
+          for (const participant of message.conversation.participants) {
+            if (participant.userId !== userId) {
+              this.io.to(participant.userId).emit('reaction_added', reactionData);
+            }
+          }
+        }
       }
 
       socket.emit('reaction_added_success', { messageId, reaction: result.reaction });
@@ -901,19 +941,39 @@ export class WebSocketService {
 
       await this.chatService.removeReaction(messageId, userId);
 
-      // Get conversation ID from message
+      // Get conversation ID and participants from message
       const message = await prisma.message.findUnique({
         where: { id: messageId },
-        select: { conversationId: true }
+        select: { 
+          conversationId: true,
+          conversation: {
+            include: {
+              participants: {
+                select: { userId: true }
+              }
+            }
+          }
+        }
       });
 
       if (message?.conversationId) {
-        // Broadcast reaction removal to all participants
-        this.io.to(`conversation:${message.conversationId}`).emit('reaction_removed', {
+        const removalData = {
           messageId,
           conversationId: message.conversationId,
           userId
-        });
+        };
+
+        // Broadcast reaction removal to the conversation room
+        this.io.to(`conversation:${message.conversationId}`).emit('reaction_removed', removalData);
+        
+        // Also broadcast to each participant's personal room
+        if (message.conversation?.participants) {
+          for (const participant of message.conversation.participants) {
+            if (participant.userId !== userId) {
+              this.io.to(participant.userId).emit('reaction_removed', removalData);
+            }
+          }
+        }
       }
 
       socket.emit('reaction_removed_success', { messageId });

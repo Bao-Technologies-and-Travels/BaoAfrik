@@ -511,9 +511,9 @@ export class ProductService {
 
             if (isNewlyPublished) {
                 updateData.publishedAt = new Date();
-                // Set expiresAt to 5 days from now when product is published
+                // Set expiresAt to 7 days from now when product is published/republished
                 const expiresAt = new Date();
-                expiresAt.setDate(expiresAt.getDate() + 5);
+                expiresAt.setDate(expiresAt.getDate() + 7);
                 updateData.expiresAt = expiresAt;
             }
 
@@ -734,6 +734,289 @@ export class ProductService {
             }
         } catch (error: any) {
             throw new Error(`Error toggling save status: ${error.message}`);
+        }
+    }
+
+    // Get public user profile
+    async getPublicUserProfile(userId: string): Promise<{
+        id: string;
+        firstName: string | null;
+        lastName: string | null;
+        profileImage: string | null;
+        bio: string | null;
+        location: string | null;
+        isVerifiedSeller: boolean;
+        createdAt: Date;
+        rating: number;
+        totalReviews: number;
+    } | null> {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    profileImage: true,
+                    bio: true,
+                    location: true,
+                    isVerifiedSeller: true,
+                    createdAt: true,
+                    rating: true
+                }
+            });
+
+            if (!user) {
+                return null;
+            }
+
+            // Count total reviews across all products by this seller
+            const totalReviews = await prisma.productReview.count({
+                where: {
+                    product: {
+                        sellerId: userId
+                    }
+                }
+            });
+
+            return {
+                ...user,
+                rating: user.rating || 0,
+                totalReviews
+            };
+        } catch (error: any) {
+            throw new Error(`Error fetching user profile: ${error.message}`);
+        }
+    }
+
+    // Get reviews for a seller (reviews on all products by this seller)
+    async getSellerReviews(sellerId: string, page: number = 1, limit: number = 10): Promise<{
+        reviews: Array<{
+            id: string;
+            rating: number;
+            comment: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            productId: string;
+            productTitle: string;
+            user: {
+                id: string;
+                firstName: string | null;
+                lastName: string | null;
+                profileImage: string | null;
+            };
+            helpfulYesCount: number;
+            helpfulNoCount: number;
+        }>;
+        averageRating: number;
+        totalReviews: number;
+        ratingDistribution: { [rating: number]: number };
+        totalPages: number;
+        currentPage: number;
+    }> {
+        try {
+            const skip = (page - 1) * limit;
+
+            // Get all reviews for products owned by this seller
+            const reviews = await prisma.productReview.findMany({
+                where: {
+                    product: {
+                        sellerId: sellerId
+                    }
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    },
+                    product: {
+                        select: {
+                            id: true,
+                            title: true
+                        }
+                    },
+                    helpfulnessVotes: true
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit
+            });
+
+            // Get total count and rating distribution
+            const allReviews = await prisma.productReview.findMany({
+                where: {
+                    product: {
+                        sellerId: sellerId
+                    }
+                },
+                select: {
+                    rating: true
+                }
+            });
+
+            const totalReviews = allReviews.length;
+            const ratingDistribution: { [rating: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+            let sum = 0;
+            for (const review of allReviews) {
+                sum += review.rating;
+                if (review.rating >= 1 && review.rating <= 5) {
+                    ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
+                }
+            }
+
+            const averageRating = totalReviews > 0 ? parseFloat((sum / totalReviews).toFixed(1)) : 0;
+
+            // Format reviews with helpfulness counts
+            const formattedReviews = reviews.map(review => {
+                const helpfulYesCount = review.helpfulnessVotes.filter(v => v.isHelpful).length;
+                const helpfulNoCount = review.helpfulnessVotes.filter(v => !v.isHelpful).length;
+
+                return {
+                    id: review.id,
+                    rating: review.rating,
+                    comment: review.comment,
+                    createdAt: review.createdAt,
+                    updatedAt: review.updatedAt,
+                    productId: review.product.id,
+                    productTitle: review.product.title,
+                    user: review.user,
+                    helpfulYesCount,
+                    helpfulNoCount
+                };
+            });
+
+            return {
+                reviews: formattedReviews,
+                averageRating,
+                totalReviews,
+                ratingDistribution,
+                totalPages: Math.ceil(totalReviews / limit),
+                currentPage: page
+            };
+        } catch (error: any) {
+            throw new Error(`Error fetching seller reviews: ${error.message}`);
+        }
+    }
+
+    // Vote on review helpfulness
+    async voteReviewHelpfulness(reviewId: string, voterId: string, isHelpful: boolean): Promise<{
+        helpfulYesCount: number;
+        helpfulNoCount: number;
+        userVote: 'yes' | 'no' | null;
+    }> {
+        try {
+            // Check if review exists
+            const review = await prisma.productReview.findUnique({
+                where: { id: reviewId }
+            });
+
+            if (!review) {
+                throw new Error('Review not found');
+            }
+
+            // Check for existing vote
+            const existingVote = await prisma.reviewHelpfulness.findUnique({
+                where: {
+                    reviewId_userId: {
+                        reviewId,
+                        userId: voterId
+                    }
+                }
+            });
+
+            if (existingVote) {
+                if (existingVote.isHelpful === isHelpful) {
+                    // Same vote - remove it (toggle off)
+                    await prisma.reviewHelpfulness.delete({
+                        where: { id: existingVote.id }
+                    });
+                } else {
+                    // Different vote - update it
+                    await prisma.reviewHelpfulness.update({
+                        where: { id: existingVote.id },
+                        data: { isHelpful }
+                    });
+                }
+            } else {
+                // Create new vote
+                await prisma.reviewHelpfulness.create({
+                    data: {
+                        reviewId,
+                        userId: voterId,
+                        isHelpful
+                    }
+                });
+            }
+
+            // Get updated counts
+            const votes = await prisma.reviewHelpfulness.findMany({
+                where: { reviewId }
+            });
+
+            const helpfulYesCount = votes.filter(v => v.isHelpful).length;
+            const helpfulNoCount = votes.filter(v => !v.isHelpful).length;
+
+            // Check user's current vote
+            const userVoteRecord = await prisma.reviewHelpfulness.findUnique({
+                where: {
+                    reviewId_userId: {
+                        reviewId,
+                        userId: voterId
+                    }
+                }
+            });
+
+            const userVote = userVoteRecord ? (userVoteRecord.isHelpful ? 'yes' : 'no') : null;
+
+            return {
+                helpfulYesCount,
+                helpfulNoCount,
+                userVote
+            };
+        } catch (error: any) {
+            throw new Error(`Error voting on review: ${error.message}`);
+        }
+    }
+
+    // Get user's vote on a review
+    async getUserReviewVote(reviewId: string, userId: string): Promise<'yes' | 'no' | null> {
+        try {
+            const vote = await prisma.reviewHelpfulness.findUnique({
+                where: {
+                    reviewId_userId: {
+                        reviewId,
+                        userId
+                    }
+                }
+            });
+
+            return vote ? (vote.isHelpful ? 'yes' : 'no') : null;
+        } catch (error: any) {
+            throw new Error(`Error getting user vote: ${error.message}`);
+        }
+    }
+
+    // Get helpfulness counts for a review
+    async getReviewHelpfulnessCounts(reviewId: string): Promise<{
+        helpfulYesCount: number;
+        helpfulNoCount: number;
+    }> {
+        try {
+            const votes = await prisma.reviewHelpfulness.findMany({
+                where: { reviewId }
+            });
+
+            return {
+                helpfulYesCount: votes.filter(v => v.isHelpful).length,
+                helpfulNoCount: votes.filter(v => !v.isHelpful).length
+            };
+        } catch (error: any) {
+            throw new Error(`Error getting helpfulness counts: ${error.message}`);
         }
     }
 }

@@ -97,14 +97,14 @@ const CreateListing: React.FC = () => {
     price: string;
     currency: string;
     image: string;
-    status: 'inactive';
+    status: 'inactive' | 'active';
     rating: number;
     reviews: number;
     createdAt: number;
     priceValue: number;
     messages: number;
     category: string;
-    reviewStatus: 'success';
+    reviewStatus: 'pending' | 'success';
   } | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -460,7 +460,7 @@ const CreateListing: React.FC = () => {
           id: product.id,
           title: product.title || 'Undefined',
           price: product.price?.toString() || 'N/A',
-          currency: product.currency || 'USD',
+          currency: product.currency || 'GCP',
           image: product.images?.[0]?.url || a1,
           description: product.description || '',
           country: product.origin || 'Cameroon',
@@ -520,7 +520,7 @@ const CreateListing: React.FC = () => {
         setTitle(product.title || '');
         setDescription(product.description || '');
         setPrice(product.price?.toString() || '');
-        setCurrency(product.currency || 'USD');
+        setCurrency(product.currency || 'GCP');
         setQuantity(product.quantity || 1);
         setCategory(product.category || '');
         setOrigin(product.origin || '');
@@ -658,21 +658,47 @@ const CreateListing: React.FC = () => {
     return payload;
   };
 
-  const applyPrefillToForm = (prefill: Record<string, string>) => {
+  const applyPrefillToForm = (prefill: Record<string, any>) => {
+    // Set basic fields
     if (prefill.title) setTitle(prefill.title);
     if (prefill.description) setDescription(prefill.description);
-    if (prefill.price) setPrice(prefill.price);
+    if (prefill.price) setPrice(prefill.price.toString());
     if (prefill.currency) setCurrency(prefill.currency);
+    if (prefill.quantity) setQuantity(Number(prefill.quantity) || 1);
+    if (prefill.category) setCategory(prefill.category);
+    if (prefill.location) setLocation(prefill.location);
+    if (typeof prefill.deliveryAvailable === 'boolean') setDeliveryAvailable(prefill.deliveryAvailable);
+    
+    // Handle country/origin
     if (prefill.country) {
       const originOption = countries.find(
         (country) => country.label.toLowerCase() === prefill.country.toLowerCase()
       );
       if (originOption) setOrigin(originOption.value);
     }
+    if (prefill.origin) {
+      const originOption = countries.find(
+        (country) => country.label.toLowerCase() === prefill.origin.toLowerCase() ||
+                     country.value.toLowerCase() === prefill.origin.toLowerCase()
+      );
+      if (originOption) setOrigin(originOption.value);
+    }
+    
+    // Handle images
     if (prefill.image) {
       setImageUrls([prefill.image]);
       setImages([]);
       setPrimaryImageIndex(0);
+    }
+    if (prefill.images && Array.isArray(prefill.images) && prefill.images.length > 0) {
+      setImageUrls(prefill.images);
+      setImages([]);
+      setPrimaryImageIndex(0);
+    }
+    
+    // Set editing draft ID if this is an edit/repost
+    if (prefill.id) {
+      setEditingDraftId(prefill.id);
     }
   };
 
@@ -1086,7 +1112,7 @@ const CreateListing: React.FC = () => {
                   id: product.id,
                   title: product.title || 'Undefined',
                   price: product.price?.toString() || 'N/A',
-                  currency: product.currency || 'USD',
+                  currency: product.currency || 'GCP',
                   image: product.images?.[0]?.url || a1,
                   description: product.description || '',
                   country: product.origin || 'Cameroon',
@@ -1279,7 +1305,7 @@ const CreateListing: React.FC = () => {
                   id: product.id,
                   title: product.title || 'Undefined',
                   price: product.price?.toString() || 'N/A',
-                  currency: product.currency || 'USD',
+                  currency: product.currency || 'GCP',
                   image: product.images?.[0]?.url || a1,
                   description: product.description || '',
                   country: product.origin || 'Cameroon',
@@ -1301,6 +1327,7 @@ const CreateListing: React.FC = () => {
         const productImage = publishResult.data?.images?.[0]?.url || imageUrls[primaryImageIndex] || imageUrls[0] || '';
 
         // Store product data for navigation after modal
+        // Initially show as 'inactive' while "under review", will update to 'active' after review period
         const productData = {
           id: actualProductId,
           title: productTitle,
@@ -1314,25 +1341,29 @@ const CreateListing: React.FC = () => {
           priceValue: parseFloat(publishResult.data?.price?.toString() || price || '0'),
           messages: 0,
           category: publishResult.data?.category || category || '',
-          reviewStatus: 'success' as const
+          reviewStatus: 'pending' as const // Initially pending review
         };
         setCreatedProductData(productData);
 
         // Show success modal instead of navigating immediately
         setShowSuccessModal(true);
-        setShowNotification(true);
+        setShowNotification(true); // Show "under review" banner
         setCountdown(10);
 
-        // Show first notification: "under review"
-        // showNotificationToast({
-        //   type: 'app',
-        //   mainText: 'Your listing is under review',
-        //   subText: 'Wait while your product is being reviewed.',
-        //   subText2: 'This usually takes a few minutes.',
-        //   duration: 10000
-        // });
-
-        setTimeout(() => {
+        // After 30 seconds, hide "under review" banner and show "available on marketplace" notification
+        // Also update the product status to active since it's now reviewed
+        const reviewTimeout = setTimeout(() => {
+          // Hide the "under review" banner
+          setShowNotification(false);
+          
+          // Update product data to active status (product is now available on marketplace)
+          setCreatedProductData(prev => prev ? {
+            ...prev,
+            status: 'active' as const,
+            reviewStatus: 'success' as const
+          } : null);
+          
+          // Show notification that listing is now available
           showNotificationToast({
             type: 'app',
             mainText: `Your listing "${productTitle}" is available on the marketplace!`,
@@ -1341,6 +1372,9 @@ const CreateListing: React.FC = () => {
             duration: 8000
           });
         }, 30000);
+        
+        // Store timeout ID for cleanup if component unmounts
+        (window as any).__reviewTimeout = reviewTimeout;
 
         setIsPostingListing(false);
       }
@@ -1364,14 +1398,10 @@ const CreateListing: React.FC = () => {
       }, 1000);
       return () => clearTimeout(timer);
     } else if (showSuccessModal && countdown === 0 && createdProductData) {
-      // Navigate to owner view state (product detail with fromMyListings state)
-      navigate(`/product/${createdProductData.id}`, {
-        state: {
-          fromMyListings: true,
-          listing: createdProductData,
-          sellerVerified: false
-        }
-      });
+      // Clear cache before navigating to ensure fresh data
+      clearListingsCache();
+      // Navigate to my-listings after posting with refresh flag
+      navigate('/my-listings', { state: { forceRefresh: true, newListingId: createdProductData.id } });
       // Reset modal state
       setShowSuccessModal(false);
       setCreatedProductData(null);
@@ -1394,22 +1424,13 @@ const CreateListing: React.FC = () => {
   }, [isLocationDropdownOpen]);
 
   const handleBackToHomepage = () => {
-    // Navigate to owner view state (product detail with fromMyListings state)
-    if (createdProductData) {
-      navigate(`/product/${createdProductData.id}`, {
-        state: {
-          fromMyListings: true,
-          listing: createdProductData,
-          sellerVerified: false
-        }
-      });
-      // Reset modal state
-      setShowSuccessModal(false);
-      setCreatedProductData(null);
-    } else {
-      // Fallback if no product data (shouldn't happen, but just in case)
-      navigate('/my-listings');
-    }
+    // Clear cache before navigating to ensure fresh data
+    clearListingsCache();
+    // Navigate to my-listings after posting with refresh flag
+    navigate('/my-listings', { state: { forceRefresh: true, newListingId: createdProductData?.id } });
+    // Reset modal state
+    setShowSuccessModal(false);
+    setCreatedProductData(null);
   };
 
   const handleAddNewListing = () => {
@@ -1417,7 +1438,7 @@ const CreateListing: React.FC = () => {
     setTitle('');
     setDescription('');
     setPrice('');
-    setCurrency('USD');
+    setCurrency('GCP');
     setQuantity(1);
     setCategory('');
     setOrigin('');
@@ -4848,8 +4869,8 @@ const CreateListing: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           />
 
-          {/* Notification - Far Above Modal */}
-          {showNotification && (
+          {/* Notification - "Under Review" Banner - Only show when review is pending */}
+          {showNotification && createdProductData?.reviewStatus === 'pending' && (
             <div
               className="fixed top-16 left-1/2 -translate-x-1/2 z-[60] animate-slide-down max-w-[300px] lg:max-w-[350px] w-[calc(100%-32px)]"
             >

@@ -80,6 +80,7 @@ export interface UpdateProfileRequest {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  phoneCode?: string;
   profileImage?: string;
   gender?: string;
   birthDate?: string;

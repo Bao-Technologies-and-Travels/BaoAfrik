@@ -60,7 +60,7 @@ import logoIcon from "../assets/images/logos/ba-brand-icon-colored.png";
 import messageAvatarIcon from '../assets/images/pre/main.png';
 import appNotificationIcon from '../assets/images/pre/nof.svg';
 
-import { useSocket } from '../contexts/socketContext';
+import { useSocket, useSocketContext } from '../contexts/socketContext';
 import { gcpStorageService } from '../services/gcpStorageService';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -111,6 +111,7 @@ const Messages: React.FC = (): JSX.Element => {
   }, []);
 
   const socket = useSocket();
+  const { isConnected: isSocketConnected, reconnect: reconnectSocket } = useSocketContext();
   const API_BASE = process.env.REACT_APP_API_URL;
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
@@ -123,6 +124,7 @@ const Messages: React.FC = (): JSX.Element => {
   type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
   const [messageStatuses, setMessageStatuses] = useState<{ [key: string]: MessageStatus }>({});
   const [isRecording, setIsRecording] = useState(false);
+  const [isSendingVoice, setIsSendingVoice] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null);
   const [soundDetected, setSoundDetected] = useState(false);
@@ -154,6 +156,7 @@ const Messages: React.FC = (): JSX.Element => {
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
   const [clickedMessageId, setClickedMessageId] = useState<number | null>(null);
+  const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
   const [isReplyRead, setIsReplyRead] = useState(false);
   const [isSellerTyping, setIsSellerTyping] = useState(false);
   const [hasIncomingReply, setHasIncomingReply] = useState(false);
@@ -268,19 +271,26 @@ const Messages: React.FC = (): JSX.Element => {
         });
         setConversations(sorted);
 
-        // Update current conversation if we have one
-        if (conversationId) {
-          const current = convos.find((c: any) => c.id === conversationId);
+        // Update current conversation if we have one (from navigation state or previously set)
+        const navStateLocal = location.state as { conversationId?: string; sellerId?: string; productData?: any } | undefined;
+        const activeConvId = conversationId || navStateLocal?.conversationId;
+
+        if (activeConvId) {
+          const current = convos.find((c: any) => c.id === activeConvId);
           if (current) {
             setCurrentConversation(current);
+            setConversationId(current.id);
+            setParticipantId(current.otherParticipant?.id || null);
+            setIsChatPinned(current.isPinned || false);
           }
-        } else if (convos.length > 0 && !conversationId) {
-          // If no active conversation, set the first one as active
+        } else if (convos.length > 0 && navStateLocal?.productData) {
+          // Only auto-open first conversation if there's a productInquiry
           const first = convos[0];
           setConversationId(first.id);
           setParticipantId(first.otherParticipant?.id || null);
           loadMessages(first.id, 1, true);
         }
+        // Otherwise, don't auto-open any chat - user must select one
       } catch (err) {
         console.warn('Failed to load conversations', err);
       }
@@ -612,7 +622,11 @@ const Messages: React.FC = (): JSX.Element => {
     let documents: any[] = [];
 
     // Check if this is a voice message - don't treat as document
-    const isVoiceMessage = msg?.messageType === 'VOICE' || msg?.type === 'voice' ||
+    // Note: Backend stores VOICE as AUDIO in the database (Prisma enum limitation)
+    const isVoiceMessage = msg?.messageType === 'VOICE' || msg?.messageType === 'AUDIO' || 
+      msg?.type === 'voice' || msg?.type === 'audio' ||
+      (msg?.audioUrl && msg.audioUrl.includes('.webm')) ||
+      (msg?.fileUrl && msg.fileUrl.includes('.webm')) ||
       (msg?.files && msg.files.length > 0 && msg.files[0]?.fileType === 'audio/webm');
 
     // If files is an array of file objects with URLs, preserve them
@@ -660,11 +674,22 @@ const Messages: React.FC = (): JSX.Element => {
     const finalDocuments = documents.length > 0 ? documents : (msg?.documents || []);
 
     // Preserve voice message properties
-    const voiceMessageType = msg?.messageType === 'VOICE' || msg?.type === 'voice' ? 'voice' : msg?.type;
+    // Note: Backend stores VOICE as AUDIO in the database
+    const voiceMessageType = isVoiceMessage ? 'voice' : msg?.type;
     // Extract voice properties from multiple sources: direct fields, productData, or files
     let voiceDuration = msg?.duration || msg?.voiceDuration;
     let voiceWaveform = msg?.waveformData || msg?.waveform;
-    let voiceAudioUrl = msg?.audioUrl || (msg?.files && msg.files[0]?.fileUrl && msg.files[0]?.fileType === 'audio/webm' ? msg.files[0].fileUrl : null);
+    // For audioUrl: check direct audioUrl first, then fileUrl for voice messages, then files array
+    let voiceAudioUrl = msg?.audioUrl;
+    if (!voiceAudioUrl && isVoiceMessage && msg?.fileUrl) {
+      voiceAudioUrl = msg.fileUrl;
+    }
+    if (!voiceAudioUrl && msg?.files && msg.files[0]?.fileUrl) {
+      const firstFile = msg.files[0];
+      if (firstFile.fileType === 'audio/webm' || firstFile.fileUrl?.match(/\.webm$/i)) {
+        voiceAudioUrl = firstFile.fileUrl;
+      }
+    }
 
     // Check productData for voice message properties (stored there for persistence)
     if (productData && typeof productData === 'object' && !Array.isArray(productData)) {
@@ -674,6 +699,22 @@ const Messages: React.FC = (): JSX.Element => {
       if (!voiceWaveform && (productData._waveformData || productData.waveformData)) {
         voiceWaveform = productData._waveformData || productData.waveformData;
       }
+    }
+
+    // Debug logging for voice messages
+    if (isVoiceMessage || msg?.messageType === 'VOICE' || msg?.type === 'voice') {
+      console.log('[VOICE] normalizeMessage:', {
+        msgId: msg?.id,
+        directWaveform: !!msg?.waveformData,
+        directWaveformLength: msg?.waveformData?.length || 0,
+        productDataWaveform: !!(productData?._waveformData || productData?.waveformData),
+        productDataWaveformLength: (productData?._waveformData || productData?.waveformData)?.length || 0,
+        finalWaveformLength: voiceWaveform?.length || 0,
+        voiceDuration,
+        // Log sample values to check format
+        sampleValues: voiceWaveform?.slice(0, 5) || [],
+        minMax: voiceWaveform ? { min: Math.min(...voiceWaveform), max: Math.max(...voiceWaveform) } : null
+      });
     }
 
     return {
@@ -692,8 +733,9 @@ const Messages: React.FC = (): JSX.Element => {
       images: finalImages,
       documents: finalDocuments,
       // Preserve voice message properties
+      // Set type to 'voice' for voice messages regardless of backend messageType (AUDIO/VOICE)
       type: voiceMessageType || msg?.type,
-      messageType: msg?.messageType,
+      messageType: isVoiceMessage ? 'VOICE' : msg?.messageType,
       duration: voiceDuration,
       waveformData: voiceWaveform,
       audioUrl: voiceAudioUrl || msg?.audioUrl
@@ -874,6 +916,12 @@ const Messages: React.FC = (): JSX.Element => {
             });
           }
 
+          // Find temp message to preserve waveformData
+          const tempMessage = prev.find(m =>
+            (normalized.tempId && (m.tempId === normalized.tempId || m.id === normalized.tempId)) ||
+            (normalized.id && m.id === normalized.id)
+          );
+
           // Remove temp message and any existing message with the same id
           const filtered = prev.filter(m => {
             // Keep messages that don't match the tempId or the real id
@@ -884,15 +932,14 @@ const Messages: React.FC = (): JSX.Element => {
           // Add the real message from backend and deduplicate
           const messageToAdd = { ...normalized, status: 'sent', ...voiceProps };
           if (filesFromBackend) messageToAdd.files = filesFromBackend;
+          // Preserve waveform data from temp message if backend doesn't provide it
+          if (isVoiceMessage && !messageToAdd.waveformData && tempMessage?.waveformData) {
+            messageToAdd.waveformData = tempMessage.waveformData;
+          }
           const merged = deduplicateMessages([...filtered, messageToAdd]);
           upsertMessageStatuses([{ ...messageToAdd, status: 'sent' }]);
           return merged;
         });
-      }
-
-      // Clear productData after successful send
-      if (normalized.productData || normalized.isProductInquiry) {
-        setProductData(null);
       }
 
       // Always refresh conversations list to update last message and unread counts
@@ -1030,30 +1077,18 @@ const Messages: React.FC = (): JSX.Element => {
         setMessages(prevMessages =>
           prevMessages.map(msg => {
             if (String(msg.id) === String(data.messageId)) {
-              // Update reactions array if available
-              if (data.allReactions && Array.isArray(data.allReactions)) {
-                // Find current user's reaction
-                const userReaction = data.allReactions.find((r: any) => String(r.userId) === String(user?.id));
-                return {
-                  ...msg,
-                  reaction: userReaction?.reaction || null,
-                  reactions: data.allReactions
-                };
-              }
-              // If it's the current user's reaction, update it
-              if (String(data.userId) === String(user?.id)) {
-                return { ...msg, reaction: data.reaction };
-              }
-              // For other users' reactions, show the reaction emoji
-              // This ensures reactions from other users are visible
-              if (data.reaction) {
-                return {
-                  ...msg,
-                  reaction: data.reaction, // Show the reaction even if it's from another user
-                  reactions: msg.reactions || []
-                };
-              }
-              return msg;
+              // Always update with the reaction from the event
+              // The reaction field shows the most recent reaction on the message
+              const newReactions = data.allReactions && Array.isArray(data.allReactions)
+                ? data.allReactions
+                : [...(msg.reactions || []), { userId: data.userId, reaction: data.reaction, user: data.user }];
+
+              // Show the reaction that was just added (regardless of who added it)
+              return {
+                ...msg,
+                reaction: data.reaction,
+                reactions: newReactions
+              };
             }
             return msg;
           })
@@ -1159,18 +1194,6 @@ const Messages: React.FC = (): JSX.Element => {
     };
   }, [socket, conversationId, user?.id]);
 
-  // websocket connection setup
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on('connect', () => {
-  //       console.log('Socket connected!');
-  //     });
-  //     socket.on('disconnect', () => {
-  //       console.log('Socket disconnected!');
-  //     });
-  //   }
-  // }, [socket]);
-
   // Initialize conversation from navigation state
   useEffect(() => {
     const state = location.state as {
@@ -1203,6 +1226,24 @@ const Messages: React.FC = (): JSX.Element => {
         }
       );
       const rawMessages = response.data.data || [];
+
+      // Debug: Log voice messages from API response
+      rawMessages.forEach((m: any) => {
+        if (m.messageType === 'VOICE' || m.type === 'voice' || m.audioUrl || m.fileUrl?.includes('.webm')) {
+          console.log('[VOICE] Raw message from API:', {
+            id: m.id,
+            messageType: m.messageType,
+            type: m.type,
+            audioUrl: m.audioUrl,
+            fileUrl: m.fileUrl,
+            directWaveformData: m.waveformData?.length || 0,
+            directDuration: m.duration,
+            productDataType: typeof m.productData,
+            productDataContent: m.productData ? JSON.stringify(m.productData).substring(0, 200) : null
+          });
+        }
+      });
+
       const newMessages = rawMessages.map((m: any) => normalizeMessage(m, user?.id));
 
       const updatedMessages = reset
@@ -1806,8 +1847,16 @@ const Messages: React.FC = (): JSX.Element => {
     handleTypingDetection();
   };
 
-  // Typing detection logic
+  // Typing detection logic - emit socket events for real-time typing indicators
   const handleTypingDetection = () => {
+    // Only emit if we have a socket and conversation
+    if (socket && conversationId) {
+      // Emit typing_start only if not already typing
+      if (!isUserTyping) {
+        socket.emit('typing_start', { conversationId });
+      }
+    }
+
     setIsUserTyping(true);
 
     // Clear existing timer
@@ -1818,18 +1867,34 @@ const Messages: React.FC = (): JSX.Element => {
     // Set new timer to stop typing indicator after 1.5 seconds of inactivity
     const timer = setTimeout(() => {
       setIsUserTyping(false);
+      // Emit typing_stop when user stops typing
+      if (socket && conversationId) {
+        socket.emit('typing_stop', { conversationId });
+      }
     }, 1500);
 
     setTypingTimer(timer);
   };
 
-  // Function to format last message text for sidebar
-  const formatLastMessageText = (message: any, isIncoming: boolean = false): string => {
-    if (!message) return '';
+  // Function to format last message text for sidebar - returns object with type and content
+  const formatLastMessagePreview = (message: any, isIncoming: boolean = false): { type: 'text' | 'audio' | 'image' | 'document'; text: string; duration?: number } => {
+    if (!message) return { type: 'text', text: '' };
 
-    // Check for audio message
-    if (message.audioUrl || message.messageType === 'AUDIO' || message.type === 'voice') {
-      return 'sent an audio';
+    // Check for audio/voice message - check multiple sources
+    const isVoiceMessage = message.audioUrl ||
+      message.messageType === 'AUDIO' ||
+      message.messageType === 'VOICE' ||
+      message.type === 'voice' ||
+      (message.files && Array.isArray(message.files) && message.files.some((f: any) =>
+        f.fileType === 'audio/webm' || f.fileUrl?.match(/\.webm$/i)
+      )) ||
+      (message.fileUrl && message.fileUrl.match(/\.webm$/i));
+
+    if (isVoiceMessage) {
+      // Get duration from various sources
+      const duration = message.duration || message.voiceDuration ||
+        (message.productData?.voiceDuration) || (message.productData?._voiceDuration) || 0;
+      return { type: 'audio', text: 'Audio', duration };
     }
 
     // Check for image(s)
@@ -1840,28 +1905,37 @@ const Messages: React.FC = (): JSX.Element => {
       (message.fileUrl && message.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i));
 
     if (hasImages) {
-      return 'sent a photo';
+      return { type: 'image', text: 'Image' };
     }
 
-    // Check for file(s) - documents
-    const hasFiles = message.fileUrl ||
-      (message.files && Array.isArray(message.files) && message.files.length > 0) ||
+    // Check for file(s) - documents (exclude audio files)
+    const hasFiles = (message.fileUrl && !message.fileUrl.match(/\.webm$/i)) ||
+      (message.files && Array.isArray(message.files) && message.files.some((f: any) =>
+        f.fileType !== 'audio/webm' && !f.fileUrl?.match(/\.webm$/i)
+      )) ||
       (message.messageType === 'FILE');
 
     if (hasFiles && !hasImages) {
-      return 'sent a file';
+      return { type: 'document', text: 'Document' };
     }
 
     // If there's text content and it's not encrypted-looking, show it
     const content = message.content || message.text || '';
     if (content && content.trim() && !content.match(/^[A-Za-z0-9+/=]{20,}$/)) {
       // Not encrypted-looking, show the content (don't add prefix for text messages)
-      return content;
+      return { type: 'text', text: content };
     }
 
     // Default fallback - if content looks encrypted or is empty, return empty
     // The UI will show "No messages yet" if empty
-    return '';
+    return { type: 'text', text: '' };
+  };
+
+  // Helper to format duration as mm:ss
+  const formatDurationShort = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Render sidebar status indicator
@@ -2283,6 +2357,12 @@ const Messages: React.FC = (): JSX.Element => {
 
   // conversation click handler
   const handleConversationClick = useCallback((conv: any) => {
+    // Clear product data and prefilled message when switching conversations
+    setProductData(null);
+    setPreFilledMessage('');
+    setMessageText('');
+    setIsMessageSent(false);
+
     setCurrentConversation(conv);
     setConversationId(conv.id);
     setParticipantId(conv.otherParticipant?.id || null);
@@ -2306,15 +2386,29 @@ const Messages: React.FC = (): JSX.Element => {
     setIsLanguageDropdownOpen(false);
   };
 
+  // Track if we've processed the navigation state to avoid reprocessing on refresh
+  const processedStateRef = React.useRef<string | null>(null);
+
   // Handle incoming product data from Product Detail page
   useEffect(() => {
     if (location.state) {
-      const { productData, preFilledMessage, conversationId: stateConversationId } = location.state;
+      const { productData, preFilledMessage, conversationId: stateConversationId, sellerId: stateSellerId } = location.state;
 
-      // Only auto-open conversation if productData is present (product inquiry)
-      // Otherwise, user must manually click to open a conversation
-      if (stateConversationId && !conversationId && productData) {
+      // Create a unique key for this navigation state
+      const stateKey = JSON.stringify({ productId: productData?.id, conversationId: stateConversationId });
+
+      // Skip if we've already processed this state
+      if (processedStateRef.current === stateKey) {
+        return;
+      }
+
+      // Auto-open conversation if conversationId is present
+      // This handles both product inquiries and direct seller messages
+      if (stateConversationId && !conversationId) {
         setConversationId(stateConversationId);
+        if (stateSellerId) {
+          setParticipantId(stateSellerId);
+        }
         // Find and set the conversation
         const conv = conversations.find((c: any) => String(c.id) === String(stateConversationId));
         if (conv) {
@@ -2322,6 +2416,9 @@ const Messages: React.FC = (): JSX.Element => {
           setParticipantId(conv.otherParticipant?.id || null);
           setIsChatPinned(conv.isPinned || false);
           loadMessages(conv.id, 1, true);
+        } else if (conversations.length === 0) {
+          // Conversations not loaded yet, load messages anyway
+          loadMessages(stateConversationId, 1, true);
         }
       }
 
@@ -2403,9 +2500,19 @@ const Messages: React.FC = (): JSX.Element => {
         }
         // Show mobile conversation view when coming from product detail
         setShowMobileConversation(true);
+
+        // Mark this state as processed
+        processedStateRef.current = stateKey;
+
+        // Clear the navigation state to prevent reprocessing on refresh
+        window.history.replaceState({}, document.title);
+      } else if (stateConversationId) {
+        // Mark state as processed even without productData
+        processedStateRef.current = stateKey;
+        window.history.replaceState({}, document.title);
       }
     }
-  }, [location.state, isMessageSent]);
+  }, [location.state, isMessageSent, conversationId, conversations]);
 
   const handleSendMessage = async (content: string) => {
     // Ensure conversationId is set
@@ -2442,8 +2549,15 @@ const Messages: React.FC = (): JSX.Element => {
       return;
     }
 
-    if (!socket) {
-      toast.error('WebSocket not connected. Please refresh the page.');
+    if (!socket || !socket.connected) {
+      // Try to reconnect
+      reconnectSocket();
+      // Wait a bit and retry
+      setTimeout(() => {
+        if (!socket?.connected) {
+          toast.error('WebSocket not connected. Please refresh the page.');
+        }
+      }, 2000);
       return;
     }
 
@@ -2493,9 +2607,12 @@ const Messages: React.FC = (): JSX.Element => {
       const messageContent = (content.trim() || preFilledMessage.trim() || '');
       const tempId = `temp_${Date.now()}_${Math.random()}`;
 
-      // Prepare productData for sending - ensure it includes all required fields
+      // Prepare productData for sending - only if this is the first message (no messages sent yet)
+      // Check if any message in the conversation already has productData
+      const hasExistingProductInquiry = messages.some(m => m.isProductInquiry || m.productData);
+
       let productDataToSend: any = null;
-      if (productData) {
+      if (productData && !hasExistingProductInquiry && !isMessageSent) {
         productDataToSend = {
           id: productData.id,
           name: productData.name || productData.title,
@@ -2513,6 +2630,8 @@ const Messages: React.FC = (): JSX.Element => {
           deliveryAvailable: productData.deliveryAvailable,
           seller: productData.seller
         };
+        // Clear productData after preparing it for send - it should only be sent once
+        setProductData(null);
       }
 
       // Create temporary message for optimistic UI (will be replaced by backend response)
@@ -2599,13 +2718,8 @@ const Messages: React.FC = (): JSX.Element => {
             return updated;
           });
           toast.error('Failed to send message: ' + (response?.error || 'Unknown error'));
-          // Don't clear productData if sending failed - user can try again
-        } else {
-          // Clear productData only after successful send
-          if (productDataToSend) {
-            setProductData(null);
-          }
         }
+        // ProductData is already cleared when preparing the message
         // If success, the message_sent or receive_message event will update the UI
       });
 
@@ -2826,7 +2940,15 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   const handleSendVoiceMessage = async () => {
+    // Prevent multiple sends
+    if (isSendingVoice) {
+      return;
+    }
+
     if (recordingTime > 0 && socket && conversationId && user?.id) {
+      // Set sending state immediately to prevent double-clicks
+      setIsSendingVoice(true);
+
       // Clear any incoming reply state when sending a new message
       setHasIncomingReply(false);
       setIsReplyRead(false);
@@ -2843,21 +2965,38 @@ const Messages: React.FC = (): JSX.Element => {
       const audioBlob = audioChunks.length > 0 ? new Blob(audioChunks, { type: 'audio/webm' }) : null;
       if (!audioBlob) {
         toast.error('No audio recorded');
+        setIsSendingVoice(false);
         return;
       }
+
+      // Capture waveform data immediately before any async operations
+      const capturedWaveformData = [...recordedWaveforms];
+      const capturedDuration = recordingTime;
+
+      // Clear the preview immediately to prevent re-sending
+      setRecordingTime(0);
+      setAudioChunks([]);
+      setRecordedWaveforms([]);
+      setAudioLevels([]);
+
+      console.log('[VOICE] Sending voice message with waveform:', {
+        waveformLength: capturedWaveformData.length,
+        duration: capturedDuration,
+        sampleValues: capturedWaveformData.slice(0, 5)
+      });
 
       const tempId = `temp_voice_${Date.now()}_${Math.random()}`;
       const tempMessage = {
         id: tempId,
         tempId,
         type: 'voice',
-        duration: recordingTime,
+        duration: capturedDuration,
         timestamp: timeString,
         timeString: timeString,
         dateString: getDayLabel(currentTime),
         sentAt: currentTime,
         audioUrl: URL.createObjectURL(audioBlob),
-        waveformData: [...recordedWaveforms],
+        waveformData: capturedWaveformData,
         conversationId,
         senderId: user.id,
         isIncoming: false,
@@ -2926,8 +3065,8 @@ const Messages: React.FC = (): JSX.Element => {
             fileSize: audioFile.size
           }],
           replyToId: replyToMessage?.id,
-          voiceDuration: recordingTime,
-          waveformData: recordedWaveforms
+          voiceDuration: capturedDuration,
+          waveformData: capturedWaveformData
         }, (response: any) => {
           if (!response?.success) {
             // Remove temp message and show error
@@ -2944,15 +3083,13 @@ const Messages: React.FC = (): JSX.Element => {
               setMessageStatuses(prev => ({ ...prev, [String(response.message.id)]: 'delivered' }));
             }
           }
+          // Reset sending state after socket callback
+          setIsSendingVoice(false);
         });
 
-        // Clear reply preview and audio chunks after sending voice message
+        // Clear reply preview after sending voice message
         setReplyToMessage(null);
-        setAudioChunks([]);
         setMediaRecorder(null);
-        setRecordedWaveforms([]);
-        setAudioLevels([]);
-        setRecordingTime(0);
         setIsMessageSent(true);
 
         // Clean up preview audio if playing
@@ -2972,10 +3109,14 @@ const Messages: React.FC = (): JSX.Element => {
           return updated;
         });
         toast.error('Failed to send voice message: ' + (error?.message || 'Unknown error'));
+        // Reset sending state on error
+        setIsSendingVoice(false);
       }
     } else {
       if (!socket) toast.error('WebSocket not connected');
       if (!conversationId) toast.error('No active conversation');
+      // Reset sending state if conditions not met
+      setIsSendingVoice(false);
     }
   };
 
@@ -3028,7 +3169,7 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Handle audio playback with play/pause toggle and countdown
-  const handleAudioPlayback = (messageId: number, audioUrl: string, duration: number) => {
+  const handleAudioPlayback = async (messageId: number, audioUrl: string, duration: number) => {
     // If this message is already playing, pause it
     if (playingMessageId === messageId && currentAudio) {
       currentAudio.pause();
@@ -3041,12 +3182,18 @@ const Messages: React.FC = (): JSX.Element => {
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
+      setCurrentAudio(null);
+      setPlayingMessageId(null);
+      // Small delay to ensure previous audio is fully stopped
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
 
-    // Create and play new audio
+    // Create new audio
     const audio = new Audio(audioUrl);
-    setCurrentAudio(audio);
-    setPlayingMessageId(messageId);
+
+    // Apply playback speed if set
+    const currentSpeed = audioPlaybackSpeed[messageId] || 1;
+    audio.playbackRate = currentSpeed;
 
     // Initialize playback time to full duration
     setAudioPlaybackTime(prev => ({
@@ -3102,11 +3249,29 @@ const Messages: React.FC = (): JSX.Element => {
       clearInterval(updateTimer);
     };
 
-    // Apply playback speed if set
-    const currentSpeed = audioPlaybackSpeed[messageId] || 1;
-    audio.playbackRate = currentSpeed;
+    // Handle audio error
+    audio.onerror = () => {
+      setPlayingMessageId(null);
+      setCurrentAudio(null);
+      clearInterval(updateTimer);
+      console.error('Audio playback error');
+    };
 
-    audio.play();
+    // Try to play the audio
+    try {
+      setCurrentAudio(audio);
+      setPlayingMessageId(messageId);
+      await audio.play();
+    } catch (error) {
+      // Handle play() interruption gracefully
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Audio playback error:', error);
+      }
+      // Reset state if play failed
+      setPlayingMessageId(null);
+      setCurrentAudio(null);
+      clearInterval(updateTimer);
+    }
   };
 
   // Handle playback speed change
@@ -3392,18 +3557,20 @@ const Messages: React.FC = (): JSX.Element => {
                         }}
                         onClick={() => {
                           const participant = currentConversation?.otherParticipant;
-                          if (participant) {
-                            const sellerSlug = `${participant.firstName} ${participant.lastName}`
+                          if (participant && participant.id) {
+                            const sellerSlug = `${participant.firstName || ''} ${participant.lastName || ''}`
                               .toLowerCase()
                               .trim()
                               .replace(/\s+/g, '-')
-                              .replace(/[^a-z0-9-]/g, '');
+                              .replace(/[^a-z0-9-]/g, '') || participant.id;
 
                             // Store seller data in sessionStorage for SellerProfile.tsx
                             sessionStorage.setItem(`seller_${sellerSlug}_data`, JSON.stringify(participant));
                             sessionStorage.setItem(`seller_${sellerSlug}_id`, participant.id);
 
                             navigate(`/seller/${sellerSlug}`);
+                          } else {
+                            toast.error('Unable to load user profile');
                           }
                         }}
                       >
@@ -3601,7 +3768,7 @@ const Messages: React.FC = (): JSX.Element => {
                           )}
 
                           {/* Message bubble with text and/or product card and/or documents and/or voice */}
-                          {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice') && (
+                          {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice' || message.messageType === 'VOICE') && (
                             <div
                               className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'} cursor-pointer`}
                               style={{
@@ -3610,7 +3777,7 @@ const Messages: React.FC = (): JSX.Element => {
                               onClick={(e) => handleMobileIncomingMessageClick(message.id, e)}
                             >
                               {/* Voice Message Display */}
-                              {message.type === 'voice' ? (
+                              {(message.type === 'voice' || message.messageType === 'VOICE') ? (
                                 <div className="flex items-center space-x-2">
                                   {/* Avatar or Speed Button - Mobile */}
                                   {playingMessageId === message.id ? (
@@ -3901,22 +4068,22 @@ const Messages: React.FC = (): JSX.Element => {
                                           </div>
                                           <div className="flex-1">
                                             <div className="flex items-center justify-between">
-                                              <div className="text-xl font-semibold" style={{ color: message.isIncoming ? '#212121' : '#6A6A6A' }}>
-                                                {message.productData.currency || 'GBP'} {message.productData.price}
+                                              <div className="text-xl font-semibold" style={{ color: message.isIncoming ? '#212121' : '#FFFFFF' }}>
+                                                {message.productData.currency || '£'} {message.productData.price}
                                               </div>
                                               {message.productData.location && (
-                                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
+                                                <div className="flex items-center space-x-2 text-[10px]" style={{ color: message.isIncoming ? '#BABABA' : 'rgba(255,255,255,0.7)' }}>
                                                   <img src={locIcon} alt="Location" className="w-4 h-4" />
                                                   <span>{message.productData.location}</span>
                                                 </div>
                                               )}
                                             </div>
                                             <div className="flex items-center justify-between -mt-0.5">
-                                              <h4 className="text-xs font-medium" style={{ color: message.isIncoming ? '#212121' : '#6A6A6A' }}>
+                                              <h4 className="text-xs font-medium" style={{ color: message.isIncoming ? '#212121' : '#FFFFFF' }}>
                                                 {message.productData.name || message.productData.title}
                                               </h4>
                                               {message.productData.category && (
-                                                <div className="text-[10px]" style={{ color: '#BABABA' }}>
+                                                <div className="text-[10px]" style={{ color: message.isIncoming ? '#333333' : 'rgba(255,255,255,0.7)' }}>
                                                   <span>Category: {message.productData.category}</span>
                                                 </div>
                                               )}
@@ -3925,7 +4092,7 @@ const Messages: React.FC = (): JSX.Element => {
                                               <p
                                                 className="text-[10px] mt-2 leading-relaxed"
                                                 style={{
-                                                  color: message.isIncoming ? '#212121' : '#6A6A6A',
+                                                  color: message.isIncoming ? '#333333' : '#FFFFFF',
                                                   display: '-webkit-box',
                                                   WebkitLineClamp: 2,
                                                   WebkitBoxOrient: 'vertical',
@@ -3936,7 +4103,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                 {message.productData.description}
                                               </p>
                                             )}
-                                            <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
+                                            <a href="#" className="text-xs mt-1 block" style={{ color: message.isIncoming ? '#83C4F8' : '#FFFFFF' }}>
                                               baoafrik.com/product-id/
                                             </a>
                                           </div>
@@ -4373,7 +4540,7 @@ const Messages: React.FC = (): JSX.Element => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>GBP {productData.price}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>£ {productData.price}</div>
                         <div className="flex items-center space-x-0.5" style={{ fontSize: '8px', color: '#BABABA' }}>
                           <img src={locIcon} alt="Location" className="w-2.5 h-2.5" />
                           <span>{productData.location}</span>
@@ -4713,9 +4880,17 @@ const Messages: React.FC = (): JSX.Element => {
                     {/* Send Button */}
                     <button
                       onClick={handleSendVoiceMessage}
-                      className="p-1.5 text-blue-600 hover:text-blue-800"
+                      disabled={isSendingVoice}
+                      className={`p-1.5 text-blue-600 hover:text-blue-800 ${isSendingVoice ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <img src={bluIcon} alt="send" className="w-6 h-6" />
+                      {isSendingVoice ? (
+                        <svg className="animate-spin w-6 h-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <img src={bluIcon} alt="send" className="w-6 h-6" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -4745,7 +4920,7 @@ const Messages: React.FC = (): JSX.Element => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
                             <div style={{ fontSize: '9px', fontWeight: 600, color: '#64B5F6' }}>
-                              {productData.currency || 'GBP'} {productData.price}
+                              {productData.currency || '£'} {productData.price}
                             </div>
                             {productData.location && (
                               <div className="flex items-center space-x-0.5" style={{ fontSize: '7px', color: '#64B5F6' }}>
@@ -5075,7 +5250,7 @@ const Messages: React.FC = (): JSX.Element => {
                       const participantAvatar = otherParticipant?.profileImage || eboAvatar;
                       const lastMessage = conv.lastMessage;
                       const isIncoming = lastMessage && lastMessage.senderId !== user?.id;
-                      const lastMessageText = formatLastMessageText(lastMessage, isIncoming);
+                      const lastMessagePreview = formatLastMessagePreview(lastMessage, isIncoming);
                       const lastMessageTime = lastMessage?.createdAt
                         ? new Date(lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : (conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
@@ -5147,8 +5322,8 @@ const Messages: React.FC = (): JSX.Element => {
                                 </div>
                               </div>
                               <div className="flex items-center justify-between -mt-1">
-                                <p className="text-xs md:text-sm truncate">
-                                  {lastMessageText ? (
+                                <p className="text-xs md:text-sm truncate flex items-center">
+                                  {lastMessagePreview.text ? (
                                     <>
                                       {isIncoming ? null : (
                                         <span
@@ -5161,7 +5336,41 @@ const Messages: React.FC = (): JSX.Element => {
                                           You
                                         </span>
                                       )}
-                                      <span style={{ color: '#4D4D4D' }}>{lastMessageText}</span>
+                                      {/* Render icon based on message type */}
+                                      {lastMessagePreview.type === 'audio' && (
+                                        <span className="flex items-center" style={{ color: '#4D4D4D' }}>
+                                          {/* <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                          </svg> */}
+                                          <img src={audioIcon} alt="audio" className="w-4 h-4 mr-1" />
+                                          {lastMessagePreview.duration ? (
+                                            <>
+                                              <span>{formatDurationShort(lastMessagePreview.duration)}</span>
+                                              <span className="mx-1">-</span>
+                                            </>
+                                          ) : null}
+                                          <span>{lastMessagePreview.text}</span>
+                                        </span>
+                                      )}
+                                      {lastMessagePreview.type === 'image' && (
+                                        <span className="flex items-center" style={{ color: '#4D4D4D' }}>
+                                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                          </svg>
+                                          {lastMessagePreview.text}
+                                        </span>
+                                      )}
+                                      {lastMessagePreview.type === 'document' && (
+                                        <span className="flex items-center" style={{ color: '#4D4D4D' }}>
+                                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                          </svg>
+                                          {lastMessagePreview.text}
+                                        </span>
+                                      )}
+                                      {lastMessagePreview.type === 'text' && (
+                                        <span style={{ color: '#4D4D4D' }}>{lastMessagePreview.text}</span>
+                                      )}
                                     </>
                                   ) : (
                                     <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>No messages yet</span>
@@ -6080,18 +6289,20 @@ const Messages: React.FC = (): JSX.Element => {
                             }}
                             onClick={() => {
                               const participant = currentConversation?.otherParticipant;
-                              if (participant) {
-                                const sellerSlug = `${participant.firstName} ${participant.lastName}`
+                              if (participant && participant.id) {
+                                const sellerSlug = `${participant.firstName || ''} ${participant.lastName || ''}`
                                   .toLowerCase()
                                   .trim()
                                   .replace(/\s+/g, '-')
-                                  .replace(/[^a-z0-9-]/g, '');
+                                  .replace(/[^a-z0-9-]/g, '') || participant.id;
 
                                 // Store seller data in sessionStorage for SellerProfile.tsx
                                 sessionStorage.setItem(`seller_${sellerSlug}_data`, JSON.stringify(participant));
                                 sessionStorage.setItem(`seller_${sellerSlug}_id`, participant.id);
 
                                 navigate(`/seller/${sellerSlug}`);
+                              } else {
+                                toast.error('Unable to load user profile');
                               }
                             }}
                           >
@@ -6218,9 +6429,16 @@ const Messages: React.FC = (): JSX.Element => {
                               position: isReactionActive ? 'relative' : 'static',
                               zIndex: isReactionActive ? 50 : 'auto'
                             }}
+                            onMouseEnter={() => setHoveredMessageId(message.id)}
+                            onMouseLeave={() => {
+                              // Only clear hover if no popup is active
+                              if (activeReactionMessageId !== message.id && activeMessageOptionsId !== message.id) {
+                                setHoveredMessageId(null);
+                              }
+                            }}
                           >
                             {/* Reaction and Option Icons - LEFT side for outgoing messages */}
-                            {!message.isIncoming && clickedMessageId === message.id && (
+                            {!message.isIncoming && (hoveredMessageId === message.id || activeReactionMessageId === message.id || activeMessageOptionsId === message.id) && (
                               <div className="flex items-center mr-1 self-center reaction-container relative" style={{ zIndex: (activeReactionMessageId === message.id || activeMessageOptionsId === message.id) ? 999 : 'auto' }}>
                                 <button
                                   className="p-1 hover:opacity-70 transition-opacity"
@@ -6457,7 +6675,7 @@ const Messages: React.FC = (): JSX.Element => {
                               )}
 
                               {/* Message bubble (only if there's text or voice or documents) */}
-                              {((!message.images || message.images.length === 0) && (message.text || message.type === 'voice' || (message.documents && message.documents.length > 0))) && (
+                              {((!message.images || message.images.length === 0) && (message.text || message.type === 'voice' || message.messageType === 'VOICE' || (message.documents && message.documents.length > 0))) && (
                                 <div
                                   className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`}
                                   style={{
@@ -6800,22 +7018,22 @@ const Messages: React.FC = (): JSX.Element => {
                                               </div>
                                               <div className="flex-1">
                                                 <div className="flex items-center justify-between">
-                                                  <div className="text-xl font-semibold" style={{ color: '#FFFFFF' }}>
-                                                    {message.productData.currency || 'GBP'} {message.productData.price}
+                                                  <div className="text-xl font-semibold" style={{ color: '#333333' }}>
+                                                    {message.productData.currency || '£'} {message.productData.price}
                                                   </div>
                                                   {message.productData.location && (
-                                                    <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#FFFFFF' }}>
+                                                    <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#333333' }}>
                                                       <img src={locIcon} alt="Location" className="w-4 h-4" />
                                                       <span>{message.productData.location}</span>
                                                     </div>
                                                   )}
                                                 </div>
                                                 <div className="flex items-center justify-between -mt-0.5">
-                                                  <h4 className="text-xs font-medium" style={{ color: '#FFFFFF' }}>
+                                                  <h4 className="text-xs font-medium" style={{ color: '#333333' }}>
                                                     {message.productData.name || message.productData.title}
                                                   </h4>
                                                   {message.productData.category && (
-                                                    <div className="text-[10px]" style={{ color: '#FFFFFF' }}>
+                                                    <div className="text-[10px]" style={{ color: '#333333' }}>
                                                       <span>Category: {message.productData.category}</span>
                                                     </div>
                                                   )}
@@ -6824,7 +7042,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                   <p
                                                     className="text-[10px] mt-2 leading-relaxed"
                                                     style={{
-                                                      color: '#FFFFFF',
+                                                      color: '#333333',
                                                       display: '-webkit-box',
                                                       WebkitLineClamp: 2,
                                                       WebkitBoxOrient: 'vertical',
@@ -7122,7 +7340,7 @@ const Messages: React.FC = (): JSX.Element => {
                             </div>
 
                             {/* Reaction and Option Icons - RIGHT side for incoming messages only */}
-                            {message.isIncoming && clickedMessageId === message.id && (
+                            {message.isIncoming && (hoveredMessageId === message.id || activeReactionMessageId === message.id || activeMessageOptionsId === message.id) && (
                               <div className="flex items-center ml-1 self-center reaction-container relative" style={{ zIndex: (activeReactionMessageId === message.id || activeMessageOptionsId === message.id) ? 999 : 'auto' }}>
                                 <button
                                   className="p-1 hover:opacity-70 transition-opacity"
@@ -7425,7 +7643,7 @@ const Messages: React.FC = (): JSX.Element => {
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
                                 <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>
-                                  {productData.currency || 'GBP'} {productData.price}
+                                  {productData.currency || '£'} {productData.price}
                                 </div>
                                 <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
                                   <img src={locIcon} alt="Location" className="w-4 h-4" />
@@ -7770,17 +7988,26 @@ const Messages: React.FC = (): JSX.Element => {
                               caretColor: '#64B5F6'
                             }}
                             onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
+                              if (e.key === 'Enter' && !isSendingVoice) {
                                 handleSendVoiceMessage();
                               }
                             }}
+                            disabled={isSendingVoice}
                           />
                         </div>
                         <button
                           onClick={handleSendVoiceMessage}
-                          className="p-2 text-blue-600 hover:text-blue-800"
+                          disabled={isSendingVoice}
+                          className={`p-2 text-blue-600 hover:text-blue-800 ${isSendingVoice ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          <img src={bluIcon} alt="send" className="w-7 h-7" />
+                          {isSendingVoice ? (
+                            <svg className="animate-spin w-7 h-7 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          ) : (
+                            <img src={bluIcon} alt="send" className="w-7 h-7" />
+                          )}
                         </button>
                       </div>
                     </div>

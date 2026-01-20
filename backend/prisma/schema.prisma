@@ -13,6 +13,7 @@ model User {
   firstName                String?   @map("first_name")
   lastName                 String?   @map("last_name")
   phoneNumber              String?   @map("phone_number")
+  phoneCode                String?   @map("phone_code")
   passwordHash             String?   @map("password_hash")
   profileImage             String?   @map("profile_image")
   gender                   String?
@@ -142,11 +143,26 @@ model ProductReview {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product            Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helpfulnessVotes   ReviewHelpfulness[]
 
   @@unique([productId, userId])
   @@map("product_reviews")
+}
+
+model ReviewHelpfulness {
+  id        String   @id @default(uuid())
+  reviewId  String   @map("review_id")
+  userId    String   @map("user_id")
+  isHelpful Boolean  @map("is_helpful")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  review ProductReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@map("review_helpfulness")
 }
 
 model Message {

@@ -44,6 +44,8 @@ import bookmarkIcon from '../assets/images/pre/bm.svg';
 import spIcon from '../assets/images/pre/sp.svg';
 import availableIcon from '../assets/images/pre/av.svg';
 import trashIcon from '../assets/images/pre/trash.svg';
+import redtrashIcon from '../assets/images/pre/redtrash.svg';
+import verityIcon from '../assets/images/pre/verity.svg';
 import activeIcon from '../assets/images/pre/active.svg';
 import inactiveIcon from '../assets/images/pre/inactive.svg';
 import repostIcon from '../assets/images/pre/repost.svg';
@@ -122,6 +124,7 @@ interface Product {
   status: string;
   createdAt: string;
   updatedAt: string;
+  publishedAt?: string | null;
   expiresAt?: string | null;
   images: ProductImage[] | string;
   seller: Seller;
@@ -292,11 +295,60 @@ const ProductDetail: React.FC = () => {
   const [showGiveOpinionModal, setShowGiveOpinionModal] = useState(false);
   const [showMessagesDropdown, setShowMessagesDropdown] = useState(false);
   const [showRepostModal, setShowRepostModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isReposting, setIsReposting] = useState(false);
+  const [localListingStatus, setLocalListingStatus] = useState<'active' | 'inactive' | null>(null);
+  const [localPublishedAt, setLocalPublishedAt] = useState<string | null>(null);
   const messagesDropdownRef = useRef<HTMLDivElement>(null);
   const repostModalRef = useRef<HTMLDivElement>(null);
   const ownerViewState = routerLocation.state as OwnerListingState | null;
-  const ownerListing = ownerViewState?.listing;
-  const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListing);
+  const ownerListingFromState = ownerViewState?.listing;
+  
+  // Determine if current user is the owner of this product
+  const isProductOwner = user && product?.seller?.id === user.id;
+  
+  // Use owner view if navigating from MyListings OR if user owns the product
+  const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListingFromState) || Boolean(isProductOwner);
+  
+  // Compute the current listing status - use localListingStatus if set, otherwise derive from product/navigation state
+  const currentListingStatus: 'active' | 'inactive' = localListingStatus || 
+    ownerListingFromState?.status || 
+    (product?.status === 'PUBLISHED' ? 'active' : 'inactive');
+
+  // Build ownerListing - merge navigation state with local updates
+  const computedDaysLeft = (() => {
+    // If local status was just updated to active (reposted), daysLeft should be undefined (7 days left > 3)
+    if (localListingStatus === 'active') return undefined;
+    
+    // Use ownerListingFromState.daysLeft if available
+    if (ownerListingFromState?.daysLeft !== undefined) {
+      return ownerListingFromState.daysLeft <= 3 ? ownerListingFromState.daysLeft : undefined;
+    }
+    
+    // Calculate from product.expiresAt
+    if (product?.expiresAt) {
+      const daysLeft = Math.ceil((new Date(product.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      // Only show daysLeft if 3 days or less
+      return daysLeft <= 3 && daysLeft > 0 ? daysLeft : undefined;
+    }
+    
+    return undefined;
+  })();
+
+  const ownerListing = (isOwnerView && (ownerListingFromState || product)) ? {
+    id: ownerListingFromState?.id || product?.id || '',
+    title: ownerListingFromState?.title || product?.title || '',
+    price: ownerListingFromState?.price || product?.price?.toString() || '0',
+    currency: ownerListingFromState?.currency || product?.currency || 'GCP',
+    status: currentListingStatus,
+    daysLeft: computedDaysLeft,
+    createdAt: ownerListingFromState?.createdAt || (product?.createdAt ? new Date(product.createdAt).getTime() : Date.now()),
+    messages: ownerListingFromState?.messages || 0,
+    reviewStatus: ownerListingFromState?.reviewStatus,
+    reviewFailureReason: ownerListingFromState?.reviewFailureReason
+  } : null;
 
   const [isMobile, setIsMobile] = useState(false);
   const mobileMessagesModalRef = useRef<HTMLDivElement>(null);
@@ -335,6 +387,122 @@ const ProductDetail: React.FC = () => {
   const { addToast } = useToast();
 
   const API_BASE = process.env.REACT_APP_API_URL;
+
+  // Handle delete listing
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteClose = () => {
+    setShowDeleteModal(false);
+    setIsDeleteSuccess(false);
+    setIsDeleting(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!product?.id) return;
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${API_BASE}/products/${product.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || 'Failed to delete product');
+      }
+
+      setIsDeleteSuccess(true);
+      addToast({ type: 'success', title: 'Success', message: 'Listing deleted successfully', duration: 2000 });
+    } catch (e: any) {
+      console.error('Delete product error', e);
+      setIsDeleteSuccess(false);
+      addToast({ type: 'error', title: 'Error', message: (e && e.message) || 'Failed to delete product', duration: 3000 });
+      setShowDeleteModal(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Handle republish listing (repost the listing - change status to PUBLISHED)
+  const handleRepostListing = async () => {
+    if (!product?.id) return;
+    setIsReposting(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${API_BASE}/products/${product.id}/status`, {
+        method: 'PATCH',
+        headers: { 
+          Authorization: `Bearer ${token}`, 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ status: 'PUBLISHED' })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || 'Failed to republish listing');
+      }
+
+      // Update local status to active
+      setLocalListingStatus('active');
+      
+      // Update the published date to current time (backend sets this too)
+      const newPublishedAt = new Date().toISOString();
+      setLocalPublishedAt(newPublishedAt);
+      
+      // Update product status and publishedAt in state
+      setProduct(prev => prev ? { ...prev, status: 'PUBLISHED', publishedAt: newPublishedAt } : prev);
+
+      addToast({ type: 'success', title: 'Success', message: 'Listing republished successfully', duration: 2000 });
+      setShowRepostModal(false);
+    } catch (e: any) {
+      console.error('Repost product error', e);
+      addToast({ type: 'error', title: 'Error', message: (e && e.message) || 'Failed to republish listing', duration: 3000 });
+    } finally {
+      setIsReposting(false);
+    }
+  };
+
+  // Handle edit and repost - navigate to create listing with all product details
+  const handleEditAndRepost = () => {
+    if (!product) return;
+    
+    // Build the prefill data with all product details
+    const prefillData = {
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price?.toString() || '',
+      currency: product.currency || 'GCP',
+      quantity: product.quantity?.toString() || '1',
+      category: product.category || '',
+      origin: product.origin || '',
+      originCode: product.originCode || '',
+      location: product.location || '',
+      saleType: product.saleType || 'DEFAULT',
+      deliveryAvailable: product.deliveryAvailable || false,
+      images: Array.isArray(product.images) 
+        ? product.images.map((img: any) => typeof img === 'string' ? img : img.url)
+        : (product.imageUrls || []),
+      isRepost: true // Flag to indicate this is a repost/edit
+    };
+    
+    navigate('/create-listing', { state: { draft: prefillData } });
+    setShowRepostModal(false);
+  };
+
+  // Initialize local listing status from navigation state or product status
+  useEffect(() => {
+    if (ownerListingFromState?.status) {
+      setLocalListingStatus(ownerListingFromState.status);
+    } else if (product?.status) {
+      // Map backend status to frontend status
+      setLocalListingStatus(product.status === 'PUBLISHED' ? 'active' : 'inactive');
+    }
+  }, [ownerListingFromState?.status, product?.status]);
 
   // Mobile detection
   useEffect(() => {
@@ -867,17 +1035,46 @@ const ProductDetail: React.FC = () => {
 
   const images = getProductImages(product);
 
-  // format published data
-  const getPublishedDate = (createdAt: string) => {
-    const date = new Date(createdAt);
+  // format published date - shows actual date with relative time in brackets
+  // Use publishedAt if available (for republished listings), otherwise fall back to createdAt
+  const getPublishedDate = (dateString: string) => {
+    const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return "Published 1 day ago";
-    if (diffDays <= 7) return `Published ${diffDays} days ago`;
-    if (diffDays <= 30) return `Published ${Math.ceil(diffDays / 7)} weeks ago`;
-    return `Published ${Math.ceil(diffDays / 30)} months ago`;
+    // Format the actual date (e.g., "Mon, 21 Dec 2024")
+    const formattedDate = date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    // Calculate relative time for brackets
+    let relativeTime = '';
+    if (diffDays === 0) {
+      relativeTime = 'Today';
+    } else if (diffDays === 1) {
+      relativeTime = '1 day ago';
+    } else if (diffDays <= 7) {
+      relativeTime = `${diffDays} days ago`;
+    } else if (diffDays <= 30) {
+      const weeks = Math.floor(diffDays / 7);
+      relativeTime = weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
+    } else {
+      const months = Math.floor(diffDays / 30);
+      relativeTime = months === 1 ? '1 month ago' : `${months} months ago`;
+    }
+
+    return `${formattedDate} (${relativeTime})`;
+  };
+  
+  // Get the display date - prefer localPublishedAt (after repost), then product.publishedAt, then product.createdAt
+  const getDisplayPublishedDate = (): string => {
+    const dateToUse = localPublishedAt || product?.publishedAt || product?.createdAt;
+    if (!dateToUse) return 'Unknown date';
+    return getPublishedDate(dateToUse);
   };
 
   // Safe seller access functions
@@ -1081,7 +1278,7 @@ const ProductDetail: React.FC = () => {
             name: product.title,
             title: product.title,
             price: product.price,
-            currency: product.currency || 'USD',
+            currency: product.currency || 'GCP',
             description: product.description || '',
             image: primaryImage, // Primary image URL
             images: imageUrls, // All image URLs array
@@ -1470,6 +1667,7 @@ const ProductDetail: React.FC = () => {
                   type="button"
                   className="flex items-center justify-center"
                   style={{ backgroundColor: '#FFE9E9', width: '40px', height: '32px', borderRadius: '12px' }}
+                  onClick={() => handleDeleteClick()}
                 >
                   <img src={trashIcon} alt="Delete listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
                 </button>
@@ -1478,7 +1676,7 @@ const ProductDetail: React.FC = () => {
                     type="button"
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
                     style={{ backgroundColor: '#F4F4F4', color: '#939393', fontSize: '13px' }}
-                    onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
+                    onClick={() => handleEditAndRepost()}
                   >
                     <img src={pencilIcon} alt="Edit listing" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
                     Edit listing
@@ -1515,8 +1713,7 @@ const ProductDetail: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate('/create-listing', { state: { draft: ownerListing ?? null } });
-                            setShowRepostModal(false);
+                            handleEditAndRepost();
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded transition-colors"
                           style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '13px' }}
@@ -1529,10 +1726,9 @@ const ProductDetail: React.FC = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Handle repost functionality
-                            console.log('Repost the listing');
-                            setShowRepostModal(false);
+                            handleRepostListing();
                           }}
+                          disabled={isReposting}
                           className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded transition-colors"
                           style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '13px' }}
                         >
@@ -1540,7 +1736,7 @@ const ProductDetail: React.FC = () => {
                             <path d="M1 4v6h6M23 20v-6h-6" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
-                          <span>Repost the listing</span>
+                          <span>{isReposting ? 'Republishing...' : 'Repost the listing'}</span>
                         </button>
 
                         {/* Option 3: Close */}
@@ -1727,7 +1923,7 @@ const ProductDetail: React.FC = () => {
                   {displayPrice}
                 </div>
                 <span className="font-light" style={{ fontSize: '12px', color: '#6A6A6A', whiteSpace: 'nowrap' }}>
-                  {product.createdAt ? getPublishedDate(product.createdAt) : displayDateLabel}
+                  {getDisplayPublishedDate()}
                 </span>
               </div>
 
@@ -2370,10 +2566,7 @@ const ProductDetail: React.FC = () => {
                     >
                       The time for your product to appear on our marketplace has expired. You can{' '}
                       <button
-                        onClick={() => {
-                          // Handle repost functionality
-                          console.log('Repost listing');
-                        }}
+                        onClick={() => handleRepostListing()}
                         className="underline"
                         style={{ color: '#6A6A6A' }}
                       >
@@ -2381,10 +2574,7 @@ const ProductDetail: React.FC = () => {
                       </button>
                       {' '}or{' '}
                       <button
-                        onClick={() => {
-                          // Handle remove functionality
-                          console.log('Remove listing');
-                        }}
+                        onClick={() => handleDeleteClick()}
                         className="underline"
                         style={{ color: '#6A6A6A' }}
                       >
@@ -2422,7 +2612,7 @@ const ProductDetail: React.FC = () => {
                 )}
               </div>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {isOwnerView ? displayPrice : `USD ${product.price}`}
+                {isOwnerView ? displayPrice : `GCP ${product.price}`}
               </div>
             </div>
             {!isOwnerView && (
@@ -2475,6 +2665,7 @@ const ProductDetail: React.FC = () => {
                         border: 'none',
                         cursor: 'pointer'
                       }}
+                      onClick={() => handleDeleteClick()}
                     >
                       <img src={trashIcon} alt="Delete" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
                     </button>
@@ -2515,8 +2706,7 @@ const ProductDetail: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate('/create-listing', { state: { draft: ownerListing ?? null } });
-                              setShowRepostModal(false);
+                              handleEditAndRepost();
                             }}
                             className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-gray-50 rounded transition-colors"
                             style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
@@ -2529,14 +2719,14 @@ const ProductDetail: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Repost the listing');
-                              setShowRepostModal(false);
+                              handleRepostListing();
                             }}
+                            disabled={isReposting}
                             className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-gray-50 rounded transition-colors"
                             style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}
                           >
                             <img src={repostIcon} alt="Repost" className="w-3.5 h-3.5" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
-                            <span>Repost the listing</span>
+                            <span>{isReposting ? 'Republishing...' : 'Repost the listing'}</span>
                           </button>
 
                           {/* Option 3: Close */}
@@ -2576,7 +2766,7 @@ const ProductDetail: React.FC = () => {
                         border: 'none',
                         cursor: 'pointer'
                       }}
-                      onClick={() => navigate('/create-listing', { state: { draft: ownerListing ?? null } })}
+                      onClick={() => handleEditAndRepost()}
                     >
                       <img src={pencilIcon} alt="Edit" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(46%) sepia(4%) saturate(18%) hue-rotate(355deg) brightness(96%) contrast(91%)' }} />
                     </button>
@@ -2591,6 +2781,7 @@ const ProductDetail: React.FC = () => {
                         border: 'none',
                         cursor: 'pointer'
                       }}
+                      onClick={() => handleDeleteClick()}
                     >
                       <img src={trashIcon} alt="Delete" className="w-4 h-4" style={{ filter: 'brightness(0) saturate(100%) invert(53%) sepia(46%) saturate(3205%) hue-rotate(332deg) brightness(103%) contrast(102%)' }} />
                     </button>
@@ -2785,8 +2976,8 @@ const ProductDetail: React.FC = () => {
                   }}
                 >
                   The time for your product to appear on our marketplace has expired. You can{' '}
-                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => setShowRepostModal(true)}>repost it</span> or{' '}
-                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }}>remove it</span>.
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => handleRepostListing()}>repost it</span> or{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => handleDeleteClick()}>remove it</span>.
                 </p>
               </div>
             </div>
@@ -2834,8 +3025,8 @@ const ProductDetail: React.FC = () => {
                   }}
                 >
                   Your item will soon be removed from our marketplace. You can{' '}
-                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => setShowRepostModal(true)}>repost it</span> or{' '}
-                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }}>remove it</span>.
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => handleRepostListing()}>repost it</span> or{' '}
+                  <span style={{ color: '#6A6A6A', cursor: 'pointer' }} onClick={() => handleDeleteClick()}>remove it</span>.
                 </p>
               </div>
             </div>
@@ -2879,7 +3070,7 @@ const ProductDetail: React.FC = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="font-light" style={{ fontSize: '10px' }}>{displayDateLabel}</span>
+                <span className="font-light" style={{ fontSize: '10px' }}>{getDisplayPublishedDate()}</span>
               </div>
             )}
           </div>
@@ -3269,10 +3460,7 @@ const ProductDetail: React.FC = () => {
                 >
                   The time for your product to appear on our marketplace has expired. You can{' '}
                   <button
-                    onClick={() => {
-                      // Handle repost functionality
-                      console.log('Repost listing');
-                    }}
+                    onClick={() => handleRepostListing()}
                     className="underline"
                     style={{ color: '#6A6A6A' }}
                   >
@@ -3280,10 +3468,7 @@ const ProductDetail: React.FC = () => {
                   </button>
                   {' '}or{' '}
                   <button
-                    onClick={() => {
-                      // Handle remove functionality
-                      console.log('Remove listing');
-                    }}
+                    onClick={() => handleDeleteClick()}
                     className="underline"
                     style={{ color: '#6A6A6A' }}
                   >
@@ -4166,7 +4351,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4265,7 +4450,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4364,7 +4549,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4463,7 +4648,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4562,7 +4747,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4661,7 +4846,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4770,7 +4955,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          USD 31.7
+                          GCP 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4870,7 +5055,7 @@ const ProductDetail: React.FC = () => {
                       <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                         <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                           <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                            USD 31.7
+                            GCP 31.7
                           </div>
                           <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                             display: 'flex',
@@ -5477,6 +5662,174 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
         </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && product && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            display: 'flex',
+            alignItems: isMobile ? 'flex-end' : 'center',
+            justifyContent: 'center',
+            zIndex: 10000
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleDeleteClose();
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '30px',
+              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+              padding: '30px',
+              paddingBottom: isMobile ? '8px' : '15px',
+              maxWidth: '420px',
+              width: isMobile ? '95%' : '90%',
+              minHeight: '320px',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              marginBottom: isMobile ? '12px' : '0'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={handleDeleteClose}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {/* Icon */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+              <img
+                src={isDeleteSuccess ? verityIcon : redtrashIcon}
+                alt={isDeleteSuccess ? 'Success' : 'Delete'}
+                style={{ width: '80px', height: '80px' }}
+              />
+            </div>
+
+            {/* Text */}
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+              <p
+                style={{
+                  color: '#212121',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                  margin: 0
+                }}
+              >
+                {isDeleteSuccess
+                  ? `The item "${product.title}" has been successfully removed.`
+                  : (
+                    <>
+                      The item "{product.title}" will be<br />
+                      permanently deleted, do you<br />
+                      wish to continue ?
+                    </>
+                  )}
+              </p>
+            </div>
+
+            {/* Buttons */}
+            {isDeleteSuccess ? (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDeleteClose();
+                    navigate('/my-listings');
+                  }}
+                  style={{
+                    backgroundColor: '#F9A825',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: isMobile ? '8px 120px' : '10px 140px',
+                    cursor: 'pointer',
+                    color: '#FFFFFF',
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: isMobile ? '13px' : '14px',
+                    fontWeight: 300
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={handleDeleteClose}
+                  style={{
+                    backgroundColor: '#F1F1F1',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: isMobile ? '8px 24px' : '10px 28px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <svg width={isMobile ? "14" : "16"} height={isMobile ? "14" : "16"} viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                  <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>Cancel</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                  style={{
+                    backgroundColor: '#FF5151',
+                    borderRadius: '12px',
+                    border: 'none',
+                    padding: isMobile ? '8px 24px' : '10px 28px',
+                    cursor: isDeleting ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    opacity: isDeleting ? 0.7 : 1
+                  }}
+                >
+                  <img src={trashIcon} alt="Delete" style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', filter: 'brightness(0) invert(1)' }} />
+                  <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? '13px' : '14px' }}>
+                    {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+                  </span>
+                </button>
+              </div>
+            )}
+
+            {/* Drag Indicator - Mobile Only */}
+            {isMobile && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '44px', marginBottom: '12px' }}>
+                <div style={{ width: '100px', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px' }}></div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
     </div>

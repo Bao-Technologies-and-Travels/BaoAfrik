@@ -19,8 +19,7 @@ router.post('/contact-seller', chatController.contactSeller);
 router.post('/contact-request', chatController.contactRequest);
 
 router.post('/conversations/:conversationId/messages', chatController.sendMessage);
-router.get('/conversations/:conversationId/messages', chatController.getMessages);
-router.post('/conversations/:conversationId/read', chatController.markAsRead);
+// Note: GET /conversations/:conversationId/messages is already defined above using getConversationMessages
 
 // Message reactions
 router.post('/messages/:messageId/reactions', chatController.addReaction);

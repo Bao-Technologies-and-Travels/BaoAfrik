@@ -664,6 +664,7 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
       firstName: true,
       lastName: true,
       phoneNumber: true,
+      phoneCode: true,
       profileImage: true,
       gender: true,
       birthDate: true,
@@ -705,6 +706,7 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
     birthDate,
     profileImage,
     phoneNumber,
+    phoneCode,
     bio,
     location
   } = req.body;
@@ -717,6 +719,7 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
   if (gender !== undefined) updateData.gender = gender;
   if (birthDate !== undefined) updateData.birthDate = new Date(birthDate);
   if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+  if (phoneCode !== undefined) updateData.phoneCode = phoneCode;
   if (bio !== undefined) updateData.bio = bio;
   if (location !== undefined) updateData.location = location;
 
@@ -729,6 +732,7 @@ export const updateProfile = asyncHandler(async (req: Request<{}, {}, UpdateProf
       firstName: true,
       lastName: true,
       phoneNumber: true,
+      phoneCode: true,
       profileImage: true,
       gender: true,
       birthDate: true,
