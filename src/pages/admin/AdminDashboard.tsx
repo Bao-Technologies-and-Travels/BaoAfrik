@@ -102,12 +102,12 @@ const AdminDashboard: React.FC = () => {
   ];
 
   const mockListings = [
-    { id: 1, name: 'Kevin Organic Oil', image: avatar, category: 'Food & Spices' },
-    { id: 2, name: 'Organic Coconut Oil', image: avatar, category: 'Food & Spices' },
+    { id: 1, name: 'Kevin Organic Oil', image: require('../../assets/images/pre/a1.png'), category: 'Food & Spices' },
+    { id: 2, name: 'Organic Coconut Oil', image: require('../../assets/images/pre/a2.png'), category: 'Food & Spices' },
   ];
 
   const mockRequests = [
-    { id: 1, name: 'White Pepper for Kevination...', image: avatar, category: 'Food & Spices' },
+    { id: 1, name: 'White Pepper for Kevination...', image: require('../../assets/images/pre/a3.png'), category: 'Food & Spices' },
   ];
 
   // Mock notification data
@@ -147,10 +147,10 @@ const AdminDashboard: React.FC = () => {
         results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
       });
       mockListings.filter(listing => listing.name.toLowerCase().includes(query)).forEach(listing => {
-        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail...' });
+        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail.', image: listing.image });
       });
       mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
-        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...' });
+        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail.', image: request.image });
       });
       
       setSearchResults(results);
@@ -174,10 +174,10 @@ const AdminDashboard: React.FC = () => {
         results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
       });
       mockListings.filter(listing => listing.name.toLowerCase().includes(query)).forEach(listing => {
-        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail...' });
+        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail.', image: listing.image });
       });
       mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
-        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...' });
+        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail.', image: request.image });
       });
       
       setSearchResults(results);
@@ -725,7 +725,7 @@ const AdminDashboard: React.FC = () => {
                       {searchResults.slice(0, 3).map((result: any, index: number) => (
                         <div key={`${result.type}-${result.id}-${index}`} style={{
                           display: 'flex',
-                          alignItems: 'center',
+                          alignItems: 'flex-start',
                           gap: '10px',
                           padding: '6px',
                           cursor: 'pointer'
@@ -738,8 +738,7 @@ const AdminDashboard: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            flexShrink: 0,
-                            position: 'relative'
+                            flexShrink: 0
                           }}>
                             <img 
                               src={result.image || result.avatar} 
@@ -751,37 +750,29 @@ const AdminDashboard: React.FC = () => {
                                 objectFit: 'cover' 
                               }} 
                             />
+                          </div>
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '3px',
+                            flex: 1,
+                            minWidth: 0,
+                            paddingTop: '4px'
+                          }}>
                             <span style={{
-                              position: 'absolute',
-                              top: '-2px',
-                              right: '-2px',
-                              fontSize: '7px',
+                              fontSize: '8px',
                               color: '#64B5F6',
                               fontFamily: 'Poppins, sans-serif',
-                              whiteSpace: 'nowrap',
-                              backgroundColor: '#FFFFFF',
-                              padding: '1px 2px',
-                              borderRadius: '2px',
-                              lineHeight: 1.1,
-                              maxWidth: '70px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
+                              lineHeight: 1.2
                             }}>
                               {result.path}
                             </span>
                             <span style={{
-                              position: 'absolute',
-                              bottom: '-2px',
-                              right: '-2px',
-                              fontSize: '10px',
+                              fontSize: '13px',
                               color: '#6A6A6A',
                               fontFamily: 'Bricolage Grotesque, sans-serif',
                               fontWeight: 500,
-                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                              padding: '1px 3px',
-                              borderRadius: '2px',
                               lineHeight: 1.2,
-                              maxWidth: '90px',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
