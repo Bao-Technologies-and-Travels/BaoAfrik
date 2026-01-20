@@ -37,6 +37,32 @@ const AdminDashboard: React.FC = () => {
   const notificationDropdownRef = useRef<HTMLDivElement>(null);
   const menuDropdownRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Search state
+  const [searchValue, setSearchValue] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchMode, setSearchMode] = useState<'suggestions' | 'category' | 'direct'>('suggestions');
+  const [selectedCategory, setSelectedCategory] = useState<'users' | 'listings' | 'requests' | null>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+
+  // Mock data for search
+  const mockUsers = [
+    { id: 1, name: 'Kevin Mobinnid', plan: 'Free Plan', verified: false, avatar: avatar },
+    { id: 2, name: 'Kevin Roland Tadjil', plan: 'Starter Plan', verified: true, avatar: avatar },
+    { id: 3, name: 'Kevin Nel Amstrong', plan: 'Free Plan', verified: false, avatar: avatar },
+    { id: 4, name: 'Kevin Tala N\'kom', plan: 'Pro Plan', verified: true, avatar: avatar },
+  ];
+
+  const mockListings = [
+    { id: 1, name: 'Kevin Organic Oil', image: avatar, category: 'Food & Spices' },
+    { id: 2, name: 'Organic Coconut Oil', image: avatar, category: 'Food & Spices' },
+  ];
+
+  const mockRequests = [
+    { id: 1, name: 'White Pepper for Kevination...', image: avatar, category: 'Food & Spices' },
+  ];
 
   // Mock notification data
   const [notifications, setNotifications] = useState([
@@ -58,6 +84,66 @@ const AdminDashboard: React.FC = () => {
 
   const unreadCount = notifications.filter(notif => !notif.isRead).length;
 
+  // Handle search input changes
+  useEffect(() => {
+    if (searchValue === '/') {
+      setSearchMode('suggestions');
+      setSelectedCategory(null);
+      setSearchResults([]);
+    } else if (searchValue.startsWith('/') && searchValue.length > 1) {
+      // User typed something after /, treat as direct search
+      setSearchMode('direct');
+      setSelectedCategory(null);
+      const query = searchValue.substring(1).toLowerCase();
+      const results: any[] = [];
+      
+      mockUsers.filter(user => user.name.toLowerCase().includes(query)).forEach(user => {
+        results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
+      });
+      mockListings.filter(listing => listing.name.toLowerCase().includes(query)).forEach(listing => {
+        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail...' });
+      });
+      mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
+        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...' });
+      });
+      
+      setSearchResults(results);
+    } else if (selectedCategory && searchValue.startsWith(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`)) {
+      setSearchMode('category');
+      const query = searchValue.replace(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`, '').toLowerCase();
+      if (selectedCategory === 'users') {
+        setSearchResults(mockUsers.filter(user => user.name.toLowerCase().includes(query)));
+      } else if (selectedCategory === 'listings') {
+        setSearchResults(mockListings.filter(listing => listing.name.toLowerCase().includes(query)));
+      } else {
+        setSearchResults(mockRequests.filter(request => request.name.toLowerCase().includes(query)));
+      }
+    } else if (searchValue && !searchValue.startsWith('@') && !searchValue.startsWith('/')) {
+      setSearchMode('direct');
+      setSelectedCategory(null);
+      const query = searchValue.toLowerCase();
+      const results: any[] = [];
+      
+      mockUsers.filter(user => user.name.toLowerCase().includes(query)).forEach(user => {
+        results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
+      });
+      mockListings.filter(listing => listing.name.toLowerCase().includes(query)).forEach(listing => {
+        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail...' });
+      });
+      mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
+        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...' });
+      });
+      
+      setSearchResults(results);
+    } else if (!searchValue) {
+      setSearchMode('suggestions');
+      setSelectedCategory(null);
+      setSearchResults([]);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchValue, selectedCategory]);
+
   // Handle clicks outside dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -65,6 +151,7 @@ const AdminDashboard: React.FC = () => {
       const languageSelector = target.closest('.language-selector');
       const notificationDropdown = target.closest('.notification-dropdown');
       const menuDropdown = target.closest('.menu-dropdown');
+      const searchContainer = target.closest('.search-container');
 
       if (!languageSelector && isLanguageDropdownOpen) {
         setIsLanguageDropdownOpen(false);
@@ -75,13 +162,36 @@ const AdminDashboard: React.FC = () => {
       if (!menuDropdown && isMenuDropdownOpen) {
         setIsMenuDropdownOpen(false);
       }
+      if (!searchContainer && isSearchFocused) {
+        setIsSearchFocused(false);
+        if (!searchValue) {
+          setSearchMode('suggestions');
+          setSelectedCategory(null);
+        }
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen]);
+  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue]);
+
+  const handleCategorySelect = (category: 'users' | 'listings' | 'requests') => {
+    setSelectedCategory(category);
+    const prefix = `@${category === 'users' ? 'User' : category === 'listings' ? 'Listing' : 'Request'}/`;
+    setSearchValue(prefix);
+    setSearchMode('category');
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+      // Move cursor to end
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.setSelectionRange(prefix.length, prefix.length);
+        }
+      }, 0);
+    }
+  };
 
   const sidebarOptions = [
     {
@@ -335,28 +445,278 @@ const AdminDashboard: React.FC = () => {
             marginBottom: '16px'
           }}>
             {/* Search Bar */}
-            <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
+            <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search, press &quot;/&quot; for commands"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                placeholder={selectedCategory ? `@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/` : 'Search, press "/" for commands'}
                 style={{
                   width: '100%',
                   padding: '8px 12px',
                   backgroundColor: '#F1F1F1',
                   borderRadius: '12px',
-                  border: 'none',
+                  border: isSearchFocused ? '1px solid #CFE8FC' : 'none',
+                  outline: 'none',
                   color: '#212121',
                   fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif'
+                  fontFamily: 'Poppins, sans-serif',
+                  caretColor: '#CFE8FC'
                 }}
               />
               <style>
                 {`
-                  input::placeholder {
-                    color: #B2B2B2;
+                  .search-container input::placeholder {
+                    color: ${selectedCategory ? '#D9D9D9' : '#B2B2B2'};
+                  }
+                  .search-container input:focus {
+                    border: 1px solid #CFE8FC !important;
                   }
                 `}
               </style>
+
+              {/* Search Dropdown */}
+              {isSearchFocused && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  marginTop: '4px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '10px',
+                  border: '1px solid #F1F1F1',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  zIndex: 1000,
+                  maxHeight: '400px',
+                  overflowY: 'auto'
+                }}>
+                  {/* Suggestions Mode */}
+                  {searchMode === 'suggestions' && (
+                    <div style={{ padding: '12px' }}>
+                      <p style={{
+                        fontSize: '8px',
+                        color: '#B0B0B0',
+                        margin: '0 0 8px 0',
+                        fontFamily: 'Poppins, sans-serif',
+                        textTransform: 'uppercase'
+                      }}>
+                        SUGGESTED
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {[
+                          { key: 'users', label: 'Users', icon: userIcon },
+                          { key: 'listings', label: 'Listings', icon: listingboxIcon },
+                          { key: 'requests', label: 'Requests', icon: requesticonIcon }
+                        ].map((option) => (
+                          <div
+                            key={option.key}
+                            onClick={() => handleCategorySelect(option.key as 'users' | 'listings' | 'requests')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: selectedCategory === option.key ? '#F0F8FE' : 'transparent',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s'
+                            }}
+                          >
+                            <img src={option.icon} alt={option.label} style={{ width: '20px', height: '20px' }} />
+                            <span style={{
+                              fontSize: '12px',
+                              color: selectedCategory === option.key ? '#64B5F6' : '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {option.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Category Search Results */}
+                  {searchMode === 'category' && selectedCategory && (
+                    <div style={{ padding: '12px' }}>
+                      {selectedCategory === 'users' && searchResults.map((user: any) => (
+                        <div key={user.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '8px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <img src={user.avatar} alt={user.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '12px',
+                              color: '#6A6A6A',
+                              margin: '0 0 4px 0',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {user.name}
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                              <span style={{
+                                fontSize: '10px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                {user.plan}
+                              </span>
+                              <span style={{ color: '#B0B0B0', fontSize: '10px' }}>•</span>
+                              <span style={{
+                                fontSize: '10px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                {user.verified ? 'Verified' : 'Unverified'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {selectedCategory === 'listings' && searchResults.map((listing: any) => (
+                        <div key={listing.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '8px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <img src={listing.image} alt={listing.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '12px',
+                              color: '#6A6A6A',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {listing.name}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      {selectedCategory === 'requests' && searchResults.map((request: any) => (
+                        <div key={request.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '8px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <img src={request.image} alt={request.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '12px',
+                              color: '#6A6A6A',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {request.name}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Direct Search Results */}
+                  {searchMode === 'direct' && searchResults.length > 0 && (
+                    <div style={{ padding: '12px' }}>
+                      {searchResults.map((result: any, index: number) => (
+                        <div key={`${result.type}-${result.id}-${index}`} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '8px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            position: 'relative'
+                          }}>
+                            <img src={result.avatar || result.image} alt={result.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <span style={{
+                              position: 'absolute',
+                              top: '-4px',
+                              right: '-4px',
+                              fontSize: '8px',
+                              color: '#64B5F6',
+                              fontFamily: 'Poppins, sans-serif',
+                              whiteSpace: 'nowrap',
+                              backgroundColor: '#FFFFFF',
+                              padding: '1px 3px',
+                              borderRadius: '3px',
+                              lineHeight: 1.2
+                            }}>
+                              {result.path}
+                            </span>
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '12px',
+                              color: '#6A6A6A',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {result.name}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Right Side Navigation */}
