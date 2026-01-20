@@ -1896,10 +1896,10 @@ const AdminDashboard: React.FC = () => {
                             <button
                               type="button"
                               style={{
-                                width: '20px',
-                                height: '20px',
+                                width: '18px',
+                                height: '18px',
                                 borderRadius: '50%',
-                                border: '0.5px solid #B0B0B0',
+                                border: '0.3px solid #B0B0B0',
                                 backgroundColor: '#FFFFFF',
                                 display: 'flex',
                                 alignItems: 'center',
