@@ -1171,7 +1171,7 @@ const AdminDashboard: React.FC = () => {
               gridColumn: '1 / 4',
               backgroundColor: '#FFFFFF',
               borderRadius: '24px',
-              padding: '16px 16px 95px 16px',
+              padding: '16px',
               border: '1px solid #F1F1F1',
               width: '100%',
               marginTop: '-100px'
@@ -1180,7 +1180,7 @@ const AdminDashboard: React.FC = () => {
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
-                  marginBottom: '8px',
+                  marginBottom: '4px',
                   marginTop: '0'
                 }}>
                   <h2 style={{ 
@@ -1236,21 +1236,21 @@ const AdminDashboard: React.FC = () => {
                 <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <div style={{ 
-                      width: '10px', 
-                      height: '10px', 
+                      width: '8px', 
+                      height: '8px', 
                       borderRadius: '50%', 
                       backgroundColor: '#9C9C9C' 
                     }} />
-                    <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Past weeks</span>
+                    <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Past weeks</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <div style={{ 
-                      width: '10px', 
-                      height: '10px', 
+                      width: '8px', 
+                      height: '8px', 
                       borderRadius: '50%', 
                       backgroundColor: '#F9A825' 
                     }} />
-                    <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Current Week</span>
+                    <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Current Week</span>
                   </div>
                 </div>
 
@@ -1258,96 +1258,129 @@ const AdminDashboard: React.FC = () => {
                 <div
                   style={{
                     position: 'relative',
-                    height: '200px',
+                    height: '280px',
                     padding: '14px 14px 10px 14px',
-                    backgroundColor: '#FAFAFA',
+                    backgroundColor: 'transparent',
                     borderRadius: '12px',
                     overflow: 'hidden'
                   }}
                 >
-                  {/* Grid lines */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    {[0, 1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        style={{
-                          position: 'absolute',
-                          left: '0',
-                          right: '0',
-                          top: `${18 + i * 40}px`,
-                          borderTop: '1px dashed #D9D9D9',
-                          opacity: 1
-                        }}
-                      />
-                    ))}
-                  </div>
-
                   <div style={{ display: 'flex', height: '100%' }}>
                     {/* Y-axis */}
                     <div
                       style={{
                         width: '34px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        paddingTop: '8px',
-                        paddingBottom: '18px',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        height: '100%',
+                        position: 'relative'
                       }}
                     >
-                      {['40k', '30k', '20k', '10k', '0k'].map((v) => (
-                        <span
-                          key={v}
-                          style={{
-                            fontSize: '11px',
-                            color: '#B0B0B0',
-                            fontFamily: 'Poppins, sans-serif',
-                            lineHeight: 1
-                          }}
-                        >
-                          {v}
-                        </span>
-                      ))}
+                      {['40k', '30k', '20k', '10k', '0k'].map((v, idx) => {
+                        // Align with grid lines: 0%, 25%, 50%, 75%, 100%
+                        const positions = [0, 0.25, 0.5, 0.75, 1];
+                        // Calculate position accounting for line height (1px) - center the text on the line
+                        // Same approach for all labels: position + 0.5px offset, then translateY(-50%) to center
+                        // Adjust 30k (idx 1), 20k (idx 2), 10k (idx 3), and 0k (idx 4) to move them up
+                        const offset =
+                          idx === 1 ? '-8px' :
+                          idx === 2 ? '-16px' :
+                          idx === 3 ? '-24px' :
+                          idx === 4 ? '-34px' :
+                          '0.5px';
+                        return (
+                          <div
+                            key={v}
+                            style={{
+                              position: 'absolute',
+                              top: `calc(${positions[idx] * 100}% + ${offset})`,
+                              transform: 'translateY(-50%)',
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                lineHeight: 1
+                              }}
+                            >
+                              {v}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {/* Bars + X axis */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      {/* Plot area (grid + axes + bars) */}
                       <div
                         style={{
                           flex: 1,
-                          display: 'flex',
-                          alignItems: 'flex-end',
-                          gap: '10px',
+                          position: 'relative',
                           paddingLeft: '6px',
                           paddingRight: '6px',
                           paddingBottom: '10px'
                         }}
                       >
-                        {[
-                          { month: 'Mar', h: 22 },
-                          { month: 'Apr', h: 32 },
-                          { month: 'May', h: 78 },
-                          { month: 'Jun', h: 46 },
-                          { month: 'Jul', h: 52 },
-                          { month: 'Aug', h: 54 },
-                          { month: 'Sep', h: 34 },
-                          { month: 'Oct', h: 50 },
-                          { month: 'Nov', h: 40 },
-                          { month: 'Dec', h: 64, isCurrent: true }
-                        ].map((item) => {
-                          const barWidth = 'clamp(12px, 2.2vw, 18px)';
-                          const radius = '999px';
+                        {/* Grid lines (aligned with Y-axis numbers) */}
+                        {[0, 1, 2, 3, 4].map((i) => {
+                          // Align with Y-axis labels: 0%, 25%, 50%, 75%, 100%
+                          const positions = [0, 0.25, 0.5, 0.75, 1];
+                          return (
+                            <div
+                              key={i}
+                              style={{
+                                position: 'absolute',
+                                left: '0',
+                                right: '0',
+                                top: `${positions[i] * 100}%`,
+                                height: '1px',
+                                backgroundImage:
+                                  'repeating-linear-gradient(to right, #D9D9D9 0 6px, transparent 6px 18px)',
+                                opacity: 1,
+                                pointerEvents: 'none',
+                                transform: 'translateY(-0.5px)'
+                              }}
+                            />
+                          );
+                        })}
 
-                          if (item.isCurrent) {
+                        {/* Bars */}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: '1px',
+                            display: 'flex',
+                            alignItems: 'stretch',
+                            justifyContent: 'space-between',
+                            gap: '16px',
+                            paddingLeft: '16px',
+                            paddingRight: '6px',
+                            paddingBottom: '0px'
+                          }}
+                        >
+                          {[
+                            { month: 'Mar', trackH: 28, fillH: 55 },
+                            { month: 'Apr', trackH: 46, fillH: 35 },
+                            { month: 'May', trackH: 100, fillH: 30 },
+                            { month: 'Jun', trackH: 70, fillH: 30 },
+                            { month: 'Jul', trackH: 80, fillH: 20 },
+                            { month: 'Aug', trackH: 80, fillH: 14 },
+                            { month: 'Sep', trackH: 50, fillH: 30 },
+                            { month: 'Oct', trackH: 76, fillH: 36 },
+                            { month: 'Nov', trackH: 58, fillH: 26 },
+                            { month: 'Dec', trackH: 90, fillH: 56, isCurrent: true }
+                          ].map((item) => {
+                            const trackWidth = 'clamp(34px, 4.2vw, 48px)';
+                            const trackRadius = '12px';
+                            const fillRadius = '10px';
+
                             return (
                               <div
                                 key={item.month}
@@ -1355,78 +1388,81 @@ const AdminDashboard: React.FC = () => {
                                   flex: 1,
                                   display: 'flex',
                                   justifyContent: 'center',
-                                  minWidth: 0
+                                  minWidth: 0,
+                                  height: '100%',
+                                  alignItems: 'flex-end'
                                 }}
                               >
                                 <div
                                   style={{
-                                    width: barWidth,
-                                    height: `${item.h}%`,
-                                    borderRadius: radius,
-                                    backgroundColor: '#F2B84B',
+                                    width: trackWidth,
+                                    height: `${item.trackH}%`,
+                                    backgroundColor: '#FAFAFA',
+                                    borderRadius: trackRadius,
                                     position: 'relative',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 1px 0 rgba(0,0,0,0.02)'
+                                    overflow: 'visible',
+                                    border: '1px solid rgba(0,0,0,0.04)'
                                   }}
                                 >
-                                  {/* Diagonal stripe overlay */}
                                   <div
                                     style={{
                                       position: 'absolute',
-                                      inset: 0,
-                                      backgroundImage:
-                                        'repeating-linear-gradient(135deg, rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 6px, rgba(255,255,255,0) 6px, rgba(255,255,255,0) 12px)'
+                                      left: '2px',
+                                      right: '2px',
+                                      bottom: '2px',
+                                      height: `${item.fillH}%`,
+                                      backgroundColor: item.isCurrent ? 'transparent' : '#E4E4E4',
+                                      backgroundImage: item.isCurrent
+                                        ? 'linear-gradient(0deg, rgba(249, 168, 37, 0.20) 0%, rgba(249, 168, 37, 0.80) 100%)'
+                                        : undefined,
+                                      borderRadius: fillRadius,
+                                      overflow: 'hidden'
                                     }}
-                                  />
-
-                                  {/* Blue marker */}
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      top: '10px',
-                                      left: '50%',
-                                      transform: 'translateX(-50%)',
-                                      width: '10px',
-                                      height: '10px',
-                                      borderRadius: '50%',
-                                      backgroundColor: '#64B5F6',
-                                      boxShadow: '0 0 0 3px rgba(255,255,255,0.9)'
-                                    }}
-                                  />
+                                  >
+                                    {/* zebra stripes for current week */}
+                                    {item.isCurrent && (
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          inset: 0,
+                                          backgroundImage:
+                                            'repeating-linear-gradient(135deg, rgba(249, 168, 37, 0.15) 0px, rgba(249, 168, 37, 0.15) 6px, rgba(255, 255, 255, 0) 6px, rgba(255, 255, 255, 0) 12px)'
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                  
+                                  {/* blue dot marker - at top of fill bar */}
+                                  {item.isCurrent && (
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        bottom: `calc(${item.fillH}% + 2px)`,
+                                        left: '50%',
+                                        transform: 'translate(-50%, 50%)',
+                                        width: '12px',
+                                        height: '12px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#64B5F6',
+                                        boxShadow: '0 0 0 1px #FFFFFF',
+                                        zIndex: 10
+                                      }}
+                                    />
+                                  )}
                                 </div>
                               </div>
                             );
-                          }
-
-                          return (
-                            <div
-                              key={item.month}
-                              style={{
-                                flex: 1,
-                                display: 'flex',
-                                justifyContent: 'center',
-                                minWidth: 0
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: barWidth,
-                                  height: `${item.h}%`,
-                                  borderRadius: radius,
-                                  backgroundColor: 'rgba(180, 180, 180, 0.35)'
-                                }}
-                              />
-                            </div>
-                          );
-                        })}
+                          })}
+                        </div>
                       </div>
 
                       <div
                         style={{
                           display: 'flex',
-                          gap: '10px',
+                          gap: '16px',
                           paddingLeft: '6px',
-                          paddingRight: '6px'
+                          paddingRight: '6px',
+                          paddingTop: '16px'
                         }}
                       >
                         {['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
