@@ -180,7 +180,6 @@ export class ChatService {
                             decryptedContent = 'Encrypted message';
                         }
                     } catch (error) {
-                        console.error('Error decrypting message: ', error);
                         decryptedContent = 'Encrypted message';
                     }
                 }
@@ -223,7 +222,6 @@ export class ChatService {
                 };
             });
         } catch (error) {
-            console.error('Error fetching user conversations:', error);
             throw new Error('Failed to fetch conversations');
         }
     }
@@ -323,7 +321,6 @@ export class ChatService {
                             decryptedContent = 'Encrypted message';
                         }
                     } catch (error) {
-                        console.error('Error decrypting message:', error);
                         decryptedContent = 'Encrypted message';
                     }
                 }
@@ -373,7 +370,6 @@ export class ChatService {
 
             return processedConversations;
         } catch (error: any) {
-            console.error('Error fetching product conversations:', error);
             throw new Error(`Failed to fetch product conversations: ${error.message}`);
         }
     }
@@ -425,7 +421,14 @@ export class ChatService {
                     }
                 },
                 replyTo: {
-                    include: {
+                    select: {
+                        id: true,
+                        content: true,
+                        encryptionIv: true,
+                        encryptionAuthTag: true,
+                        messageType: true,
+                        audioUrl: true,
+                        createdAt: true,
                         sender: {
                             select: {
                                 id: true,
@@ -502,36 +505,39 @@ export class ChatService {
                 // Extract voice message properties from productData if present
                 let voiceDuration = null;
                 let waveformData = null;
-                
-                // Debug: Log raw productData from database for voice messages
-                if (message.messageType === 'VOICE') {
-                    console.log('[VOICE] getConversationMessages - raw message from DB:', {
-                        messageId: message.id,
-                        messageType: message.messageType,
-                        audioUrl: message.audioUrl,
-                        fileUrl: message.fileUrl,
-                        rawProductData: message.productData,
-                        parsedProductData: parsedProductData
-                    });
-                }
-                
+
                 if (parsedProductData && typeof parsedProductData === 'object') {
                     voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
                     waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
-                    console.log('[VOICE] getConversationMessages - extracted from productData:', {
-                        messageId: message.id,
-                        hasVoiceDuration: !!voiceDuration,
-                        hasWaveformData: !!waveformData,
-                        waveformLength: waveformData?.length || 0,
-                        productDataKeys: Object.keys(parsedProductData)
-                    });
-                    // Keep voice properties in productData for the response, don't delete them
-                    // This allows them to persist across page loads
+            
+                }
+
+                // Decrypt replyTo content if present
+                let decryptedReplyTo = message.replyTo;
+                if (message.replyTo && message.replyTo.content && message.replyTo.encryptionIv && message.replyTo.encryptionAuthTag) {
+                    try {
+                        const decryptedReplyContent = this.decryptMessage(
+                            message.replyTo.content,
+                            message.replyTo.encryptionIv,
+                            message.replyTo.encryptionAuthTag
+                        );
+                        decryptedReplyTo = {
+                            ...message.replyTo,
+                            content: decryptedReplyContent
+                        };
+                    } catch (replyDecryptError) {
+                        console.error('Failed to decrypt replyTo content:', replyDecryptError);
+                        decryptedReplyTo = {
+                            ...message.replyTo,
+                            content: '[Encrypted message]'
+                        };
+                    }
                 }
 
                 return {
                     ...message,
                     content: plainText,
+                    replyTo: decryptedReplyTo,
                     productData: parsedProductData,
                     fileUrl: message.fileUrl,
                     fileName: message.fileName,
@@ -546,6 +552,7 @@ export class ChatService {
                     isPinned: userMetadata?.isPinned || false,
                     isArchived: userMetadata?.isArchived || false,
                     isImportant: userMetadata?.isImportant || false,
+                    isDeletedForMe: userMetadata?.isDeletedForMe || false,
                     label: userMetadata?.label || null,
                     formattedTime: this.formatTo12HourTime(message.createdAt)
                 };
@@ -558,11 +565,33 @@ export class ChatService {
                     voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
                     waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
                 }
+
+                // Try to decrypt replyTo content even if main content decryption failed
+                let decryptedReplyTo = message.replyTo;
+                if (message.replyTo && message.replyTo.content && message.replyTo.encryptionIv && message.replyTo.encryptionAuthTag) {
+                    try {
+                        const decryptedReplyContent = this.decryptMessage(
+                            message.replyTo.content,
+                            message.replyTo.encryptionIv,
+                            message.replyTo.encryptionAuthTag
+                        );
+                        decryptedReplyTo = {
+                            ...message.replyTo,
+                            content: decryptedReplyContent
+                        };
+                    } catch (replyDecryptError) {
+                        decryptedReplyTo = {
+                            ...message.replyTo,
+                            content: '[Encrypted message]'
+                        };
+                    }
+                }
                 
                 return {
                     ...message,
                     content: '[Secure message - decryption failed]',
                     decryptionError: true,
+                    replyTo: decryptedReplyTo,
                     productData: parsedProductData,
                     fileUrl: message.fileUrl,
                     fileName: message.fileName,
@@ -672,10 +701,8 @@ export class ChatService {
         if (!encrypted) {
             throw new Error('No result from db_encrypt');
         }
-        console.log('Database encryption test successful');
         return true;
     } catch (error) {
-        console.warn('Database encryption function error:', error);
         return false;
     }
 }
@@ -791,7 +818,6 @@ export class ChatService {
                         `;
                         dbEncryptedContent = result[0]?.db_encrypted || null;
                     } catch (error) {
-                        console.warn('Database encryption failed, using app-level encryption only');
                         dbEncryptedContent = null;
                     }
                 }
@@ -902,17 +928,6 @@ export class ChatService {
             // encryption at app level
             const appEncrypted = this.encryptMessage(data.content);
 
-            // Debug: Log productData before storage
-            if (data.productData) {
-                console.log('[VOICE] sendMessage - productData before storage:', {
-                    hasVoiceDuration: !!data.productData._voiceDuration,
-                    hasWaveformData: !!data.productData._waveformData,
-                    waveformLength: data.productData._waveformData?.length || 0,
-                    productDataKeys: Object.keys(data.productData),
-                    stringifiedLength: JSON.stringify(data.productData).length
-                });
-            }
-
             // Create message
             const message = await tx.message.create({
                 data: {
@@ -984,15 +999,8 @@ export class ChatService {
             try {
                 if (message.productData) {
                     parsedProductData = JSON.parse(message.productData);
-                    console.log('[VOICE] sendMessage - parsed productData:', {
-                        hasVoiceDuration: !!parsedProductData?._voiceDuration,
-                        hasWaveformData: !!parsedProductData?._waveformData,
-                        waveformLength: parsedProductData?._waveformData?.length || 0,
-                        productDataKeys: parsedProductData ? Object.keys(parsedProductData) : []
-                    });
                 }
             } catch (error) {
-                console.error('[VOICE] sendMessage - failed to parse productData:', error);
                 parsedProductData = null;
             }
 
@@ -1252,6 +1260,7 @@ export class ChatService {
         isPinned?: boolean;
         isArchived?: boolean;
         isImportant?: boolean;
+        isDeletedForMe?: boolean;
         label?: string | null;
     }) {
         try {
@@ -1272,6 +1281,7 @@ export class ChatService {
                     isPinned: data.isPinned || false,
                     isArchived: data.isArchived || false,
                     isImportant: data.isImportant || false,
+                    isDeletedForMe: data.isDeletedForMe || false,
                     label: data.label || null,
                     createdAt: new Date(),
                     updatedAt: new Date()

@@ -247,15 +247,16 @@ model MessageReaction {
 }
 
 model MessageMetadata {
-  id          String   @id @default(uuid())
-  messageId   String   @map("message_id")
-  userId      String   @map("user_id")
-  isPinned    Boolean  @default(false) @map("is_pinned")
-  isArchived  Boolean  @default(false) @map("is_archived")
-  isImportant Boolean  @default(false) @map("is_important")
-  label       String? // label name or null
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id            String   @id @default(uuid())
+  messageId     String   @map("message_id")
+  userId        String   @map("user_id")
+  isPinned      Boolean  @default(false) @map("is_pinned")
+  isArchived    Boolean  @default(false) @map("is_archived")
+  isImportant   Boolean  @default(false) @map("is_important")
+  isDeletedForMe Boolean @default(false) @map("is_deleted_for_me")
+  label         String? // label name or null
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)

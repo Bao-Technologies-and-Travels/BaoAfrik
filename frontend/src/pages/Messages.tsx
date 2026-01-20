@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -158,7 +158,8 @@ const Messages: React.FC = (): JSX.Element => {
   const [clickedMessageId, setClickedMessageId] = useState<number | null>(null);
   const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
   const [isReplyRead, setIsReplyRead] = useState(false);
-  const [isSellerTyping, setIsSellerTyping] = useState(false);
+  const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<Record<string, { name: string; timestamp: number }>>({});
   const [hasIncomingReply, setHasIncomingReply] = useState(false);
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
   const [actionsMenuOpen, setActionsMenuOpen] = useState<number | null>(null);
@@ -565,21 +566,20 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Helper to safely get a sender label from a reply sender field (can be string or object)
-  const getReplySenderLabel = (sender: any, isIncoming: boolean) => {
-    // If I'm the sender (not incoming), show "You"
-    if (!isIncoming) {
-      return 'You';
-    }
+  // This returns the label of WHO SENT THE ORIGINAL MESSAGE being replied to
+  const getReplySenderLabel = (sender: any, _isIncoming?: boolean) => {
     if (!sender) {
       return 'User';
     }
     if (typeof sender === 'string') {
+      // If sender is a string, it might already be a name or "You"
       return sender;
     }
-    // Check if sender is the current user
+    // Check if the original message sender is the current user
     if (sender.id && user?.id && String(sender.id) === String(user.id)) {
       return 'You';
     }
+    // Otherwise, return the name of the other person
     const first = sender.firstName || '';
     const last = sender.lastName || '';
     const name = `${first} ${last}`.trim();
@@ -599,7 +599,15 @@ const Messages: React.FC = (): JSX.Element => {
     const isArchived = msg?.isArchived || false;
     const isImportant = msg?.isImportant || false;
     const label = msg?.label || null;
-    const replyTo = msg?.replyTo || null;
+    // Normalize replyTo to ensure it has a 'text' field (backend may send 'content')
+    let replyTo = msg?.replyTo || null;
+    if (replyTo) {
+      replyTo = {
+        ...replyTo,
+        text: replyTo.text || replyTo.content || '',
+        content: replyTo.content || replyTo.text || ''
+      };
+    }
     // Parse productData if it's a string, otherwise use as-is
     let productData = msg?.productData || null;
     if (productData && typeof productData === 'string') {
@@ -623,7 +631,7 @@ const Messages: React.FC = (): JSX.Element => {
 
     // Check if this is a voice message - don't treat as document
     // Note: Backend stores VOICE as AUDIO in the database (Prisma enum limitation)
-    const isVoiceMessage = msg?.messageType === 'VOICE' || msg?.messageType === 'AUDIO' || 
+    const isVoiceMessage = msg?.messageType === 'VOICE' || msg?.messageType === 'AUDIO' ||
       msg?.type === 'voice' || msg?.type === 'audio' ||
       (msg?.audioUrl && msg.audioUrl.includes('.webm')) ||
       (msg?.fileUrl && msg.fileUrl.includes('.webm')) ||
@@ -701,22 +709,6 @@ const Messages: React.FC = (): JSX.Element => {
       }
     }
 
-    // Debug logging for voice messages
-    if (isVoiceMessage || msg?.messageType === 'VOICE' || msg?.type === 'voice') {
-      console.log('[VOICE] normalizeMessage:', {
-        msgId: msg?.id,
-        directWaveform: !!msg?.waveformData,
-        directWaveformLength: msg?.waveformData?.length || 0,
-        productDataWaveform: !!(productData?._waveformData || productData?.waveformData),
-        productDataWaveformLength: (productData?._waveformData || productData?.waveformData)?.length || 0,
-        finalWaveformLength: voiceWaveform?.length || 0,
-        voiceDuration,
-        // Log sample values to check format
-        sampleValues: voiceWaveform?.slice(0, 5) || [],
-        minMax: voiceWaveform ? { min: Math.min(...voiceWaveform), max: Math.max(...voiceWaveform) } : null
-      });
-    }
-
     return {
       ...msg,
       text,
@@ -725,6 +717,7 @@ const Messages: React.FC = (): JSX.Element => {
       isPinned,
       isArchived,
       isImportant,
+      isDeletedForMe: msg?.isDeletedForMe || false,
       label,
       replyTo,
       productData,
@@ -769,14 +762,45 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Join conversation room when conversationId is set
+  // Join conversation room when conversationId is set and socket is connected
   useEffect(() => {
     if (!socket || !conversationId) return;
 
-    // Join the conversation room
-    socket.emit('join_conversation', conversationId);
+    let hasJoined = false;
+
+    // Function to join the conversation room
+    const joinRoom = () => {
+      if (socket.connected && !hasJoined) {
+        socket.emit('join_conversation', conversationId);
+        hasJoined = true;
+      }
+    };
+
+    // Join immediately if connected
+    joinRoom();
+
+    // Also join when socket connects/reconnects
+    const handleConnect = () => {
+      hasJoined = false; // Reset so we can rejoin
+      joinRoom();
+    };
+
+    socket.on('connect', handleConnect);
+
+    // Handle conversation_joined confirmation
+    const handleJoined = (data: any) => {
+      if (data.conversationId === conversationId) {
+        hasJoined = true;
+      }
+    };
+    socket.on('conversation_joined', handleJoined);
 
     return () => {
-      socket.emit('leave_conversation', conversationId);
+      socket.off('connect', handleConnect);
+      socket.off('conversation_joined', handleJoined);
+      if (socket.connected && hasJoined) {
+        socket.emit('leave_conversation', conversationId);
+      }
     };
   }, [socket, conversationId]);
 
@@ -786,6 +810,12 @@ const Messages: React.FC = (): JSX.Element => {
 
     function handleReceiveMessage(msg: any) {
       const normalized = normalizeMessage(msg, user?.id);
+
+      // Clear typing indicator when we receive a message from the other user
+      if (normalized.isIncoming && normalized.conversationId === conversationId) {
+        setShowTypingIndicator(false);
+        setIsOtherUserTyping(false);
+      }
 
       // Preserve voice message properties for received messages
       const isVoiceMessage = normalized.messageType === 'VOICE' || normalized.type === 'voice';
@@ -970,13 +1000,35 @@ const Messages: React.FC = (): JSX.Element => {
 
     // Handle typing indicators
     function handleUserTyping(data: any) {
-      if (!conversationId || data.conversationId === conversationId) {
+      // Track typing for all conversations (for sidebar display)
+      if (data.conversationId && String(data.userId) !== String(user?.id)) {
+        setTypingUsers(prev => ({
+          ...prev,
+          [data.conversationId]: {
+            name: data.userName || 'User',
+            timestamp: Date.now()
+          }
+        }));
+      }
+      // Show typing indicator for current conversation
+      if (String(data.conversationId) === String(conversationId) && String(data.userId) !== String(user?.id)) {
         setShowTypingIndicator(true);
+        setIsOtherUserTyping(true);
       }
     }
     function handleUserStopTyping(data: any) {
-      if (!conversationId || data.conversationId === conversationId) {
+      // Remove from typing users tracking
+      if (data.conversationId) {
+        setTypingUsers(prev => {
+          const updated = { ...prev };
+          delete updated[data.conversationId];
+          return updated;
+        });
+      }
+      // Hide typing indicator for current conversation
+      if (String(data.conversationId) === String(conversationId) && String(data.userId) !== String(user?.id)) {
         setShowTypingIndicator(false);
+        setIsOtherUserTyping(false);
       }
     }
     socket.on('user_typing', handleUserTyping);
@@ -1097,22 +1149,26 @@ const Messages: React.FC = (): JSX.Element => {
     }
 
     function handleReactionRemoved(data: any) {
-      // Update reactions for all conversations
-      if (data.messageId) {
+      // Update reactions for all conversations - remove the reaction from the specified user
+      if (data.messageId && data.userId) {
         setMessages(prevMessages =>
           prevMessages.map(msg => {
             if (String(msg.id) === String(data.messageId)) {
-              // Remove reaction if it's the current user's reaction
-              if (String(data.userId) === String(user?.id)) {
-                return { ...msg, reaction: undefined, reactions: (msg.reactions || []).filter((r: any) => String(r.userId) !== String(data.userId)) };
-              }
-              // Remove from reactions array for other users
+              // Filter out the reaction from this user
               const existingReactions = msg.reactions || [];
+              const updatedReactions = existingReactions.filter((r: any) =>
+                String(r.userId) !== String(data.userId)
+              );
+
+              // Clear the reaction field if there are no more reactions
+              // OR if the removed reaction matches the displayed reaction
+              const shouldClearReaction = updatedReactions.length === 0 ||
+                (data.reaction && msg.reaction === data.reaction);
+
               return {
                 ...msg,
-                reactions: existingReactions.filter((r: any) =>
-                  !(String(r.userId) === String(data.userId) && r.reaction === data.reaction)
-                )
+                reaction: shouldClearReaction ? undefined : (updatedReactions[0]?.reaction || undefined),
+                reactions: updatedReactions
               };
             }
             return msg;
@@ -1122,16 +1178,21 @@ const Messages: React.FC = (): JSX.Element => {
     }
 
     function handleMessageMetadataUpdated(data: any) {
-      if (data.messageId && conversationId) {
+      if (data.messageId) {
         setMessages(prevMessages =>
           prevMessages.map(msg => {
             if (String(msg.id) === String(data.messageId)) {
+              // If message is deleted for this user, update the display
+              const isDeletedForMe = data.isDeletedForMe || data.metadata?.isDeletedForMe || false;
               return {
                 ...msg,
-                isPinned: data.metadata?.isPinned || false,
-                isArchived: data.metadata?.isArchived || false,
-                isImportant: data.metadata?.isImportant || false,
-                label: data.metadata?.label || null
+                isPinned: data.metadata?.isPinned ?? msg.isPinned ?? false,
+                isArchived: data.metadata?.isArchived ?? msg.isArchived ?? false,
+                isImportant: data.metadata?.isImportant ?? msg.isImportant ?? false,
+                isDeletedForMe: isDeletedForMe,
+                label: data.metadata?.label ?? msg.label ?? null,
+                // Clear text for deleted messages
+                text: isDeletedForMe ? '' : msg.text
               };
             }
             return msg;
@@ -1226,23 +1287,6 @@ const Messages: React.FC = (): JSX.Element => {
         }
       );
       const rawMessages = response.data.data || [];
-
-      // Debug: Log voice messages from API response
-      rawMessages.forEach((m: any) => {
-        if (m.messageType === 'VOICE' || m.type === 'voice' || m.audioUrl || m.fileUrl?.includes('.webm')) {
-          console.log('[VOICE] Raw message from API:', {
-            id: m.id,
-            messageType: m.messageType,
-            type: m.type,
-            audioUrl: m.audioUrl,
-            fileUrl: m.fileUrl,
-            directWaveformData: m.waveformData?.length || 0,
-            directDuration: m.duration,
-            productDataType: typeof m.productData,
-            productDataContent: m.productData ? JSON.stringify(m.productData).substring(0, 200) : null
-          });
-        }
-      });
 
       const newMessages = rawMessages.map((m: any) => normalizeMessage(m, user?.id));
 
@@ -1847,34 +1891,37 @@ const Messages: React.FC = (): JSX.Element => {
     handleTypingDetection();
   };
 
+  // Ref to track typing state without stale closure issues
+  const isTypingRef = useRef(false);
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Typing detection logic - emit socket events for real-time typing indicators
-  const handleTypingDetection = () => {
-    // Only emit if we have a socket and conversation
-    if (socket && conversationId) {
-      // Emit typing_start only if not already typing
-      if (!isUserTyping) {
-        socket.emit('typing_start', { conversationId });
-      }
+  const handleTypingDetection = useCallback(() => {
+    // Only emit if we have a connected socket and conversation
+    if (!socket || !socket.connected || !conversationId) return;
+
+    // Emit typing_start only if not already typing
+    if (!isTypingRef.current) {
+      isTypingRef.current = true;
+      setIsUserTyping(true);
+      socket.emit('typing_start', { conversationId });
     }
 
-    setIsUserTyping(true);
-
     // Clear existing timer
-    if (typingTimer) {
-      clearTimeout(typingTimer);
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
     }
 
     // Set new timer to stop typing indicator after 1.5 seconds of inactivity
-    const timer = setTimeout(() => {
+    typingTimerRef.current = setTimeout(() => {
+      isTypingRef.current = false;
       setIsUserTyping(false);
       // Emit typing_stop when user stops typing
-      if (socket && conversationId) {
+      if (socket && socket.connected && conversationId) {
         socket.emit('typing_stop', { conversationId });
       }
     }, 1500);
-
-    setTypingTimer(timer);
-  };
+  }, [socket, conversationId]);
 
   // Function to format last message text for sidebar - returns object with type and content
   const formatLastMessagePreview = (message: any, isIncoming: boolean = false): { type: 'text' | 'audio' | 'image' | 'document'; text: string; duration?: number } => {
@@ -2008,23 +2055,50 @@ const Messages: React.FC = (): JSX.Element => {
     setMobileMessageCoords(null);
   };
 
-  // Handle reaction removal
-  const handleRemoveReaction = async (messageId: number) => {
-    if (socket) {
-      // Optimistically update UI
-      setMessages(prevMessages =>
-        prevMessages.map(msg =>
-          msg.id === messageId
-            ? { ...msg, reaction: undefined }
-            : msg
-        )
-      );
+  // Handle reaction removal - only allow removing your own reactions
+  const handleRemoveReaction = async (messageId: number, reactionUserId?: string) => {
+    // Only allow the user who added the reaction to remove it
+    if (!socket || !user?.id) return;
 
-      // Emit to socket to persist and sync
-      socket.emit('remove_reaction', {
-        messageId: String(messageId)
-      });
+    // If reactionUserId is provided, check if current user owns this reaction
+    if (reactionUserId && String(reactionUserId) !== String(user.id)) {
+      // User doesn't own this reaction, don't allow removal
+      return;
     }
+
+    // Find the message to get the reaction info
+    const message = messages.find(m => m.id === messageId);
+    if (!message) return;
+
+    // Check if the current user has a reaction on this message
+    const userReaction = message.reactions?.find((r: any) => String(r.userId) === String(user.id));
+    if (!userReaction && message.reaction) {
+      // The displayed reaction might not belong to this user
+      // Check reactions array to see if user has one
+      const hasOwnReaction = message.reactions?.some((r: any) => String(r.userId) === String(user.id));
+      if (!hasOwnReaction) {
+        return; // User has no reaction to remove
+      }
+    }
+
+    // Optimistically update UI
+    setMessages(prevMessages =>
+      prevMessages.map(msg =>
+        msg.id === messageId
+          ? {
+            ...msg,
+            reaction: undefined,
+            reactions: (msg.reactions || []).filter((r: any) => String(r.userId) !== String(user.id))
+          }
+          : msg
+      )
+    );
+
+    // Emit to socket to persist and sync
+    socket.emit('remove_reaction', {
+      messageId: String(messageId),
+      reaction: userReaction?.reaction || message.reaction
+    });
   };
 
   // Handle message options click
@@ -2039,12 +2113,10 @@ const Messages: React.FC = (): JSX.Element => {
 
   // Handle message option selection
   const handleMessageOptionSelect = (action: string, messageOrId?: { id: number } | number | string) => {
-    // Support being called with either a message object ({ id }) or a raw id (number/string)
     const rawId = typeof messageOrId === 'object' && messageOrId !== null
       ? (messageOrId as any).id
       : messageOrId;
     const messageId = rawId !== undefined && rawId !== null ? String(rawId) : undefined;
-    console.log('Selected action:', action);
 
     if (action === 'reply' && messageId) {
       // Find the message to reply to
@@ -2161,17 +2233,21 @@ const Messages: React.FC = (): JSX.Element => {
     }
 
     if (action === 'delete' && messageId && socket) {
-      // Delete message for current user (soft delete - archive it)
+      // Delete message for current user (soft delete)
       const message = messages.find(m => String(m.id) === messageId);
       if (message) {
-        // Optimistically update UI - remove from view
+        // Optimistically update UI - mark as deleted for me
         setMessages(prevMessages =>
-          prevMessages.filter(msg => String(msg.id) !== messageId)
+          prevMessages.map(msg =>
+            String(msg.id) === messageId
+              ? { ...msg, isDeletedForMe: true, text: '' }
+              : msg
+          )
         );
         // Emit to socket to persist
         socket.emit('update_message_metadata', {
           messageId: String(messageId),
-          isArchived: true
+          isDeletedForMe: true
         });
         toast.success('Message deleted');
       }
@@ -2952,7 +3028,7 @@ const Messages: React.FC = (): JSX.Element => {
       // Clear any incoming reply state when sending a new message
       setHasIncomingReply(false);
       setIsReplyRead(false);
-      setIsSellerTyping(false);
+      setIsOtherUserTyping(false);
 
       const currentTime = new Date();
       const timeString = currentTime.toLocaleTimeString('en-US', {
@@ -2978,12 +3054,6 @@ const Messages: React.FC = (): JSX.Element => {
       setAudioChunks([]);
       setRecordedWaveforms([]);
       setAudioLevels([]);
-
-      console.log('[VOICE] Sending voice message with waveform:', {
-        waveformLength: capturedWaveformData.length,
-        duration: capturedDuration,
-        sampleValues: capturedWaveformData.slice(0, 5)
-      });
 
       const tempId = `temp_voice_${Date.now()}_${Math.random()}`;
       const tempMessage = {
@@ -3767,8 +3837,8 @@ const Messages: React.FC = (): JSX.Element => {
                             </div>
                           )}
 
-                          {/* Message bubble with text and/or product card and/or documents and/or voice */}
-                          {(message.text || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice' || message.messageType === 'VOICE') && (
+                          {/* Message bubble with text and/or product card and/or documents and/or voice and/or deleted messages */}
+                          {(message.text || message.isDeletedForMe || (!message.images?.length && message.isProductInquiry && message.productData) || (message.documents && message.documents.length > 0) || message.type === 'voice' || message.messageType === 'VOICE') && (
                             <div
                               className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'} cursor-pointer`}
                               style={{
@@ -3877,9 +3947,24 @@ const Messages: React.FC = (): JSX.Element => {
                                   {/* Reply Section - Mobile */}
                                   {message.replyTo && (
                                     <div className="mb-2">
-                                      {/* Replied Message Text Above */}
+                                      {/* User's NEW message text ABOVE */}
+                                      {(message.text || message.isDeletedForMe) && (
+                                        <p
+                                          style={{
+                                            fontSize: '12px',
+                                            marginBottom: '8px',
+                                            color: message.isIncoming ? '#6A6A6A' : '#FFFFFF',
+                                            fontStyle: message.isDeletedForMe ? 'italic' : 'normal',
+                                            opacity: message.isDeletedForMe ? 0.7 : 1
+                                          }}
+                                        >
+                                          {message.isDeletedForMe ? 'You deleted this message' : message.text}
+                                        </p>
+                                      )}
+
+                                      {/* Replied-to message BELOW with vertical line */}
                                       <div
-                                        className="cursor-pointer hover:opacity-80 transition-opacity mb-2"
+                                        className="cursor-pointer hover:opacity-80 transition-opacity"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           if (message.replyTo?.id) {
@@ -3887,165 +3972,50 @@ const Messages: React.FC = (): JSX.Element => {
                                           }
                                         }}
                                       >
-                                        {message.replyTo.type === 'voice' ? (
-                                          /* Voice Note Reply - Screenshot Structure - TWO LINES */
-                                          <div className="flex items-start">
-                                            {/* White vertical line on LEFT - spans both sender label and audio preview */}
-                                            <div
-                                              className="rounded-full mr-1.5"
-                                              style={{
-                                                width: '2px',
-                                                backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
-                                                flexShrink: 0,
-                                                alignSelf: 'stretch'
-                                              }}
-                                            ></div>
+                                        <div className="flex items-stretch">
+                                          {/* Vertical line on LEFT */}
+                                          <div
+                                            className="rounded-full mr-1.5"
+                                            style={{
+                                              width: '2px',
+                                              backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                              flexShrink: 0,
+                                              alignSelf: 'stretch'
+                                            }}
+                                          ></div>
 
-                                            <div className="flex-1">
-                                              {/* Sender label */}
-                                              <div style={{ fontSize: '10px', color: message.isIncoming ? '#64B5F6' : '#CFE8FC', fontWeight: 500, marginBottom: '4px' }}>
-                                                {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
-                                              </div>
-                                              {/* Audio preview */}
-                                              <div className="flex items-center">
-                                                {/* Speed button - appears when playing */}
-                                                {playingMessageId === message.id && (
-                                                  <button
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      handleSpeedChange(message.id);
-                                                    }}
-                                                    className="flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
-                                                    style={{
-                                                      backgroundColor: '#4781AF',
-                                                      borderRadius: '8px',
-                                                      width: '28px',
-                                                      height: '20px',
-                                                      padding: '0 6px',
-                                                      marginRight: '6px'
-                                                    }}
-                                                  >
-                                                    <span className="text-white" style={{ fontSize: '9px', fontWeight: 500 }}>
-                                                      {(audioPlaybackSpeed[message.id] || 1) === 1 ? '1x' : (audioPlaybackSpeed[message.id] || 1) === 1.5 ? '1.5x' : '2x'}
-                                                    </span>
-                                                  </button>
-                                                )}
-
-                                                {/* Duration */}
-                                                <span style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', marginRight: '6px' }}>
-                                                  {Math.floor((message.replyTo.duration || 0) / 60).toString().padStart(2, '0')}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')}
-                                                </span>
-
-                                                {/* Waveform */}
-                                                <div className="flex items-center space-x-0.5 flex-1">
-                                                  {(message.replyTo.waveformData && message.replyTo.waveformData.length > 0 ?
-                                                    message.replyTo.waveformData.slice(-20).map((level: number, i: number) => {
-                                                      const progress = audioPlaybackProgress[message.id] || 0;
-                                                      const totalBars = Math.min(20, message.replyTo.waveformData.length);
-                                                      const isPlayed = playingMessageId === message.id && (i / totalBars) * 100 <= progress;
-                                                      return (
-                                                        <div
-                                                          key={i}
-                                                          style={{
-                                                            width: '1.5px',
-                                                            height: `${Math.max(2, level * 8)}px`,
-                                                            backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
-                                                            borderRadius: '1px'
-                                                          }}
-                                                        />
-                                                      );
-                                                    })
-                                                    :
-                                                    [2, 3, 2, 4, 6, 7, 8, 7, 6, 4, 6, 5, 3, 6, 8, 9, 8, 6, 5, 3].map((h, i) => {
-                                                      const progress = audioPlaybackProgress[message.id] || 0;
-                                                      const isPlayed = playingMessageId === message.id && (i / 20) * 100 <= progress;
-                                                      return (
-                                                        <div
-                                                          key={i}
-                                                          style={{
-                                                            width: '1.5px',
-                                                            height: `${h}px`,
-                                                            backgroundColor: isPlayed ? '#FFFFFF' : (message.isIncoming ? '#6A6A6A' : '#CFE8FC'),
-                                                            borderRadius: '1px'
-                                                          }}
-                                                        />
-                                                      );
-                                                    })
-                                                  )}
-                                                </div>
-
-                                                {/* Play/Pause button - far right */}
-                                                <button
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    if (message.replyTo.audioUrl) {
-                                                      handleAudioPlayback(message.id, message.replyTo.audioUrl, message.replyTo.duration);
-                                                    }
-                                                  }}
-                                                  className="ml-3 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-80 transition-opacity"
-                                                  style={{
-                                                    width: '18px',
-                                                    height: '18px',
-                                                    backgroundColor: '#FFFFFF'
-                                                  }}
-                                                >
-                                                  {playingMessageId === message.id ? (
-                                                    <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
-                                                      <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                                                    </svg>
-                                                  ) : (
-                                                    <svg style={{ width: '12px', height: '12px', color: '#64B5F6' }} fill="currentColor" viewBox="0 0 24 24">
-                                                      <path d="M8 5v14l11-7z" />
-                                                    </svg>
-                                                  )}
-                                                </button>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        ) : (
-                                          /* Text Reply - Show replied message text */
-                                          <div className="flex items-stretch">
-                                            {/* Vertical line - spans both sender label and message text */}
-                                            <div
-                                              className="rounded-full mr-1.5"
-                                              style={{
-                                                width: '2px',
-                                                backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
-                                                flexShrink: 0,
-                                                alignSelf: 'stretch'
-                                              }}
-                                            ></div>
-
-                                            {/* Quoted message info */}
-                                            <div className="flex-1">
-                                              <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
-                                                {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                          {/* Quoted message info */}
+                                          <div className="flex-1">
+                                            <p style={{ fontSize: '10px', fontWeight: 500, marginBottom: '2px', color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                              {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                            </p>
+                                            {message.replyTo.type === 'voice' ? (
+                                              <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                                🎤 Voice message ({Math.floor((message.replyTo.duration || 0) / 60)}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')})
                                               </p>
+                                            ) : (
                                               <p style={{ fontSize: '10px', color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: '1.3' }}>
                                                 {message.replyTo.text}
                                               </p>
-                                            </div>
+                                            )}
                                           </div>
-                                        )}
+                                        </div>
                                       </div>
-
-                                      {/* Reply Text Below */}
-                                      {message.text && (
-                                        <p
-                                          style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
-                                        >
-                                          {message.text}
-                                        </p>
-                                      )}
                                     </div>
                                   )}
 
                                   {/* Message Text (only show if no reply) */}
-                                  {!message.replyTo && message.text && (
+                                  {!message.replyTo && (message.text || message.isDeletedForMe) && (
                                     <p
-                                      style={{ fontSize: '12px', marginBottom: 0, color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                      style={{
+                                        fontSize: '12px',
+                                        marginBottom: 0,
+                                        color: message.isIncoming ? '#6A6A6A' : '#FFFFFF',
+                                        fontStyle: message.isDeletedForMe ? 'italic' : 'normal',
+                                        opacity: message.isDeletedForMe ? 0.7 : 1
+                                      }}
                                     >
-                                      {message.text}
+                                      {message.isDeletedForMe ? 'You deleted this message' : message.text}
                                     </p>
                                   )}
 
@@ -4205,8 +4175,13 @@ const Messages: React.FC = (): JSX.Element => {
                             {/* Reaction Display - inline after timestamp */}
                             {message.reaction && (
                               <div
-                                className="ml-3 cursor-pointer hover:opacity-80 transition-opacity"
-                                onClick={() => handleRemoveReaction(message.id)}
+                                className={`ml-3 ${message.reactions?.some((r: any) => String(r.userId) === String(user?.id)) ? 'cursor-pointer hover:opacity-80' : 'cursor-default'} transition-opacity`}
+                                onClick={() => {
+                                  // Only allow removal if user owns the reaction
+                                  if (message.reactions?.some((r: any) => String(r.userId) === String(user?.id))) {
+                                    handleRemoveReaction(message.id);
+                                  }
+                                }}
                                 style={{
                                   backgroundColor: '#FFFFFF',
                                   border: '1px solid #F1F1F1',
@@ -4288,42 +4263,6 @@ const Messages: React.FC = (): JSX.Element => {
                       </div>
                     );
                   })}
-
-                  {/* Typing Indicator */}
-                  {isSellerTyping && (
-                    <div className="flex justify-start mb-3">
-                      <div className="max-w-20">
-                        <div
-                          className="rounded-2xl rounded-bl-md px-3 py-2 flex items-center"
-                          style={{ backgroundColor: '#F0F8FE' }}
-                        >
-                          <div className="flex space-x-1">
-                            <div
-                              className="w-1.5 h-1.5 rounded-full animate-bounce"
-                              style={{
-                                backgroundColor: '#64B5F6',
-                                animationDelay: '0ms'
-                              }}
-                            ></div>
-                            <div
-                              className="w-1.5 h-1.5 rounded-full animate-bounce"
-                              style={{
-                                backgroundColor: '#64B5F6',
-                                animationDelay: '150ms'
-                              }}
-                            ></div>
-                            <div
-                              className="w-1.5 h-1.5 rounded-full animate-bounce"
-                              style={{
-                                backgroundColor: '#64B5F6',
-                                animationDelay: '300ms'
-                              }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {/* View Latest Messages Button */}
                   {showAllMessages && messages.length > 10 && (
@@ -4515,6 +4454,31 @@ const Messages: React.FC = (): JSX.Element => {
                 </div>
               )}
             </div>
+
+            {/* Typing Indicator - Fixed above input */}
+            {isOtherUserTyping && (
+              <div className="px-4 py-2 bg-white border-t border-gray-100">
+                <div className="flex items-center space-x-2">
+                  <div className="flex space-x-1">
+                    <div
+                      className="w-1.5 h-1.5 rounded-full animate-bounce"
+                      style={{ backgroundColor: '#64B5F6', animationDelay: '0ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 rounded-full animate-bounce"
+                      style={{ backgroundColor: '#64B5F6', animationDelay: '150ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 rounded-full animate-bounce"
+                      style={{ backgroundColor: '#64B5F6', animationDelay: '300ms' }}
+                    ></div>
+                  </div>
+                  <span className="text-xs" style={{ color: '#64B5F6' }}>
+                    {currentConversation?.otherParticipant?.firstName || 'User'} is typing...
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Fixed Input Bar at Bottom */}
             <div className="border-t border-gray-200 px-4 py-3 bg-white">
@@ -5323,7 +5287,17 @@ const Messages: React.FC = (): JSX.Element => {
                               </div>
                               <div className="flex items-center justify-between -mt-1">
                                 <p className="text-xs md:text-sm truncate flex items-center">
-                                  {lastMessagePreview.text ? (
+                                  {/* Show "Typing..." when other user is typing in this conversation */}
+                                  {typingUsers[conv.id] ? (
+                                    <span className="flex items-center" style={{ color: '#64B5F6', fontStyle: 'italic' }}>
+                                      <span className="flex space-x-0.5 mr-1">
+                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: '#64B5F6', animationDelay: '0ms' }}></span>
+                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: '#64B5F6', animationDelay: '150ms' }}></span>
+                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: '#64B5F6', animationDelay: '300ms' }}></span>
+                                      </span>
+                                      Typing...
+                                    </span>
+                                  ) : lastMessagePreview.text ? (
                                     <>
                                       {isIncoming ? null : (
                                         <span
@@ -6517,7 +6491,7 @@ const Messages: React.FC = (): JSX.Element => {
                                     {showReactionEmojiPicker && (
                                       <div
                                         className="absolute top-full mt-2 z-50"
-                                        style={{ left: '50%', transform: 'translateX(-50%)' }}
+                                        style={{ right: 0 }}
                                         onClick={(e) => e.stopPropagation()}
                                       >
                                         <EmojiPicker
@@ -6674,8 +6648,8 @@ const Messages: React.FC = (): JSX.Element => {
                                 </div>
                               )}
 
-                              {/* Message bubble (only if there's text or voice or documents) */}
-                              {((!message.images || message.images.length === 0) && (message.text || message.type === 'voice' || message.messageType === 'VOICE' || (message.documents && message.documents.length > 0))) && (
+                              {/* Message bubble (only if there's text or voice or documents or deleted message) */}
+                              {((!message.images || message.images.length === 0) && (message.text || message.isDeletedForMe || message.type === 'voice' || message.messageType === 'VOICE' || (message.documents && message.documents.length > 0))) && (
                                 <div
                                   className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`}
                                   style={{
@@ -6820,10 +6794,69 @@ const Messages: React.FC = (): JSX.Element => {
                                   ) : (
                                     // Text Message Display
                                     <>
-                                      {/* Reply Section */}
+                                      {/* Reply Section - Desktop */}
                                       {message.replyTo && (
                                         <div className="mb-3">
-                                          {/* Replied Message Text Above */}
+                                          {/* User's NEW message text ABOVE */}
+                                          {(message.text || message.isDeletedForMe) && (
+                                            <p
+                                              className="text-sm mb-2"
+                                              style={{
+                                                color: message.isIncoming ? '#6A6A6A' : '#FFFFFF',
+                                                fontStyle: message.isDeletedForMe ? 'italic' : 'normal',
+                                                opacity: message.isDeletedForMe ? 0.7 : 1
+                                              }}
+                                            >
+                                              {message.isDeletedForMe ? 'You deleted this message' : message.text}
+                                            </p>
+                                          )}
+
+                                          {/* Replied-to message BELOW with vertical line */}
+                                          <div
+                                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (message.replyTo?.id) {
+                                                scrollToMessage(message.replyTo.id);
+                                              }
+                                            }}
+                                          >
+                                            <div className="flex items-stretch">
+                                              {/* Vertical line on LEFT */}
+                                              <div
+                                                className="rounded-full mr-2"
+                                                style={{
+                                                  width: '2px',
+                                                  backgroundColor: message.isIncoming ? '#64B5F6' : '#FFFFFF',
+                                                  flexShrink: 0,
+                                                  alignSelf: 'stretch'
+                                                }}
+                                              ></div>
+
+                                              {/* Quoted message info */}
+                                              <div className="flex-1">
+                                                <p className="text-xs font-medium mb-0.5" style={{ color: message.isIncoming ? '#64B5F6' : 'rgba(255, 255, 255, 0.9)' }}>
+                                                  {getReplySenderLabel(message.replyTo.sender, message.isIncoming)}
+                                                </p>
+                                                {message.replyTo.type === 'voice' ? (
+                                                  <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)' }}>
+                                                    🎤 Voice message ({Math.floor((message.replyTo.duration || 0) / 60)}:{((message.replyTo.duration || 0) % 60).toString().padStart(2, '0')})
+                                                  </p>
+                                                ) : (
+                                                  <p className="text-xs" style={{ color: message.isIncoming ? '#6A6A6A' : 'rgba(255, 255, 255, 0.6)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: '1.3' }}>
+                                                    {message.replyTo.text}
+                                                  </p>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* REMOVING OLD COMPLEX REPLY STRUCTURE - REPLACED ABOVE */}
+                                      {false && message.replyTo && (
+                                        <div className="mb-3 hidden">
+                                          {/* OLD: Replied Message Text Above */}
                                           <div
                                             className="cursor-pointer hover:opacity-80 transition-opacity mb-2"
                                             onClick={(e) => {
@@ -6976,24 +7009,32 @@ const Messages: React.FC = (): JSX.Element => {
                                           </div>
 
                                           {/* Reply Text Below */}
-                                          {message.text && (
+                                          {(message.text || message.isDeletedForMe) && (
                                             <p
                                               className="text-sm mb-3"
-                                              style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                              style={{
+                                                color: message.isIncoming ? '#6A6A6A' : '#FFFFFF',
+                                                fontStyle: message.isDeletedForMe ? 'italic' : 'normal',
+                                                opacity: message.isDeletedForMe ? 0.7 : 1
+                                              }}
                                             >
-                                              {message.text}
+                                              {message.isDeletedForMe ? 'You deleted this message' : message.text}
                                             </p>
                                           )}
                                         </div>
                                       )}
 
-                                      {/* Regular message text (only show if no reply) */}
-                                      {!message.replyTo && (
+                                      {/* Regular message text (only show if no reply and has text or is deleted) */}
+                                      {!message.replyTo && (message.text || message.isDeletedForMe) && (
                                         <p
                                           className="text-sm mb-3"
-                                          style={{ color: message.isIncoming ? '#6A6A6A' : '#FFFFFF' }}
+                                          style={{
+                                            color: message.isIncoming ? '#6A6A6A' : '#FFFFFF',
+                                            fontStyle: message.isDeletedForMe ? 'italic' : 'normal',
+                                            opacity: message.isDeletedForMe ? 0.7 : 1
+                                          }}
                                         >
-                                          {message.text}
+                                          {message.isDeletedForMe ? 'You deleted this message' : message.text}
                                         </p>
                                       )}
 
@@ -7161,8 +7202,12 @@ const Messages: React.FC = (): JSX.Element => {
                                     {/* Reaction Display - LEFT of timestamp */}
                                     {message.reaction && (
                                       <div
-                                        className="mr-6 cursor-pointer hover:opacity-80 transition-opacity"
-                                        onClick={() => handleRemoveReaction(message.id)}
+                                        className={`mr-6 ${message.reactions?.some((r: any) => String(r.userId) === String(user?.id)) ? 'cursor-pointer hover:opacity-80' : 'cursor-default'} transition-opacity`}
+                                        onClick={() => {
+                                          if (message.reactions?.some((r: any) => String(r.userId) === String(user?.id))) {
+                                            handleRemoveReaction(message.id);
+                                          }
+                                        }}
                                         style={{
                                           backgroundColor: '#FFFFFF',
                                           border: '1px solid #F1F1F1',
@@ -7177,9 +7222,12 @@ const Messages: React.FC = (): JSX.Element => {
                                           gap: '8px'
                                         }}
                                       >
-                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
+                                        {/* Only show X icon if user owns the reaction */}
+                                        {message.reactions?.some((r: any) => String(r.userId) === String(user?.id)) && (
+                                          <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                          </svg>
+                                        )}
                                         <span style={{ fontSize: '14px', lineHeight: 1 }}>
                                           {message.reaction}
                                         </span>
@@ -7256,8 +7304,12 @@ const Messages: React.FC = (): JSX.Element => {
                                     {/* Reaction Display - RIGHT of timestamp */}
                                     {message.reaction && (
                                       <div
-                                        className="ml-6 cursor-pointer hover:opacity-80 transition-opacity"
-                                        onClick={() => handleRemoveReaction(message.id)}
+                                        className={`ml-6 ${message.reactions?.some((r: any) => String(r.userId) === String(user?.id)) ? 'cursor-pointer hover:opacity-80' : 'cursor-default'} transition-opacity`}
+                                        onClick={() => {
+                                          if (message.reactions?.some((r: any) => String(r.userId) === String(user?.id))) {
+                                            handleRemoveReaction(message.id);
+                                          }
+                                        }}
                                         style={{
                                           backgroundColor: '#FFFFFF',
                                           border: '1px solid #F1F1F1',
@@ -7272,9 +7324,12 @@ const Messages: React.FC = (): JSX.Element => {
                                           gap: '8px'
                                         }}
                                       >
-                                        <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
+                                        {/* Only show X icon if user owns the reaction */}
+                                        {message.reactions?.some((r: any) => String(r.userId) === String(user?.id)) && (
+                                          <svg style={{ width: '14px', height: '14px', color: '#BABABA' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                          </svg>
+                                        )}
                                         <span style={{ fontSize: '14px', lineHeight: 1 }}>
                                           {message.reaction}
                                         </span>
@@ -7544,42 +7599,6 @@ const Messages: React.FC = (): JSX.Element => {
                         );
                       })}
 
-                      {/* Typing Indicator */}
-                      {isSellerTyping && (
-                        <div className="flex justify-start mb-4">
-                          <div className="max-w-20">
-                            <div
-                              className="rounded-2xl rounded-bl-md px-3 py-2 flex items-center"
-                              style={{ backgroundColor: '#F0F8FE' }}
-                            >
-                              <div className="flex space-x-1">
-                                <div
-                                  className="w-1.5 h-1.5 rounded-full animate-bounce"
-                                  style={{
-                                    backgroundColor: '#64B5F6',
-                                    animationDelay: '0ms'
-                                  }}
-                                ></div>
-                                <div
-                                  className="w-1.5 h-1.5 rounded-full animate-bounce"
-                                  style={{
-                                    backgroundColor: '#64B5F6',
-                                    animationDelay: '150ms'
-                                  }}
-                                ></div>
-                                <div
-                                  className="w-1.5 h-1.5 rounded-full animate-bounce"
-                                  style={{
-                                    backgroundColor: '#64B5F6',
-                                    animationDelay: '300ms'
-                                  }}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
                       {/* View Latest Messages Button */}
                       {showAllMessages && messages.length > 10 && (
                         <div className="flex justify-center mt-4 mb-4">
@@ -7602,6 +7621,31 @@ const Messages: React.FC = (): JSX.Element => {
                   )}
                 </div>
                 {/* End Scrollable Content Area */}
+
+                {/* Typing Indicator - Fixed above input */}
+                {isOtherUserTyping && (
+                  <div className="px-6 py-2 bg-white">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <div
+                          className="w-2 h-2 rounded-full animate-bounce"
+                          style={{ backgroundColor: '#64B5F6', animationDelay: '0ms' }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 rounded-full animate-bounce"
+                          style={{ backgroundColor: '#64B5F6', animationDelay: '150ms' }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 rounded-full animate-bounce"
+                          style={{ backgroundColor: '#64B5F6', animationDelay: '300ms' }}
+                        ></div>
+                      </div>
+                      <span className="text-sm" style={{ color: '#64B5F6' }}>
+                        {currentConversation?.otherParticipant?.firstName || 'User'} is typing...
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Message Input - Fixed at Bottom */}
                 <div className={`px-6 pb-6 flex-shrink-0 ${messages.length > 0 ? 'py-2' : '-mt-2'}`}>
@@ -8105,39 +8149,41 @@ const Messages: React.FC = (): JSX.Element => {
                         </div>
                       )}
 
-
                       {/* Reply Preview */}
                       {replyToMessage && (
-                        <div className="mb-2 px-3 py-2 rounded-lg" style={{ backgroundColor: '#F0F8FE', border: '1px solid #64B5F6' }}>
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-stretch">
-                                <div
-                                  className="rounded-full mr-2"
-                                  style={{
-                                    width: '2px',
-                                    backgroundColor: '#64B5F6',
-                                    flexShrink: 0,
-                                    alignSelf: 'stretch'
-                                  }}
-                                ></div>
-                                <div className="flex-1">
-                                  <p className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
-                                    {getReplySenderLabel(replyToMessage.sender, replyToMessage.isIncoming)}
-                                  </p>
-                                  <p className="text-xs truncate" style={{ color: '#6A6A6A' }}>
-                                    {replyToMessage.text || replyToMessage.content || (replyToMessage.type === 'voice' ? 'Voice message' : '')}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => setReplyToMessage(null)}
-                              className="ml-2 flex-shrink-0 hover:opacity-70"
-                            >
-                              <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
-                            </button>
+                        <div className="rounded-lg p-2 pl-4 pr-8 relative flex"
+                          style={{
+                            backgroundColor: '#FAFAFA'
+                          }}
+                        >
+                          {/* blue line inside */}
+                          <div
+                            className="rounded-full mr-3"
+                            style={{
+                              width: '2px',
+                              backgroundColor: '#64B5F6',
+                              flexShrink: 0,
+                            }}
+                          >
                           </div>
+
+                          {/* content */}
+                          <div className="flex-1">
+                            <p className="text-xs font-medium mb-0.5" style={{ color: '#64B5F6' }}>
+                              {getReplySenderLabel(replyToMessage.sender, replyToMessage.isIncoming)}
+                            </p>
+                            <p className="text-xs truncate" style={{ color: '#6A6A6A' }}>
+                              {replyToMessage.text || replyToMessage.content || (replyToMessage.type === 'voice' ? 'Voice message' : '')}
+                            </p>
+                          </div>
+
+                          {/* close button */}
+                          <button
+                            onClick={() => setReplyToMessage(null)}
+                            className="ml-2 flex-shrink-0 hover:opacity-70"
+                          >
+                            <img src={replyCloseIcon} alt="Close" className="w-4 h-4" />
+                          </button>
                         </div>
                       )}
 

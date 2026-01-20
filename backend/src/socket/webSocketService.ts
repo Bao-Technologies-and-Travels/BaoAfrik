@@ -1,5 +1,6 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { ChatService } from '../services/chatService';
+import { notificationService } from '../services/notificationService';
 import jwt from 'jsonwebtoken';
 import prisma from '@/config/database';
 interface AuthenticatedSocket extends Socket {
@@ -281,6 +282,12 @@ export class WebSocketService {
         await this.handleJoinConversation(authenticatedSocket, conversationId);
       });
 
+      socket.on('leave_conversation', (conversationId) => {
+        if (conversationId) {
+          socket.leave(`conversation:${conversationId}`);
+        }
+      });
+
       socket.on('typing_start', (data) => {
         this.handleTypingStart(authenticatedSocket, data);
       });
@@ -458,7 +465,7 @@ export class WebSocketService {
       const hasFiles = files && Array.isArray(files) && files.length > 0;
       const hasFileUrl = !!fileUrl;
       const hasContent = !!content && content.trim().length > 0;
-      
+
       if (!conversationId || (!hasContent && !hasFileUrl && !hasFiles)) {
         throw new Error('Missing required message fields');
       }
@@ -522,7 +529,7 @@ export class WebSocketService {
           waveformLength: data.waveformData?.length || 0,
           existingProductData: !!normalizedProductData
         });
-        
+
         if (!normalizedProductData) {
           normalizedProductData = {};
         }
@@ -533,7 +540,7 @@ export class WebSocketService {
           normalizedProductData._waveformData = data.waveformData;
           console.log('[VOICE] Stored waveformData in normalizedProductData, length:', data.waveformData.length);
         }
-        
+
         console.log('[VOICE] normalizedProductData after processing:', {
           hasVoiceDuration: !!normalizedProductData._voiceDuration,
           hasWaveformData: !!normalizedProductData._waveformData,
@@ -549,7 +556,7 @@ export class WebSocketService {
 
       // For voice messages, also set audioUrl
       const audioUrl = finalMessageType === 'VOICE' ? finalFileUrl : undefined;
-      
+
       const message = await this.chatService.sendMessage({
         content: content || '', // Allow empty content if files are present
         conversationId,
@@ -579,7 +586,7 @@ export class WebSocketService {
         } else {
           parsedProductData = message.productData;
         }
-        
+
         // Extract files from productData if stored there
         if (parsedProductData && parsedProductData._files && Array.isArray(parsedProductData._files)) {
           extractedFiles = parsedProductData._files;
@@ -609,7 +616,7 @@ export class WebSocketService {
         } : null,
         productData: parsedProductData
       };
-      
+
       // Include voice message properties if this is a voice message
       if (finalMessageType === 'VOICE' && data.voiceDuration) {
         messageResponse.type = 'voice';
@@ -657,7 +664,27 @@ export class WebSocketService {
       for (const recipientId of recipientIds) {
         try {
           const senderName = `${socket.user?.firstName || ''} ${socket.user?.lastName || ''}`.trim() || socket.user?.email || 'Someone';
-          const preview = (content || '').toString().slice(0, 120);
+          const preview = finalMessageType === 'VOICE' || finalMessageType === 'AUDIO'
+            ? 'Sent you a voice message'
+            : (content || '').toString().slice(0, 120) || 'Sent you a message';
+
+          // Create persistent notification in database
+          await notificationService.createNotification({
+            userId: recipientId,
+            actorId: senderId,
+            type: 'message',
+            message: preview,
+            metadata: {
+              conversationId,
+              messageId: message.id,
+              senderName,
+              senderId,
+              senderImage: socket.user?.profileImage || null,
+              messageType: finalMessageType
+            }
+          });
+
+          // Emit real-time notification
           this.io.to(recipientId).emit('new_message_notification', {
             conversationId,
             messageId: message.id,
@@ -666,9 +693,16 @@ export class WebSocketService {
             senderId,
             senderImage: socket.user?.profileImage || null
           });
-          const counts = await this.chatService.getUnreadCounts(recipientId);
-          const totalUnread = (counts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
-          this.io.to(recipientId).emit('notification_count', { totalUnread });
+
+          // Get updated unread counts (both chat and notifications)
+          const chatCounts = await this.chatService.getUnreadCounts(recipientId);
+          const totalChatUnread = (chatCounts || []).reduce((s: number, c: any) => s + (c.unreadCount || 0), 0);
+          const notificationUnread = await notificationService.getUnreadCount(recipientId);
+
+          this.io.to(recipientId).emit('notification_count', {
+            totalUnread: totalChatUnread,
+            notificationCount: notificationUnread
+          });
         } catch (e) {
           console.warn('Failed to emit message notification/count', e);
         }
@@ -676,7 +710,7 @@ export class WebSocketService {
 
       // Emit to sender: message_sent
       socket.emit('message_sent', { ...messageResponse, isIncoming: false, status: 'SENT' });
-      
+
       // Also emit status update to sender immediately after sending
       socket.emit('message_status_updated', {
         messageId: message.id,
@@ -715,22 +749,64 @@ export class WebSocketService {
     const { conversationId } = data;
     const userId = socket.user!.id;
 
-    socket.to(`conversation:${conversationId}`).emit('user_typing', {
+    if (!conversationId) {
+      return;
+    }
+
+    const typingData = {
       conversationId,
       userId,
       userName: `${socket.user!.firstName} ${socket.user!.lastName}`.trim() || socket.user!.email
-    });
+    };
+
+    // Emit to the conversation room (excluding the sender) - this is immediate
+    socket.to(`conversation:${conversationId}`).emit('user_typing', typingData);
+
+    // Also broadcast to all sockets in the user's personal room (for reliability)
+    // This handles cases where user might not have joined the conversation room yet
+    this.broadcastTypingToParticipants(conversationId, userId, 'user_typing', typingData);
   }
 
   private handleTypingStop(socket: AuthenticatedSocket, data: any) {
     const { conversationId } = data;
     const userId = socket.user!.id;
 
-    if (!conversationId) return;
+    if (!conversationId) {
+      return;
+    }
 
-    socket.to(`conversation:${conversationId}`).emit('user_stop_typing', {
+    const typingData = {
       conversationId,
       userId
+    };
+
+    // Emit to the conversation room (excluding the sender) - this is immediate
+    socket.to(`conversation:${conversationId}`).emit('user_stop_typing', typingData);
+
+    // Also broadcast to participants' personal rooms
+    this.broadcastTypingToParticipants(conversationId, userId, 'user_stop_typing', typingData);
+  }
+
+  // Non-blocking background broadcast to participant personal rooms
+  private broadcastTypingToParticipants(conversationId: string, senderId: string, event: string, data: any) {
+    // Fire and forget - don't await
+    prisma.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        participants: {
+          select: { userId: true }
+        }
+      }
+    }).then(conversation => {
+      if (conversation?.participants) {
+        for (const participant of conversation.participants) {
+          if (participant.userId !== senderId) {
+            this.io.to(participant.userId).emit(event, data);
+          }
+        }
+      }
+    }).catch(() => {
+      // Silently ignore errors - the conversation room broadcast already went out
     });
   }
 
@@ -745,14 +821,14 @@ export class WebSocketService {
         conversationId,
         userId
       });
-      
+
       // Broadcast to all participants in the conversation room
       this.io.to(`conversation:${conversationId}`).emit('messages_read', {
         messageIds,
         conversationId,
         readBy: userId
       });
-      
+
       // Also send status updates for each message to mark as read
       for (const messageId of messageIds) {
         this.io.to(`conversation:${conversationId}`).emit('message_status_updated', {
@@ -878,11 +954,11 @@ export class WebSocketService {
       }
 
       const result = await this.chatService.addReaction(messageId, userId, reaction);
-      
+
       // Get conversation ID and participants from message
       const message = await prisma.message.findUnique({
         where: { id: messageId },
-        select: { 
+        select: {
           conversationId: true,
           conversation: {
             include: {
@@ -911,7 +987,7 @@ export class WebSocketService {
 
         // Broadcast reaction to the conversation room
         this.io.to(`conversation:${message.conversationId}`).emit('reaction_added', reactionData);
-        
+
         // Also broadcast to each participant's personal room to ensure they receive it
         if (message.conversation?.participants) {
           for (const participant of message.conversation.participants) {
@@ -931,7 +1007,7 @@ export class WebSocketService {
 
   private async handleRemoveReaction(socket: AuthenticatedSocket, data: any) {
     try {
-      const { messageId } = data;
+      const { messageId, reaction } = data;
       const userId = socket.user!.id;
 
       if (!messageId) {
@@ -944,7 +1020,7 @@ export class WebSocketService {
       // Get conversation ID and participants from message
       const message = await prisma.message.findUnique({
         where: { id: messageId },
-        select: { 
+        select: {
           conversationId: true,
           conversation: {
             include: {
@@ -960,12 +1036,13 @@ export class WebSocketService {
         const removalData = {
           messageId,
           conversationId: message.conversationId,
-          userId
+          userId,
+          reaction // Include the reaction that was removed
         };
 
         // Broadcast reaction removal to the conversation room
         this.io.to(`conversation:${message.conversationId}`).emit('reaction_removed', removalData);
-        
+
         // Also broadcast to each participant's personal room
         if (message.conversation?.participants) {
           for (const participant of message.conversation.participants) {
@@ -985,7 +1062,7 @@ export class WebSocketService {
 
   private async handleUpdateMessageMetadata(socket: AuthenticatedSocket, data: any) {
     try {
-      const { messageId, isPinned, isArchived, isImportant, label } = data;
+      const { messageId, isPinned, isArchived, isImportant, isDeletedForMe, label } = data;
       const userId = socket.user!.id;
 
       if (!messageId) {
@@ -997,11 +1074,16 @@ export class WebSocketService {
         isPinned,
         isArchived,
         isImportant,
+        isDeletedForMe,
         label
       });
 
-      // Metadata updates are user-specific, only notify the user who made the change
-      socket.emit('metadata_updated_success', { messageId, metadata });
+      // Emit success with the updated metadata
+      socket.emit('message_metadata_updated', {
+        messageId,
+        metadata,
+        isDeletedForMe: metadata.isDeletedForMe
+      });
     } catch (error: any) {
       console.error('Error updating message metadata:', error);
       socket.emit('metadata_error', { error: error.message || 'Failed to update message metadata' });

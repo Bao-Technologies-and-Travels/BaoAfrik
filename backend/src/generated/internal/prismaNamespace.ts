@@ -2197,6 +2197,7 @@ export const MessageMetadataScalarFieldEnum = {
   isPinned: 'isPinned',
   isArchived: 'isArchived',
   isImportant: 'isImportant',
+  isDeletedForMe: 'isDeletedForMe',
   label: 'label',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

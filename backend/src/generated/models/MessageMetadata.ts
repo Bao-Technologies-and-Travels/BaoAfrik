@@ -31,6 +31,7 @@ export type MessageMetadataMinAggregateOutputType = {
   isPinned: boolean | null
   isArchived: boolean | null
   isImportant: boolean | null
+  isDeletedForMe: boolean | null
   label: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -43,6 +44,7 @@ export type MessageMetadataMaxAggregateOutputType = {
   isPinned: boolean | null
   isArchived: boolean | null
   isImportant: boolean | null
+  isDeletedForMe: boolean | null
   label: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -55,6 +57,7 @@ export type MessageMetadataCountAggregateOutputType = {
   isPinned: number
   isArchived: number
   isImportant: number
+  isDeletedForMe: number
   label: number
   createdAt: number
   updatedAt: number
@@ -69,6 +72,7 @@ export type MessageMetadataMinAggregateInputType = {
   isPinned?: true
   isArchived?: true
   isImportant?: true
+  isDeletedForMe?: true
   label?: true
   createdAt?: true
   updatedAt?: true
@@ -81,6 +85,7 @@ export type MessageMetadataMaxAggregateInputType = {
   isPinned?: true
   isArchived?: true
   isImportant?: true
+  isDeletedForMe?: true
   label?: true
   createdAt?: true
   updatedAt?: true
@@ -93,6 +98,7 @@ export type MessageMetadataCountAggregateInputType = {
   isPinned?: true
   isArchived?: true
   isImportant?: true
+  isDeletedForMe?: true
   label?: true
   createdAt?: true
   updatedAt?: true
@@ -178,6 +184,7 @@ export type MessageMetadataGroupByOutputType = {
   isPinned: boolean
   isArchived: boolean
   isImportant: boolean
+  isDeletedForMe: boolean
   label: string | null
   createdAt: Date
   updatedAt: Date
@@ -211,6 +218,7 @@ export type MessageMetadataWhereInput = {
   isPinned?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   isArchived?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   isImportant?: Prisma.BoolFilter<"MessageMetadata"> | boolean
+  isDeletedForMe?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   label?: Prisma.StringNullableFilter<"MessageMetadata"> | string | null
   createdAt?: Prisma.DateTimeFilter<"MessageMetadata"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageMetadata"> | Date | string
@@ -225,6 +233,7 @@ export type MessageMetadataOrderByWithRelationInput = {
   isPinned?: Prisma.SortOrder
   isArchived?: Prisma.SortOrder
   isImportant?: Prisma.SortOrder
+  isDeletedForMe?: Prisma.SortOrder
   label?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -243,6 +252,7 @@ export type MessageMetadataWhereUniqueInput = Prisma.AtLeast<{
   isPinned?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   isArchived?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   isImportant?: Prisma.BoolFilter<"MessageMetadata"> | boolean
+  isDeletedForMe?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   label?: Prisma.StringNullableFilter<"MessageMetadata"> | string | null
   createdAt?: Prisma.DateTimeFilter<"MessageMetadata"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageMetadata"> | Date | string
@@ -257,6 +267,7 @@ export type MessageMetadataOrderByWithAggregationInput = {
   isPinned?: Prisma.SortOrder
   isArchived?: Prisma.SortOrder
   isImportant?: Prisma.SortOrder
+  isDeletedForMe?: Prisma.SortOrder
   label?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -275,6 +286,7 @@ export type MessageMetadataScalarWhereWithAggregatesInput = {
   isPinned?: Prisma.BoolWithAggregatesFilter<"MessageMetadata"> | boolean
   isArchived?: Prisma.BoolWithAggregatesFilter<"MessageMetadata"> | boolean
   isImportant?: Prisma.BoolWithAggregatesFilter<"MessageMetadata"> | boolean
+  isDeletedForMe?: Prisma.BoolWithAggregatesFilter<"MessageMetadata"> | boolean
   label?: Prisma.StringNullableWithAggregatesFilter<"MessageMetadata"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MessageMetadata"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MessageMetadata"> | Date | string
@@ -285,6 +297,7 @@ export type MessageMetadataCreateInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -299,6 +312,7 @@ export type MessageMetadataUncheckedCreateInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -309,6 +323,7 @@ export type MessageMetadataUpdateInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -323,6 +338,7 @@ export type MessageMetadataUncheckedUpdateInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,6 +351,7 @@ export type MessageMetadataCreateManyInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -345,6 +362,7 @@ export type MessageMetadataUpdateManyMutationInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -357,6 +375,7 @@ export type MessageMetadataUncheckedUpdateManyInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -384,6 +403,7 @@ export type MessageMetadataCountOrderByAggregateInput = {
   isPinned?: Prisma.SortOrder
   isArchived?: Prisma.SortOrder
   isImportant?: Prisma.SortOrder
+  isDeletedForMe?: Prisma.SortOrder
   label?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -396,6 +416,7 @@ export type MessageMetadataMaxOrderByAggregateInput = {
   isPinned?: Prisma.SortOrder
   isArchived?: Prisma.SortOrder
   isImportant?: Prisma.SortOrder
+  isDeletedForMe?: Prisma.SortOrder
   label?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -408,6 +429,7 @@ export type MessageMetadataMinOrderByAggregateInput = {
   isPinned?: Prisma.SortOrder
   isArchived?: Prisma.SortOrder
   isImportant?: Prisma.SortOrder
+  isDeletedForMe?: Prisma.SortOrder
   label?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -502,6 +524,7 @@ export type MessageMetadataCreateWithoutUserInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -514,6 +537,7 @@ export type MessageMetadataUncheckedCreateWithoutUserInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -555,6 +579,7 @@ export type MessageMetadataScalarWhereInput = {
   isPinned?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   isArchived?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   isImportant?: Prisma.BoolFilter<"MessageMetadata"> | boolean
+  isDeletedForMe?: Prisma.BoolFilter<"MessageMetadata"> | boolean
   label?: Prisma.StringNullableFilter<"MessageMetadata"> | string | null
   createdAt?: Prisma.DateTimeFilter<"MessageMetadata"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MessageMetadata"> | Date | string
@@ -565,6 +590,7 @@ export type MessageMetadataCreateWithoutMessageInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -577,6 +603,7 @@ export type MessageMetadataUncheckedCreateWithoutMessageInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -614,6 +641,7 @@ export type MessageMetadataCreateManyUserInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -624,6 +652,7 @@ export type MessageMetadataUpdateWithoutUserInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -636,6 +665,7 @@ export type MessageMetadataUncheckedUpdateWithoutUserInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -647,6 +677,7 @@ export type MessageMetadataUncheckedUpdateManyWithoutUserInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -658,6 +689,7 @@ export type MessageMetadataCreateManyMessageInput = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -668,6 +700,7 @@ export type MessageMetadataUpdateWithoutMessageInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -680,6 +713,7 @@ export type MessageMetadataUncheckedUpdateWithoutMessageInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -691,6 +725,7 @@ export type MessageMetadataUncheckedUpdateManyWithoutMessageInput = {
   isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isArchived?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isImportant?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedForMe?: Prisma.BoolFieldUpdateOperationsInput | boolean
   label?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -705,6 +740,7 @@ export type MessageMetadataSelect<ExtArgs extends runtime.Types.Extensions.Inter
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -719,6 +755,7 @@ export type MessageMetadataSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -733,6 +770,7 @@ export type MessageMetadataSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -747,12 +785,13 @@ export type MessageMetadataSelectScalar = {
   isPinned?: boolean
   isArchived?: boolean
   isImportant?: boolean
+  isDeletedForMe?: boolean
   label?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MessageMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageId" | "userId" | "isPinned" | "isArchived" | "isImportant" | "label" | "createdAt" | "updatedAt", ExtArgs["result"]["messageMetadata"]>
+export type MessageMetadataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "messageId" | "userId" | "isPinned" | "isArchived" | "isImportant" | "isDeletedForMe" | "label" | "createdAt" | "updatedAt", ExtArgs["result"]["messageMetadata"]>
 export type MessageMetadataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   message?: boolean | Prisma.MessageDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -779,6 +818,7 @@ export type $MessageMetadataPayload<ExtArgs extends runtime.Types.Extensions.Int
     isPinned: boolean
     isArchived: boolean
     isImportant: boolean
+    isDeletedForMe: boolean
     label: string | null
     createdAt: Date
     updatedAt: Date
@@ -1213,6 +1253,7 @@ export interface MessageMetadataFieldRefs {
   readonly isPinned: Prisma.FieldRef<"MessageMetadata", 'Boolean'>
   readonly isArchived: Prisma.FieldRef<"MessageMetadata", 'Boolean'>
   readonly isImportant: Prisma.FieldRef<"MessageMetadata", 'Boolean'>
+  readonly isDeletedForMe: Prisma.FieldRef<"MessageMetadata", 'Boolean'>
   readonly label: Prisma.FieldRef<"MessageMetadata", 'String'>
   readonly createdAt: Prisma.FieldRef<"MessageMetadata", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MessageMetadata", 'DateTime'>
