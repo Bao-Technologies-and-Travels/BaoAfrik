@@ -21,9 +21,8 @@ import avatar from '../../assets/images/logos/avatar.png';
 import logoIcon from '../../assets/images/logos/ba-brand-icon-colored.png';
 import messageAvatarIcon from '../../assets/images/pre/main.png';
 import appNotificationIcon from '../../assets/images/pre/nof.svg';
-import bar1Icon from '../../assets/images/admin/bar1.svg';
-import bar2Icon from '../../assets/images/admin/bar2.svg';
 import visualIcon from '../../assets/images/admin/visual.svg';
+import MustUsersArc from '../../components/ui/MustUsersArc';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -38,15 +37,6 @@ const AdminDashboard: React.FC = () => {
   const notificationDropdownRef = useRef<HTMLDivElement>(null);
   const menuDropdownRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-
-  // Country positions for the blue dot (x, y coordinates)
-  const countryPositions: { [key: string]: { x: number; y: number } } = {
-    'France': { x: 50, y: 45 },
-    'United Kingdom': { x: 48, y: 35 },
-    'Germany': { x: 52, y: 40 },
-    'Spain': { x: 45, y: 50 }
-  };
 
   // Mock notification data
   const [notifications, setNotifications] = useState([
@@ -188,14 +178,6 @@ const AdminDashboard: React.FC = () => {
     return `${day}, ${date} ${month}. ${year} - ${displayHours}:${displayMinutes} ${ampm}`;
   };
 
-  // Update dot position when country changes
-  useEffect(() => {
-    if (dotRef.current && countryPositions[selectedCountry]) {
-      const { x, y } = countryPositions[selectedCountry];
-      dotRef.current.style.left = `${x}%`;
-      dotRef.current.style.top = `${y}%`;
-    }
-  }, [selectedCountry]);
 
   return (
     <div style={{ backgroundColor: '#FAFAFA', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
@@ -1157,7 +1139,7 @@ const AdminDashboard: React.FC = () => {
                     ))}
                   </div>
 
-                  <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                  <div style={{ textAlign: 'right', marginTop: '12px' }}>
                     <button style={{
                       color: '#64B5F6',
                       fontSize: '11px',
@@ -1175,15 +1157,24 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Performance Overview - directly below metrics */}
+            {/* Row 2: Performance Overview (left) + User per country (right) */}
             <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginTop: '0',
+              marginBottom: '12px',
+              alignItems: 'start'
+            }}>
+            {/* Performance Overview - left 3 columns */}
+            <div style={{ 
+              gridColumn: '1 / 4',
               backgroundColor: '#FFFFFF',
               borderRadius: '24px',
-              padding: '16px',
+              padding: '16px 16px 95px 16px',
               border: '1px solid #F1F1F1',
-              marginTop: '-100px',
-              marginBottom: '12px',
-              maxWidth: '71.5%'
+              width: '100%',
+              marginTop: '-100px'
             }}>
                 <div style={{ 
                   display: 'flex', 
@@ -1263,75 +1254,213 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Chart Placeholder */}
-                <div style={{
-                  height: '120px',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  gap: '6px',
-                  padding: '12px 12px 0 12px',
-                  backgroundColor: '#FAFAFA',
-                  borderRadius: '8px'
-                }}>
-                  {[
-                    { month: 'Apr', height: 75 },
-                    { month: 'May', height: 90 },
-                    { month: 'Jun', height: 60 },
-                    { month: 'Jul', height: 50 },
-                    { month: 'Aug', height: 30 },
-                    { month: 'Sep', height: 70 },
-                    { month: 'Oct', height: 85 },
-                    { month: 'Nov', height: 35 },
-                    { month: 'Dec', height: 55, isCurrent: true }
-                  ].map((item) => (
-                    <div key={item.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{
-                        width: '100%',
-                        height: `${item.height}%`,
-                        backgroundColor: item.isCurrent ? '#F9A825' : '#9C9C9C',
-                        borderRadius: '4px 4px 0 0',
-                        marginBottom: '6px',
-                        position: 'relative'
-                      }}>
-                        {item.isCurrent && (
-                          <div style={{
-                            position: 'absolute',
-                            top: '-6px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '10px',
-                            height: '10px',
-                            borderRadius: '50%',
-                            backgroundColor: '#64B5F6'
-                          }} />
-                        )}
-                      </div>
-                      <span style={{ fontSize: '10px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>{item.month}</span>
+                {/* Chart */}
+                <div
+                  style={{
+                    position: 'relative',
+                    height: '200px',
+                    padding: '14px 14px 10px 14px',
+                    backgroundColor: '#FAFAFA',
+                    borderRadius: '12px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* Grid lines */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    {[0, 1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        style={{
+                          position: 'absolute',
+                          left: '0',
+                          right: '0',
+                          top: `${18 + i * 40}px`,
+                          borderTop: '1px dashed #D9D9D9',
+                          opacity: 1
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', height: '100%' }}>
+                    {/* Y-axis */}
+                    <div
+                      style={{
+                        width: '34px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        paddingTop: '8px',
+                        paddingBottom: '18px',
+                        flexShrink: 0
+                      }}
+                    >
+                      {['40k', '30k', '20k', '10k', '0k'].map((v) => (
+                        <span
+                          key={v}
+                          style={{
+                            fontSize: '11px',
+                            color: '#B0B0B0',
+                            fontFamily: 'Poppins, sans-serif',
+                            lineHeight: 1
+                          }}
+                        >
+                          {v}
+                        </span>
+                      ))}
                     </div>
-                  ))}
+
+                    {/* Bars + X axis */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <div
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          gap: '10px',
+                          paddingLeft: '6px',
+                          paddingRight: '6px',
+                          paddingBottom: '10px'
+                        }}
+                      >
+                        {[
+                          { month: 'Mar', h: 22 },
+                          { month: 'Apr', h: 32 },
+                          { month: 'May', h: 78 },
+                          { month: 'Jun', h: 46 },
+                          { month: 'Jul', h: 52 },
+                          { month: 'Aug', h: 54 },
+                          { month: 'Sep', h: 34 },
+                          { month: 'Oct', h: 50 },
+                          { month: 'Nov', h: 40 },
+                          { month: 'Dec', h: 64, isCurrent: true }
+                        ].map((item) => {
+                          const barWidth = 'clamp(12px, 2.2vw, 18px)';
+                          const radius = '999px';
+
+                          if (item.isCurrent) {
+                            return (
+                              <div
+                                key={item.month}
+                                style={{
+                                  flex: 1,
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  minWidth: 0
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: barWidth,
+                                    height: `${item.h}%`,
+                                    borderRadius: radius,
+                                    backgroundColor: '#F2B84B',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    boxShadow: '0 1px 0 rgba(0,0,0,0.02)'
+                                  }}
+                                >
+                                  {/* Diagonal stripe overlay */}
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      inset: 0,
+                                      backgroundImage:
+                                        'repeating-linear-gradient(135deg, rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 6px, rgba(255,255,255,0) 6px, rgba(255,255,255,0) 12px)'
+                                    }}
+                                  />
+
+                                  {/* Blue marker */}
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      top: '10px',
+                                      left: '50%',
+                                      transform: 'translateX(-50%)',
+                                      width: '10px',
+                                      height: '10px',
+                                      borderRadius: '50%',
+                                      backgroundColor: '#64B5F6',
+                                      boxShadow: '0 0 0 3px rgba(255,255,255,0.9)'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div
+                              key={item.month}
+                              style={{
+                                flex: 1,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                minWidth: 0
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: barWidth,
+                                  height: `${item.h}%`,
+                                  borderRadius: radius,
+                                  backgroundColor: 'rgba(180, 180, 180, 0.35)'
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '10px',
+                          paddingLeft: '6px',
+                          paddingRight: '6px'
+                        }}
+                      >
+                        {['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
+                          <div
+                            key={m}
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              {m}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
             </div>
 
-            {/* User per country - positioned like Reported Issues */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
-              gap: '10px',
-              marginTop: '-120px',
-              marginBottom: '12px',
-              alignItems: 'start'
-            }}>
-              {/* Empty space for first 3 columns */}
-              <div></div>
-              <div></div>
-              <div></div>
-              
-              {/* User per country */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* User per country - right column (independent of Performance Overview height) */}
+            <div style={{ gridColumn: '4', display: 'flex', flexDirection: 'column', marginTop: '12px' }}>
                 <div style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
-                  padding: '12px',
+                  padding: '10px',
                   border: '0.5px solid #F1F1F1',
                   width: '100%',
                   maxWidth: '320px'
@@ -1340,7 +1469,7 @@ const AdminDashboard: React.FC = () => {
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center',
-                    marginBottom: '12px'
+                    marginBottom: '0px'
                   }}>
                     <h2 style={{ 
                       fontSize: '14px',
@@ -1376,134 +1505,33 @@ const AdminDashboard: React.FC = () => {
                     display: 'flex', 
                     justifyContent: 'center', 
                     alignItems: 'center',
-                    marginBottom: '12px',
-                    position: 'relative',
-                    height: '140px'
+                    marginTop: '-74px',
+                    marginBottom: '8px'
                   }}>
-                    {/* Semi-circular progress bars */}
-                    <div style={{
-                      position: 'relative',
-                      width: '240px',
-                      height: '120px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'flex-end'
-                    }}>
-                      {/* 18 progress bars arranged in semi-circle */}
-                      {Array.from({ length: 18 }).map((_, index) => {
-                        // First 12 bars are UK (blue shades), last 6 are other countries (grey)
-                        const isUK = index < 12;
-                        let barColor = '#F4F4F4'; // default empty
-                        if (isUK) {
-                          // Use different shades of blue for UK bars
-                          if (index < 4) barColor = '#83C4F8';
-                          else if (index < 8) barColor = '#B8DDFB';
-                          else barColor = '#CFE8FC';
-                        } else {
-                          barColor = '#F4F4F4';
-                        }
-                        
-                        // Calculate rotation angle for semi-circle (0 to 180 degrees)
-                        const angle = (index * 180) / 17; // 0 to 180 degrees
-                        const rotation = angle - 90; // Start from left (-90) to right (90)
-                        const radius = 90; // Distance from center
-                        
-                        // Bar path for UK bars (from bar1.svg)
-                        const ukBarPath = "M7.88646 0.109009C4.63222 -0.515968 1.47175 1.61414 1.01088 4.89565C0.522854 8.37051 0.188118 11.8652 0.00764532 15.3695C-0.162785 18.6788 2.53587 21.3701 5.84958 21.3743L44.9405 21.423C48.2542 21.4271 50.9165 18.7391 51.2109 15.4384C51.2374 15.1414 51.2658 14.8445 51.2962 14.5477C51.6337 11.2513 49.5301 8.10672 46.2758 7.48174L7.88646 0.109009Z";
-                        // Bar path for other countries (from bar2.svg)
-                        const otherBarPath = "M45.4727 21.375C48.7864 21.375 51.4884 18.687 51.3221 15.3775C51.146 11.873 50.8156 8.37788 50.3319 4.90241C49.8751 1.62034 46.7173 -0.51371 43.4623 0.107224L5.06372 7.43213C1.80872 8.05306 -0.298859 11.195 0.0345459 14.4919C0.0645599 14.7886 0.0926361 15.0856 0.118759 15.3827C0.409027 18.6837 3.06801 21.375 6.38171 21.375H45.4727Z";
-                        
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              position: 'absolute',
-                              left: '50%',
-                              bottom: '0',
-                              transformOrigin: '50% 100%',
-                              transform: `translateX(-50%) rotate(${rotation}deg) translateY(-${radius}px)`,
-                              width: '52px',
-                              height: '22px'
-                            }}
-                          >
-                            <svg width="52" height="22" viewBox="0 0 52 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path 
-                                d={isUK ? ukBarPath : otherBarPath} 
-                                fill={barColor}
-                              />
-                            </svg>
-                          </div>
-                        );
-                      })}
-                      
-                      {/* Center percentage */}
-                      <div style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        textAlign: 'center',
-                        zIndex: 10
-                      }}>
-                        <p style={{
-                          fontSize: '24px',
-                          fontWeight: 600,
-                          color: '#212121',
-                          margin: 0,
-                          fontFamily: 'Bricolage Grotesque, sans-serif'
-                        }}>
-                          67.56%
-                        </p>
-                        <p style={{
-                          fontSize: '10px',
-                          color: '#B0B0B0',
-                          margin: '4px 0 0 0',
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          Must users: 104
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Legend - United Kingdom and Other countries side by side */}
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <div style={{ 
-                        width: '8px', 
-                        height: '8px', 
-                        borderRadius: '50%', 
-                        backgroundColor: '#83C4F8' 
-                      }} />
-                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>United Kingdom</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <div style={{ 
-                        width: '8px', 
-                        height: '8px', 
-                        borderRadius: '50%', 
-                        backgroundColor: '#F4F4F4' 
-                      }} />
-                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Other countries</span>
-                    </div>
+                    <MustUsersArc 
+                      percentage={67.56}
+                      users={104}
+                      width={200}
+                    />
                   </div>
 
                   {/* Country Breakdown Section */}
                   <div style={{
-                    padding: '12px',
+                    padding: '4px 10px',
                     backgroundColor: '#FAFAFA',
                     borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
-                    position: 'relative'
+                    gap: '10px',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}>
                     <div style={{ flex: 1 }}>
                       {/* Less users at top left */}
                       <p style={{ 
-                        fontSize: '10px',
+                        fontSize: '9px',
                         color: '#6A6A6A',
-                        margin: '0 0 8px 0',
+                        margin: '0 0 4px 0',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
                         Less users: 2.89%
@@ -1511,48 +1539,50 @@ const AdminDashboard: React.FC = () => {
                       
                       {/* France text */}
                       <p style={{ 
-                        fontSize: '11px',
+                        fontSize: '10px',
                         color: '#939393',
-                        margin: '0 0 4px 0',
+                        margin: '0 0 3px 0',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
                         France
                       </p>
                       
-                      {/* Users count and badge */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
+                      {/* Users count and badge - badge directly to the right in one line */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'nowrap' }}>
                         <span style={{ 
-                          fontSize: '12px', 
+                          fontSize: '11px', 
                           color: '#202224', 
                           fontWeight: 500, 
-                          fontFamily: 'Bricolage Grotesque, sans-serif' 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          whiteSpace: 'nowrap'
                         }}>
                           67 Users
                         </span>
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
-                          gap: '4px',
+                          gap: '3px',
                           backgroundColor: '#EDFBF0',
-                          padding: '2px 6px',
-                          borderRadius: '12px'
+                          padding: '2px 5px',
+                          borderRadius: '10px'
                         }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none">
                             <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                         </div>
                       </div>
                     </div>
                     
-                    {/* Globe visualization */}
+                    {/* Globe visualization - reduced size to fit appropriately */}
                     <div 
                       ref={globeRef}
                       style={{
-                        width: '80px',
-                        height: '80px',
+                        width: '160px',
+                        height: '65px',
                         position: 'relative',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        marginLeft: 'auto'
                       }}
                     >
                       <img 
@@ -1561,24 +1591,8 @@ const AdminDashboard: React.FC = () => {
                         style={{ 
                           width: '100%',
                           height: '100%',
-                          animation: 'rotateGlobe 20s linear infinite'
+                          objectFit: 'contain'
                         }} 
-                      />
-                      {/* Blue dot that moves based on selected country */}
-                      <div
-                        ref={dotRef}
-                        style={{
-                          position: 'absolute',
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          backgroundColor: '#64B5F6',
-                          left: `${countryPositions[selectedCountry]?.x || 50}%`,
-                          top: `${countryPositions[selectedCountry]?.y || 45}%`,
-                          transform: 'translate(-50%, -50%)',
-                          transition: 'left 0.5s ease, top 0.5s ease',
-                          zIndex: 10
-                        }}
                       />
                     </div>
                   </div>
