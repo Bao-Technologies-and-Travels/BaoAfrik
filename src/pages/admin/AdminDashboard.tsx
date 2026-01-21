@@ -23,6 +23,7 @@ import messageAvatarIcon from '../../assets/images/pre/main.png';
 import appNotificationIcon from '../../assets/images/pre/nof.svg';
 import visualIcon from '../../assets/images/admin/visual.svg';
 import MustUsersArc from '../../components/ui/MustUsersArc';
+import users2Icon from '../../assets/images/admin/users2.svg';
 import productImage1 from '../../assets/images/pre/a1.png';
 import productImage2 from '../../assets/images/pre/a2.png';
 import productImage3 from '../../assets/images/pre/a3.png';
@@ -96,6 +97,11 @@ const AdminDashboard: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<'users' | 'listings' | 'requests' | null>(null);
   const [searchResults, setSearchResults] = useState<any[]>([]);
 
+  // Users management page state (Option A: same table layout, data changes)
+  const [usersToggle, setUsersToggle] = useState<'activities' | 'list'>('activities');
+  const [usersActivityTab, setUsersActivityTab] = useState<'all' | 'joined' | 'posted' | 'reviewed' | 'reported'>('all');
+  const [usersSortBy, setUsersSortBy] = useState('Sort by');
+
   // Mock data for search
   const mockUsers = [
     { id: 1, name: 'Kevin Mobinnid', plan: 'Free Plan', verified: false, avatar: avatar },
@@ -112,6 +118,30 @@ const AdminDashboard: React.FC = () => {
   const mockRequests = [
     { id: 1, name: 'White Pepper for Kevination...', image: productImage3, category: 'Food & Spices' },
   ];
+
+  // Mock data for Users Management table
+  const usersActivitiesRows = [
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Free Plan', avatar, isNewUser: true, type: 'joined' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Free Plan', avatar, isNewUser: false, type: 'posted' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Starter plan', avatar, isNewUser: false, type: 'reviewed' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Pro plan', avatar, isNewUser: false, type: 'reported' as const },
+  ];
+
+  const filteredUsersActivitiesRows =
+    usersActivityTab === 'all'
+      ? usersActivitiesRows
+      : usersActivitiesRows.filter((r) => r.type === usersActivityTab);
+
+  const getPlanBadgeStyle = (plan: string) => {
+    const p = plan.toLowerCase();
+    if (p.includes('starter')) {
+      return { backgroundColor: '#F0F8FE', color: '#64B5F6' };
+    }
+    if (p.includes('pro')) {
+      return { backgroundColor: '#EDFBF0', color: '#45C55B' };
+    }
+    return { backgroundColor: '#F4F4F4', color: '#939393' };
+  };
 
   // Mock notification data
   const [notifications, setNotifications] = useState([
@@ -268,7 +298,7 @@ const AdminDashboard: React.FC = () => {
       section: 'MANAGEMENT',
       value: 'users',
       label: 'Users',
-      activeIcon: userIcon,
+      activeIcon: users2Icon,
       inactiveIcon: userIcon
     },
     {
@@ -1233,7 +1263,243 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Dashboard Content */}
-          <div>
+          {selectedSidebarOption === 'users' ? (
+            <div>
+              {/* Users Management Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h1 style={{
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    color: '#202224',
+                    margin: '0 0 4px 0',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}>
+                    Users Management
+                  </h1>
+                  <p style={{
+                    color: '#9C9C9C',
+                    fontSize: '12px',
+                    margin: 0,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Explore the recent actions and events performed by users within the BAO Afrik platform.
+                  </p>
+                </div>
+
+                {/* Toggle */}
+                <div style={{
+                  backgroundColor: '#939393',
+                  borderRadius: '12px',
+                  padding: '3px',
+                  display: 'flex',
+                  gap: '3px',
+                  flexShrink: 0
+                }}>
+                  {[
+                    { key: 'activities', label: 'User activities' },
+                    { key: 'list', label: 'User lists' }
+                  ].map((t) => {
+                    const isActive = usersToggle === (t.key as 'activities' | 'list');
+                    return (
+                      <button
+                        key={t.key}
+                        onClick={() => setUsersToggle(t.key as 'activities' | 'list')}
+                        style={{
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '6px 10px',
+                          borderRadius: '10px',
+                          backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                          color: isActive ? '#64B5F6' : '#939393',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          lineHeight: 1,
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Users Activities Table (same layout; data changes with toggle/tab) */}
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                border: '1px solid #F1F1F1',
+                padding: '12px 14px'
+              }}>
+                {/* Top bar 1: tabs + export + sort */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+                    {[
+                      { key: 'all', label: 'All user recent activities' },
+                      { key: 'joined', label: 'Joined' },
+                      { key: 'posted', label: 'Posted' },
+                      { key: 'reviewed', label: 'Reviewed' },
+                      { key: 'reported', label: 'Reported' },
+                    ].map((tab) => {
+                      const isActive = usersActivityTab === (tab.key as any);
+                      return (
+                        <button
+                          key={tab.key}
+                          onClick={() => setUsersActivityTab(tab.key as any)}
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            padding: '0 0 10px 0',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            color: isActive ? '#64B5F6' : '#B0B0B0',
+                            fontWeight: 400,
+                            borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                          }}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#64B5F6',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <span style={{ color: '#64B5F6' }}>Export data</span>
+                      <img
+                        src={exportIcon}
+                        alt="Export"
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                        }}
+                      />
+                    </button>
+
+                    <select
+                      value={usersSortBy}
+                      onChange={(e) => setUsersSortBy(e.target.value)}
+                      style={{
+                        padding: '0 22px 0 0',
+                        borderRadius: '8px',
+                        border: 'none',
+                        fontSize: '11px',
+                        color: '#B0B0B0',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 0px center',
+                        backgroundSize: '12px'
+                      }}
+                    >
+                      <option>Sort by</option>
+                      <option>Date</option>
+                      <option>Activity</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
+
+                {/* Top bar 2: column headers */}
+                <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '10px 0 8px 0' }}>
+                  {['Users', 'Date of creation', 'Activity', 'User plan', 'Actions'].map((h) => (
+                    <div key={h} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{h}</div>
+                  ))}
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1' }} />
+
+                {/* Rows */}
+                <div>
+                  {filteredUsersActivitiesRows.map((row, idx) => (
+                    <div key={`${row.email}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0', borderBottom: idx < filteredUsersActivitiesRows.length - 1 ? '1px solid #F7F7F7' : 'none' }}>
+                      {/* Users column */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.name}
+                            </span>
+                            {row.isNewUser && (
+                              <span style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '8px', borderRadius: '4px', padding: '2px 6px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
+                                New user
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                            {row.email}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date */}
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.date}</div>
+                      {/* Activity */}
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.activity}</div>
+
+                      {/* User plan */}
+                      <div style={{ paddingTop: '4px' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          fontSize: '9px',
+                          fontFamily: 'Poppins, sans-serif',
+                          ...getPlanBadgeStyle(row.plan)
+                        }}>
+                          {row.plan}
+                        </span>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px' }}>
+                        <button style={{ width: '28px', height: '28px', border: '1px solid #E4E4E4', borderRadius: '50%', background: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        </button>
+                        <button type="button" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #E4E4E4', backgroundColor: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
             {/* Metrics Cards and Reported Issues Container */}
             <div style={{ 
               display: 'grid', 
@@ -2355,7 +2621,8 @@ const AdminDashboard: React.FC = () => {
               </div>
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
