@@ -103,6 +103,8 @@ const AdminDashboard: React.FC = () => {
   const [usersSortBy, setUsersSortBy] = useState('Sort by');
   const [usersPage, setUsersPage] = useState(1);
   const [usersGoTo, setUsersGoTo] = useState('');
+  const [hoveredUserRowKey, setHoveredUserRowKey] = useState<string | null>(null);
+  const [selectedUserRowKey, setSelectedUserRowKey] = useState<string | null>(null);
 
   // Mock data for search
   const mockUsers = [
@@ -123,14 +125,16 @@ const AdminDashboard: React.FC = () => {
 
   // Mock data for Users Management table
   const usersActivitiesRows = [
-    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Free Plan', avatar, isNewUser: true, type: 'joined' as const },
-    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Free Plan', avatar, isNewUser: false, type: 'posted' as const },
-    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Starter plan', avatar, isNewUser: false, type: 'reviewed' as const },
-    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Pro plan', avatar, isNewUser: false, type: 'reported' as const },
-    { name: 'Nadine Ngum', email: 'nadine.ngum@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Pro plan', avatar, isNewUser: true, type: 'joined' as const },
-    { name: 'Herman Kabore', email: 'herman.kabore@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Starter plan', avatar, isNewUser: false, type: 'posted' as const },
-    { name: 'Amara Diop', email: 'amara.diop@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Free Plan', avatar, isNewUser: false, type: 'reviewed' as const },
-    { name: 'Aicha Diallo', email: 'aicha.diallo@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Free Plan', avatar, isNewUser: false, type: 'reported' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Free Plan', avatar, avatarBg: '#E3F2FD', isNewUser: true, type: 'joined' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses2@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Free Plan', avatar, avatarBg: '#F0F8FE', isNewUser: false, type: 'posted' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses3@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Starter plan', avatar, avatarBg: '#EDFBF0', isNewUser: false, type: 'reviewed' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses4@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Pro plan', avatar, avatarBg: '#FEF6E9', isNewUser: false, type: 'reported' as const },
+    { name: 'Nadine Ngum', email: 'nadine.ngum@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Pro plan', avatar, avatarBg: '#FFF5F5', isNewUser: true, type: 'joined' as const },
+    { name: 'Herman Kabore', email: 'herman.kabore@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Starter plan', avatar, avatarBg: '#F4F4F4', isNewUser: false, type: 'posted' as const },
+    { name: 'Amara Diop', email: 'amara.diop@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Free Plan', avatar, avatarBg: '#F3F4FF', isNewUser: false, type: 'reviewed' as const },
+    { name: 'Aicha Diallo', email: 'aicha.diallo@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Free Plan', avatar, avatarBg: '#F3FDF8', isNewUser: false, type: 'reported' as const },
+    { name: 'Kevin Mobinnid', email: 'kevin.mobinnid@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Starter plan', avatar, avatarBg: '#F0FFF8', isNewUser: true, type: 'joined' as const },
+    { name: 'Kevin Roland Tadjil', email: 'kevin.roland@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Pro plan', avatar, avatarBg: '#F6F0FF', isNewUser: false, type: 'posted' as const },
   ];
 
   const filteredUsersActivitiesRows =
@@ -138,7 +142,7 @@ const AdminDashboard: React.FC = () => {
       ? usersActivitiesRows
       : usersActivitiesRows.filter((r) => r.type === usersActivityTab);
 
-  const usersPageSize = 4;
+  const usersPageSize = 6;
   const usersTotalPages = 48; // match screenshot pagination
   const usersPaginationNumbers = [1, 2, 3];
   const pagedUsersRows = filteredUsersActivitiesRows.slice((usersPage - 1) * usersPageSize, usersPage * usersPageSize);
@@ -1465,11 +1469,29 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Rows */}
                 <div>
-                  {pagedUsersRows.map((row, idx) => (
-                    <div key={`${row.email}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0', borderBottom: idx < filteredUsersActivitiesRows.length - 1 ? '1px solid #F7F7F7' : 'none' }}>
+                  {pagedUsersRows.map((row, idx) => {
+                    const rowKey = `${row.email}-${idx}`;
+                    const isRowActive = hoveredUserRowKey === rowKey || selectedUserRowKey === rowKey;
+
+                    return (
+                    <div
+                      key={rowKey}
+                      onMouseEnter={() => setHoveredUserRowKey(rowKey)}
+                      onMouseLeave={() => setHoveredUserRowKey(null)}
+                      onClick={() => setSelectedUserRowKey(rowKey)}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr',
+                        gap: '10px',
+                        padding: '14px 8px',
+                        borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F7F7F7' : 'none',
+                        backgroundColor: isRowActive ? '#F6FBFF' : 'transparent',
+                        borderRadius: '12px'
+                      }}
+                    >
                       {/* Users column */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: (row as any).avatarBg || '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover' }} />
                         </div>
                         <div style={{ minWidth: 0 }}>
@@ -1525,7 +1547,8 @@ const AdminDashboard: React.FC = () => {
                         </button>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Pagination (MyListings style; left controls + right Go to) */}
