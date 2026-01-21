@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/pre/logo.png';
 import ov1Icon from '../../assets/images/admin/ov1.svg';
@@ -80,6 +81,24 @@ const SuggestionOption: React.FC<{
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  
+  // Apply custom cursor to entire dashboard
+  useEffect(() => {
+    const style = document.createElement('style');
+    const cursorUrl = `url("${mouseCursorIcon}"), auto`;
+    style.textContent = `
+      * {
+        cursor: ${cursorUrl} !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
+  
   const [selectedSidebarOption, setSelectedSidebarOption] = useState('overview');
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
@@ -109,8 +128,17 @@ const AdminDashboard: React.FC = () => {
   const [usersGoTo, setUsersGoTo] = useState('');
   const [hoveredUserRowKey, setHoveredUserRowKey] = useState<string | null>(null);
   const [selectedUserRowKey, setSelectedUserRowKey] = useState<string | null>(null);
-  const [openMoreOptionsIndex, setOpenMoreOptionsIndex] = useState<number | null>(null);
-  const moreOptionsDropdownRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedUserEmails, setSelectedUserEmails] = useState<Set<string>>(new Set());
+  const [removedUserEmails, setRemovedUserEmails] = useState<Set<string>>(new Set());
+
+  // More options dropdown (portal)
+  const [moreMenu, setMoreMenu] = useState<{
+    email: string;
+    anchorRect: DOMRect;
+  } | null>(null);
+  const moreMenuRef = useRef<HTMLDivElement | null>(null);
+  const moreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Mock data for search
   const mockUsers = [
@@ -144,9 +172,10 @@ const AdminDashboard: React.FC = () => {
   ];
 
   const filteredUsersActivitiesRows =
-    usersActivityTab === 'all'
+    (usersActivityTab === 'all'
       ? usersActivitiesRows
-      : usersActivitiesRows.filter((r) => r.type === usersActivityTab);
+      : usersActivitiesRows.filter((r) => r.type === usersActivityTab))
+      .filter((r) => !removedUserEmails.has(r.email));
 
   const usersPageSize = 6;
   const usersTotalPages = 48; // match screenshot pagination
@@ -271,8 +300,9 @@ const AdminDashboard: React.FC = () => {
           setSelectedCategory(null);
         }
       }
-      if (!moreOptionsDropdown && !moreOptionsButton && openMoreOptionsIndex !== null) {
-        setOpenMoreOptionsIndex(null);
+      // Don't close more options dropdown if clicking on the button or dropdown itself
+      if (!moreOptionsDropdown && !moreOptionsButton && moreMenu !== null) {
+        setMoreMenu(null);
       }
     };
 
@@ -280,7 +310,204 @@ const AdminDashboard: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, openMoreOptionsIndex]);
+  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue]);
+
+  // Close more menu on outside click / scroll / resize (portal-safe)
+  useEffect(() => {
+    if (!moreMenu) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const clickedMenu = !!moreMenuRef.current?.contains(target);
+      const clickedButton = !!moreMenuButtonRef.current?.contains(target);
+      if (!clickedMenu && !clickedButton) {
+        setMoreMenu(null);
+      }
+    };
+
+    const onScroll = () => setMoreMenu(null);
+    const onResize = () => setMoreMenu(null);
+
+    document.addEventListener('mousedown', onMouseDown, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, true);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [moreMenu]);
+
+  const clearSelectionMode = () => {
+    setSelectedUserEmails(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const renderMoreOptionsMenu = () => {
+    if (!moreMenu) return null;
+
+    const menuWidth = 200;
+    const margin = 8;
+    const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, moreMenu.anchorRect.right - menuWidth));
+    const top = moreMenu.anchorRect.bottom + 8;
+
+    return createPortal(
+      <div
+        ref={moreMenuRef}
+        style={{
+          position: 'fixed',
+          top,
+          left,
+          width: `${menuWidth}px`,
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          border: '1px solid #F1F1F1',
+          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+          padding: '8px',
+          zIndex: 99999
+        }}
+      >
+        {/* Select item */}
+        <div
+          onClick={() => {
+            setIsSelectionMode(true);
+            setSelectedUserEmails(new Set([moreMenu.email]));
+            setMoreMenu(null);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+            e.currentTarget.style.backgroundColor = '#F0F8FE';
+            const icon = e.currentTarget.querySelector('img');
+            const text = e.currentTarget.querySelector('span');
+            if (icon) (icon as HTMLImageElement).style.filter =
+              'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
+            if (text) (text as HTMLElement).style.color = '#64B5F6';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.cursor = 'pointer';
+            e.currentTarget.style.backgroundColor = 'transparent';
+            const icon = e.currentTarget.querySelector('img');
+            const text = e.currentTarget.querySelector('span');
+            if (icon) (icon as HTMLImageElement).style.filter =
+              'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+            if (text) (text as HTMLElement).style.color = '#939393';
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px',
+            borderRadius: '8px',
+            cursor: `url(${mouseCursorIcon}), auto`,
+            transition: 'background-color 0.2s'
+          }}
+        >
+          <img
+            src={selectIcon}
+            alt="Select"
+            style={{
+              width: '16px',
+              height: '16px',
+              filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+            }}
+          />
+          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Select item</span>
+        </div>
+
+        {/* View activity detail */}
+        <div
+          onMouseEnter={(e) => {
+            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+            e.currentTarget.style.backgroundColor = '#F0F8FE';
+            const icon = e.currentTarget.querySelector('img');
+            const text = e.currentTarget.querySelector('span');
+            if (icon) (icon as HTMLImageElement).style.filter =
+              'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
+            if (text) (text as HTMLElement).style.color = '#64B5F6';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.cursor = 'pointer';
+            e.currentTarget.style.backgroundColor = 'transparent';
+            const icon = e.currentTarget.querySelector('img');
+            const text = e.currentTarget.querySelector('span');
+            if (icon) (icon as HTMLImageElement).style.filter =
+              'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+            if (text) (text as HTMLElement).style.color = '#939393';
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px',
+            borderRadius: '8px',
+            cursor: `url(${mouseCursorIcon}), auto`,
+            transition: 'background-color 0.2s'
+          }}
+        >
+          <img
+            src={viewIcon}
+            alt="View"
+            style={{
+              width: '16px',
+              height: '16px',
+              filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+            }}
+          />
+          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View activity detail</span>
+        </div>
+
+        {/* Delete the activity */}
+        <div
+          onMouseEnter={(e) => {
+            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.cursor = 'pointer';
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px',
+            borderRadius: '8px',
+            cursor: `url(${mouseCursorIcon}), auto`,
+            transition: 'background-color 0.2s'
+          }}
+        >
+          <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+          <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
+        </div>
+
+        {/* Close */}
+        <div
+          onClick={() => setMoreMenu(null)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.cursor = 'pointer';
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px',
+            borderRadius: '8px',
+            backgroundColor: '#FAFAFA',
+            cursor: `url(${mouseCursorIcon}), auto`,
+            transition: 'background-color 0.2s'
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+        </div>
+      </div>,
+      document.body
+    );
+  };
 
   const handleCategorySelect = (category: 'users' | 'listings' | 'requests') => {
     setSelectedCategory(category);
@@ -396,6 +623,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div style={{ backgroundColor: '#FAFAFA', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
+      {renderMoreOptionsMenu()}
       <style>
         {`
           @keyframes rotateGlobe {
@@ -1318,7 +1546,7 @@ const AdminDashboard: React.FC = () => {
                     {/* Toggle (aligned with description) */}
                     <div style={{
                       backgroundColor: '#F4F4F4',
-                      borderRadius: '12px',
+                      borderRadius: '9px',
                       padding: '3px',
                       display: 'flex',
                       gap: '3px',
@@ -1338,7 +1566,7 @@ const AdminDashboard: React.FC = () => {
                               border: 'none',
                               cursor: 'pointer',
                               padding: '6px 10px',
-                              borderRadius: '10px',
+                              borderRadius: '7px',
                               backgroundColor: isActive ? '#FFFFFF' : 'transparent',
                               color: isActive ? '#64B5F6' : '#939393',
                               fontSize: '11px',
@@ -1364,40 +1592,127 @@ const AdminDashboard: React.FC = () => {
                 border: '1px solid #F1F1F1',
                 padding: '12px 14px'
               }}>
-                {/* Top bar 1: tabs + export + sort */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
-                    {[
-                      { key: 'all', label: 'All user recent activities' },
-                      { key: 'joined', label: 'Joined' },
-                      { key: 'posted', label: 'Posted' },
-                      { key: 'reviewed', label: 'Reviewed' },
-                      { key: 'reported', label: 'Reported' },
-                    ].map((tab) => {
-                      const isActive = usersActivityTab === (tab.key as any);
-                      return (
-                        <button
-                          key={tab.key}
-                          onClick={() => setUsersActivityTab(tab.key as any)}
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            padding: '0 0 10px 0',
-                            cursor: 'pointer',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            color: isActive ? '#64B5F6' : '#B0B0B0',
-                            fontWeight: 400,
-                            borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                          }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                {/* Top bar 1: tabs + export + sort OR selection controls */}
+                {!isSelectionMode ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+                      {[
+                        { key: 'all', label: 'All user recent activities' },
+                        { key: 'joined', label: 'Joined' },
+                        { key: 'posted', label: 'Posted' },
+                        { key: 'reviewed', label: 'Reviewed' },
+                        { key: 'reported', label: 'Reported' },
+                      ].map((tab) => {
+                        const isActive = usersActivityTab === (tab.key as any);
+                        return (
+                          <button
+                            key={tab.key}
+                            onClick={() => setUsersActivityTab(tab.key as any)}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              padding: '0 0 10px 0',
+                              cursor: 'pointer',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              color: isActive ? '#64B5F6' : '#B0B0B0',
+                              fontWeight: 400,
+                              borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                            }}
+                          >
+                            {tab.label}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                      <button
+                        type="button"
+                        style={{
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#64B5F6',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0
+                        }}
+                      >
+                        <span style={{ color: '#64B5F6' }}>Export data</span>
+                        <img
+                          src={exportIcon}
+                          alt="Export"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                          }}
+                        />
+                      </button>
+
+                      <select
+                        value={usersSortBy}
+                        onChange={(e) => setUsersSortBy(e.target.value)}
+                        style={{
+                          padding: '0 18px 0 0',
+                          borderRadius: '8px',
+                          border: 'none',
+                          fontSize: '11px',
+                          color: '#B0B0B0',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 4px center',
+                          backgroundSize: '12px'
+                        }}
+                      >
+                        <option>Sort by</option>
+                        <option>Date</option>
+                        <option>Activity</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', padding: '8px 0' }}>
+                    <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {selectedUserEmails.size} item{selectedUserEmails.size !== 1 ? 's' : ''} selected
+                    </span>
+                    <button
+                      onClick={() => {
+                        setMoreMenu(null);
+                        clearSelectionMode();
+                      }}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                      Clear all selections
+                    </button>
                     <button
                       type="button"
                       style={{
@@ -1407,62 +1722,70 @@ const AdminDashboard: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        color: '#64B5F6',
+                        color: '#939393',
                         fontSize: '11px',
                         fontFamily: 'Poppins, sans-serif',
                         padding: 0
                       }}
                     >
-                      <span style={{ color: '#64B5F6' }}>Export data</span>
                       <img
                         src={exportIcon}
                         alt="Export"
                         style={{
                           width: '14px',
                           height: '14px',
-                          filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                          filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
                         }}
                       />
+                      Export item data
                     </button>
-
-                    <select
-                      value={usersSortBy}
-                      onChange={(e) => setUsersSortBy(e.target.value)}
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const emailsToRemove = Array.from(selectedUserEmails);
+                        if (emailsToRemove.length === 0) return;
+                        // Remove selected rows from the list (by email)
+                        setRemovedUserEmails((prev) => {
+                          const next = new Set(prev);
+                          emailsToRemove.forEach((email) => next.add(email));
+                          return next;
+                        });
+                        // Exit selection mode
+                        setMoreMenu(null);
+                        clearSelectionMode();
+                      }}
                       style={{
-                        padding: '0 18px 0 0',
-                        borderRadius: '8px',
                         border: 'none',
+                        background: 'transparent',
+                        cursor: selectedUserEmails.size ? 'pointer' : 'not-allowed',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#FF5151',
                         fontSize: '11px',
-                        color: '#B0B0B0',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
                         fontFamily: 'Poppins, sans-serif',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 4px center',
-                        backgroundSize: '12px'
+                        padding: 0,
+                        opacity: selectedUserEmails.size ? 1 : 0.5
                       }}
                     >
-                      <option>Sort by</option>
-                      <option>Date</option>
-                      <option>Activity</option>
-                    </select>
+                      <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                      Remove from activity list
+                    </button>
                   </div>
-                </div>
+                )}
 
                 <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
 
                 {/* Top bar 2: column headers */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0 12px 0' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isSelectionMode ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0 12px 0' }}>
                   {[
                     { key: 'Users', label: 'Users' },
                     { key: 'Date of creation', label: 'Date of creation' },
                     { key: 'Activity', label: 'Activity' },
                     { key: 'User plan', label: 'User plan' },
-                    { key: 'Actions', label: 'Actions' }
+                    ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
                   ].map((h) => (
                     <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       {h.label}
@@ -1489,10 +1812,19 @@ const AdminDashboard: React.FC = () => {
                       key={rowKey}
                       onMouseEnter={() => setHoveredUserRowKey(rowKey)}
                       onMouseLeave={() => setHoveredUserRowKey(null)}
-                      onClick={() => setSelectedUserRowKey(rowKey)}
+                      onClick={(e) => {
+                        // Don't trigger row selection if clicking on interactive elements
+                        const target = e.target as HTMLElement;
+                        if (target.closest('.more-options-button') || 
+                            target.closest('.checkbox-container') || 
+                            isSelectionMode) {
+                          return;
+                        }
+                        setSelectedUserRowKey(rowKey);
+                      }}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr',
+                        gridTemplateColumns: isSelectionMode ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1.6fr 1fr 0.8fr',
                         gap: '10px',
                         padding: '14px 8px',
                         borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F7F7F7' : 'none',
@@ -1502,6 +1834,44 @@ const AdminDashboard: React.FC = () => {
                     >
                       {/* Users column */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                        {isSelectionMode && (
+                          <div
+                            className="checkbox-container"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              const newSelected = new Set(selectedUserEmails);
+                              if (newSelected.has(row.email)) {
+                                newSelected.delete(row.email);
+                              } else {
+                                newSelected.add(row.email);
+                              }
+                              setSelectedUserEmails(newSelected);
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              border: selectedUserEmails.has(row.email) ? '2px solid #64B5F6' : '2px solid #D9D9D9',
+                              borderRadius: '4px',
+                              backgroundColor: selectedUserEmails.has(row.email) ? '#64B5F6' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              flexShrink: 0
+                            }}
+                          >
+                            {selectedUserEmails.has(row.email) && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                        )}
                         <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: (row as any).avatarBg || '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover' }} />
                         </div>
@@ -1542,171 +1912,65 @@ const AdminDashboard: React.FC = () => {
                       </div>
 
                       {/* Actions */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}>
-                        <button style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        </button>
-                        <div style={{ position: 'relative' }}>
-                          <button
-                            type="button"
-                            className="more-options-button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMoreOptionsIndex(openMoreOptionsIndex === idx ? null : idx);
-                            }}
-                            style={{
-                              width: '24px',
-                              height: '24px',
-                              borderRadius: '50%',
-                              border: openMoreOptionsIndex === idx ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
-                              backgroundColor: '#FFFFFF',
-                              cursor: 'pointer',
-                              padding: 0,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}
-                          >
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="3" cy="6" r="1.2" fill={openMoreOptionsIndex === idx ? '#64B5F6' : '#B0B0B0'} />
-                              <circle cx="6" cy="6" r="1.2" fill={openMoreOptionsIndex === idx ? '#64B5F6' : '#B0B0B0'} />
-                              <circle cx="9" cy="6" r="1.2" fill={openMoreOptionsIndex === idx ? '#64B5F6' : '#B0B0B0'} />
-                            </svg>
-                          </button>
-                          {openMoreOptionsIndex === idx && (
-                            <div
-                              ref={(el) => { moreOptionsDropdownRefs.current[idx] = el; }}
-                              className="more-options-dropdown"
-                              style={{
-                                position: 'absolute',
-                                top: '100%',
-                                right: 0,
-                                marginTop: '8px',
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: '12px',
-                                border: '1px solid #F1F1F1',
-                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                                padding: '8px',
-                                minWidth: '180px',
-                                zIndex: 1000
-                              }}
-                            >
-                              {/* Select item */}
-                              <div
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-                                  e.currentTarget.style.backgroundColor = '#F0F8FE';
-                                  const icon = e.currentTarget.querySelector('img');
-                                  const text = e.currentTarget.querySelector('span');
-                                  if (icon) icon.style.filter = 'none';
-                                  if (text) (text as HTMLElement).style.color = '#64B5F6';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.cursor = 'pointer';
-                                  e.currentTarget.style.backgroundColor = 'transparent';
-                                  const icon = e.currentTarget.querySelector('img');
-                                  const text = e.currentTarget.querySelector('span');
-                                  if (icon) icon.style.filter = 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
-                                  if (text) (text as HTMLElement).style.color = '#939393';
-                                }}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px',
-                                  padding: '8px',
-                                  borderRadius: '8px',
-                                  cursor: `url(${mouseCursorIcon}), auto`,
-                                  transition: 'background-color 0.2s'
-                                }}
-                              >
-                                <img src={selectIcon} alt="Select" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
-                                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Select item</span>
-                              </div>
-                              {/* View activity detail */}
-                              <div
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-                                  e.currentTarget.style.backgroundColor = '#F0F8FE';
-                                  const icon = e.currentTarget.querySelector('img');
-                                  const text = e.currentTarget.querySelector('span');
-                                  if (icon) icon.style.filter = 'none';
-                                  if (text) (text as HTMLElement).style.color = '#64B5F6';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.cursor = 'pointer';
-                                  e.currentTarget.style.backgroundColor = 'transparent';
-                                  const icon = e.currentTarget.querySelector('img');
-                                  const text = e.currentTarget.querySelector('span');
-                                  if (icon) icon.style.filter = 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
-                                  if (text) (text as HTMLElement).style.color = '#939393';
-                                }}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px',
-                                  padding: '8px',
-                                  borderRadius: '8px',
-                                  cursor: `url(${mouseCursorIcon}), auto`,
-                                  transition: 'background-color 0.2s'
-                                }}
-                              >
-                                <img src={viewIcon} alt="View" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
-                                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View activity detail</span>
-                              </div>
-                              {/* Delete the activity */}
-                              <div
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.cursor = 'pointer';
-                                }}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px',
-                                  padding: '8px',
-                                  borderRadius: '8px',
-                                  cursor: `url(${mouseCursorIcon}), auto`,
-                                  transition: 'background-color 0.2s'
-                                }}
-                              >
-                                <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
-                                <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
-                              </div>
-                              {/* Close */}
-                              <div
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.cursor = 'pointer';
-                                }}
-                                onClick={() => setOpenMoreOptionsIndex(null)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px',
-                                  padding: '8px',
-                                  borderRadius: '8px',
-                                  backgroundColor: '#FAFAFA',
-                                  cursor: `url(${mouseCursorIcon}), auto`,
-                                  transition: 'background-color 0.2s'
-                                }}
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                                <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
-                              </div>
-                            </div>
+                      {isSelectionMode ? (
+                        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2px' }}>
+                          {selectedUserEmails.has(row.email) && (
+                            <span style={{ fontSize: '11px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Selected</span>
                           )}
                         </div>
-                      </div>
+                      ) : (
+                        <div 
+                          style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button 
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                          <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className="more-options-button"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                                moreMenuButtonRef.current = e.currentTarget as HTMLButtonElement;
+                                setMoreMenu((prev) => (prev?.email === row.email ? null : { email: row.email, anchorRect: rect }));
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                              }}
+                              style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                border: moreMenu?.email === row.email ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer',
+                                padding: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1001,
+                                position: 'relative'
+                              }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="3" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="6" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="9" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     );
                   })}
