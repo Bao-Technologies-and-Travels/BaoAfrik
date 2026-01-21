@@ -37,6 +37,9 @@ import unverifyIcon from '../../assets/images/pre/unverify.svg';
 import statIcon from '../../assets/images/admin/stat.svg.svg';
 import stat2Icon from '../../assets/images/admin/stat2.svg';
 import stat3Icon from '../../assets/images/admin/stat3.svg';
+import profileIcon from '../../assets/images/pre/profile.svg';
+import pencilIcon from '../../assets/images/pre/pencil.svg';
+import statusIcon from '../../assets/images/pre/status.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -381,6 +384,36 @@ const AdminDashboard: React.FC = () => {
     const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, moreMenu.anchorRect.right - menuWidth));
     const top = moreMenu.anchorRect.bottom + 8;
 
+    const isUsersList = usersToggle === 'list';
+    const primaryHoverOn = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+      e.currentTarget.style.backgroundColor = '#F0F8FE';
+      const icon = e.currentTarget.querySelector('img');
+      const text = e.currentTarget.querySelector('span');
+      if (icon) (icon as HTMLImageElement).style.filter =
+        'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
+      if (text) (text as HTMLElement).style.color = '#64B5F6';
+    };
+    const primaryHoverOff = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.currentTarget.style.cursor = 'pointer';
+      e.currentTarget.style.backgroundColor = 'transparent';
+      const icon = e.currentTarget.querySelector('img');
+      const text = e.currentTarget.querySelector('span');
+      if (icon) (icon as HTMLImageElement).style.filter =
+        'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+      if (text) (text as HTMLElement).style.color = '#939393';
+    };
+
+    const baseItemStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px',
+      borderRadius: '8px',
+      cursor: `url(${mouseCursorIcon}), auto`,
+      transition: 'background-color 0.2s'
+    };
+
     return createPortal(
       <div
         ref={moreMenuRef}
@@ -397,40 +430,16 @@ const AdminDashboard: React.FC = () => {
           zIndex: 99999
         }}
       >
-        {/* Select item */}
+        {/* Select */}
         <div
           onClick={() => {
             setIsSelectionMode(true);
             setSelectedUserEmails(new Set([moreMenu.email]));
             setMoreMenu(null);
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-            e.currentTarget.style.backgroundColor = '#F0F8FE';
-            const icon = e.currentTarget.querySelector('img');
-            const text = e.currentTarget.querySelector('span');
-            if (icon) (icon as HTMLImageElement).style.filter =
-              'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
-            if (text) (text as HTMLElement).style.color = '#64B5F6';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.cursor = 'pointer';
-            e.currentTarget.style.backgroundColor = 'transparent';
-            const icon = e.currentTarget.querySelector('img');
-            const text = e.currentTarget.querySelector('span');
-            if (icon) (icon as HTMLImageElement).style.filter =
-              'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
-            if (text) (text as HTMLElement).style.color = '#939393';
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px',
-            borderRadius: '8px',
-            cursor: `url(${mouseCursorIcon}), auto`,
-            transition: 'background-color 0.2s'
-          }}
+          onMouseEnter={primaryHoverOn}
+          onMouseLeave={primaryHoverOff}
+          style={baseItemStyle}
         >
           <img
             src={selectIcon}
@@ -441,72 +450,99 @@ const AdminDashboard: React.FC = () => {
               filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
             }}
           />
-          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Select item</span>
+          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+            {isUsersList ? 'Select user' : 'Select item'}
+          </span>
         </div>
 
-        {/* View activity detail */}
-        <div
-          onMouseEnter={(e) => {
-            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-            e.currentTarget.style.backgroundColor = '#F0F8FE';
-            const icon = e.currentTarget.querySelector('img');
-            const text = e.currentTarget.querySelector('span');
-            if (icon) (icon as HTMLImageElement).style.filter =
-              'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
-            if (text) (text as HTMLElement).style.color = '#64B5F6';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.cursor = 'pointer';
-            e.currentTarget.style.backgroundColor = 'transparent';
-            const icon = e.currentTarget.querySelector('img');
-            const text = e.currentTarget.querySelector('span');
-            if (icon) (icon as HTMLImageElement).style.filter =
-              'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
-            if (text) (text as HTMLElement).style.color = '#939393';
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px',
-            borderRadius: '8px',
-            cursor: `url(${mouseCursorIcon}), auto`,
-            transition: 'background-color 0.2s'
-          }}
-        >
-          <img
-            src={viewIcon}
-            alt="View"
-            style={{
-              width: '16px',
-              height: '16px',
-              filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
-            }}
-          />
-          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View activity detail</span>
-        </div>
+        {/* Secondary options */}
+        {isUsersList ? (
+          <>
+            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+              <img
+                src={profileIcon}
+                alt="View profile"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                }}
+              />
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View user profile</span>
+            </div>
 
-        {/* Delete the activity */}
-        <div
-          onMouseEnter={(e) => {
-            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.cursor = 'pointer';
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px',
-            borderRadius: '8px',
-            cursor: `url(${mouseCursorIcon}), auto`,
-            transition: 'background-color 0.2s'
-          }}
-        >
-          <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
-          <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
-        </div>
+            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+              <img
+                src={pencilIcon}
+                alt="Edit access"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                }}
+              />
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
+            </div>
+
+            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+              <img
+                src={statusIcon}
+                alt="Suspend"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                }}
+              />
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Suspend user account</span>
+            </div>
+
+            <div
+              onClick={() => {
+                setRemovedUserEmails((prev) => new Set(prev).add(moreMenu.email));
+                setMoreMenu(null);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.cursor = 'pointer';
+              }}
+              style={baseItemStyle}
+            >
+              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+              <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete user account</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+              <img
+                src={viewIcon}
+                alt="View"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                }}
+              />
+              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View activity detail</span>
+            </div>
+
+            <div
+              onMouseEnter={(e) => {
+                e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.cursor = 'pointer';
+              }}
+              style={baseItemStyle}
+            >
+              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+              <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
+            </div>
+          </>
+        )}
 
         {/* Close */}
         <div
@@ -1994,42 +2030,95 @@ const AdminDashboard: React.FC = () => {
                           filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
                         }}
                       />
-                      Export item data
+                      {usersToggle === 'list' ? 'Export user data' : 'Export item data'}
                     </button>
-                    <button
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const emailsToRemove = Array.from(selectedUserEmails);
-                        if (emailsToRemove.length === 0) return;
-                        // Remove selected rows from the list (by email)
-                        setRemovedUserEmails((prev) => {
-                          const next = new Set(prev);
-                          emailsToRemove.forEach((email) => next.add(email));
-                          return next;
-                        });
-                        // Exit selection mode
-                        setMoreMenu(null);
-                        clearSelectionMode();
-                      }}
-                      style={{
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: selectedUserEmails.size ? 'pointer' : 'not-allowed',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#FF5151',
-                        fontSize: '11px',
-                        fontFamily: 'Poppins, sans-serif',
-                        padding: 0,
-                        opacity: selectedUserEmails.size ? 1 : 0.5
-                      }}
-                    >
-                      <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                      Remove from activity list
-                    </button>
+                    {usersToggle === 'list' ? (
+                      <>
+                        <button
+                          type="button"
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#B0B0B0',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            padding: 0
+                          }}
+                        >
+                          <img src={statusIcon} alt="Suspend" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                          Suspend user account
+                        </button>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const emailsToRemove = Array.from(selectedUserEmails);
+                            if (emailsToRemove.length === 0) return;
+                            setRemovedUserEmails((prev) => {
+                              const next = new Set(prev);
+                              emailsToRemove.forEach((email) => next.add(email));
+                              return next;
+                            });
+                            setMoreMenu(null);
+                            clearSelectionMode();
+                          }}
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            cursor: selectedUserEmails.size ? 'pointer' : 'not-allowed',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#FF5151',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            padding: 0,
+                            opacity: selectedUserEmails.size ? 1 : 0.5
+                          }}
+                        >
+                          <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                          Delete user account
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const emailsToRemove = Array.from(selectedUserEmails);
+                          if (emailsToRemove.length === 0) return;
+                          setRemovedUserEmails((prev) => {
+                            const next = new Set(prev);
+                            emailsToRemove.forEach((email) => next.add(email));
+                            return next;
+                          });
+                          setMoreMenu(null);
+                          clearSelectionMode();
+                        }}
+                        style={{
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: selectedUserEmails.size ? 'pointer' : 'not-allowed',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#FF5151',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0,
+                          opacity: selectedUserEmails.size ? 1 : 0.5
+                        }}
+                      >
+                        <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                        Remove from activity list
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -2090,9 +2179,9 @@ const AdminDashboard: React.FC = () => {
                         gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'),
                         gap: '10px',
                         padding: '14px 8px',
-                        borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F7F7F7' : 'none',
+                        borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F1F1F1' : 'none',
                         backgroundColor: isRowActive ? '#F6FBFF' : 'transparent',
-                        borderRadius: '12px'
+                        borderRadius: 0
                       }}
                     >
                       {/* Users column */}
