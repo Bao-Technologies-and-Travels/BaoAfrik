@@ -40,6 +40,7 @@ import stat3Icon from '../../assets/images/admin/stat3.svg';
 import profileIcon from '../../assets/images/pre/profile.svg';
 import pencilIcon from '../../assets/images/pre/pencil.svg';
 import statusIcon from '../../assets/images/pre/status.svg';
+import suspendIcon from '../../assets/images/admin/suspend.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -486,7 +487,7 @@ const AdminDashboard: React.FC = () => {
 
             <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
               <img
-                src={statusIcon}
+                src={suspendIcon}
                 alt="Suspend"
                 style={{
                   width: '16px',
@@ -1584,7 +1585,7 @@ const AdminDashboard: React.FC = () => {
 
           {/* Dashboard Content */}
           {selectedSidebarOption === 'users' ? (
-            <div>
+            <div style={{ paddingRight: '14px' }}>
               {/* Users Management Header */}
               <div style={{ marginTop: '10px', marginBottom: '16px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -2049,7 +2050,7 @@ const AdminDashboard: React.FC = () => {
                             padding: 0
                           }}
                         >
-                          <img src={statusIcon} alt="Suspend" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                          <img src={suspendIcon} alt="Suspend" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
                           Suspend user account
                         </button>
                         <button
