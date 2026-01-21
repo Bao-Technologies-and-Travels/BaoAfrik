@@ -857,14 +857,38 @@ const AdminDashboard: React.FC = () => {
         {/* Main Content Area */}
         <div style={{ flex: 1, padding: '16px', paddingRight: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 32px)' }} className="admin-content-scroll">
           {/* Top Navigation Bar */}
-          {!viewingUserProfile && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              marginBottom: '16px'
-            }}>
-              {/* Search Bar */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            marginBottom: '16px'
+          }}>
+            {/* Left Side: Search (overview) OR Breadcrumbs (details) */}
+            {viewingUserProfile ? (
+              <nav style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif',
+                color: '#BABABA',
+                minWidth: 0
+              }}>
+                <img
+                  src={arrowLeftIcon}
+                  alt="Back"
+                  style={{ width: '14px', height: '14px', cursor: 'pointer', flexShrink: 0 }}
+                  onClick={() => setViewingUserProfile(false)}
+                />
+                <span style={{ cursor: 'pointer' }} onClick={() => setViewingUserProfile(false)}>
+                  Homepage
+                </span>
+                <span style={{ color: '#D4D4D4' }}>·</span>
+                <span style={{ cursor: 'pointer' }}>Users activities</span>
+                <span style={{ color: '#D4D4D4' }}>·</span>
+                <span style={{ color: '#4D4D4D', fontWeight: 500 }}>User activity details</span>
+              </nav>
+            ) : (
               <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
               <div style={{ position: 'relative' }}>
                 {selectedCategory && (
@@ -1161,6 +1185,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
               )}
             </div>
+            )}
 
             {/* Right Side Navigation */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '16px' }}>
@@ -1602,75 +1627,57 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          )}
 
           {/* Dashboard Content */}
           {selectedSidebarOption === 'users' ? (
             viewingUserProfile && selectedUserForProfile ? (
               // User Activity Details View
               <div style={{ paddingRight: '14px' }}>
-                {/* Breadcrumbs */}
-                <nav style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '13px',
-                  marginBottom: '16px',
-                  fontFamily: 'Poppins, sans-serif'
-                }}>
-                  <img
-                    src={arrowLeftIcon}
-                    alt="Back"
-                    style={{ width: '14px', height: '14px', cursor: 'pointer' }}
-                    onClick={() => setViewingUserProfile(false)}
-                  />
-                  <span
-                    style={{ color: '#BABABA', cursor: 'pointer' }}
-                    onClick={() => setViewingUserProfile(false)}
-                  >
-                    Homepage
-                  </span>
-                  <span style={{ color: '#BABABA' }}>·</span>
-                  <span style={{ color: '#212121' }}>Users activities</span>
-                  <span style={{ color: '#BABABA' }}>·</span>
-                  <span style={{ color: '#4D4D4D' }}>User activity details</span>
-                </nav>
+                {/* Two column layout: right sidebar starts at the title row */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 380px',
+                    gap: '20px',
+                    alignItems: 'start'
+                  }}
+                >
+                  {/* Left: Title + Description + Activity Card */}
+                  <div>
+                    {/* Title and Description (match overview sizing) */}
+                    <div style={{ marginBottom: '12px' }}>
+                      <h1
+                        style={{
+                          fontSize: '16px',
+                          fontWeight: 600,
+                          color: '#202224',
+                          margin: '0 0 2px 0',
+                          fontFamily: 'Bricolage Grotesque, sans-serif'
+                        }}
+                      >
+                        User activity details
+                      </h1>
+                      <p
+                        style={{
+                          color: '#9C9C9C',
+                          fontSize: '12px',
+                          margin: 0,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Lorem ipsum dolor sit amet consectetur. Amet mi porttitor duis facilisis amet erat urna.
+                      </p>
+                    </div>
 
-                {/* Title and Description */}
-                <div style={{ marginBottom: '20px' }}>
-                  <h1 style={{
-                    fontSize: '20px',
-                    fontWeight: 600,
-                    color: '#202224',
-                    margin: '0 0 8px 0',
-                    fontFamily: 'Bricolage Grotesque, sans-serif'
-                  }}>
-                    User activity details
-                  </h1>
-                  <p style={{
-                    color: '#9C9C9C',
-                    fontSize: '12px',
-                    margin: 0,
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Lorem ipsum dolor sit amet consectetur. Amet mi porttitor duis facilisis amet erat urna.
-                  </p>
-                </div>
-
-                {/* Main Content Area - Two Column Layout */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 380px',
-                  gap: '20px',
-                  alignItems: 'flex-start'
-                }}>
-                  {/* Left: Activity Card */}
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '18px',
-                    border: '1px solid #F1F1F1',
-                    padding: '16px'
-                  }}>
+                    {/* Activity Card */}
+                    <div
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '18px',
+                        border: '1px solid #F1F1F1',
+                        padding: '16px'
+                      }}
+                    >
                     {/* Top Bar: Search + Export + Sort */}
                     <div style={{
                       display: 'flex',
@@ -1893,29 +1900,32 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                    </div>
                   </div>
 
-                  {/* Right: User Details Sidebar */}
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '18px',
-                    border: '1px solid #F1F1F1',
-                    padding: '16px',
-                    position: 'sticky',
-                    top: '20px'
-                  }}>
+                  {/* Right: User Details Sidebar (aligned with title) */}
+                  <div
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '14px'
+                    }}
+                  >
                     {/* Top Section: User Profile */}
-                    <div style={{
-                      backgroundColor: '#FAFAFA',
-                      borderRadius: '14px',
-                      padding: '16px',
-                      marginBottom: '16px'
-                    }}>
+                    <div
+                      style={{
+                        backgroundColor: '#FAFAFA',
+                        borderRadius: '14px',
+                        padding: '14px',
+                        marginBottom: '14px'
+                      }}
+                    >
                       {/* Profile with Dot */}
                       <div style={{ position: 'relative', display: 'inline-block', marginBottom: '12px' }}>
                         <div style={{
-                          width: '64px',
-                          height: '64px',
+                          width: '58px',
+                          height: '58px',
                           borderRadius: '50%',
                           backgroundColor: '#D5E9BD',
                           border: '2px solid #FFFFFF',
@@ -1928,8 +1938,8 @@ const AdminDashboard: React.FC = () => {
                             src={selectedUserForProfile.avatar}
                             alt={selectedUserForProfile.name}
                             style={{
-                              width: '60px',
-                              height: '60px',
+                            width: '54px',
+                            height: '54px',
                               borderRadius: '50%',
                               objectFit: 'cover'
                             }}
@@ -1950,7 +1960,7 @@ const AdminDashboard: React.FC = () => {
 
                       {/* User Name */}
                       <h3 style={{
-                        fontSize: '16px',
+                        fontSize: '15px',
                         fontWeight: 600,
                         color: '#212121',
                         margin: '0 0 4px 0',
@@ -1961,7 +1971,7 @@ const AdminDashboard: React.FC = () => {
 
                       {/* Last Login */}
                       <p style={{
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#B0B0B0',
                         margin: '0 0 12px 0',
                         fontFamily: 'Poppins, sans-serif'
@@ -1983,8 +1993,8 @@ const AdminDashboard: React.FC = () => {
                           <button
                             key={idx}
                             style={{
-                              width: '36px',
-                              height: '36px',
+                              width: '34px',
+                              height: '34px',
                               borderRadius: '50%',
                               backgroundColor: '#FFFFFF',
                               border: 'none',
@@ -2006,8 +2016,8 @@ const AdminDashboard: React.FC = () => {
                                 src={action.icon}
                                 alt={action.alt}
                                 style={{
-                                  width: '18px',
-                                  height: '18px',
+                                  width: '16px',
+                                  height: '16px',
                                   filter: 'brightness(0) saturate(100%) invert(13%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
                                 }}
                               />
@@ -2033,7 +2043,7 @@ const AdminDashboard: React.FC = () => {
                             border: 'none',
                             borderBottom: idx === 0 ? '2px solid #64B5F6' : '2px solid transparent',
                             color: idx === 0 ? '#64B5F6' : '#B0B0B0',
-                            fontSize: '12px',
+                          fontSize: '11px',
                             fontFamily: 'Poppins, sans-serif',
                             cursor: 'pointer',
                             marginBottom: '-1px'
@@ -2054,7 +2064,7 @@ const AdminDashboard: React.FC = () => {
                       borderBottom: '1px solid #F1F1F1'
                     }}>
                       <span style={{
-                        fontSize: '13px',
+                        fontSize: '12px',
                         color: '#6A6A6A',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
@@ -2082,7 +2092,7 @@ const AdminDashboard: React.FC = () => {
                         cursor: 'pointer'
                       }}>
                         <span style={{
-                          fontSize: '13px',
+                          fontSize: '12px',
                           color: '#6A6A6A',
                           fontFamily: 'Poppins, sans-serif',
                           fontWeight: 500
@@ -2252,7 +2262,7 @@ const AdminDashboard: React.FC = () => {
                         cursor: 'pointer'
                       }}>
                         <span style={{
-                          fontSize: '13px',
+                          fontSize: '12px',
                           color: '#6A6A6A',
                           fontFamily: 'Poppins, sans-serif',
                           fontWeight: 500
@@ -2391,7 +2401,7 @@ const AdminDashboard: React.FC = () => {
                         cursor: 'pointer'
                       }}>
                         <span style={{
-                          fontSize: '13px',
+                          fontSize: '12px',
                           color: '#6A6A6A',
                           fontFamily: 'Poppins, sans-serif',
                           fontWeight: 500
