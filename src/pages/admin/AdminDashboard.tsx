@@ -41,6 +41,8 @@ import profileIcon from '../../assets/images/pre/profile.svg';
 import pencilIcon from '../../assets/images/pre/pencil.svg';
 import statusIcon from '../../assets/images/pre/status.svg';
 import suspendIcon from '../../assets/images/admin/suspend.svg';
+import notifIcon from '../../assets/images/admin/notif.svg';
+import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -149,6 +151,10 @@ const AdminDashboard: React.FC = () => {
   } | null>(null);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
   const moreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // User profile detail view state
+  const [viewingUserProfile, setViewingUserProfile] = useState(false);
+  const [selectedUserForProfile, setSelectedUserForProfile] = useState<any>(null);
 
   // Mock data for search
   const mockUsers = [
@@ -459,7 +465,20 @@ const AdminDashboard: React.FC = () => {
         {/* Secondary options */}
         {isUsersList ? (
           <>
-            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+            <div 
+              onClick={() => {
+                const user = usersListRows.find(u => u.email === moreMenu.email);
+                if (user) {
+                  setSelectedUserForProfile(user);
+                  setViewingUserProfile(true);
+                  setMoreMenu(null);
+                }
+              }}
+              onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
+              style={baseItemStyle}
+            >
               <img
                 src={profileIcon}
                 alt="View profile"
@@ -838,14 +857,15 @@ const AdminDashboard: React.FC = () => {
         {/* Main Content Area */}
         <div style={{ flex: 1, padding: '16px', paddingRight: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 32px)' }} className="admin-content-scroll">
           {/* Top Navigation Bar */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between',
-            marginBottom: '16px'
-          }}>
-            {/* Search Bar */}
-            <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
+          {!viewingUserProfile && (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              marginBottom: '16px'
+            }}>
+              {/* Search Bar */}
+              <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
               <div style={{ position: 'relative' }}>
                 {selectedCategory && (
                   <span style={{
@@ -1582,12 +1602,916 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </div>
+          )}
 
           {/* Dashboard Content */}
           {selectedSidebarOption === 'users' ? (
-            <div style={{ paddingRight: '14px' }}>
-              {/* Users Management Header */}
-              <div style={{ marginTop: '10px', marginBottom: '16px' }}>
+            viewingUserProfile && selectedUserForProfile ? (
+              // User Activity Details View
+              <div style={{ paddingRight: '14px' }}>
+                {/* Breadcrumbs */}
+                <nav style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '13px',
+                  marginBottom: '16px',
+                  fontFamily: 'Poppins, sans-serif'
+                }}>
+                  <img
+                    src={arrowLeftIcon}
+                    alt="Back"
+                    style={{ width: '14px', height: '14px', cursor: 'pointer' }}
+                    onClick={() => setViewingUserProfile(false)}
+                  />
+                  <span
+                    style={{ color: '#BABABA', cursor: 'pointer' }}
+                    onClick={() => setViewingUserProfile(false)}
+                  >
+                    Homepage
+                  </span>
+                  <span style={{ color: '#BABABA' }}>·</span>
+                  <span style={{ color: '#212121' }}>Users activities</span>
+                  <span style={{ color: '#BABABA' }}>·</span>
+                  <span style={{ color: '#4D4D4D' }}>User activity details</span>
+                </nav>
+
+                {/* Title and Description */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h1 style={{
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#202224',
+                    margin: '0 0 8px 0',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}>
+                    User activity details
+                  </h1>
+                  <p style={{
+                    color: '#9C9C9C',
+                    fontSize: '12px',
+                    margin: 0,
+                    fontFamily: 'Poppins, sans-serif'
+                  }}>
+                    Lorem ipsum dolor sit amet consectetur. Amet mi porttitor duis facilisis amet erat urna.
+                  </p>
+                </div>
+
+                {/* Main Content Area - Two Column Layout */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 380px',
+                  gap: '20px',
+                  alignItems: 'flex-start'
+                }}>
+                  {/* Left: Activity Card */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    border: '1px solid #F1F1F1',
+                    padding: '16px'
+                  }}>
+                    {/* Top Bar: Search + Export + Sort */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      marginBottom: '16px'
+                    }}>
+                      {/* Search Bar */}
+                      <div style={{ flex: 1, position: 'relative' }}>
+                        <input
+                          type="text"
+                          placeholder="Search an activity?"
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '10px',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            color: '#212121',
+                            backgroundColor: '#FAFAFA',
+                            outline: 'none'
+                          }}
+                        />
+                      </div>
+
+                      {/* Export Data Button */}
+                      <button style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 12px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#64B5F6',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px' }} />
+                        Export data
+                      </button>
+
+                      {/* Sort By Dropdown */}
+                      <select
+                        value={usersSortBy}
+                        onChange={(e) => setUsersSortBy(e.target.value)}
+                        style={{
+                          padding: '8px 28px 8px 12px',
+                          border: '1px solid #F1F1F1',
+                          borderRadius: '10px',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          color: '#212121',
+                          backgroundColor: '#FFFFFF',
+                          cursor: 'pointer',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23B0B0B0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 8px center'
+                        }}
+                      >
+                        <option>Sort by</option>
+                        <option>Date (Newest)</option>
+                        <option>Date (Oldest)</option>
+                        <option>Activity Type</option>
+                      </select>
+                    </div>
+
+                    {/* Date Header */}
+                    <div style={{
+                      color: '#939393',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      marginBottom: '12px'
+                    }}>
+                      Mon, 21 Dec 2025
+                    </div>
+
+                    {/* Activity Entry */}
+                    <div style={{
+                      display: 'flex',
+                      gap: '12px',
+                      paddingBottom: '16px',
+                      borderBottom: '1px solid #F1F1F1'
+                    }}>
+                      {/* Profile with Notification Bell */}
+                      <div style={{ position: 'relative', flexShrink: 0 }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '50%',
+                          backgroundColor: '#D5E9BD',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden'
+                        }}>
+                          <img
+                            src={selectedUserForProfile.avatar}
+                            alt={selectedUserForProfile.name}
+                            style={{
+                              width: '44px',
+                              height: '44px',
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        </div>
+                        {/* Notification Bell Icon */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-2px',
+                          right: '-2px',
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '1px solid #F1F1F1',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                        }}>
+                          <img
+                            src={notifIcon}
+                            alt="Notification"
+                            style={{
+                              width: '12px',
+                              height: '12px',
+                              filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Activity Content */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'space-between',
+                          marginBottom: '4px'
+                        }}>
+                          <span style={{
+                            fontSize: '13px',
+                            color: '#6A6A6A',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontWeight: 500
+                          }}>
+                            Account created
+                          </span>
+                          <div style={{
+                            width: '24px',
+                            height: '24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <circle cx="8" cy="4" r="1.5" fill="#4D4D4D"/>
+                              <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
+                              <circle cx="8" cy="12" r="1.5" fill="#4D4D4D"/>
+                            </svg>
+                          </div>
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px',
+                          flexWrap: 'wrap'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              This user @
+                            </span>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {selectedUserForProfile.name.split(' ')[0]}
+                            </span>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {selectedUserForProfile.name.split(' ').slice(1).join(' ')} joined Bao'Afrik
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '12px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer',
+                                textDecoration: 'none'
+                              }}
+                            >
+                              View more
+                            </span>
+                          </div>
+                          <span style={{
+                            fontSize: '11px',
+                            color: '#B0B0B0',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            19 min ago
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: User Details Sidebar */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    border: '1px solid #F1F1F1',
+                    padding: '16px',
+                    position: 'sticky',
+                    top: '20px'
+                  }}>
+                    {/* Top Section: User Profile */}
+                    <div style={{
+                      backgroundColor: '#FAFAFA',
+                      borderRadius: '14px',
+                      padding: '16px',
+                      marginBottom: '16px'
+                    }}>
+                      {/* Profile with Dot */}
+                      <div style={{ position: 'relative', display: 'inline-block', marginBottom: '12px' }}>
+                        <div style={{
+                          width: '64px',
+                          height: '64px',
+                          borderRadius: '50%',
+                          backgroundColor: '#D5E9BD',
+                          border: '2px solid #FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden'
+                        }}>
+                          <img
+                            src={selectedUserForProfile.avatar}
+                            alt={selectedUserForProfile.name}
+                            style={{
+                              width: '60px',
+                              height: '60px',
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        </div>
+                        {/* Status Dot */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '2px',
+                          right: '2px',
+                          width: '14px',
+                          height: '14px',
+                          borderRadius: '50%',
+                          backgroundColor: '#D9D9D9',
+                          border: '2px solid #FFFFFF'
+                        }} />
+                      </div>
+
+                      {/* User Name */}
+                      <h3 style={{
+                        fontSize: '16px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: '0 0 4px 0',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        {selectedUserForProfile.name}
+                      </h3>
+
+                      {/* Last Login */}
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#B0B0B0',
+                        margin: '0 0 12px 0',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        Last login: today at 19:25
+                      </p>
+
+                      {/* Three Action Buttons */}
+                      <div style={{
+                        display: 'flex',
+                        gap: '8px',
+                        justifyContent: 'center'
+                      }}>
+                        {[
+                          { icon: chatsIcon, alt: 'Chat' },
+                          { icon: exportIcon, alt: 'Download' },
+                          { icon: 'ellipsis', alt: 'More' }
+                        ].map((action, idx) => (
+                          <button
+                            key={idx}
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '50%',
+                              backgroundColor: '#FFFFFF',
+                              border: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.02)'
+                            }}
+                          >
+                            {action.icon === 'ellipsis' ? (
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="8" cy="4" r="1.5" fill="#212121"/>
+                                <circle cx="8" cy="8" r="1.5" fill="#212121"/>
+                                <circle cx="8" cy="12" r="1.5" fill="#212121"/>
+                              </svg>
+                            ) : (
+                              <img
+                                src={action.icon}
+                                alt={action.alt}
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  filter: 'brightness(0) saturate(100%) invert(13%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
+                                }}
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tabs */}
+                    <div style={{
+                      display: 'flex',
+                      gap: '16px',
+                      marginBottom: '16px',
+                      borderBottom: '1px solid #F1F1F1'
+                    }}>
+                      {['About user', 'Reviews and rates', 'Reported issues ab...'].map((tab, idx) => (
+                        <button
+                          key={idx}
+                          style={{
+                            padding: '8px 0',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderBottom: idx === 0 ? '2px solid #64B5F6' : '2px solid transparent',
+                            color: idx === 0 ? '#64B5F6' : '#B0B0B0',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            cursor: 'pointer',
+                            marginBottom: '-1px'
+                          }}
+                        >
+                          {tab}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* See user bio */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 0',
+                      marginBottom: '8px',
+                      borderBottom: '1px solid #F1F1F1'
+                    }}>
+                      <span style={{
+                        fontSize: '13px',
+                        color: '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        See user bio
+                      </span>
+                      <img
+                        src={arrowDownIcon}
+                        alt="Expand"
+                        style={{
+                          width: '12px',
+                          height: '12px',
+                          transform: 'rotate(0deg)',
+                          filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
+                        }}
+                      />
+                    </div>
+
+                    {/* Account Information */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '12px',
+                        cursor: 'pointer'
+                      }}>
+                        <span style={{
+                          fontSize: '13px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 500
+                        }}>
+                          Account Information
+                        </span>
+                        <img
+                          src={arrowDownIcon}
+                          alt="Expand"
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            transform: 'rotate(180deg)',
+                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
+                          }}
+                        />
+                      </div>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '12px'
+                      }}>
+                        {/* Column 1 */}
+                        <div>
+                          <div style={{ marginBottom: '10px' }}>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={userIcon}
+                                alt="Joined"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                Joined
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              06 Dec, 2025
+                            </span>
+                          </div>
+                          <div>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={userIcon}
+                                alt="Location"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                Account Location
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              France
+                            </span>
+                          </div>
+                        </div>
+                        {/* Column 2 */}
+                        <div>
+                          <div style={{ marginBottom: '10px' }}>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={appNotificationIcon}
+                                alt="Mail"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                Mail Address
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {selectedUserForProfile.email}
+                            </span>
+                          </div>
+                          <div>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={userIcon}
+                                alt="Connection"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                Last Connexion
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '12px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              From France
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Section */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '12px',
+                        cursor: 'pointer'
+                      }}>
+                        <span style={{
+                          fontSize: '13px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 500
+                        }}>
+                          Status
+                        </span>
+                        <img
+                          src={arrowDownIcon}
+                          alt="Expand"
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            transform: 'rotate(180deg)',
+                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
+                          }}
+                        />
+                      </div>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px'
+                      }}>
+                        {/* Profile Completed Card */}
+                        <div style={{
+                          backgroundColor: '#FAFAFA',
+                          borderRadius: '10px',
+                          padding: '12px',
+                          border: '1px solid #F1F1F1'
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            marginBottom: '8px'
+                          }}>
+                            <img
+                              src={verifyIcon}
+                              alt="Verified"
+                              style={{ width: '14px', height: '14px' }}
+                            />
+                            <span style={{
+                              fontSize: '11px',
+                              color: '#212121',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              Profile completed
+                            </span>
+                          </div>
+                          <div style={{
+                            height: '4px',
+                            backgroundColor: '#E4E4E4',
+                            borderRadius: '2px',
+                            overflow: 'hidden',
+                            marginBottom: '4px'
+                          }}>
+                            <div style={{
+                              width: '20%',
+                              height: '100%',
+                              backgroundColor: '#45C55B',
+                              borderRadius: '2px'
+                            }} />
+                          </div>
+                          <span style={{
+                            fontSize: '10px',
+                            color: '#939393',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            20%
+                          </span>
+                        </div>
+                        {/* User Plan Card */}
+                        <div style={{
+                          backgroundColor: '#FAFAFA',
+                          borderRadius: '10px',
+                          padding: '12px',
+                          border: '1px solid #F1F1F1',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            marginBottom: '8px'
+                          }}>
+                            <img
+                              src={profileIcon}
+                              alt="Plan"
+                              style={{
+                                width: '14px',
+                                height: '14px',
+                                filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                              }}
+                            />
+                            <span style={{
+                              fontSize: '11px',
+                              color: '#212121',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              User plan - Free
+                            </span>
+                            <div style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              width: '14px',
+                              height: '14px',
+                              cursor: 'pointer'
+                            }}>
+                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <circle cx="7" cy="7" r="6" stroke="#B0B0B0" strokeWidth="1"/>
+                                <text x="7" y="9.5" textAnchor="middle" fontSize="8" fill="#B0B0B0">i</text>
+                              </svg>
+                            </div>
+                          </div>
+                          <p style={{
+                            fontSize: '10px',
+                            color: '#939393',
+                            margin: 0,
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            Post free until 23 March 2026
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* User Metrics Section */}
+                    <div>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '12px',
+                        cursor: 'pointer'
+                      }}>
+                        <span style={{
+                          fontSize: '13px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif',
+                          fontWeight: 500
+                        }}>
+                          User Metrics
+                        </span>
+                        <img
+                          src={arrowDownIcon}
+                          alt="Expand"
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            transform: 'rotate(180deg)',
+                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
+                          }}
+                        />
+                      </div>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px'
+                      }}>
+                        {/* Posted Listings Card */}
+                        <div style={{
+                          backgroundColor: '#FAFAFA',
+                          borderRadius: '10px',
+                          padding: '12px',
+                          border: '1px solid #F1F1F1',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            width: '16px',
+                            height: '16px'
+                          }}>
+                            <img
+                              src={listingboxIcon}
+                              alt="Listings"
+                              style={{
+                                width: '16px',
+                                height: '16px',
+                                filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                              }}
+                            />
+                          </div>
+                          <div style={{
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            marginBottom: '4px'
+                          }}>
+                            248
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#45C55B',
+                            fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '4px'
+                          }}>
+                            +17.89%
+                          </div>
+                          <div style={{
+                            fontSize: '10px',
+                            color: '#939393',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            Last month: 94
+                          </div>
+                        </div>
+                        {/* Active Listings Card */}
+                        <div style={{
+                          backgroundColor: '#FAFAFA',
+                          borderRadius: '10px',
+                          padding: '12px',
+                          border: '1px solid #F1F1F1',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            width: '16px',
+                            height: '16px'
+                          }}>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <path d="M4 8L6 10L12 4" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                          <div style={{
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            marginBottom: '4px'
+                          }}>
+                            217
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#64B5F6',
+                            fontFamily: 'Poppins, sans-serif',
+                            cursor: 'pointer',
+                            textDecoration: 'none'
+                          }}>
+                            31 inactive listings &gt;
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Normal Users Management View
+              <div style={{ paddingRight: '14px' }}>
+                {/* Users Management Header */}
+                <div style={{ marginTop: '10px', marginBottom: '16px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h1 style={{
                     fontSize: '16px',
@@ -2461,8 +3385,9 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
+            )
           ) : (
-            <div>
+          <div>
             {/* Metrics Cards and Reported Issues Container */}
             <div style={{ 
               display: 'grid', 
@@ -3582,8 +4507,8 @@ const AdminDashboard: React.FC = () => {
                   </tbody>
                 </table>
               </div>
-              </div>
             </div>
+          </div>
             </div>
           )}
         </div>
