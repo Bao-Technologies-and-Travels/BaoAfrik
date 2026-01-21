@@ -197,10 +197,20 @@ const AdminDashboard: React.FC = () => {
       : usersActivitiesRows.filter((r) => r.type === usersActivityTab))
       .filter((r) => !removedUserEmails.has(r.email));
 
+  const filteredUsersListRows = (() => {
+    let filtered = usersListRows.filter((r) => !removedUserEmails.has(r.email));
+    if (usersListTab === 'new') filtered = filtered.filter((r) => r.isNewUser);
+    if (usersListTab === 'free') filtered = filtered.filter((r) => r.plan.toLowerCase().includes('free'));
+    if (usersListTab === 'verified') filtered = filtered.filter((r) => r.verified);
+    if (usersListTab === 'unverified') filtered = filtered.filter((r) => !r.verified);
+    return filtered;
+  })();
+
   const usersPageSize = 6;
   const usersTotalPages = 48; // match screenshot pagination
   const usersPaginationNumbers = [1, 2, 3];
-  const pagedUsersRows = filteredUsersActivitiesRows.slice((usersPage - 1) * usersPageSize, usersPage * usersPageSize);
+  const pagedUsersRows = (usersToggle === 'activities' ? filteredUsersActivitiesRows : filteredUsersListRows)
+    .slice((usersPage - 1) * usersPageSize, usersPage * usersPageSize);
 
   const getPlanBadgeStyle = (plan: string) => {
     const p = plan.toLowerCase();
@@ -1617,7 +1627,7 @@ const AdminDashboard: React.FC = () => {
                   <div style={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '18px',
-                    padding: '10px',
+                    padding: '8px',
                     border: '1px solid #F1F1F1'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1645,13 +1655,13 @@ const AdminDashboard: React.FC = () => {
                             alignItems: 'center', 
                             gap: '4px',
                             backgroundColor: '#EDFBF0',
-                            padding: '2px 6px',
-                            borderRadius: '12px'
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
                           }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
                               <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                            <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                           </div>
                         </div>
                         {/* last month removed */}
@@ -1664,7 +1674,7 @@ const AdminDashboard: React.FC = () => {
                   <div style={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '18px',
-                    padding: '10px',
+                    padding: '8px',
                     border: '1px solid #F1F1F1'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1692,13 +1702,13 @@ const AdminDashboard: React.FC = () => {
                             alignItems: 'center', 
                             gap: '4px',
                             backgroundColor: '#EDFBF0',
-                            padding: '2px 6px',
-                            borderRadius: '12px'
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
                           }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
                               <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                            <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                           </div>
                         </div>
                         {/* last month removed */}
@@ -1711,7 +1721,7 @@ const AdminDashboard: React.FC = () => {
                   <div style={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '18px',
-                    padding: '10px',
+                    padding: '8px',
                     border: '1px solid #F1F1F1'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1739,13 +1749,13 @@ const AdminDashboard: React.FC = () => {
                             alignItems: 'center', 
                             gap: '4px',
                             backgroundColor: '#FFE9E9',
-                            padding: '2px 6px',
-                            borderRadius: '12px'
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
                           }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
                               <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                            <span style={{ color: '#EF4444', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                            <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
                           </div>
                         </div>
                         {/* last month removed */}
@@ -1758,7 +1768,7 @@ const AdminDashboard: React.FC = () => {
                   <div style={{
                     backgroundColor: '#FFFFFF',
                     borderRadius: '18px',
-                    padding: '10px',
+                    padding: '8px',
                     border: '1px solid #F1F1F1'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1786,10 +1796,10 @@ const AdminDashboard: React.FC = () => {
                             alignItems: 'center', 
                             gap: '4px',
                             backgroundColor: '#F4F4F4',
-                            padding: '2px 6px',
-                            borderRadius: '12px'
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
                           }}>
-                            <span style={{ color: '#939393', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
+                            <span style={{ color: '#939393', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
                           </div>
                         </div>
                         {/* last month removed */}
@@ -1810,7 +1820,7 @@ const AdminDashboard: React.FC = () => {
                 {/* Top bar 1: tabs + export + sort OR selection controls */}
                 {!isSelectionMode ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: usersToggle === 'list' ? '26px' : '18px', flexWrap: 'wrap' }}>
                       {usersToggle === 'activities' ? (
                         [
                           { key: 'all', label: 'All user recent activities' },
@@ -1885,7 +1895,8 @@ const AdminDashboard: React.FC = () => {
                           color: '#64B5F6',
                           fontSize: '11px',
                           fontFamily: 'Poppins, sans-serif',
-                          padding: 0
+                          padding: 0,
+                          marginRight: usersToggle === 'list' ? '8px' : 0
                         }}
                       >
                         <span style={{ color: '#64B5F6' }}>{usersToggle === 'activities' ? 'Export data' : 'Export users datas'}</span>
