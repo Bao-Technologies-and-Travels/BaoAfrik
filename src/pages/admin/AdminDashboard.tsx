@@ -32,6 +32,8 @@ import selectIcon from '../../assets/images/admin/select.svg';
 import viewIcon from '../../assets/images/admin/view.svg';
 import trashIcon from '../../assets/images/admin/trash.svg';
 import mouseCursorIcon from '../../assets/images/admin/mouse.svg';
+import verifyIcon from '../../assets/images/pre/verify.svg';
+import unverifyIcon from '../../assets/images/pre/unverify.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -123,6 +125,7 @@ const AdminDashboard: React.FC = () => {
   // Users management page state (Option A: same table layout, data changes)
   const [usersToggle, setUsersToggle] = useState<'activities' | 'list'>('activities');
   const [usersActivityTab, setUsersActivityTab] = useState<'all' | 'joined' | 'posted' | 'reviewed' | 'reported'>('all');
+  const [usersListTab, setUsersListTab] = useState<'all' | 'new' | 'free' | 'verified' | 'unverified'>('all');
   const [usersSortBy, setUsersSortBy] = useState('Sort by');
   const [usersPage, setUsersPage] = useState(1);
   const [usersGoTo, setUsersGoTo] = useState('');
@@ -159,16 +162,30 @@ const AdminDashboard: React.FC = () => {
 
   // Mock data for Users Management table
   const usersActivitiesRows = [
-    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Free Plan', avatar, avatarBg: '#E3F2FD', isNewUser: true, type: 'joined' as const },
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: "Joined Bao'Afrik", plan: 'Free Plan', avatar, avatarBg: '#E3F2FD', isNewUser: true, type: 'joined' as const },
     { name: 'Clara Vanstone', email: 'mailaddresses2@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Free Plan', avatar, avatarBg: '#F0F8FE', isNewUser: false, type: 'posted' as const },
     { name: 'Clara Vanstone', email: 'mailaddresses3@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Starter plan', avatar, avatarBg: '#EDFBF0', isNewUser: false, type: 'reviewed' as const },
     { name: 'Clara Vanstone', email: 'mailaddresses4@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Pro plan', avatar, avatarBg: '#FEF6E9', isNewUser: false, type: 'reported' as const },
-    { name: 'Nadine Ngum', email: 'nadine.ngum@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Pro plan', avatar, avatarBg: '#FFF5F5', isNewUser: true, type: 'joined' as const },
+    { name: 'Nadine Ngum', email: 'nadine.ngum@gmail.com', date: 'Mon, 21 Dec 2024', activity: "Joined Bao'Afrik", plan: 'Pro plan', avatar, avatarBg: '#FFF5F5', isNewUser: true, type: 'joined' as const },
     { name: 'Herman Kabore', email: 'herman.kabore@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Starter plan', avatar, avatarBg: '#F4F4F4', isNewUser: false, type: 'posted' as const },
     { name: 'Amara Diop', email: 'amara.diop@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Free Plan', avatar, avatarBg: '#F3F4FF', isNewUser: false, type: 'reviewed' as const },
     { name: 'Aicha Diallo', email: 'aicha.diallo@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Free Plan', avatar, avatarBg: '#F3FDF8', isNewUser: false, type: 'reported' as const },
-    { name: 'Kevin Mobinnid', email: 'kevin.mobinnid@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Starter plan', avatar, avatarBg: '#F0FFF8', isNewUser: true, type: 'joined' as const },
+    { name: 'Kevin Mobinnid', email: 'kevin.mobinnid@gmail.com', date: 'Mon, 21 Dec 2024', activity: "Joined Bao'Afrik", plan: 'Starter plan', avatar, avatarBg: '#F0FFF8', isNewUser: true, type: 'joined' as const },
     { name: 'Kevin Roland Tadjil', email: 'kevin.roland@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Pro plan', avatar, avatarBg: '#F6F0FF', isNewUser: false, type: 'posted' as const },
+  ];
+
+  // Mock data for Users List table
+  const usersListRows = [
+    { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Free Plan', avatar, avatarBg: '#E3F2FD', isNewUser: true, verified: false },
+    { name: 'Clara Vanstone', email: 'mailaddresses2@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Free Plan', avatar, avatarBg: '#F0F8FE', isNewUser: false, verified: false },
+    { name: 'Clara Vanstone', email: 'mailaddresses3@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Starter plan', avatar, avatarBg: '#EDFBF0', isNewUser: false, verified: true },
+    { name: 'Clara Vanstone', email: 'mailaddresses4@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Pro plan', avatar, avatarBg: '#FEF6E9', isNewUser: false, verified: true },
+    { name: 'Nadine Ngum', email: 'nadine.ngum@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Pro plan', avatar, avatarBg: '#FFF5F5', isNewUser: true, verified: true },
+    { name: 'Herman Kabore', email: 'herman.kabore@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Starter plan', avatar, avatarBg: '#F4F4F4', isNewUser: false, verified: false },
+    { name: 'Amara Diop', email: 'amara.diop@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Free Plan', avatar, avatarBg: '#F3F4FF', isNewUser: false, verified: true },
+    { name: 'Aicha Diallo', email: 'aicha.diallo@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Free Plan', avatar, avatarBg: '#F3FDF8', isNewUser: false, verified: false },
+    { name: 'Kevin Mobinnid', email: 'kevin.mobinnid@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Starter plan', avatar, avatarBg: '#F0FFF8', isNewUser: true, verified: true },
+    { name: 'Kevin Roland Tadjil', email: 'kevin.roland@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Pro plan', avatar, avatarBg: '#F6F0FF', isNewUser: false, verified: true },
   ];
 
   const filteredUsersActivitiesRows =
@@ -1540,7 +1557,7 @@ const AdminDashboard: React.FC = () => {
                     }}>
                       {usersToggle === 'activities'
                         ? 'Explore the recent actions and events performed by users within the BAO Afrik platform.'
-                        : 'Explore the user list and overview details within the BAO Afrik platform.'}
+                        : 'Find a directory of registered users. Sort and manage accounts easily.'}
                     </p>
 
                     {/* Toggle (aligned with description) */}
@@ -1585,6 +1602,229 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
+              {/* Metrics Cards (only for Users list) */}
+              {usersToggle === 'list' && (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '10px',
+                  marginBottom: '20px'
+                }}>
+                  {/* Total user account */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '10px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Total user account
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            569
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#EDFBF0',
+                            padding: '2px 6px',
+                            borderRadius: '12px'
+                          }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
+                        </div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '8px',
+                          margin: 0,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Last month: 482
+                        </p>
+                      </div>
+                      <img src={peopleIcon} alt="Total users" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+
+                  {/* Active accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '10px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Active accounts
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            321
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#EDFBF0',
+                            padding: '2px 6px',
+                            borderRadius: '12px'
+                          }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
+                        </div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '8px',
+                          margin: 0,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Last month: 273
+                        </p>
+                      </div>
+                      <img src={activeusersIcon} alt="Active accounts" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+
+                  {/* Inactive accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '10px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Inactive accounts
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            204
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#FFE9E9',
+                            padding: '2px 6px',
+                            borderRadius: '12px'
+                          }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                              <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#EF4444', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                          </div>
+                        </div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '8px',
+                          margin: 0,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Last month: 213
+                        </p>
+                      </div>
+                      <img src={activelistingsIcon} alt="Inactive accounts" style={{ width: '24px', height: '24px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                    </div>
+                  </div>
+
+                  {/* Suspended accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '10px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Suspended accounts
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            13
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#F4F4F4',
+                            padding: '2px 6px',
+                            borderRadius: '12px'
+                          }}>
+                            <span style={{ color: '#939393', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
+                          </div>
+                        </div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '8px',
+                          margin: 0,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Last month: 13
+                        </p>
+                      </div>
+                      <img src={flagIcon} alt="Suspended accounts" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Users Activities Table (same layout; data changes with toggle/tab) */}
               <div style={{
                 backgroundColor: '#FFFFFF',
@@ -1596,34 +1836,65 @@ const AdminDashboard: React.FC = () => {
                 {!isSelectionMode ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
-                      {[
-                        { key: 'all', label: 'All user recent activities' },
-                        { key: 'joined', label: 'Joined' },
-                        { key: 'posted', label: 'Posted' },
-                        { key: 'reviewed', label: 'Reviewed' },
-                        { key: 'reported', label: 'Reported' },
-                      ].map((tab) => {
-                        const isActive = usersActivityTab === (tab.key as any);
-                        return (
-                          <button
-                            key={tab.key}
-                            onClick={() => setUsersActivityTab(tab.key as any)}
-                            style={{
-                              border: 'none',
-                              background: 'transparent',
-                              padding: '0 0 10px 0',
-                              cursor: 'pointer',
-                              fontSize: '11px',
-                              fontFamily: 'Poppins, sans-serif',
-                              color: isActive ? '#64B5F6' : '#B0B0B0',
-                              fontWeight: 400,
-                              borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                            }}
-                          >
-                            {tab.label}
-                          </button>
-                        );
-                      })}
+                      {usersToggle === 'activities' ? (
+                        [
+                          { key: 'all', label: 'All user recent activities' },
+                          { key: 'joined', label: 'Joined' },
+                          { key: 'posted', label: 'Posted' },
+                          { key: 'reviewed', label: 'Reviewed' },
+                          { key: 'reported', label: 'Reported' },
+                        ].map((tab) => {
+                          const isActive = usersActivityTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => setUsersActivityTab(tab.key as any)}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        [
+                          { key: 'all', label: 'All users' },
+                          { key: 'new', label: 'New users' },
+                          { key: 'free', label: 'Free Plan' },
+                          { key: 'verified', label: 'Verified' },
+                          { key: 'unverified', label: 'Unverified' },
+                        ].map((tab) => {
+                          const isActive = usersListTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => setUsersListTab(tab.key as any)}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      )}
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
@@ -1642,7 +1913,7 @@ const AdminDashboard: React.FC = () => {
                           padding: 0
                         }}
                       >
-                        <span style={{ color: '#64B5F6' }}>Export data</span>
+                        <span style={{ color: '#64B5F6' }}>{usersToggle === 'activities' ? 'Export data' : 'Export users datas'}</span>
                         <img
                           src={exportIcon}
                           alt="Export"
@@ -1779,14 +2050,20 @@ const AdminDashboard: React.FC = () => {
                 <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
 
                 {/* Top bar 2: column headers */}
-                <div style={{ display: 'grid', gridTemplateColumns: isSelectionMode ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0 12px 0' }}>
-                  {[
+                <div style={{ display: 'grid', gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'), gap: '10px', padding: '14px 0 12px 0' }}>
+                  {(usersToggle === 'activities' ? [
                     { key: 'Users', label: 'Users' },
                     { key: 'Date of creation', label: 'Date of creation' },
                     { key: 'Activity', label: 'Activity' },
                     { key: 'User plan', label: 'User plan' },
                     ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
-                  ].map((h) => (
+                  ] : [
+                    { key: 'Users', label: 'Users' },
+                    { key: 'Joined', label: 'Joined' },
+                    { key: 'User plan', label: 'User plan' },
+                    { key: 'User status', label: 'User status' },
+                    ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
+                  ]).map((h) => (
                     <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       {h.label}
                       {h.key !== 'Actions' && (
@@ -1824,7 +2101,7 @@ const AdminDashboard: React.FC = () => {
                       }}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: isSelectionMode ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1.6fr 1fr 0.8fr',
+                        gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'),
                         gap: '10px',
                         padding: '14px 8px',
                         borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F7F7F7' : 'none',
@@ -1892,10 +2169,13 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Date */}
+                      {/* Date/Joined */}
                       <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.date}</div>
-                      {/* Activity */}
-                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.activity}</div>
+                      
+                      {/* Activity (only for activities view) */}
+                      {usersToggle === 'activities' && (
+                        <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{(row as any).activity}</div>
+                      )}
 
                       {/* User plan */}
                       <div style={{ paddingTop: '4px' }}>
@@ -1910,6 +2190,30 @@ const AdminDashboard: React.FC = () => {
                           {row.plan}
                         </span>
                       </div>
+
+                      {/* User status (only for list view) */}
+                      {usersToggle === 'list' && (
+                        <div style={{ paddingTop: '4px' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '9px',
+                            fontFamily: 'Poppins, sans-serif',
+                            backgroundColor: (row as any).verified ? '#EDFBF0' : '#F4F4F4',
+                            color: (row as any).verified ? '#22C55E' : '#939393'
+                          }}>
+                            <img 
+                              src={(row as any).verified ? verifyIcon : unverifyIcon} 
+                              alt={(row as any).verified ? 'Verified' : 'Unverified'} 
+                              style={{ width: '8px', height: '8px' }} 
+                            />
+                            {(row as any).verified ? 'Verified' : 'Unverified'}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Actions */}
                       {isSelectionMode ? (
