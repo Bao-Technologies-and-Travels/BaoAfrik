@@ -125,6 +125,10 @@ const AdminDashboard: React.FC = () => {
     { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Free Plan', avatar, isNewUser: false, type: 'posted' as const },
     { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Starter plan', avatar, isNewUser: false, type: 'reviewed' as const },
     { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Pro plan', avatar, isNewUser: false, type: 'reported' as const },
+    { name: 'Nadine Ngum', email: 'nadine.ngum@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined Bao’Afrik', plan: 'Pro plan', avatar, isNewUser: true, type: 'joined' as const },
+    { name: 'Herman Kabore', email: 'herman.kabore@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Starter plan', avatar, isNewUser: false, type: 'posted' as const },
+    { name: 'Amara Diop', email: 'amara.diop@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reviewed a listing', plan: 'Free Plan', avatar, isNewUser: false, type: 'reviewed' as const },
+    { name: 'Aicha Diallo', email: 'aicha.diallo@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Reported an issue', plan: 'Free Plan', avatar, isNewUser: false, type: 'reported' as const },
   ];
 
   const filteredUsersActivitiesRows =
@@ -1266,62 +1270,68 @@ const AdminDashboard: React.FC = () => {
           {selectedSidebarOption === 'users' ? (
             <div>
               {/* Users Management Header */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+              <div style={{ marginTop: '10px', marginBottom: '16px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h1 style={{
-                    fontSize: '18px',
+                    fontSize: '16px',
                     fontWeight: 600,
                     color: '#202224',
                     margin: '0 0 4px 0',
                     fontFamily: 'Bricolage Grotesque, sans-serif'
                   }}>
-                    Users Management
+                    {usersToggle === 'activities' ? 'User activities' : 'User lists'}
                   </h1>
-                  <p style={{
-                    color: '#9C9C9C',
-                    fontSize: '12px',
-                    margin: 0,
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Explore the recent actions and events performed by users within the BAO Afrik platform.
-                  </p>
-                </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <p style={{
+                      color: '#9C9C9C',
+                      fontSize: '12px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      {usersToggle === 'activities'
+                        ? 'Explore the recent actions and events performed by users within the BAO Afrik platform.'
+                        : 'Explore the user list and overview details within the BAO Afrik platform.'}
+                    </p>
 
-                {/* Toggle */}
-                <div style={{
-                  backgroundColor: '#939393',
-                  borderRadius: '12px',
-                  padding: '3px',
-                  display: 'flex',
-                  gap: '3px',
-                  flexShrink: 0
-                }}>
-                  {[
-                    { key: 'activities', label: 'User activities' },
-                    { key: 'list', label: 'User lists' }
-                  ].map((t) => {
-                    const isActive = usersToggle === (t.key as 'activities' | 'list');
-                    return (
-                      <button
-                        key={t.key}
-                        onClick={() => setUsersToggle(t.key as 'activities' | 'list')}
-                        style={{
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: '6px 10px',
-                          borderRadius: '10px',
-                          backgroundColor: isActive ? '#FFFFFF' : 'transparent',
-                          color: isActive ? '#64B5F6' : '#939393',
-                          fontSize: '11px',
-                          fontFamily: 'Poppins, sans-serif',
-                          lineHeight: 1,
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {t.label}
-                      </button>
-                    );
-                  })}
+                    {/* Toggle (aligned with description) */}
+                    <div style={{
+                      backgroundColor: '#F4F4F4',
+                      borderRadius: '12px',
+                      padding: '3px',
+                      display: 'flex',
+                      gap: '3px',
+                      flexShrink: 0,
+                      border: '1px solid #F1F1F1'
+                    }}>
+                      {[
+                        { key: 'activities', label: 'Activities' },
+                        { key: 'list', label: 'User lists' }
+                      ].map((t) => {
+                        const isActive = usersToggle === (t.key as 'activities' | 'list');
+                        return (
+                          <button
+                            key={t.key}
+                            onClick={() => setUsersToggle(t.key as 'activities' | 'list')}
+                            style={{
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '6px 10px',
+                              borderRadius: '10px',
+                              backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                              color: isActive ? '#64B5F6' : '#939393',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: 1,
+                              whiteSpace: 'nowrap',
+                              boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.05)' : 'none'
+                            }}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1397,7 +1407,7 @@ const AdminDashboard: React.FC = () => {
                       value={usersSortBy}
                       onChange={(e) => setUsersSortBy(e.target.value)}
                       style={{
-                        padding: '0 22px 0 0',
+                        padding: '0 18px 0 0',
                         borderRadius: '8px',
                         border: 'none',
                         fontSize: '11px',
@@ -1410,7 +1420,7 @@ const AdminDashboard: React.FC = () => {
                         MozAppearance: 'none',
                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                         backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 0px center',
+                        backgroundPosition: 'right 4px center',
                         backgroundSize: '12px'
                       }}
                     >
@@ -1424,9 +1434,23 @@ const AdminDashboard: React.FC = () => {
                 <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
 
                 {/* Top bar 2: column headers */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '10px 0 8px 0' }}>
-                  {['Users', 'Date of creation', 'Activity', 'User plan', 'Actions'].map((h) => (
-                    <div key={h} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{h}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0 12px 0' }}>
+                  {[
+                    { key: 'Users', label: 'Users' },
+                    { key: 'Date of creation', label: 'Date of creation' },
+                    { key: 'Activity', label: 'Activity' },
+                    { key: 'User plan', label: 'User plan' },
+                    { key: 'Actions', label: 'Actions' }
+                  ].map((h) => (
+                    <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {h.label}
+                      {h.key !== 'Actions' && (
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 8l-6-6-6 6" />
+                          <path d="M18 16l-6 6-6-6" />
+                        </svg>
+                      )}
+                    </div>
                   ))}
                 </div>
 
@@ -1438,8 +1462,8 @@ const AdminDashboard: React.FC = () => {
                     <div key={`${row.email}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0', borderBottom: idx < filteredUsersActivitiesRows.length - 1 ? '1px solid #F7F7F7' : 'none' }}>
                       {/* Users column */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                        <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover' }} />
                         </div>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
@@ -1479,13 +1503,13 @@ const AdminDashboard: React.FC = () => {
 
                       {/* Actions */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px' }}>
-                        <button style={{ width: '28px', height: '28px', border: '1px solid #E4E4E4', borderRadius: '50%', background: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <button style={{ width: '24px', height: '24px', border: '1px solid #E4E4E4', borderRadius: '50%', background: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg>
                         </button>
-                        <button type="button" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #E4E4E4', backgroundColor: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <button type="button" style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #E4E4E4', backgroundColor: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
                             <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
