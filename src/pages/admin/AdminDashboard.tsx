@@ -34,6 +34,9 @@ import trashIcon from '../../assets/images/admin/trash.svg';
 import mouseCursorIcon from '../../assets/images/admin/mouse.svg';
 import verifyIcon from '../../assets/images/pre/verify.svg';
 import unverifyIcon from '../../assets/images/pre/unverify.svg';
+import statIcon from '../../assets/images/admin/stat.svg.svg';
+import stat2Icon from '../../assets/images/admin/stat2.svg';
+import stat3Icon from '../../assets/images/admin/stat3.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -1651,16 +1654,9 @@ const AdminDashboard: React.FC = () => {
                             <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                           </div>
                         </div>
-                        <p style={{ 
-                          color: '#9C9C9C',
-                          fontSize: '8px',
-                          margin: 0,
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          Last month: 482
-                        </p>
+                        {/* last month removed */}
                       </div>
-                      <img src={peopleIcon} alt="Total users" style={{ width: '24px', height: '24px' }} />
+                      <img src={statIcon} alt="Total users" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
 
@@ -1705,16 +1701,9 @@ const AdminDashboard: React.FC = () => {
                             <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                           </div>
                         </div>
-                        <p style={{ 
-                          color: '#9C9C9C',
-                          fontSize: '8px',
-                          margin: 0,
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          Last month: 273
-                        </p>
+                        {/* last month removed */}
                       </div>
-                      <img src={activeusersIcon} alt="Active accounts" style={{ width: '24px', height: '24px' }} />
+                      <img src={stat2Icon} alt="Active accounts" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
 
@@ -1759,16 +1748,9 @@ const AdminDashboard: React.FC = () => {
                             <span style={{ color: '#EF4444', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
                           </div>
                         </div>
-                        <p style={{ 
-                          color: '#9C9C9C',
-                          fontSize: '8px',
-                          margin: 0,
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          Last month: 213
-                        </p>
+                        {/* last month removed */}
                       </div>
-                      <img src={activelistingsIcon} alt="Inactive accounts" style={{ width: '24px', height: '24px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                      <img src={peopleIcon} alt="Inactive accounts" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
 
@@ -1810,16 +1792,9 @@ const AdminDashboard: React.FC = () => {
                             <span style={{ color: '#939393', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
                           </div>
                         </div>
-                        <p style={{ 
-                          color: '#9C9C9C',
-                          fontSize: '8px',
-                          margin: 0,
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          Last month: 13
-                        </p>
+                        {/* last month removed */}
                       </div>
-                      <img src={flagIcon} alt="Suspended accounts" style={{ width: '24px', height: '24px' }} />
+                      <img src={stat3Icon} alt="Suspended accounts" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
                 </div>
