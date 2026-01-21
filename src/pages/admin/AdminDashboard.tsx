@@ -23,6 +23,9 @@ import messageAvatarIcon from '../../assets/images/pre/main.png';
 import appNotificationIcon from '../../assets/images/pre/nof.svg';
 import visualIcon from '../../assets/images/admin/visual.svg';
 import MustUsersArc from '../../components/ui/MustUsersArc';
+import productImage1 from '../../assets/images/pre/a1.png';
+import productImage2 from '../../assets/images/pre/a2.png';
+import productImage3 from '../../assets/images/pre/a3.png';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -102,12 +105,12 @@ const AdminDashboard: React.FC = () => {
   ];
 
   const mockListings = [
-    { id: 1, name: 'Kevin Organic Oil', image: require('../../assets/images/pre/a1.png'), category: 'Food & Spices' },
-    { id: 2, name: 'Organic Coconut Oil', image: require('../../assets/images/pre/a2.png'), category: 'Food & Spices' },
+    { id: 1, name: 'Kevin Organic Oil', image: productImage1, category: 'Food & Spices' },
+    { id: 2, name: 'Organic Coconut Oil', image: productImage2, category: 'Food & Spices' },
   ];
 
   const mockRequests = [
-    { id: 1, name: 'White Pepper for Kevination...', image: require('../../assets/images/pre/a3.png'), category: 'Food & Spices' },
+    { id: 1, name: 'White Pepper for Kevination...', image: productImage3, category: 'Food & Spices' },
   ];
 
   // Mock notification data
@@ -147,10 +150,10 @@ const AdminDashboard: React.FC = () => {
         results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
       });
       mockListings.filter(listing => listing.name.toLowerCase().includes(query)).forEach(listing => {
-        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail.', image: listing.image });
+        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail...', image: listing.image });
       });
       mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
-        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail.', image: request.image });
+        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...', image: request.image });
       });
       
       setSearchResults(results);
@@ -174,10 +177,10 @@ const AdminDashboard: React.FC = () => {
         results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
       });
       mockListings.filter(listing => listing.name.toLowerCase().includes(query)).forEach(listing => {
-        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail.', image: listing.image });
+        results.push({ type: 'listing', ...listing, path: 'Listings \\ Listing detail...', image: listing.image });
       });
       mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
-        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail.', image: request.image });
+        results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...', image: request.image });
       });
       
       setSearchResults(results);
@@ -508,9 +511,9 @@ const AdminDashboard: React.FC = () => {
                     @{selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/
                   </span>
                 )}
-                <input
+              <input
                   ref={searchInputRef}
-                  type="text"
+                type="text"
                   value={selectedCategory && searchValue.startsWith(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`) 
                     ? searchValue.replace(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`, '')
                     : searchValue}
@@ -524,22 +527,22 @@ const AdminDashboard: React.FC = () => {
                   }}
                   onFocus={() => setIsSearchFocused(true)}
                   placeholder={selectedCategory ? '' : 'Search, press "/" for commands'}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
                     paddingLeft: selectedCategory 
                       ? `calc(12px + ${`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`.length * 7}px)`
                       : '12px',
-                    backgroundColor: '#F1F1F1',
-                    borderRadius: '12px',
+                  backgroundColor: '#F1F1F1',
+                  borderRadius: '12px',
                     border: isSearchFocused ? '1px solid #CFE8FC' : 'none',
                     outline: 'none',
                     color: '#6A6A6A',
-                    fontSize: '12px',
+                  fontSize: '12px',
                     fontFamily: 'Poppins, sans-serif',
                     caretColor: '#CFE8FC'
-                  }}
-                />
+                }}
+              />
               </div>
               <style>
                 {`
@@ -1723,7 +1726,7 @@ const AdminDashboard: React.FC = () => {
                               position: 'absolute',
                               top: `calc(${positions[idx] * 100}% + ${offset})`,
                               transform: 'translateY(-50%)',
-                              display: 'flex',
+                  display: 'flex',
                               alignItems: 'center'
                             }}
                           >
@@ -1849,10 +1852,10 @@ const AdminDashboard: React.FC = () => {
                                     }}
                                   >
                                     {/* zebra stripes for current week */}
-                                    {item.isCurrent && (
+                        {item.isCurrent && (
                                       <div
                                         style={{
-                                          position: 'absolute',
+                            position: 'absolute',
                                           inset: 0,
                                           backgroundImage:
                                             'repeating-linear-gradient(135deg, rgba(249, 168, 37, 0.15) 0px, rgba(249, 168, 37, 0.15) 6px, rgba(255, 255, 255, 0) 6px, rgba(255, 255, 255, 0) 12px)'
@@ -1867,18 +1870,18 @@ const AdminDashboard: React.FC = () => {
                                       style={{
                                         position: 'absolute',
                                         bottom: `calc(${item.fillH}% + 2px)`,
-                                        left: '50%',
+                            left: '50%',
                                         transform: 'translate(-50%, 50%)',
                                         width: '12px',
                                         height: '12px',
-                                        borderRadius: '50%',
+                            borderRadius: '50%',
                                         backgroundColor: '#64B5F6',
                                         boxShadow: '0 0 0 1px #FFFFFF',
                                         zIndex: 10
                                       }}
                                     />
-                                  )}
-                                </div>
+                        )}
+                      </div>
                               </div>
                             );
                           })}
@@ -1912,8 +1915,8 @@ const AdminDashboard: React.FC = () => {
                             >
                               {m}
                             </span>
-                          </div>
-                        ))}
+                    </div>
+                  ))}
                       </div>
                     </div>
                   </div>
@@ -2057,7 +2060,7 @@ const AdminDashboard: React.FC = () => {
                           width: '100%',
                           height: '100%',
                           objectFit: 'contain'
-                        }} 
+                        }}
                       />
                     </div>
                   </div>
@@ -2066,7 +2069,7 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Recent Activities - Full width to align with cards above */}
-            <div style={{ 
+            <div style={{
               display: 'grid', 
               gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
               gap: '10px',
@@ -2076,14 +2079,14 @@ const AdminDashboard: React.FC = () => {
             }}>
               <div style={{
                 gridColumn: '1 / 5',
-                backgroundColor: '#FFFFFF',
-                borderRadius: '12px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
                 padding: '10px 6px 10px 12px',
-                border: '1px solid #F1F1F1',
+              border: '1px solid #F1F1F1',
                 boxSizing: 'border-box',
                 width: 'calc(100% - 20px)',
                 maxWidth: 'calc(100% - 20px)'
-              }}>
+            }}>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
@@ -2189,7 +2192,7 @@ const AdminDashboard: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          Activity
+                        Activity
                           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M18 8l-6-6-6 6" />
                             <path d="M18 16l-6 6-6-6" />
@@ -2242,15 +2245,15 @@ const AdminDashboard: React.FC = () => {
                             {/* User Info */}
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' }}>
-                                <p style={{ 
+                          <p style={{ 
                                   fontSize: '10px',
-                                  color: '#212121',
+                            color: '#212121',
                                   margin: 0,
-                                  fontWeight: 500,
+                            fontWeight: 500,
                                   fontFamily: 'Bricolage Grotesque, sans-serif'
-                                }}>
-                                  {item.name}
-                                </p>
+                          }}>
+                            {item.name}
+                          </p>
                                 {item.isNewUser && (
                                   <span style={{
                                     backgroundColor: '#F0F8FE',
@@ -2266,14 +2269,14 @@ const AdminDashboard: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <p style={{ 
+                          <p style={{ 
                                 fontSize: '9px',
                                 color: '#939393',
                                 margin: 0,
-                                fontFamily: 'Poppins, sans-serif'
-                              }}>
-                                {item.email}
-                              </p>
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            {item.email}
+                          </p>
                             </div>
                           </div>
                         </td>
@@ -2290,14 +2293,14 @@ const AdminDashboard: React.FC = () => {
                         </td>
                         {/* Activity Column */}
                         <td style={{ padding: '8px' }}>
-                          <p style={{ 
-                            fontSize: '10px',
+                            <p style={{ 
+                              fontSize: '10px',
                             color: '#939393',
-                            margin: 0,
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
+                              margin: 0,
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
                             {item.activity}
-                          </p>
+                            </p>
                         </td>
                         {/* Actions Column */}
                         <td style={{ padding: '8px' }}>
@@ -2341,7 +2344,7 @@ const AdminDashboard: React.FC = () => {
                                 <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
                                 <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
                                 <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
-                              </svg>
+                                </svg>
                             </button>
                           </div>
                         </td>
