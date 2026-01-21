@@ -1797,7 +1797,7 @@ const AdminDashboard: React.FC = () => {
                             paddingBottom: '0px'
                           }}
                         >
-                          {[
+                  {[
                             { month: 'Mar', trackH: 28, fillH: 55 },
                             { month: 'Apr', trackH: 46, fillH: 35 },
                             { month: 'May', trackH: 100, fillH: 30 },
