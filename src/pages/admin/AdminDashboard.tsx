@@ -101,6 +101,8 @@ const AdminDashboard: React.FC = () => {
   const [usersToggle, setUsersToggle] = useState<'activities' | 'list'>('activities');
   const [usersActivityTab, setUsersActivityTab] = useState<'all' | 'joined' | 'posted' | 'reviewed' | 'reported'>('all');
   const [usersSortBy, setUsersSortBy] = useState('Sort by');
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersGoTo, setUsersGoTo] = useState('');
 
   // Mock data for search
   const mockUsers = [
@@ -135,6 +137,11 @@ const AdminDashboard: React.FC = () => {
     usersActivityTab === 'all'
       ? usersActivitiesRows
       : usersActivitiesRows.filter((r) => r.type === usersActivityTab);
+
+  const usersPageSize = 4;
+  const usersTotalPages = 48; // match screenshot pagination
+  const usersPaginationNumbers = [1, 2, 3];
+  const pagedUsersRows = filteredUsersActivitiesRows.slice((usersPage - 1) * usersPageSize, usersPage * usersPageSize);
 
   const getPlanBadgeStyle = (plan: string) => {
     const p = plan.toLowerCase();
@@ -1276,7 +1283,7 @@ const AdminDashboard: React.FC = () => {
                     fontSize: '16px',
                     fontWeight: 600,
                     color: '#202224',
-                    margin: '0 0 4px 0',
+                    margin: '0 0 2px 0',
                     fontFamily: 'Bricolage Grotesque, sans-serif'
                   }}>
                     {usersToggle === 'activities' ? 'User activities' : 'User lists'}
@@ -1458,7 +1465,7 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Rows */}
                 <div>
-                  {filteredUsersActivitiesRows.map((row, idx) => (
+                  {pagedUsersRows.map((row, idx) => (
                     <div key={`${row.email}-${idx}`} style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0', borderBottom: idx < filteredUsersActivitiesRows.length - 1 ? '1px solid #F7F7F7' : 'none' }}>
                       {/* Users column */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
@@ -1503,7 +1510,7 @@ const AdminDashboard: React.FC = () => {
 
                       {/* Actions */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px' }}>
-                        <button style={{ width: '24px', height: '24px', border: '1px solid #E4E4E4', borderRadius: '50%', background: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <button style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
@@ -1519,6 +1526,110 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Pagination (MyListings style; left controls + right Go to) */}
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '8px' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button
+                      aria-label="Previous page"
+                      onClick={() => setUsersPage((p) => Math.max(1, p - 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F0F0F0',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                      {usersPaginationNumbers.map((page) => (
+                        <span
+                          key={page}
+                          onClick={() => setUsersPage(page)}
+                          style={{
+                            cursor: 'pointer',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '14px',
+                            color: page === usersPage ? '#212121' : '#B0B0B0'
+                          }}
+                        >
+                          {page}
+                        </span>
+                      ))}
+                      <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
+                      <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>{usersTotalPages}</span>
+                    </div>
+
+                    <button
+                      aria-label="Next page"
+                      onClick={() => setUsersPage((p) => Math.min(usersTotalPages, p + 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F0F0F0',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 6l6 6-6 6" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+                    <input
+                      type="text"
+                      placeholder="e.g 40"
+                      value={usersGoTo}
+                      onChange={(e) => setUsersGoTo(e.target.value)}
+                      style={{
+                        border: '1px solid #BABABA',
+                        borderRadius: '8px',
+                        padding: '6px 10px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        color: '#D9D9D9',
+                        width: '64px',
+                        textAlign: 'center'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const n = parseInt(usersGoTo, 10);
+                        if (!Number.isNaN(n)) setUsersPage(Math.min(usersTotalPages, Math.max(1, n)));
+                      }}
+                      style={{
+                        backgroundColor: '#212121',
+                        color: '#FFFFFF',
+                        borderRadius: '8px',
+                        padding: '6px 14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Go
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
