@@ -27,6 +27,10 @@ import users2Icon from '../../assets/images/admin/users2.svg';
 import productImage1 from '../../assets/images/pre/a1.png';
 import productImage2 from '../../assets/images/pre/a2.png';
 import productImage3 from '../../assets/images/pre/a3.png';
+import selectIcon from '../../assets/images/admin/select.svg';
+import viewIcon from '../../assets/images/admin/view.svg';
+import trashIcon from '../../assets/images/admin/trash.svg';
+import mouseCursorIcon from '../../assets/images/admin/mouse.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -105,6 +109,8 @@ const AdminDashboard: React.FC = () => {
   const [usersGoTo, setUsersGoTo] = useState('');
   const [hoveredUserRowKey, setHoveredUserRowKey] = useState<string | null>(null);
   const [selectedUserRowKey, setSelectedUserRowKey] = useState<string | null>(null);
+  const [openMoreOptionsIndex, setOpenMoreOptionsIndex] = useState<number | null>(null);
+  const moreOptionsDropdownRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   // Mock data for search
   const mockUsers = [
@@ -246,6 +252,8 @@ const AdminDashboard: React.FC = () => {
       const notificationDropdown = target.closest('.notification-dropdown');
       const menuDropdown = target.closest('.menu-dropdown');
       const searchContainer = target.closest('.search-container');
+      const moreOptionsDropdown = target.closest('.more-options-dropdown');
+      const moreOptionsButton = target.closest('.more-options-button');
 
       if (!languageSelector && isLanguageDropdownOpen) {
         setIsLanguageDropdownOpen(false);
@@ -263,13 +271,16 @@ const AdminDashboard: React.FC = () => {
           setSelectedCategory(null);
         }
       }
+      if (!moreOptionsDropdown && !moreOptionsButton && openMoreOptionsIndex !== null) {
+        setOpenMoreOptionsIndex(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue]);
+  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, openMoreOptionsIndex]);
 
   const handleCategorySelect = (category: 'users' | 'listings' | 'requests') => {
     setSelectedCategory(category);
@@ -1531,20 +1542,170 @@ const AdminDashboard: React.FC = () => {
                       </div>
 
                       {/* Actions */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}>
                         <button style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg>
                         </button>
-                        <button type="button" style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid #E4E4E4', backgroundColor: '#FFFFFF', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
-                            <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
-                            <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
-                          </svg>
-                        </button>
+                        <div style={{ position: 'relative' }}>
+                          <button
+                            type="button"
+                            className="more-options-button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMoreOptionsIndex(openMoreOptionsIndex === idx ? null : idx);
+                            }}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              border: openMoreOptionsIndex === idx ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
+                              backgroundColor: '#FFFFFF',
+                              cursor: 'pointer',
+                              padding: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="3" cy="6" r="1.2" fill={openMoreOptionsIndex === idx ? '#64B5F6' : '#B0B0B0'} />
+                              <circle cx="6" cy="6" r="1.2" fill={openMoreOptionsIndex === idx ? '#64B5F6' : '#B0B0B0'} />
+                              <circle cx="9" cy="6" r="1.2" fill={openMoreOptionsIndex === idx ? '#64B5F6' : '#B0B0B0'} />
+                            </svg>
+                          </button>
+                          {openMoreOptionsIndex === idx && (
+                            <div
+                              ref={(el) => { moreOptionsDropdownRefs.current[idx] = el; }}
+                              className="more-options-dropdown"
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                right: 0,
+                                marginTop: '8px',
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '12px',
+                                border: '1px solid #F1F1F1',
+                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                                padding: '8px',
+                                minWidth: '180px',
+                                zIndex: 1000
+                              }}
+                            >
+                              {/* Select item */}
+                              <div
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                                  e.currentTarget.style.backgroundColor = '#F0F8FE';
+                                  const icon = e.currentTarget.querySelector('img');
+                                  const text = e.currentTarget.querySelector('span');
+                                  if (icon) icon.style.filter = 'none';
+                                  if (text) (text as HTMLElement).style.color = '#64B5F6';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.cursor = 'pointer';
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                  const icon = e.currentTarget.querySelector('img');
+                                  const text = e.currentTarget.querySelector('span');
+                                  if (icon) icon.style.filter = 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+                                  if (text) (text as HTMLElement).style.color = '#939393';
+                                }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  padding: '8px',
+                                  borderRadius: '8px',
+                                  cursor: `url(${mouseCursorIcon}), auto`,
+                                  transition: 'background-color 0.2s'
+                                }}
+                              >
+                                <img src={selectIcon} alt="Select" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Select item</span>
+                              </div>
+                              {/* View activity detail */}
+                              <div
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                                  e.currentTarget.style.backgroundColor = '#F0F8FE';
+                                  const icon = e.currentTarget.querySelector('img');
+                                  const text = e.currentTarget.querySelector('span');
+                                  if (icon) icon.style.filter = 'none';
+                                  if (text) (text as HTMLElement).style.color = '#64B5F6';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.cursor = 'pointer';
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                  const icon = e.currentTarget.querySelector('img');
+                                  const text = e.currentTarget.querySelector('span');
+                                  if (icon) icon.style.filter = 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+                                  if (text) (text as HTMLElement).style.color = '#939393';
+                                }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  padding: '8px',
+                                  borderRadius: '8px',
+                                  cursor: `url(${mouseCursorIcon}), auto`,
+                                  transition: 'background-color 0.2s'
+                                }}
+                              >
+                                <img src={viewIcon} alt="View" style={{ width: '16px', height: '16px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View activity detail</span>
+                              </div>
+                              {/* Delete the activity */}
+                              <div
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.cursor = 'pointer';
+                                }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  padding: '8px',
+                                  borderRadius: '8px',
+                                  cursor: `url(${mouseCursorIcon}), auto`,
+                                  transition: 'background-color 0.2s'
+                                }}
+                              >
+                                <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                                <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
+                              </div>
+                              {/* Close */}
+                              <div
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.cursor = 'pointer';
+                                }}
+                                onClick={() => setOpenMoreOptionsIndex(null)}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  padding: '8px',
+                                  borderRadius: '8px',
+                                  backgroundColor: '#FAFAFA',
+                                  cursor: `url(${mouseCursorIcon}), auto`,
+                                  transition: 'background-color 0.2s'
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                                <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     );
