@@ -173,6 +173,11 @@ const AdminDashboard: React.FC = () => {
   const [isDeleteActivitySuccess, setIsDeleteActivitySuccess] = useState(false);
   const [isActivityDeleted, setIsActivityDeleted] = useState(false);
   const [deleteCountdown, setDeleteCountdown] = useState(5);
+  const [sidebarMoreMenu, setSidebarMoreMenu] = useState<{
+    anchorRect: DOMRect;
+  } | null>(null);
+  const sidebarMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const sidebarMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Mock data for search
   const mockUsers = [
@@ -399,6 +404,30 @@ const AdminDashboard: React.FC = () => {
       window.removeEventListener('resize', onResize);
     };
   }, [activityCardMoreMenu]);
+
+  // Close sidebar more menu on outside click / scroll / resize (portal-safe)
+  useEffect(() => {
+    if (!sidebarMoreMenu) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const clickedMenu = !!sidebarMoreMenuRef.current?.contains(target);
+      const clickedButton = !!sidebarMoreMenuButtonRef.current?.contains(target);
+      if (!clickedMenu && !clickedButton) {
+        setSidebarMoreMenu(null);
+      }
+    };
+    const onScroll = () => setSidebarMoreMenu(null);
+    const onResize = () => setSidebarMoreMenu(null);
+    document.addEventListener('mousedown', onMouseDown, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, true);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [sidebarMoreMenu]);
 
   // Countdown timer for delete success modal
   useEffect(() => {
@@ -2436,42 +2465,188 @@ const AdminDashboard: React.FC = () => {
                           { icon: chatsIcon, alt: 'Chat' },
                           { icon: sendIcon, alt: 'Send' },
                           { icon: 'ellipsis', alt: 'More' }
-                        ].map((action, idx) => (
-                          <button
-                            key={idx}
+                        ].map((action, idx) => {
+                          const isMoreButton = action.icon === 'ellipsis';
+                          const isMoreMenuOpen = isMoreButton && sidebarMoreMenu !== null;
+                          return (
+                            <button
+                              key={idx}
+                              ref={isMoreButton ? sidebarMoreMenuButtonRef : null}
+                              onClick={(e) => {
+                                if (isMoreButton) {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setSidebarMoreMenu(prev => prev ? null : { anchorRect: rect });
+                                }
+                              }}
+                              style={{
+                                width: '34px',
+                                height: '34px',
+                                borderRadius: '50%',
+                                backgroundColor: isMoreMenuOpen ? '#F0F8FE' : '#FFFFFF',
+                                border: isMoreMenuOpen ? '1px solid #CFE8FC' : 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.02)'
+                              }}
+                            >
+                              {action.icon === 'ellipsis' ? (
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                  <circle cx="4" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                  <circle cx="8" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                  <circle cx="12" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                </svg>
+                              ) : (
+                                <img
+                                  src={action.icon}
+                                  alt={action.alt}
+                                  style={{
+                                    width: '16px',
+                                    height: '16px',
+                                    filter: 'brightness(0) saturate(100%) invert(13%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
+                                  }}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Sidebar More Options Dropdown */}
+                      {sidebarMoreMenu && (() => {
+                        const menuWidth = 200;
+                        const margin = 8;
+                        const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, sidebarMoreMenu.anchorRect.right - menuWidth));
+                        const top = sidebarMoreMenu.anchorRect.bottom + 8;
+
+                        const primaryHoverOn = (e: React.MouseEvent<HTMLDivElement>) => {
+                          e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                          e.currentTarget.style.backgroundColor = '#F0F8FE';
+                          const icon = e.currentTarget.querySelector('img');
+                          const text = e.currentTarget.querySelector('span');
+                          if (icon) (icon as HTMLImageElement).style.filter =
+                            'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
+                          if (text) (text as HTMLElement).style.color = '#64B5F6';
+                        };
+                        const primaryHoverOff = (e: React.MouseEvent<HTMLDivElement>) => {
+                          e.currentTarget.style.cursor = 'pointer';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          const icon = e.currentTarget.querySelector('img');
+                          const text = e.currentTarget.querySelector('span');
+                          if (icon) (icon as HTMLImageElement).style.filter =
+                            'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+                          if (text) (text as HTMLElement).style.color = '#939393';
+                        };
+
+                        const baseItemStyle: React.CSSProperties = {
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px',
+                          borderRadius: '8px',
+                          cursor: `url(${mouseCursorIcon}), auto`,
+                          transition: 'background-color 0.2s'
+                        };
+
+                        return createPortal(
+                          <div
+                            ref={sidebarMoreMenuRef}
+                            className="sidebar-more-options-dropdown"
                             style={{
-                              width: '34px',
-                              height: '34px',
-                              borderRadius: '50%',
+                              position: 'fixed',
+                              top,
+                              left,
+                              width: `${menuWidth}px`,
                               backgroundColor: '#FFFFFF',
-                              border: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.02)'
+                              borderRadius: '12px',
+                              border: '1px solid #F1F1F1',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              padding: '8px',
+                              zIndex: 99999
                             }}
                           >
-                            {action.icon === 'ellipsis' ? (
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <circle cx="4" cy="8" r="1.5" fill="#212121"/>
-                                <circle cx="8" cy="8" r="1.5" fill="#212121"/>
-                                <circle cx="12" cy="8" r="1.5" fill="#212121"/>
-                              </svg>
-                            ) : (
+                            {/* Edit user access */}
+                            <div 
+                              onMouseEnter={primaryHoverOn} 
+                              onMouseLeave={primaryHoverOff} 
+                              style={baseItemStyle}
+                            >
                               <img
-                                src={action.icon}
-                                alt={action.alt}
+                                src={pencilIcon}
+                                alt="Edit access"
                                 style={{
                                   width: '16px',
                                   height: '16px',
-                                  filter: 'brightness(0) saturate(100%) invert(13%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
+                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
                                 }}
                               />
-                            )}
-                          </button>
-                        ))}
-                      </div>
+                              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
+                            </div>
+
+                            {/* Suspend the user */}
+                            <div 
+                              onMouseEnter={primaryHoverOn} 
+                              onMouseLeave={primaryHoverOff} 
+                              style={baseItemStyle}
+                            >
+                              <img
+                                src={suspendIcon}
+                                alt="Suspend"
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Suspend the user</span>
+                            </div>
+
+                            {/* Delete user account */}
+                            <div
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.cursor = 'pointer';
+                              }}
+                              style={baseItemStyle}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                              <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete user account</span>
+                            </div>
+
+                            {/* Close */}
+                            <div
+                              onClick={() => setSidebarMoreMenu(null)}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.cursor = 'pointer';
+                              }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '8px',
+                                borderRadius: '8px',
+                                backgroundColor: '#FAFAFA',
+                                cursor: `url(${mouseCursorIcon}), auto`,
+                                transition: 'background-color 0.2s',
+                                marginTop: '4px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                              <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                            </div>
+                          </div>,
+                          document.body
+                        );
+                      })()}
                     </div>
 
                     {/* Tabs */}
