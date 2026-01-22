@@ -1690,12 +1690,11 @@ const AdminDashboard: React.FC = () => {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
                       gap: '12px',
                       marginBottom: '12px'
                     }}>
                       {/* Search Bar */}
-                      <div style={{ flex: 1, position: 'relative', maxWidth: '520px' }}>
+                      <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
                         <input
                           type="text"
                           placeholder="Search an activity?"
@@ -1714,59 +1713,56 @@ const AdminDashboard: React.FC = () => {
                         />
                       </div>
 
-                      {/* Export Data Button */}
-                      <button style={{
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#64B5F6',
-                        fontSize: '11px',
-                        fontFamily: 'Poppins, sans-serif',
-                        padding: 0
-                      }}>
-                        <span style={{ color: '#64B5F6' }}>Export data</span>
-                        <img
-                          src={exportIcon}
-                          alt="Export"
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            filter:
-                              'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                          }}
-                        />
-                      </button>
+                      {/* Export Data Button + Sort By Dropdown */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
+                        {/* Export Data Button */}
+                        <button style={{
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#64B5F6',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0
+                        }}>
+                          <span style={{ color: '#64B5F6' }}>Export data</span>
+                          <img
+                            src={exportIcon}
+                            alt="Export"
+                            style={{
+                              width: '14px',
+                              height: '14px',
+                              filter:
+                                'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                            }}
+                          />
+                        </button>
 
-                      {/* Sort By Dropdown */}
-                      <select
-                        value={usersSortBy}
-                        onChange={(e) => setUsersSortBy(e.target.value)}
-                        style={{
-                          padding: '0 18px 0 0',
+                        {/* Sort By Dropdown */}
+                        <select style={{
+                          padding: '4px 10px',
+                          paddingRight: '28px',
                           borderRadius: '8px',
                           border: 'none',
                           fontSize: '11px',
-                          fontFamily: 'Poppins, sans-serif',
-                          color: '#B0B0B0',
-                          backgroundColor: 'transparent',
+                          color: '#939393',
+                          backgroundColor: '#FFFFFF',
                           cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
                           appearance: 'none',
                           WebkitAppearance: 'none',
                           MozAppearance: 'none',
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'right 4px center',
+                          backgroundPosition: 'right 8px center',
                           backgroundSize: '12px'
-                        }}
-                      >
-                        <option>Sort by</option>
-                        <option>Date (Newest)</option>
-                        <option>Date (Oldest)</option>
-                        <option>Activity Type</option>
-                      </select>
+                        }}>
+                          <option>Sort by</option>
+                        </select>
+                      </div>
                     </div>
 
                     {/* Date Header */}
@@ -1774,8 +1770,8 @@ const AdminDashboard: React.FC = () => {
                       color: '#939393',
                       fontSize: '11px',
                       fontFamily: 'Poppins, sans-serif',
-                      marginTop: '10px',
-                      marginBottom: '10px'
+                      marginTop: '16px',
+                      marginBottom: '16px'
                     }}>
                       Mon, 21 Dec 2025
                     </div>
@@ -1783,9 +1779,7 @@ const AdminDashboard: React.FC = () => {
                     {/* Activity Entry */}
                     <div style={{
                       display: 'flex',
-                      gap: '12px',
-                      paddingBottom: '16px',
-                      borderBottom: '1px solid #F1F1F1'
+                      gap: '12px'
                     }}>
                       {/* Profile with Notification Bell */}
                       <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -1843,7 +1837,8 @@ const AdminDashboard: React.FC = () => {
                           display: 'flex',
                           alignItems: 'flex-start',
                           justifyContent: 'space-between',
-                          marginBottom: '4px'
+                          marginBottom: '0px',
+                          marginTop: '4px'
                         }}>
                           <span style={{
                             fontSize: '12px',
@@ -1904,7 +1899,7 @@ const AdminDashboard: React.FC = () => {
                                 color: '#64B5F6',
                                 fontFamily: 'Poppins, sans-serif',
                                 cursor: 'pointer',
-                                textDecoration: 'none'
+                                textDecoration: 'underline'
                               }}
                             >
                               View more
