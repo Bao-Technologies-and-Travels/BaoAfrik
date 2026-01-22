@@ -863,8 +863,8 @@ const AdminDashboard: React.FC = () => {
             justifyContent: 'space-between',
             marginBottom: '16px'
           }}>
-            {/* Left Side: Search (overview) OR Breadcrumbs (details) */}
-            {viewingUserProfile ? (
+            {/* Left Side: Search (default) OR Breadcrumbs (only for user-profile detail view) */}
+            {selectedSidebarOption === 'users' && viewingUserProfile && selectedUserForProfile ? (
               <nav style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -884,7 +884,15 @@ const AdminDashboard: React.FC = () => {
                   Homepage
                 </span>
                 <span style={{ color: '#D4D4D4' }}>·</span>
-                <span style={{ cursor: 'pointer' }}>Users activities</span>
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setViewingUserProfile(false);
+                    setUsersToggle('list');
+                  }}
+                >
+                  Users activities
+                </span>
                 <span style={{ color: '#D4D4D4' }}>·</span>
                 <span style={{ color: '#4D4D4D', fontWeight: 500 }}>User activity details</span>
               </nav>
@@ -1684,42 +1692,52 @@ const AdminDashboard: React.FC = () => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       gap: '12px',
-                      marginBottom: '16px'
+                      marginBottom: '12px'
                     }}>
                       {/* Search Bar */}
-                      <div style={{ flex: 1, position: 'relative' }}>
+                      <div style={{ flex: 1, position: 'relative', maxWidth: '520px' }}>
                         <input
                           type="text"
                           placeholder="Search an activity?"
                           style={{
                             width: '100%',
-                            padding: '10px 12px',
-                            border: '1px solid #F1F1F1',
-                            borderRadius: '10px',
+                            padding: '8px 12px',
+                            border: 'none',
+                            borderRadius: '12px',
                             fontSize: '12px',
                             fontFamily: 'Poppins, sans-serif',
-                            color: '#212121',
-                            backgroundColor: '#FAFAFA',
-                            outline: 'none'
+                            color: '#6A6A6A',
+                            backgroundColor: '#F1F1F1',
+                            outline: 'none',
+                            caretColor: '#CFE8FC'
                           }}
                         />
                       </div>
 
                       {/* Export Data Button */}
                       <button style={{
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        padding: '8px 12px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
                         color: '#64B5F6',
                         fontSize: '11px',
-                        fontFamily: 'Poppins, sans-serif'
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
                       }}>
-                        <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px' }} />
-                        Export data
+                        <span style={{ color: '#64B5F6' }}>Export data</span>
+                        <img
+                          src={exportIcon}
+                          alt="Export"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            filter:
+                              'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                          }}
+                        />
                       </button>
 
                       {/* Sort By Dropdown */}
@@ -1727,20 +1745,21 @@ const AdminDashboard: React.FC = () => {
                         value={usersSortBy}
                         onChange={(e) => setUsersSortBy(e.target.value)}
                         style={{
-                          padding: '8px 28px 8px 12px',
-                          border: '1px solid #F1F1F1',
-                          borderRadius: '10px',
+                          padding: '0 18px 0 0',
+                          borderRadius: '8px',
+                          border: 'none',
                           fontSize: '11px',
                           fontFamily: 'Poppins, sans-serif',
-                          color: '#212121',
-                          backgroundColor: '#FFFFFF',
+                          color: '#B0B0B0',
+                          backgroundColor: 'transparent',
                           cursor: 'pointer',
                           appearance: 'none',
                           WebkitAppearance: 'none',
                           MozAppearance: 'none',
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23B0B0B0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'right 8px center'
+                          backgroundPosition: 'right 4px center',
+                          backgroundSize: '12px'
                         }}
                       >
                         <option>Sort by</option>
@@ -1753,9 +1772,10 @@ const AdminDashboard: React.FC = () => {
                     {/* Date Header */}
                     <div style={{
                       color: '#939393',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontFamily: 'Poppins, sans-serif',
-                      marginBottom: '12px'
+                      marginTop: '10px',
+                      marginBottom: '10px'
                     }}>
                       Mon, 21 Dec 2025
                     </div>
@@ -1826,7 +1846,7 @@ const AdminDashboard: React.FC = () => {
                           marginBottom: '4px'
                         }}>
                           <span style={{
-                            fontSize: '13px',
+                            fontSize: '12px',
                             color: '#6A6A6A',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
                             fontWeight: 500
@@ -1842,9 +1862,9 @@ const AdminDashboard: React.FC = () => {
                             cursor: 'pointer'
                           }}>
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <circle cx="8" cy="4" r="1.5" fill="#4D4D4D"/>
+                              <circle cx="4" cy="8" r="1.5" fill="#4D4D4D"/>
                               <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
-                              <circle cx="8" cy="12" r="1.5" fill="#4D4D4D"/>
+                              <circle cx="12" cy="8" r="1.5" fill="#4D4D4D"/>
                             </svg>
                           </div>
                         </div>
@@ -1857,14 +1877,14 @@ const AdminDashboard: React.FC = () => {
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#939393',
                               fontFamily: 'Poppins, sans-serif'
                             }}>
                               This user @
                             </span>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#939393',
                               fontFamily: 'Poppins, sans-serif',
                               fontWeight: 500
@@ -1872,7 +1892,7 @@ const AdminDashboard: React.FC = () => {
                               {selectedUserForProfile.name.split(' ')[0]}
                             </span>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#B0B0B0',
                               fontFamily: 'Poppins, sans-serif'
                             }}>
@@ -1880,7 +1900,7 @@ const AdminDashboard: React.FC = () => {
                             </span>
                             <span
                               style={{
-                                fontSize: '12px',
+                                fontSize: '11px',
                                 color: '#64B5F6',
                                 fontFamily: 'Poppins, sans-serif',
                                 cursor: 'pointer',
@@ -1891,7 +1911,7 @@ const AdminDashboard: React.FC = () => {
                             </span>
                           </div>
                           <span style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             color: '#B0B0B0',
                             fontFamily: 'Poppins, sans-serif'
                           }}>
@@ -1909,7 +1929,8 @@ const AdminDashboard: React.FC = () => {
                       backgroundColor: '#FFFFFF',
                       borderRadius: '18px',
                       border: '1px solid #F1F1F1',
-                      padding: '14px'
+                      padding: '14px',
+                      marginTop: '10px'
                     }}
                   >
                     {/* Top Section: User Profile */}
