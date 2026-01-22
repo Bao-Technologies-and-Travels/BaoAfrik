@@ -614,3 +614,58 @@ DO $$ BEGIN
         ALTER TABLE "social_accounts" ADD CONSTRAINT "social_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
     END IF;
 END $$;
+
+-- 13. Create UserReview and UserReviewHelpfulness tables for user/seller reviews
+CREATE TABLE IF NOT EXISTS "user_reviews" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "reviewer_id" TEXT NOT NULL,
+    "rating" INTEGER NOT NULL,
+    "comment" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "user_reviews_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "user_review_helpfulness" (
+    "id" TEXT NOT NULL,
+    "review_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "is_helpful" BOOLEAN NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "user_review_helpfulness_pkey" PRIMARY KEY ("id")
+);
+
+-- 14. Create indexes for user reviews
+CREATE UNIQUE INDEX IF NOT EXISTS "user_reviews_user_id_reviewer_id_key" ON "user_reviews"("user_id", "reviewer_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "user_review_helpfulness_review_id_user_id_key" ON "user_review_helpfulness"("review_id", "user_id");
+
+CREATE INDEX IF NOT EXISTS "user_reviews_user_id_idx" ON "user_reviews"("user_id");
+CREATE INDEX IF NOT EXISTS "user_reviews_reviewer_id_idx" ON "user_reviews"("reviewer_id");
+CREATE INDEX IF NOT EXISTS "user_reviews_created_at_idx" ON "user_reviews"("created_at" DESC);
+CREATE INDEX IF NOT EXISTS "user_review_helpfulness_review_id_idx" ON "user_review_helpfulness"("review_id");
+CREATE INDEX IF NOT EXISTS "user_review_helpfulness_user_id_idx" ON "user_review_helpfulness"("user_id");
+
+-- 15. Add foreign keys for user reviews
+DO $$ BEGIN
+    -- UserReview foreign keys
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_reviews_user_id_fkey') THEN
+        ALTER TABLE "user_reviews" ADD CONSTRAINT "user_reviews_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_reviews_reviewer_id_fkey') THEN
+        ALTER TABLE "user_reviews" ADD CONSTRAINT "user_reviews_reviewer_id_fkey" FOREIGN KEY ("reviewer_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+
+    -- UserReviewHelpfulness foreign keys
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_review_helpfulness_review_id_fkey') THEN
+        ALTER TABLE "user_review_helpfulness" ADD CONSTRAINT "user_review_helpfulness_review_id_fkey" FOREIGN KEY ("review_id") REFERENCES "user_reviews"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_review_helpfulness_user_id_fkey') THEN
+        ALTER TABLE "user_review_helpfulness" ADD CONSTRAINT "user_review_helpfulness_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;

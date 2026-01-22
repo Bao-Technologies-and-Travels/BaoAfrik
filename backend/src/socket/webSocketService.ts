@@ -989,10 +989,54 @@ export class WebSocketService {
         this.io.to(`conversation:${message.conversationId}`).emit('reaction_added', reactionData);
 
         // Also broadcast to each participant's personal room to ensure they receive it
+        // And send notifications like messages
         if (message.conversation?.participants) {
           for (const participant of message.conversation.participants) {
             if (participant.userId !== userId) {
               this.io.to(participant.userId).emit('reaction_added', reactionData);
+
+              // Create notification for reaction (like message notifications)
+              try {
+                const senderName = `${socket.user?.firstName || ''} ${socket.user?.lastName || ''}`.trim() || socket.user?.email || 'Someone';
+                const preview = `${senderName} reacted to a message`;
+
+                // Create persistent notification in database
+                await notificationService.createNotification({
+                  userId: participant.userId,
+                  actorId: userId,
+                  type: 'message',
+                  message: preview,
+                  metadata: {
+                    conversationId: message.conversationId,
+                    messageId: messageId,
+                    senderName,
+                    senderId: userId,
+                    senderImage: socket.user?.profileImage || null,
+                    messageType: 'REACTION',
+                    reaction: result.reaction
+                  }
+                });
+
+                // Emit real-time notification
+                this.io.to(participant.userId).emit('new_message_notification', {
+                  conversationId: message.conversationId,
+                  messageId: messageId,
+                  preview,
+                  senderName,
+                  senderId: userId,
+                  senderImage: socket.user?.profileImage || null,
+                  type: 'reaction',
+                  reaction: result.reaction
+                });
+
+                // Get updated unread counts
+                const notificationUnread = await notificationService.getUnreadCount(participant.userId);
+                this.io.to(participant.userId).emit('notification_count', {
+                  notificationCount: notificationUnread
+                });
+              } catch (e) {
+                console.warn('Failed to emit reaction notification', e);
+              }
             }
           }
         }

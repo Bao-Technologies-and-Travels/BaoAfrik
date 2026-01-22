@@ -222,15 +222,15 @@ const SellerProfile: React.FC = () => {
         if (response.ok) {
           const result = await response.json();
           if (result.success && result.data) {
-            // Map reviews to match frontend interface
+            // Map reviews to match frontend interface (user reviews, not product reviews)
             const mappedReviews = (result.data.reviews || []).map((review: any) => ({
               id: review.id,
               rating: review.rating,
               comment: review.comment,
               createdAt: review.createdAt,
-              productId: review.productId,
-              productTitle: review.productTitle,
-              user: review.user,
+              productId: review.productId || null, // May not exist for user reviews
+              productTitle: review.productTitle || null, // May not exist for user reviews
+              user: review.reviewer || review.user, // User reviews have 'reviewer' field
               helpfulYes: review.helpfulYesCount || 0,
               helpfulNo: review.helpfulNoCount || 0
             }));
@@ -1450,17 +1450,92 @@ const SellerProfile: React.FC = () => {
                       {/* Post Review Button */}
                       <div className="pl-8 relative mt-4">
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             if (userRating > 0 && userReviewText.trim()) {
-                              const today = new Date();
-                              const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                              const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
-                              setPostedReview({
-                                rating: userRating,
-                                text: userReviewText,
-                                date: dateStr
-                              });
-                              setIsReviewPosted(true);
+                              // Post user review to backend (not product review)
+                              try {
+                                const token = localStorage.getItem("accessToken");
+                                if (!token) {
+                                  alert('Please sign in to post a review');
+                                  return;
+                                }
+
+                                const realSellerId = sessionStorage.getItem(`seller_${sellerId}_id`);
+                                if (!realSellerId) {
+                                  alert('Unable to post review: Seller information not available');
+                                  return;
+                                }
+
+                                // Post user review (separate from product reviews)
+                                const response = await fetch(
+                                  `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}/reviews`,
+                                  {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({
+                                      rating: userRating,
+                                      comment: userReviewText.trim()
+                                    })
+                                  }
+                                );
+
+                                const result = await response.json();
+
+                                if (!response.ok || !result?.success) {
+                                  throw new Error(result?.message || 'Failed to post review');
+                                }
+
+                                // Refresh seller reviews from backend
+                                const reviewsResponse = await fetch(
+                                  `${process.env.REACT_APP_API_URL}/products/user/${realSellerId}/reviews`,
+                                  { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
+                                );
+
+                                if (reviewsResponse.ok) {
+                                  const reviewsResult = await reviewsResponse.json();
+                                  if (reviewsResult.success && reviewsResult.data) {
+                                    const mappedReviews = (reviewsResult.data.reviews || []).map((review: any) => ({
+                                      id: review.id,
+                                      rating: review.rating,
+                                      comment: review.comment,
+                                      createdAt: review.createdAt,
+                                      productId: review.productId || null,
+                                      productTitle: review.productTitle || null,
+                                      user: review.reviewer || review.user,
+                                      helpfulYes: review.helpfulYesCount || 0,
+                                      helpfulNo: review.helpfulNoCount || 0
+                                    }));
+
+                                    setSellerReviews(mappedReviews);
+                                    setReviewsSummary({
+                                      averageRating: reviewsResult.data.averageRating || 0,
+                                      totalReviews: reviewsResult.data.totalReviews || 0,
+                                      ratingDistribution: reviewsResult.data.ratingDistribution || {}
+                                    });
+                                  }
+                                }
+
+                                // Update local state for UI feedback
+                                const today = new Date();
+                                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                                const dateStr = `${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
+                                setPostedReview({
+                                  rating: userRating,
+                                  text: userReviewText.trim(),
+                                  date: dateStr
+                                });
+                                setIsReviewPosted(true);
+                                
+                                // Reset form
+                                setUserRating(0);
+                                setUserReviewText('');
+                              } catch (error: any) {
+                                console.error('Error posting review:', error);
+                                alert(error.message || 'Failed to post review. Please try again.');
+                              }
                             }
                           }}
                           className="w-full py-2.5 rounded-lg font-medium transition-all mt-12 relative"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
@@ -570,18 +570,33 @@ const ProductDetail: React.FC = () => {
     };
   }, [showMessagesDropdown, showRepostModal]);
 
+  // Ref to prevent duplicate product conversations fetch
+  const fetchingConversationsRef = useRef(false);
+  const lastFetchedProductIdRef = useRef<string | null>(null);
+
   // Fetch conversations for product (owner view only)
   useEffect(() => {
+    const productId = product?.id;
+    
+    // Prevent duplicate calls for the same product
+    if (!isOwnerView || !productId || !user || fetchingConversationsRef.current || lastFetchedProductIdRef.current === productId) {
+      return;
+    }
+
     const fetchProductConversations = async () => {
-      if (!isOwnerView || !product?.id || !user) return;
+      fetchingConversationsRef.current = true;
+      lastFetchedProductIdRef.current = productId;
 
       try {
         setIsLoadingConversations(true);
         const token = localStorage.getItem('accessToken');
-        if (!token) return;
+        if (!token) {
+          fetchingConversationsRef.current = false;
+          return;
+        }
 
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/chat/conversations/product/${product.id}`,
+          `${process.env.REACT_APP_API_URL}/chat/conversations/product/${productId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -598,8 +613,10 @@ const ProductDetail: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching product conversations:', error);
+        lastFetchedProductIdRef.current = null; // Reset on error to allow retry
       } finally {
         setIsLoadingConversations(false);
+        fetchingConversationsRef.current = false;
       }
     };
 
@@ -902,13 +919,19 @@ const ProductDetail: React.FC = () => {
   }
 
   // Fetch product data from API
+  // Ref to track if product is being fetched to prevent duplicate calls
+  const fetchingProductRef = useRef(false);
+  const lastFetchedIdRef = useRef<string | null>(null);
+
   useEffect(() => {
+    // Prevent duplicate calls for the same product ID
+    if (!id || fetchingProductRef.current || lastFetchedIdRef.current === id) {
+      return;
+    }
+
     const fetchProduct = async () => {
-      if (!id) {
-        setError("Product ID is required");
-        setIsLoading(false);
-        return
-      }
+      fetchingProductRef.current = true;
+      lastFetchedIdRef.current = id;
 
       try {
         setIsLoading(true);
@@ -943,18 +966,34 @@ const ProductDetail: React.FC = () => {
           message: error.message || "Failed to load product details",
           duration: 2000
         });
+        // Reset ref on error so it can retry
+        lastFetchedIdRef.current = null;
       } finally {
         setIsLoading(false);
+        fetchingProductRef.current = false;
       }
     };
 
     fetchProduct();
-  }, [id, addToast]);
+  }, [id]); // Removed addToast from dependencies - it's stable from context
+
+  // Ref to prevent duplicate seller products fetch
+  const fetchingSellerProductsRef = useRef(false);
+  const lastFetchedSellerIdRef = useRef<string | null>(null);
 
   // fetch seller's products
   useEffect(() => {
+    const sellerId = product?.seller?.id;
+    const productId = product?.id;
+
+    // Prevent duplicate calls for the same seller
+    if (!sellerId || fetchingSellerProductsRef.current || lastFetchedSellerIdRef.current === sellerId) {
+      return;
+    }
+
     const fetchSellerProducts = async () => {
-      if (!product?.seller?.id) return;
+      fetchingSellerProductsRef.current = true;
+      lastFetchedSellerIdRef.current = sellerId;
 
       try {
         setIsLoadingSellerProducts(true);
@@ -962,7 +1001,7 @@ const ProductDetail: React.FC = () => {
 
         // Use the user products endpoint from your routes
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/products/user/${product.seller.id}?limit=12&exclude=${product.id}`,
+          `${process.env.REACT_APP_API_URL}/products/user/${sellerId}?limit=12&exclude=${productId}`,
           {
             headers: token ? {
               'Authorization': `Bearer ${token}`
@@ -985,26 +1024,39 @@ const ProductDetail: React.FC = () => {
         }
       } catch (error) {
         setSellerProducts([]);
+        lastFetchedSellerIdRef.current = null; // Reset on error to allow retry
       } finally {
         setIsLoadingSellerProducts(false);
+        fetchingSellerProductsRef.current = false;
       }
     };
 
-    if (product?.seller?.id) {
-      fetchSellerProducts();
-    }
+    fetchSellerProducts();
   }, [product?.seller?.id, product?.id]);
+
+  // Ref to prevent duplicate related products fetch
+  const fetchingRelatedProductsRef = useRef(false);
+  const lastFetchedCategoryRef = useRef<string | null>(null);
 
   // Fetch related products
   useEffect(() => {
+    const category = product?.category;
+    const productId = product?.id;
+
+    // Prevent duplicate calls for the same category
+    if (!category || fetchingRelatedProductsRef.current || lastFetchedCategoryRef.current === category) {
+      return;
+    }
+
     const fetchRelatedProducts = async () => {
-      if (!product?.category) return;
+      fetchingRelatedProductsRef.current = true;
+      lastFetchedCategoryRef.current = category;
 
       setIsLoadingRelated(true);
       try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/products?category=${encodeURIComponent(product.category)}&limit=12`,
+          `${process.env.REACT_APP_API_URL}/products?category=${encodeURIComponent(category)}&limit=12`,
           {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
           }
@@ -1019,14 +1071,16 @@ const ProductDetail: React.FC = () => {
 
         // Filter out the current product from related products
         const filteredProducts = products
-          .filter((p: any) => p && p.id && p.id !== product.id)
+          .filter((p: any) => p && p.id && p.id !== productId)
           .slice(0, 12);
 
         setRelatedProducts(filteredProducts);
       } catch (err) {
         console.error('Error fetching related products:', err);
+        lastFetchedCategoryRef.current = null; // Reset on error to allow retry
       } finally {
         setIsLoadingRelated(false);
+        fetchingRelatedProductsRef.current = false;
       }
     };
 

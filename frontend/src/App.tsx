@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationToastProvider } from './contexts/NotificationToastContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -36,6 +37,7 @@ import ProfileSettings from './pages/ProfileSettings';
 import Requests from './pages/Requests';
 import MyRequests from './pages/MyRequests';
 import ImageSearch from './pages/ImageSearch';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import './App.css';
 
 import { ToastProvider } from './contexts/ToastContext';
@@ -46,7 +48,7 @@ function AppContent() {
   const isUserAccountPage = location.pathname === '/account';
   const authPages = ['/login', '/register', '/verify-email', '/email-verification-success', '/social-login-validation', '/social-login-error', '/profile-setup', '/user-preferences', '/forgot-password', '/reset-password-sent', '/reset-password', '/password-reset-success', '/two-factor-email', '/two-factor-phone', '/two-factor-code', '/two-factor-success'];
   const isAuthPage = authPages.includes(location.pathname);
-  const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings', '/my-requests', '/image-search'];
+  const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/notification-detail', '/archived-chats', '/settings', '/my-listings', '/my-requests', '/image-search', '/admin'];
   const isCustomLayoutPage = customLayoutPages.includes(location.pathname);
   const isEditListingPage = location.pathname.match(/^\/edit-listing\/[^/]+$/);
 
@@ -92,6 +94,7 @@ function AppContent() {
           <Route path="/my-listings" element={<MyListings />} />
           <Route path="/my-requests" element={<MyRequests />} />
           <Route path="/image-search" element={<ImageSearch />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>
     );
@@ -148,11 +151,13 @@ function App() {
   return (
     <ToastProvider>
       <AuthProvider>
-        <NotificationToastProvider>
-          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <AppContent />
-          </Router>
-        </NotificationToastProvider>
+        <NotificationProvider>
+          <NotificationToastProvider>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <AppContent />
+            </Router>
+          </NotificationToastProvider>
+        </NotificationProvider>
       </AuthProvider>
     </ToastProvider>
   );

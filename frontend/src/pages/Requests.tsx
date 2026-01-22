@@ -95,25 +95,38 @@ const Requests: React.FC = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [currentRequestForShare, setCurrentRequestForShare] = useState<ProductRequest | null>(null);
 
+  // Only UK cities for buyer location filter
   const locationSuggestions = [
-    'Pakse, Laos',
-    'Palermo, Italy',
-    'Panama City, Panama',
-    'Paris, France',
-    'Patna, India',
-    'Perth, Australia',
-    'Philadelphia, USA',
-    'Phnom Penh, Cambodia',
-    'Prague, Czech Republic',
-    'Porto, Portugal',
-    'Portland, USA',
-    'Pune, India',
     'London, United Kingdom',
-    'New York, USA',
-    'Toronto, Canada',
-    'Berlin, Germany',
-    'Sydney, Australia',
-    'Dubai, UAE'
+    'Manchester, United Kingdom',
+    'Birmingham, United Kingdom',
+    'Glasgow, United Kingdom',
+    'Liverpool, United Kingdom',
+    'Leeds, United Kingdom',
+    'Edinburgh, United Kingdom',
+    'Bristol, United Kingdom',
+    'Cardiff, United Kingdom',
+    'Sheffield, United Kingdom',
+    'Newcastle, United Kingdom',
+    'Nottingham, United Kingdom',
+    'Leicester, United Kingdom',
+    'Coventry, United Kingdom',
+    'Belfast, United Kingdom',
+    'Southampton, United Kingdom',
+    'Portsmouth, United Kingdom',
+    'Brighton, United Kingdom',
+    'Reading, United Kingdom',
+    'Northampton, United Kingdom',
+    'Aberdeen, United Kingdom',
+    'Norwich, United Kingdom',
+    'Bournemouth, United Kingdom',
+    'Swindon, United Kingdom',
+    'Oxford, United Kingdom',
+    'Cambridge, United Kingdom',
+    'York, United Kingdom',
+    'Peterborough, United Kingdom',
+    'Dundee, United Kingdom',
+    'Exeter, United Kingdom'
   ];
 
   const priceOptions = [
@@ -131,6 +144,11 @@ const Requests: React.FC = () => {
     code: country.code,
     flag: country.flag
   }));
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // check for mobile
   useEffect(() => {

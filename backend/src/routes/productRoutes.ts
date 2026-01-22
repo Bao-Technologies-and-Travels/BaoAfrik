@@ -16,6 +16,7 @@ router.post('/search', productController.getProducts);
 // Public user profile and seller reviews
 router.get('/user/:userId/profile', productController.getPublicUserProfile);
 router.get('/user/:userId/reviews', productController.getSellerReviews);
+router.post('/user/:userId/reviews', authenticateToken, productController.createUserReview);
 
 // Bookmark/Save routes - must come before /:id routes
 router.get('/saved', authenticateToken, productController.getSavedProducts);

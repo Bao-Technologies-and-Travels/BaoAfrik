@@ -58,6 +58,8 @@ export const ModelName = {
   ProductSave: 'ProductSave',
   ProductReview: 'ProductReview',
   ReviewHelpfulness: 'ReviewHelpfulness',
+  UserReview: 'UserReview',
+  UserReviewHelpfulness: 'UserReviewHelpfulness',
   Message: 'Message',
   MessageStatus: 'MessageStatus',
   MessageReaction: 'MessageReaction',
@@ -205,6 +207,31 @@ export const ReviewHelpfulnessScalarFieldEnum = {
 } as const
 
 export type ReviewHelpfulnessScalarFieldEnum = (typeof ReviewHelpfulnessScalarFieldEnum)[keyof typeof ReviewHelpfulnessScalarFieldEnum]
+
+
+export const UserReviewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  reviewerId: 'reviewerId',
+  rating: 'rating',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserReviewScalarFieldEnum = (typeof UserReviewScalarFieldEnum)[keyof typeof UserReviewScalarFieldEnum]
+
+
+export const UserReviewHelpfulnessScalarFieldEnum = {
+  id: 'id',
+  reviewId: 'reviewId',
+  userId: 'userId',
+  isHelpful: 'isHelpful',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserReviewHelpfulnessScalarFieldEnum = (typeof UserReviewHelpfulnessScalarFieldEnum)[keyof typeof UserReviewHelpfulnessScalarFieldEnum]
 
 
 export const MessageScalarFieldEnum = {

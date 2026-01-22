@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getProductCountry, countries } from '../utils/countryHelpers';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/layout/Header';
@@ -179,6 +179,20 @@ const Home: React.FC = () => {
   const [selectedPlaceOfOriginText, setSelectedPlaceOfOriginText] = useState('');
   const [focusedSearchSection, setFocusedSearchSection] = useState<string | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
+
+  // Handle "Make a Request" button click - check authentication
+  const handleMakeRequestClick = () => {
+    if (!user) {
+      addToast({
+        type: 'info',
+        title: 'Login Required',
+        message: 'Please log in to make a request',
+        duration: 3000
+      });
+      return;
+    }
+    setShowRequestModal(true);
+  };
   const [requestProductName, setRequestProductName] = useState('');
   const [requestProductOrigin, setRequestProductOrigin] = useState('');
   const [requestProductOriginInput, setRequestProductOriginInput] = useState('');
@@ -289,14 +303,23 @@ const Home: React.FC = () => {
     'Southampton', 'Plymouth', 'Derby', 'Reading', 'York'
   ];
 
+  // Ref to prevent duplicate product fetches within the same render cycle (React StrictMode)
+  const fetchingProductsRef = useRef(false);
+
   // UseEffect for fetching products
   useEffect(() => {
+    // Only prevent if currently fetching (to avoid duplicate calls in StrictMode)
+    if (fetchingProductsRef.current) {
+      return;
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, 10000); // 10 second timeout
 
     const fetchWithTimeout = async () => {
+      fetchingProductsRef.current = true;
       try {
         await fetchProducts(controller.signal);
       } catch (err: any) {
@@ -305,6 +328,7 @@ const Home: React.FC = () => {
         }
       } finally {
         clearTimeout(timeoutId);
+        fetchingProductsRef.current = false;
       }
     };
 
@@ -313,6 +337,8 @@ const Home: React.FC = () => {
     return () => {
       controller.abort();
       clearTimeout(timeoutId);
+      // Reset ref on cleanup to allow refetch if component remounts
+      fetchingProductsRef.current = false;
     };
   }, []);
 
@@ -407,10 +433,30 @@ const Home: React.FC = () => {
     }
   }, [navigationLocation.search]);
 
+  // Ref to prevent duplicate requests fetch within the same render cycle
+  const fetchingRequestsRef = useRef(false);
+  const lastRequestFiltersRef = useRef<string | null>(null);
+  const hasFetchedRef = useRef(false);
+
   // useEffect for fetching requests from API
   useEffect(() => {
+    // Create a key from current filters to detect filter changes
+    const filterKey = `${requestBuyerLocation}-${requestFilterCountry}-${requestFilterPrice}`;
+
+    // Only prevent if currently fetching
+    if (fetchingRequestsRef.current) {
+      return;
+    }
+
+    // If we've fetched before AND filters haven't changed, skip
+    // But always allow the initial fetch (hasFetchedRef.current === false)
+    if (hasFetchedRef.current && lastRequestFiltersRef.current === filterKey) {
+      return;
+    }
+
     const controller = new AbortController();
     const fetchRequests = async () => {
+      fetchingRequestsRef.current = true;
       try {
         setIsLoadingRequests(true);
         setRequestsError(null);
@@ -467,25 +513,56 @@ const Home: React.FC = () => {
         }
 
         const result = await response.json();
-        // Handle both response formats: { success: true, data: [...] } or { data: [...] }
-        if (result.success && Array.isArray(result.data)) {
-          setRequests(result.data);
-        } else if (Array.isArray(result.data)) {
-          setRequests(result.data);
-        } else {
-          setRequests([]);
+
+        // Handle response format: { success: true, data: [...], pagination: {...} }
+        let requestsArray: any[] = [];
+
+        if (result.success && result.data) {
+          // If data is an array, use it directly
+          if (Array.isArray(result.data)) {
+            requestsArray = result.data;
+          }
+          // If data is an object with a requests/items property, extract it
+          else if (result.data.requests && Array.isArray(result.data.requests)) {
+            requestsArray = result.data.requests;
+          }
+          // If data is an object with a data property (nested), extract it
+          else if (result.data.data && Array.isArray(result.data.data)) {
+            requestsArray = result.data.data;
+          }
+        }
+        // Fallback: check if result itself is an array
+        else if (Array.isArray(result)) {
+          requestsArray = result;
+        }
+        // Fallback: check if result.data exists and is an array (without success flag)
+        else if (result.data && Array.isArray(result.data)) {
+          requestsArray = result.data;
         }
 
+        setRequests(requestsArray);
+        hasFetchedRef.current = true;
+        lastRequestFiltersRef.current = filterKey; // Only set after successful fetch
+
       } catch (error: any) {
-        if (error?.name === 'AbortError') return;
-        console.error('Error fetching requests:', error);
+        if (error?.name === 'AbortError') {
+          fetchingRequestsRef.current = false;
+          // Don't reset refs on abort - keep them to prevent immediate retry
+          return;
+        }
         setRequestsError('Failed to load requests. Please try again later.');
+        // Reset on error to allow retry with same filters
+        lastRequestFiltersRef.current = null;
+        hasFetchedRef.current = false;
       } finally {
         setIsLoadingRequests(false);
+        fetchingRequestsRef.current = false;
       }
     };
     fetchRequests();
-    // return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [requestBuyerLocation, requestFilterCountry, requestFilterPrice]);
 
   const getDefaultProductImage = (category: string | undefined): any => {
@@ -562,7 +639,7 @@ const Home: React.FC = () => {
   };
 
   const getAllProducts = (): FrontendProduct[] => {
-     // Filter to only show products with PUBLISHED status
+    // Filter to only show products with PUBLISHED status
     const activeProducts = products.filter(product => product.status === 'PUBLISHED');
     return transformToFrontendProducts(activeProducts);
   };
@@ -769,28 +846,23 @@ const Home: React.FC = () => {
     return Math.max(1, Math.ceil(totalItems / itemsPerPage));
   }, [productsToDisplay.length, itemsPerPage]);
 
-  // Get products to display
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, selectedCountry, isSearchActive, searchResults.length]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    if (productGridRef.current) {
+      productGridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
+
+  // Get products to display with pagination applied
   const getProductsToDisplay = (): FrontendProduct[] => {
-    if (isSearchActive) {
-      return searchResults;
-    }
-
-    // Use activeCategory for filtering
-    let products: FrontendProduct[] = [];
-    if (activeCategory === 'All') {
-      products = Object.values(allProductsComputed).flat();
-    } else {
-      products = allProductsComputed[activeCategory as keyof typeof allProductsComputed] || [];
-    }
-
-    // Apply country filter if selected (filter by country badge, not seller location)
-    if (selectedCountry) {
-      products = products.filter((product: FrontendProduct) =>
-        getProductCountry(product.origin).name === selectedCountry
-      );
-    }
-
-    return products;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return productsToDisplay.slice(startIndex, endIndex);
   };
 
   // Check if we should show "no results" state
@@ -1187,7 +1259,7 @@ const Home: React.FC = () => {
               gap: isMobile ? '4px' : '6px'
             }}
           >
-            {!isMobile && <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Filter :</span>}
+            {!isMobile && <span style={{ color: '#BABABA', fontSize: '14px', fontWeight: 'normal' }}>Origin :</span>}
             <img src={earthIcon} alt="Globe" style={{ width: isMobile ? '16px' : '22px', height: isMobile ? '16px' : '22px' }} />
             <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px' }}>Africa</span>
             <img
@@ -1922,14 +1994,25 @@ const Home: React.FC = () => {
       });
       if (refreshResponse.ok) {
         const refreshResult = await refreshResponse.json();
-        // Handle both response formats: { success: true, data: [...] } or { data: [...] }
-        if (refreshResult.success && Array.isArray(refreshResult.data)) {
-          setRequests(refreshResult.data);
-        } else if (Array.isArray(refreshResult.data)) {
-          setRequests(refreshResult.data);
-        } else {
-          setRequests([]);
+
+        // Handle response format: { success: true, data: [...], pagination: {...} }
+        let requestsArray: any[] = [];
+
+        if (refreshResult.success && refreshResult.data) {
+          if (Array.isArray(refreshResult.data)) {
+            requestsArray = refreshResult.data;
+          } else if (refreshResult.data.requests && Array.isArray(refreshResult.data.requests)) {
+            requestsArray = refreshResult.data.requests;
+          } else if (refreshResult.data.data && Array.isArray(refreshResult.data.data)) {
+            requestsArray = refreshResult.data.data;
+          }
+        } else if (Array.isArray(refreshResult)) {
+          requestsArray = refreshResult;
+        } else if (refreshResult.data && Array.isArray(refreshResult.data)) {
+          requestsArray = refreshResult.data;
         }
+
+        setRequests(requestsArray);
       }
 
       setShowRequestModal(false);
@@ -3020,7 +3103,7 @@ const Home: React.FC = () => {
 
                       {/* Make a Request Button */}
                       <button
-                        onClick={() => setShowRequestModal(true)}
+                        onClick={handleMakeRequestClick}
                         className="inline-flex items-center mx-auto"
                         style={{
                           display: 'flex',
@@ -3205,16 +3288,29 @@ const Home: React.FC = () => {
                             </div>
                             <div className="flex items-center space-x-3">
                               <button
-                                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                                aria-label="Scroll left"
+                                onClick={() => scrollCategoryLeft(category)}
+                                disabled={getCategoryPage(category) === 1}
+                                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                aria-label="Previous page"
                               >
-                                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                                <img
+                                  src={getCategoryPage(category) > 1 ? blackArrowIcon : grayArrowIcon}
+                                  alt="Previous"
+                                  className="w-full h-full"
+                                  style={{ transform: 'scaleX(-1)' }}
+                                />
                               </button>
                               <button
-                                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
-                                aria-label="Scroll right"
+                                onClick={() => scrollCategoryRight(category)}
+                                disabled={getCategoryPage(category) >= Math.ceil(filteredProducts.length / productsPerPage)}
+                                className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                aria-label="Next page"
                               >
-                                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                                <img
+                                  src={getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? blackArrowIcon : grayArrowIcon}
+                                  alt="Next"
+                                  className="w-full h-full"
+                                />
                               </button>
                             </div>
                           </div>
@@ -3387,7 +3483,12 @@ const Home: React.FC = () => {
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 aria-label="Previous page"
                               >
-                                <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                                <img
+                                  src={getCategoryPage(category) > 1 ? blackArrowIcon : grayArrowIcon}
+                                  alt="Previous"
+                                  className="w-full h-full"
+                                  style={{ transform: 'scaleX(-1)' }}
+                                />
                               </button>
                               <span className="text-sm text-gray-600">
                                 Page {getCategoryPage(category)} of {Math.ceil(filteredProducts.length / productsPerPage) || 1}
@@ -3398,7 +3499,11 @@ const Home: React.FC = () => {
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 aria-label="Next page"
                               >
-                                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                                <img
+                                  src={getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? blackArrowIcon : grayArrowIcon}
+                                  alt="Next"
+                                  className="w-full h-full"
+                                />
                               </button>
                             </div>
                           </div>
@@ -3622,7 +3727,7 @@ const Home: React.FC = () => {
 
                     {/* Make a Request Button */}
                     <button
-                      onClick={() => setShowRequestModal(true)}
+                      onClick={handleMakeRequestClick}
                       className="inline-flex items-center mx-auto"
                       style={{
                         display: 'flex',
@@ -4042,7 +4147,7 @@ const Home: React.FC = () => {
                 Don't worry, just ask for it and we will bring it to you.
               </p>
               <button
-                onClick={() => setShowRequestModal(true)}
+                onClick={handleMakeRequestClick}
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium transition-colors"
                 style={{
                   background: 'linear-gradient(90deg, #E55325 0%, #F9A825 100%)',
@@ -4086,7 +4191,7 @@ const Home: React.FC = () => {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
               }}>
-                Over 400
+                Over {requests.length}
               </div>
               <div style={{ fontSize: window.innerWidth < 640 ? '10px' : '18px', color: '#9C9C9C', marginTop: '4px' }}>
                 Request availables
@@ -4602,6 +4707,7 @@ const Home: React.FC = () => {
               {/* See all requests link */}
               <Link
                 to="/requests"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                 style={{
                   color: '#64B5F6',
@@ -6767,7 +6873,7 @@ const Home: React.FC = () => {
                           </p>
                           <button
                             type="button"
-                            onClick={() => setShowRequestModal(true)}
+                            onClick={handleMakeRequestClick}
                             className="inline-flex items-center mx-auto"
                             style={{
                               display: 'flex',

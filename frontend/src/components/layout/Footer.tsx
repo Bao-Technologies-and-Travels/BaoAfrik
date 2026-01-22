@@ -1,8 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import footerLogo from '../../assets/images/logos/text.png';
 
 const Footer: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -10,13 +12,12 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2 text-center md:text-left">
             <div className="mb-6">
-              <Link to="/" className="inline-block focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
-                <img
-                  src={footerLogo}
-                  alt="BaoAfrik - African Marketplace Logo"
-                  className="h-8 mb-4 mx-auto md:mx-0"
-                />
-              </Link>
+              <img
+                src={footerLogo}
+                alt="BaoAfrik - African Marketplace Logo"
+                className="h-8 mb-4 mx-auto md:mx-0 cursor-pointer"
+                onClick={() => navigate('/')}
+              />
               <p className="text-sm leading-relaxed" style={{ color: '#BABABA' }}>
                 Come to the meeting of African treasures
               </p>
@@ -40,8 +41,8 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>About Us</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/contact" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact us</Link></li>
-              <li><Link to="/about" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Bao Technologies and Travels</Link></li>
-              <li><Link to="/network" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our network</Link></li>
+              {/* <li><Link to="/about" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Bao Technologies and Travels</Link></li> */}
+              {/* <li><Link to="/network" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our network</Link></li> */}
               <li><Link to="/partnership" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnership</Link></li>
             </ul>
           </div>

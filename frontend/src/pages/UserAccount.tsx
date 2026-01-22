@@ -722,7 +722,7 @@ const UserAccount: React.FC = () => {
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
                       <p className="text-gray-500 mt-2">Loading reviews...</p>
-                    </div>
+                      </div>
                   ) : reviewsSummary?.reviews && reviewsSummary.reviews.length > 0 ? (
                     reviewsSummary.reviews.map((review) => {
                       const reviewerName = `${review.user.firstName || ''} ${review.user.lastName || ''}`.trim() || 'Anonymous';
@@ -737,90 +737,90 @@ const UserAccount: React.FC = () => {
                                 <img src={review.user.profileImage} alt={reviewerName} className="w-full h-full object-cover" />
                               ) : (
                                 <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </div>
-                            <div className="flex-1">
+                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                  </svg>
+                                )}
+                              </div>
+                              <div className="flex-1">
                               <h4 className="font-semibold text-gray-900 mb-2">{reviewerName}</h4>
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                  <div className="flex items-center">
-                                    {[1, 2, 3, 4, 5].map((star) => (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center">
+                              {[1, 2, 3, 4, 5].map((star) => (
                                       <svg
                                         key={star}
                                         className={`w-3.5 h-3.5 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'} fill-current`}
                                         viewBox="0 0 24 24"
                                       >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
-                                  </div>
-                                  <span className="text-sm font-medium" style={{ color: '#939393' }}>{review.rating.toFixed(1)}</span>
-                                </div>
-                                <span className="text-xs" style={{ color: '#939393' }}>Posted on {formatReviewDate(review.createdAt)}</span>
-                              </div>
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                              ))}
                             </div>
+                                  <span className="text-sm font-medium" style={{ color: '#939393' }}>{review.rating.toFixed(1)}</span>
                           </div>
-                          <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
+                                <span className="text-xs" style={{ color: '#939393' }}>Posted on {formatReviewDate(review.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: '#B0B0B0' }}>
                             {review.comment || 'No comment provided.'}
-                          </p>
+                    </p>
 
-                          {/* Helpfulness Section */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
+                    {/* Helpfulness Section */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
                               {!userVote && (
-                                <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
-                              )}
-                              <div className="flex items-center space-x-2">
-                                <button
+                          <span className="text-xs" style={{ color: '#212121' }}>Was this review helpful to you?</span>
+                        )}
+                        <div className="flex items-center space-x-2">
+                          <button
                                   onClick={() => handleHelpfulnessVote(review.id, true)}
-                                  className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                                  style={{
+                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+                            style={{
                                     border: `1px solid ${userVote === 'yes' ? '#F0F8FE' : '#E1E1E1'}`,
                                     backgroundColor: userVote === 'yes' ? '#F0F8FE' : 'white'
-                                  }}
-                                >
+                            }}
+                          >
                                   <span className="text-xs" style={{ color: userVote === 'yes' ? '#64B5F6' : '#6A6A6A' }}>
                                     {userVote ? counts.yes : 'Yes'}
-                                  </span>
-                                  <img
-                                    src={likeIcon}
-                                    alt="Like"
-                                    className="w-3.5 h-3.5"
-                                    style={{
+                            </span>
+                            <img
+                              src={likeIcon}
+                              alt="Like"
+                              className="w-3.5 h-3.5"
+                              style={{
                                       filter: userVote === 'yes'
-                                        ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                        : 'none'
-                                    }}
-                                  />
-                                </button>
-                                <button
+                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                  : 'none'
+                              }}
+                            />
+                          </button>
+                          <button
                                   onClick={() => handleHelpfulnessVote(review.id, false)}
-                                  className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
-                                  style={{
+                            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full transition-colors"
+                            style={{
                                     border: `1px solid ${userVote === 'no' ? '#F0F8FE' : '#E1E1E1'}`,
                                     backgroundColor: userVote === 'no' ? '#F0F8FE' : 'white'
-                                  }}
-                                >
+                            }}
+                          >
                                   <span className="text-xs" style={{ color: userVote === 'no' ? '#64B5F6' : '#6A6A6A' }}>
                                     {userVote ? counts.no : 'No'}
-                                  </span>
-                                  <img
-                                    src={dislikeIcon}
-                                    alt="Dislike"
-                                    className="w-3.5 h-3.5"
-                                    style={{
+                            </span>
+                            <img
+                              src={dislikeIcon}
+                              alt="Dislike"
+                              className="w-3.5 h-3.5"
+                              style={{
                                       filter: userVote === 'no'
-                                        ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
-                                        : 'none'
-                                    }}
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                                  ? 'brightness(0) saturate(100%) invert(60%) sepia(89%) saturate(1726%) hue-rotate(183deg) brightness(97%) contrast(92%)'
+                                  : 'none'
+                              }}
+                            />
+                          </button>
                         </div>
+                      </div>
+                    </div>
+                  </div>
                       );
                     })
                   ) : (
@@ -832,29 +832,29 @@ const UserAccount: React.FC = () => {
 
                 {/* Pagination */}
                 {reviewsSummary && reviewsSummary.totalReviews > 0 && (
-                  <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
-                    <div className="flex items-center justify-between">
+                <div className="border-t pt-6 mt-6" style={{ borderColor: '#E5E5E5' }}>
+                  <div className="flex items-center justify-between">
                       <span className="text-sm" style={{ color: '#BABABA' }}>
                         {((currentPage - 1) * reviewsPerPage) + 1} - {Math.min(currentPage * reviewsPerPage, reviewsSummary.totalReviews)} out of {reviewsSummary.totalReviews}
                       </span>
-                      <div className="flex items-center space-x-1">
-                        <button
+                    <div className="flex items-center space-x-1">
+                      <button
                           disabled={currentPage === 1}
                           onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                          className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
-                        >
+                        className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
+                      >
                           <img src={currentPage === 1 ? grayArrowIcon : blackArrowIcon} alt="Previous" style={{ width: '20px', height: '20px', transform: 'rotate(180deg)' }} />
-                        </button>
-                        <button
+                      </button>
+                      <button
                           disabled={currentPage >= (reviewsSummary.totalPages || 1)}
                           onClick={() => setCurrentPage(prev => prev + 1)}
                           className="transition-opacity disabled:cursor-not-allowed hover:opacity-80"
-                        >
+                      >
                           <img src={currentPage >= (reviewsSummary.totalPages || 1) ? grayArrowIcon : blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
-                        </button>
-                      </div>
+                      </button>
                     </div>
                   </div>
+                </div>
                 )}
               </div>
 
@@ -880,9 +880,9 @@ const UserAccount: React.FC = () => {
                           <span className="text-xs w-3" style={{ color: '#939393' }}>{rating}</span>
                           <div className="flex-1 bg-gray-200 rounded-full h-1">
                             <div className="bg-yellow-400 h-1 rounded-full" style={{ width: `${percentage}%` }}></div>
-                          </div>
+                    </div>
                           <span className="text-xs w-6 text-right" style={{ color: '#939393' }}>{count}</span>
-                        </div>
+                    </div>
                       );
                     })}
                   </div>

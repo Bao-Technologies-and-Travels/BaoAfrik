@@ -78,9 +78,39 @@ const Notifications: React.FC = () => {
         }
       }
 
+      // For product notifications, map message to text/additionalText structure
+      // Use existing fields or extract from message
+      let text = n.text || n.title;
+      let additionalText = n.additionalText || meta?.additionalText;
+      let subText = n.subText || meta?.subText;
+
+      // For product availability notifications, format the message properly
+      if (n.type === 'product' && n.message) {
+        const message = n.message;
+        // If message contains "Your listing" and "is now available", format it
+        if (message.includes('Your listing') && message.includes('is now available')) {
+          // Extract product title from message
+          const match = message.match(/Your listing "([^"]+)" is now available/);
+          if (match) {
+            text = 'Your profile has been updated,';
+            additionalText = 'you are now a seller.';
+            // Use a default subText or extract from meta if available
+            subText = meta?.subText || `Facture 6 août 2025 Séquence : 2-7480206584 N° de commande : MQKW6YTK42Documen...`;
+          }
+        } else {
+          // For other product messages, use the message as text
+          text = n.title || message;
+          additionalText = meta?.additionalText;
+          subText = meta?.subText;
+        }
+      }
+
       return {
         ...n,
         meta,
+        text,
+        additionalText,
+        subText,
         day: getDayLabel(created),
         time: formatTime(created),
         actor: n.actor || undefined
@@ -571,7 +601,7 @@ const Notifications: React.FC = () => {
                   )}
 
                   {/* Test Toast Button */}
-                  <button
+                  {/* <button
                     onClick={() => showNotification({
                       type: 'app',
                       mainText: 'Your profile has been updated,',
@@ -581,7 +611,7 @@ const Notifications: React.FC = () => {
                     className="text-xs px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
                   >
                     Test Toast
-                  </button>
+                  </button> */}
                 </div>
 
                 {/* Pagination */}

@@ -472,13 +472,12 @@ const Login: React.FC = () => {
       {/* Left side - Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
-          {/* Visitor Access Button */}
-          {/* <div className="text-center pt-8 md:pt-0">
+          <div className="text-center pt-8 md:pt-0">
             <button
               onClick={handleVisitorAccess}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-full hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
             >
-              <svg
+              {/* <svg
                 className="w-4 h-4 mr-2"
                 fill="none"
                 stroke="currentColor"
@@ -496,10 +495,10 @@ const Login: React.FC = () => {
                   strokeWidth={2}
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 />
-              </svg>
-              Access as visitor
+              </svg> */}
+              Back to Hompage
             </button>
-          </div> */}
+          </div>
 
           {/* Success Message */}
           {successMessage && messageType === "success" && (

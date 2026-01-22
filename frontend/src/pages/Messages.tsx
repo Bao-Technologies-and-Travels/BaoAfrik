@@ -112,6 +112,15 @@ const Messages: React.FC = (): JSX.Element => {
 
   const socket = useSocket();
   const { isConnected: isSocketConnected, reconnect: reconnectSocket } = useSocketContext();
+
+  // Ensure socket is connected on mount
+  useEffect(() => {
+    if (!socket && reconnectSocket) {
+      reconnectSocket();
+    } else if (socket && !socket.connected) {
+      reconnectSocket();
+    }
+  }, [socket, reconnectSocket]);
   const API_BASE = process.env.REACT_APP_API_URL;
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
@@ -212,6 +221,7 @@ const Messages: React.FC = (): JSX.Element => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [currentConversation, setCurrentConversation] = useState<any>(null);
+  const [sellerProfile, setSellerProfile] = useState<{ rating: number; totalReviews: number } | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
 
   // fetch notifications on mount
@@ -262,8 +272,14 @@ const Messages: React.FC = (): JSX.Element => {
           { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
         );
         const convos = res.data?.data || [];
+        // Trust backend for isArchived - ensure it's properly set from backend
+        // Convert to boolean to ensure consistency
+        const normalizedConvos = convos.map((conv: any) => ({
+          ...conv,
+          isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)
+        }));
         // Sort: pinned first, then by lastMessageAt
-        const sorted = convos.sort((a: any, b: any) => {
+        const sorted = normalizedConvos.sort((a: any, b: any) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
           const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
@@ -299,6 +315,48 @@ const Messages: React.FC = (): JSX.Element => {
     fetchConversations();
   }, [API_BASE]);
 
+  // Fetch seller profile (rating) when conversation changes
+  useEffect(() => {
+    const fetchSellerProfile = async () => {
+      const participantIdToFetch = currentConversation?.otherParticipant?.id;
+      if (!participantIdToFetch) {
+        setSellerProfile(null);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(
+          `${API_BASE}/products/user/${participantIdToFetch}/profile`,
+          { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            setSellerProfile({
+              rating: result.data.rating || 0,
+              totalReviews: result.data.totalReviews || 0
+            });
+          } else {
+            setSellerProfile(null);
+          }
+        } else {
+          setSellerProfile(null);
+        }
+      } catch (error) {
+        console.error('Error fetching seller profile:', error);
+        setSellerProfile(null);
+      }
+    };
+
+    if (currentConversation?.otherParticipant?.id) {
+      fetchSellerProfile();
+    } else {
+      setSellerProfile(null);
+    }
+  }, [currentConversation?.otherParticipant?.id, API_BASE]);
+
   // fetch unread counts function - shared between useEffects
   const fetchUnread = useCallback(async () => {
     try {
@@ -317,7 +375,7 @@ const Messages: React.FC = (): JSX.Element => {
     }
   }, [setNotificationCount]);
 
-  // fetch unread counts and archived count
+  // fetch unread counts
   useEffect(() => {
     const fetchArchivedCount = async () => {
       try {
@@ -594,7 +652,9 @@ const Messages: React.FC = (): JSX.Element => {
       ? msg.isIncoming
       : (msg?.senderId && currentUserId ? msg.senderId !== currentUserId : false);
     // Ensure reaction, metadata fields, and replyTo are preserved
+    // Load reactions from backend - can be in reaction field (single) or reactions array (all)
     const reaction = msg?.reaction || null;
+    const reactions = msg?.reactions || (reaction ? [{ reaction, userId: msg?.senderId || null }] : []);
     const isPinned = msg?.isPinned || false;
     const isArchived = msg?.isArchived || false;
     const isImportant = msg?.isImportant || false;
@@ -714,6 +774,7 @@ const Messages: React.FC = (): JSX.Element => {
       text,
       isIncoming,
       reaction,
+      reactions, // Preserve reactions array from backend
       isPinned,
       isArchived,
       isImportant,
@@ -806,7 +867,13 @@ const Messages: React.FC = (): JSX.Element => {
 
   // Socket event listeners for real-time updates
   useEffect(() => {
-    if (!socket) return;
+    // Ensure socket is available - if not, try to reconnect
+    if (!socket) {
+      if (reconnectSocket) {
+        reconnectSocket();
+      }
+      return;
+    }
 
     function handleReceiveMessage(msg: any) {
       const normalized = normalizeMessage(msg, user?.id);
@@ -881,6 +948,7 @@ const Messages: React.FC = (): JSX.Element => {
       }
 
       // Always refresh conversations list to update last message and unread counts
+      // IMPORTANT: Preserve isArchived status - archived chats stay archived even with new messages
       const refreshConversations = async () => {
         try {
           const token = localStorage.getItem("accessToken");
@@ -889,15 +957,33 @@ const Messages: React.FC = (): JSX.Element => {
             { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
           );
           const convos = res.data?.data || [];
-          // Sort: pinned first, then by lastMessageAt
-          const sorted = convos.sort((a: any, b: any) => {
-            if (a.isPinned && !b.isPinned) return -1;
-            if (!a.isPinned && b.isPinned) return 1;
-            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
-            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
-            return bTime - aTime;
+          // Merge with existing conversations to preserve local metadata (isPinned only)
+          // Trust backend for isArchived - it should persist
+          setConversations(prev => {
+            const merged = convos.map((conv: any) => {
+              const existing = prev.find((p: any) => String(p.id) === String(conv.id));
+              if (existing) {
+                // Preserve local isPinned state, but trust backend for isArchived
+                // If conversation was archived, keep it archived even with new messages
+                const wasArchived = existing.isArchived ?? false;
+                return {
+                  ...conv,
+                  isPinned: existing.isPinned ?? conv.isPinned ?? false,
+                  // Trust backend isArchived value, but if it was archived before, keep it archived
+                  isArchived: conv.isArchived ?? wasArchived
+                };
+              }
+              return conv;
+            });
+            // Sort: pinned first, then by lastMessageAt
+            return merged.sort((a: any, b: any) => {
+              if (a.isPinned && !b.isPinned) return -1;
+              if (!a.isPinned && b.isPinned) return 1;
+              const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+              const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+              return bTime - aTime;
+            });
           });
-          setConversations(sorted);
         } catch (err) {
           console.warn('Failed to refresh conversations on receive message', err);
         }
@@ -981,15 +1067,37 @@ const Messages: React.FC = (): JSX.Element => {
             { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
           );
           const convos = res.data?.data || [];
-          // Sort: pinned first, then by lastMessageAt
-          const sorted = convos.sort((a: any, b: any) => {
-            if (a.isPinned && !b.isPinned) return -1;
-            if (!a.isPinned && b.isPinned) return 1;
-            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
-            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
-            return bTime - aTime;
+          // Merge with existing conversations to preserve local metadata (isPinned only)
+          // Trust backend for isArchived - it should persist
+          setConversations(prev => {
+            const merged = convos.map((conv: any) => {
+              const existing = prev.find((p: any) => String(p.id) === String(conv.id));
+              if (existing) {
+                // Preserve local isPinned state, but trust backend for isArchived
+                // Convert to boolean to ensure consistency
+                const backendArchived = Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true);
+                return {
+                  ...conv,
+                  isPinned: existing.isPinned ?? conv.isPinned ?? false,
+                  // Trust backend isArchived value - it should persist
+                  isArchived: backendArchived
+                };
+              }
+              // For new conversations, also ensure isArchived is boolean
+              return {
+                ...conv,
+                isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)
+              };
+            });
+            // Sort: pinned first, then by lastMessageAt
+            return merged.sort((a: any, b: any) => {
+              if (a.isPinned && !b.isPinned) return -1;
+              if (!a.isPinned && b.isPinned) return 1;
+              const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+              const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+              return bTime - aTime;
+            });
           });
-          setConversations(sorted);
         } catch (err) {
           console.warn('Failed to refresh conversations on message sent', err);
         }
@@ -1041,13 +1149,14 @@ const Messages: React.FC = (): JSX.Element => {
       const statusKey = String(data.messageId);
       const normalizedStatus = normalizeStatus(data.status);
 
-      // Update messageStatuses state
+      // Update messageStatuses state (works globally for all conversations)
       setMessageStatuses(prev => {
         const updated = { ...prev, [statusKey]: normalizedStatus };
         return updated;
       });
 
       // Also update message in messages array (check both id and tempId)
+      // This updates messages even if not in the active conversation
       setMessages(prev =>
         prev.map(msg => {
           if (String(msg.id) === statusKey || String(msg.tempId) === statusKey) {
@@ -1057,8 +1166,25 @@ const Messages: React.FC = (): JSX.Element => {
         })
       );
 
-      // Force re-render of status icon
-      setMessageStatuses(prev => ({ ...prev }));
+      // Also update conversations list to reflect status changes in last message
+      if (data.conversationId) {
+        setConversations(prev =>
+          prev.map(conv => {
+            if (String(conv.id) === String(data.conversationId) && conv.lastMessage) {
+              if (String(conv.lastMessage.id) === statusKey) {
+                return {
+                  ...conv,
+                  lastMessage: {
+                    ...conv.lastMessage,
+                    status: normalizedStatus
+                  }
+                };
+              }
+            }
+            return conv;
+          })
+        );
+      }
     }
     socket.on('message_status_updated', handleStatusUpdate);
 
@@ -1105,15 +1231,37 @@ const Messages: React.FC = (): JSX.Element => {
             { params: { page: 1, limit: 20 }, headers: { Authorization: `Bearer ${token}` } }
           );
           const convos = res.data?.data || [];
-          // Sort: pinned first, then by lastMessageAt
-          const sorted = convos.sort((a: any, b: any) => {
-            if (a.isPinned && !b.isPinned) return -1;
-            if (!a.isPinned && b.isPinned) return 1;
-            const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
-            const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
-            return bTime - aTime;
+          // Merge with existing conversations to preserve local metadata (isPinned only)
+          // Trust backend for isArchived - it should persist
+          setConversations(prev => {
+            const merged = convos.map((conv: any) => {
+              const existing = prev.find((p: any) => String(p.id) === String(conv.id));
+              if (existing) {
+                // Preserve local isPinned state, but trust backend for isArchived
+                // Convert to boolean to ensure consistency
+                const backendArchived = Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true);
+                return {
+                  ...conv,
+                  isPinned: existing.isPinned ?? conv.isPinned ?? false,
+                  // Trust backend isArchived value - it should persist
+                  isArchived: backendArchived
+                };
+              }
+              // For new conversations, also ensure isArchived is boolean
+              return {
+                ...conv,
+                isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)
+              };
+            });
+            // Sort: pinned first, then by lastMessageAt
+            return merged.sort((a: any, b: any) => {
+              if (a.isPinned && !b.isPinned) return -1;
+              if (!a.isPinned && b.isPinned) return 1;
+              const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+              const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+              return bTime - aTime;
+            });
           });
-          setConversations(sorted);
         } catch (err) {
           console.warn('Failed to refresh conversations on new message', err);
         }
@@ -1145,6 +1293,22 @@ const Messages: React.FC = (): JSX.Element => {
             return msg;
           })
         );
+
+        // Update conversation list to show reaction in last message preview if applicable
+        // This ensures reactions are visible even when not actively reading
+        setConversations(prev => prev.map(conv => {
+          if (conv.lastMessage && String(conv.lastMessage.id) === String(data.messageId)) {
+            return {
+              ...conv,
+              lastMessage: {
+                ...conv.lastMessage,
+                reaction: data.reaction,
+                reactions: data.allReactions || [...(conv.lastMessage.reactions || []), { userId: data.userId, reaction: data.reaction }]
+              }
+            };
+          }
+          return conv;
+        }));
       }
     }
 
@@ -1174,6 +1338,28 @@ const Messages: React.FC = (): JSX.Element => {
             return msg;
           })
         );
+
+        // Also update conversation list to reflect reaction removal
+        setConversations(prev => prev.map(conv => {
+          if (conv.lastMessage && String(conv.lastMessage.id) === String(data.messageId)) {
+            const existingReactions = conv.lastMessage.reactions || [];
+            const updatedReactions = existingReactions.filter((r: any) =>
+              String(r.userId) !== String(data.userId)
+            );
+            const shouldClearReaction = updatedReactions.length === 0 ||
+              (data.reaction && conv.lastMessage.reaction === data.reaction);
+
+            return {
+              ...conv,
+              lastMessage: {
+                ...conv.lastMessage,
+                reaction: shouldClearReaction ? undefined : (updatedReactions[0]?.reaction || undefined),
+                reactions: updatedReactions
+              }
+            };
+          }
+          return conv;
+        }));
       }
     }
 
@@ -1239,21 +1425,26 @@ const Messages: React.FC = (): JSX.Element => {
     socket.on('conversation_metadata_updated', handleConversationMetadataUpdated);
     socket.on('conversation_deleted', handleConversationDeleted);
 
+    // Note: All listeners are set up above with socket.on()
+    // These will work even if socket wasn't connected initially - they'll be active when it connects
+
     return () => {
-      socket.off('receive_message', handleReceiveMessage);
-      socket.off('message_sent', handleMessageSent);
-      socket.off('user_typing', handleUserTyping);
-      socket.off('user_stop_typing', handleUserStopTyping);
-      socket.off('message_status_updated', handleStatusUpdate);
-      socket.off('messages_read', handleMessagesRead);
-      socket.off('new_message_notification', handleNewMessageNotif);
-      socket.off('reaction_added', handleReactionAdded);
-      socket.off('conversation_metadata_updated', handleConversationMetadataUpdated);
-      socket.off('conversation_deleted', handleConversationDeleted);
-      socket.off('reaction_removed', handleReactionRemoved);
-      socket.off('message_metadata_updated', handleMessageMetadataUpdated);
+      if (socket) {
+        socket.off('receive_message', handleReceiveMessage);
+        socket.off('message_sent', handleMessageSent);
+        socket.off('user_typing', handleUserTyping);
+        socket.off('user_stop_typing', handleUserStopTyping);
+        socket.off('message_status_updated', handleStatusUpdate);
+        socket.off('messages_read', handleMessagesRead);
+        socket.off('new_message_notification', handleNewMessageNotif);
+        socket.off('reaction_added', handleReactionAdded);
+        socket.off('conversation_metadata_updated', handleConversationMetadataUpdated);
+        socket.off('conversation_deleted', handleConversationDeleted);
+        socket.off('reaction_removed', handleReactionRemoved);
+        socket.off('message_metadata_updated', handleMessageMetadataUpdated);
+      }
     };
-  }, [socket, conversationId, user?.id]);
+  }, [socket, conversationId, user?.id, reconnectSocket]);
 
   // Initialize conversation from navigation state
   useEffect(() => {
@@ -1298,6 +1489,12 @@ const Messages: React.FC = (): JSX.Element => {
       setMessages(updatedMessages);
       setHasMore(newMessages.length === pageSize);
       setPage(pageNum);
+
+      // Set pinned message if one exists
+      if (reset) {
+        const pinned = updatedMessages.find((m: any) => m.isPinned);
+        setPinnedMessage(pinned || null);
+      }
 
       // Mark messages as read
       if (newMessages.length > 0) {
@@ -1358,11 +1555,27 @@ const Messages: React.FC = (): JSX.Element => {
       );
 
       // Also emit via socket to broadcast to other participant
+      // Wait for socket connection if not connected
       if (socket) {
-        socket.emit('mark_as_read', {
-          conversationId,
-          messageIds
-        });
+        if (socket.connected) {
+          socket.emit('mark_as_read', {
+            conversationId,
+            messageIds
+          });
+        } else {
+          // Wait for connection and then emit
+          const waitForConnection = () => {
+            if (socket.connected) {
+              socket.emit('mark_as_read', {
+                conversationId,
+                messageIds
+              });
+            } else {
+              setTimeout(waitForConnection, 100);
+            }
+          };
+          waitForConnection();
+        }
       }
     } catch (error) {
       console.error('Error marking messages as read:', error);
@@ -1535,6 +1748,21 @@ const Messages: React.FC = (): JSX.Element => {
     setHasNewIncomingMessage(false);
   }, [conversationId]);
 
+  // Helper to check if conversation has messages from both parties
+  const hasBidirectionalMessages = useCallback(() => {
+    if (messages.length < 2) return false;
+    const hasIncoming = messages.some(msg => msg.isIncoming);
+    const hasOutgoing = messages.some(msg => !msg.isIncoming);
+    return hasIncoming && hasOutgoing;
+  }, [messages]);
+
+  // Show condensed header when messages are loaded and conversation is bidirectional
+  useEffect(() => {
+    if (messages.length >= 2 && hasBidirectionalMessages()) {
+      setShowCondensedHeader(true);
+    }
+  }, [messages.length, hasBidirectionalMessages]);
+
   // Scroll detection for condensed header
   useEffect(() => {
     // Try mobile scroll container first, then desktop, then fallback to messages container
@@ -1544,6 +1772,7 @@ const Messages: React.FC = (): JSX.Element => {
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
       const isNearBottom = scrollHeight - scrollTop - clientHeight < 100; // 100px threshold
+      const hasBothParties = hasBidirectionalMessages();
 
       if (!isNearBottom) {
         // User has scrolled up - show condensed header
@@ -1556,8 +1785,11 @@ const Messages: React.FC = (): JSX.Element => {
       } else {
         // User is at bottom
         setHasUserScrolled(false);
-        // Only hide condensed header if not expecting a response and no new messages
-        if (!hasRecentlySentMessage && !hasNewIncomingMessage) {
+        // Show condensed header if there are messages from both parties (bidirectional conversation)
+        // OR if expecting a response or new messages arrived
+        if (hasBothParties || hasRecentlySentMessage || hasNewIncomingMessage) {
+          setShowCondensedHeader(true);
+        } else {
           setShowCondensedHeader(false);
         }
       }
@@ -1567,7 +1799,7 @@ const Messages: React.FC = (): JSX.Element => {
     return () => {
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [hasRecentlySentMessage, hasNewIncomingMessage]);
+  }, [hasRecentlySentMessage, hasNewIncomingMessage, hasBidirectionalMessages]);
 
   // File attachment handlers
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1759,7 +1991,7 @@ const Messages: React.FC = (): JSX.Element => {
           await markMessagesAsRead(conversationId, unreadMessages);
           toast.success('Messages marked as read');
         } else {
-          toast.info('No unread messages');
+          // toast.info('No unread messages');
         }
         setActionsMenuOpen(null);
         setActionsMenuCoords(null);
@@ -1826,10 +2058,12 @@ const Messages: React.FC = (): JSX.Element => {
       }
 
       if (action === 'Archive the chat') {
-        // Optimistically update UI - remove from list
-        setConversations(prev => prev.filter(conv => String(conv.id) !== conversationId));
-        // Update archived count
-        setArchivedCount(prev => prev + 1);
+        // Optimistically update UI - mark as archived (don't remove from list)
+        setConversations(prev => prev.map(conv =>
+          String(conv.id) === conversationId
+            ? { ...conv, isArchived: true }
+            : conv
+        ));
         // Emit to socket
         socket.emit('update_conversation_metadata', {
           conversationId,
@@ -1841,12 +2075,33 @@ const Messages: React.FC = (): JSX.Element => {
           { isArchived: true },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        toast.success('Chat archived');
+        // toast.success('Chat archived');
         // If this was the active conversation, clear it
         if (String(chatId) === String(conversationId)) {
           setConversationId(null);
           setMessages([]);
         }
+      }
+
+      if (action === 'Unarchive the chat') {
+        // Optimistically update UI - mark as not archived
+        setConversations(prev => prev.map(conv =>
+          String(conv.id) === conversationId
+            ? { ...conv, isArchived: false }
+            : conv
+        ));
+        // Emit to socket
+        socket.emit('update_conversation_metadata', {
+          conversationId,
+          isArchived: false
+        });
+        // Also update via API
+        await axios.patch(
+          `${API_BASE}/chat/conversations/${conversationId}/metadata`,
+          { isArchived: false },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // toast.success('Chat unarchived');
       }
 
       if (action === 'Delete the chat') {
@@ -2042,10 +2297,28 @@ const Messages: React.FC = (): JSX.Element => {
       );
 
       // Emit to socket to persist and sync
-      socket.emit('add_reaction', {
-        messageId: String(messageId),
-        reaction
-      });
+      // Ensure socket is connected before emitting
+      if (socket.connected) {
+        socket.emit('add_reaction', {
+          messageId: String(messageId),
+          reaction,
+          conversationId: conversationId || currentConversation?.id
+        });
+      } else {
+        // Wait for connection and then emit
+        const waitForConnection = () => {
+          if (socket.connected) {
+            socket.emit('add_reaction', {
+              messageId: String(messageId),
+              reaction,
+              conversationId: conversationId || currentConversation?.id
+            });
+          } else {
+            setTimeout(waitForConnection, 100);
+          }
+        };
+        waitForConnection();
+      }
     }
 
     setActiveReactionMessageId(null);
@@ -2173,17 +2446,33 @@ const Messages: React.FC = (): JSX.Element => {
 
     if (action === 'pin' && messageId && socket) {
       // Find the message
-      const message = messages.find(m => m.id === messageId);
+      const message = messages.find(m => String(m.id) === String(messageId));
       if (message) {
         const newPinnedStatus = !message.isPinned;
         if (newPinnedStatus) {
-          // Pin the message
+          // Pin the message - clear any previously pinned message first
+          if (pinnedMessage && pinnedMessage.id !== message.id) {
+            // Unpin the previous message
+            setMessages(prevMessages =>
+              prevMessages.map(msg =>
+                msg.id === pinnedMessage.id
+                  ? { ...msg, isPinned: false }
+                  : msg
+              )
+            );
+            socket.emit('update_message_metadata', {
+              messageId: String(pinnedMessage.id),
+              isPinned: false
+            });
+          }
           setPinnedMessage(message);
+          toast.success('Message pinned');
         } else {
           // Clear pinned message preview if this was the pinned message
-          if (pinnedMessage && pinnedMessage.id === messageId) {
+          if (pinnedMessage && String(pinnedMessage.id) === String(messageId)) {
             setPinnedMessage(null);
           }
+          toast.success('Message unpinned');
         }
         // Optimistically update UI
         setMessages(prevMessages =>
@@ -2198,6 +2487,9 @@ const Messages: React.FC = (): JSX.Element => {
           messageId: String(messageId),
           isPinned: newPinnedStatus
         });
+        // Close the options menu
+        setActiveMessageOptionsId(null);
+        setMobileMessageOptionsId(null);
       }
     }
 
@@ -2212,8 +2504,13 @@ const Messages: React.FC = (): JSX.Element => {
           }).catch(() => {
             toast.error('Failed to copy message');
           });
+        } else {
+          toast.error('No text to copy');
         }
       }
+      // Close the options menu
+      setActiveMessageOptionsId(null);
+      setMobileMessageOptionsId(null);
     }
 
     if (action === 'select' && messageId) {
@@ -2304,15 +2601,23 @@ const Messages: React.FC = (): JSX.Element => {
 
   // Handle unpinning from preview
   const handleUnpinMessage = () => {
-    if (pinnedMessage) {
+    if (pinnedMessage && socket) {
+      const messageId = pinnedMessage.id;
+      // Optimistically update UI
       setMessages(prevMessages =>
         prevMessages.map(msg =>
-          msg.id === pinnedMessage.id
+          msg.id === messageId
             ? { ...msg, isPinned: false }
             : msg
         )
       );
       setPinnedMessage(null);
+      // Emit to socket to persist
+      socket.emit('update_message_metadata', {
+        messageId: String(messageId),
+        isPinned: false
+      });
+      toast.success('Message unpinned');
     }
   };
 
@@ -2625,15 +2930,31 @@ const Messages: React.FC = (): JSX.Element => {
       return;
     }
 
-    if (!socket || !socket.connected) {
-      // Try to reconnect
+    // Ensure socket is connected before sending
+    if (!socket) {
+      toast.error('WebSocket not initialized. Please refresh the page.');
+      return;
+    }
+
+    if (!socket.connected) {
+      // Try to reconnect immediately
       reconnectSocket();
-      // Wait a bit and retry
-      setTimeout(() => {
-        if (!socket?.connected) {
-          toast.error('WebSocket not connected. Please refresh the page.');
+      // Wait a bit for connection, but don't block indefinitely
+      let attempts = 0;
+      const maxAttempts = 10; // Wait up to 1 second (10 * 100ms)
+      const checkConnection = setInterval(() => {
+        attempts++;
+        if (socket.connected) {
+          clearInterval(checkConnection);
+          // Retry sending after connection is established
+          handleSendMessage(content);
+          return;
         }
-      }, 2000);
+        if (attempts >= maxAttempts) {
+          clearInterval(checkConnection);
+          toast.error('WebSocket connection timeout. Please refresh the page.');
+        }
+      }, 500);
       return;
     }
 
@@ -2866,11 +3187,8 @@ const Messages: React.FC = (): JSX.Element => {
 
         if (unreadMessages.length > 0) {
           await markMessagesAsRead(conversationId, unreadMessages);
-          // Emit via socket to broadcast to other participant
-          socket.emit('mark_as_read', {
-            conversationId,
-            messageIds: unreadMessages.map((m: any) => m.id)
-          });
+          // markMessagesAsRead already handles socket emit, but ensure it happens
+          // The socket emit is handled inside markMessagesAsRead function
         }
       } catch (error) {
         console.error('Error marking messages as read:', error);
@@ -3484,9 +3802,20 @@ const Messages: React.FC = (): JSX.Element => {
         }
       `}</style>
 
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 
-      <div className="h-screen bg-gray-50 flex overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
         {/* Hidden file input for file attachments */}
         <input
           id="file-upload"
@@ -3516,7 +3845,7 @@ const Messages: React.FC = (): JSX.Element => {
         />
         {/* Mobile Conversation View - Full Screen on Mobile */}
         {showMobileConversation && (
-          <div className="md:hidden w-full bg-white flex flex-col h-screen overflow-hidden">
+          <div className="md:hidden w-full bg-white flex flex-col h-screen overflow-hidden absolute inset-0 z-50">
             {/* Scrollable Content */}
             <div ref={mobileScrollContainerRef} className="flex-1 overflow-y-auto">
               {/* Seller Profile Section or Condensed Header */}
@@ -3577,7 +3906,7 @@ const Messages: React.FC = (): JSX.Element => {
                       <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
-                      <span className="text-sm" style={{ color: '#BABABA' }}>{currentConversation?.otherParticipant?.rating || 0.0}</span>
+                      <span className="text-sm" style={{ color: '#BABABA' }}>{sellerProfile?.rating || currentConversation?.otherParticipant?.rating || 0.0}</span>
                     </div>
 
                     {/* Website and Location - Side by Side */}
@@ -3651,45 +3980,52 @@ const Messages: React.FC = (): JSX.Element => {
                 </>
               ) : (
                 // Condensed Header Bar - Single Row - Sticky
-                <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out rounded-t-2xl">
-                  <div className="flex items-center space-x-3">
-                    {/* Profile Picture */}
-                    <img
-                      src={currentConversation?.otherParticipant?.profileImage || productData?.seller?.profileImage || eboAvatar}
-                      alt={currentConversation?.otherParticipant ? `${currentConversation.otherParticipant.firstName} ${currentConversation.otherParticipant.lastName}` : (productData?.seller?.name || 'User')}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    {/* Name and Rating */}
-                    <div>
-                      <h3 className="text-base font-semibold text-gray-900">
-                        {currentConversation?.otherParticipant
-                          ? `${currentConversation.otherParticipant.firstName || ''} ${currentConversation.otherParticipant.lastName || ''}`.trim() || 'User'
-                          : (productData?.seller?.name || 'User')}
-                      </h3>
-                      <div className="flex items-center space-x-1">
-                        <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        <span className="text-sm" style={{ color: '#BABABA' }}>{currentConversation?.otherParticipant?.rating || 0.0}</span>
+                <div className="sticky top-0 z-30 bg-white" style={{ borderBottom: '1px solid #F1F1F1' }}>
+                  <div className="flex items-center justify-between px-4 py-3">
+                    {/* Left: Back Arrow */}
+                    <button onClick={() => setShowMobileConversation(false)} className="p-1">
+                      <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+
+                    {/* Left: Avatar + name + rating */}
+                    <div className="flex items-center space-x-2 flex-1">
+                      <img
+                        src={currentConversation?.otherParticipant?.profileImage || productData?.seller?.profileImage || eboAvatar}
+                        alt={currentConversation?.otherParticipant ? `${currentConversation.otherParticipant.firstName} ${currentConversation.otherParticipant.lastName}` : (productData?.seller?.name || 'User')}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900">
+                          {currentConversation?.otherParticipant
+                            ? `${currentConversation.otherParticipant.firstName || ''} ${currentConversation.otherParticipant.lastName || ''}`.trim() || 'User'
+                            : (productData?.seller?.name || 'User')}
+                        </h3>
+                        <div className="flex items-center space-x-1">
+                          <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <span className="text-sm" style={{ color: '#BABABA' }}>{sellerProfile?.rating || currentConversation?.otherParticipant?.rating || 0.0}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {/* Right Icons */}
-                  <div className="flex space-x-2">
-                    <button className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                      <img
-                        src={fiIcon}
-                        alt="Search"
-                        className="w-5 h-5"
-                      />
-                    </button>
-                    <button className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                      <img
-                        src={faIcon}
-                        alt="Settings"
-                        className="w-5 h-5"
-                      />
-                    </button>
+
+                    {/* Right: Action Icons */}
+                    <div className="flex space-x-2">
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        style={{ border: '0.727px solid #F3F3F3' }}
+                      >
+                        <img src={fiIcon} alt="Refresh" className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        style={{ border: '0.727px solid #F3F3F3' }}
+                      >
+                        <img src={faIcon} alt="Report" className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -3705,7 +4041,11 @@ const Messages: React.FC = (): JSX.Element => {
                       style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(92%) contrast(86%)' }}
                       onClick={handleUnpinMessage}
                     />
-                    <div className="flex-1 min-w-0 px-2 py-1.5" style={{ backgroundColor: '#FFFFFF', borderRadius: '6px' }}>
+                    <div
+                      className="flex-1 min-w-0 px-2 py-1.5 cursor-pointer hover:bg-gray-50 transition-colors"
+                      style={{ backgroundColor: '#FFFFFF', borderRadius: '6px' }}
+                      onClick={() => scrollToMessage(pinnedMessage.id)}
+                    >
                       <p className="text-xs truncate" style={{ color: '#6A6A6A' }}>
                         {pinnedMessage.text}
                       </p>
@@ -3842,7 +4182,9 @@ const Messages: React.FC = (): JSX.Element => {
                             <div
                               className={`rounded-2xl p-2.5 ${message.isIncoming ? 'rounded-bl-md' : 'rounded-br-md'} cursor-pointer`}
                               style={{
-                                backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
+                                backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6',
+                                maxWidth: '100%',
+                                width: 'fit-content'
                               }}
                               onClick={(e) => handleMobileIncomingMessageClick(message.id, e)}
                             >
@@ -5059,7 +5401,8 @@ const Messages: React.FC = (): JSX.Element => {
                     <img
                       src={logo}
                       alt="bao'Afrik"
-                      className="h-8 w-auto"
+                      className="h-8 w-auto object-contain max-w-full"
+                      style={{ minWidth: '120px', maxWidth: '200px' }}
                     /></Link>
                   <button className="bg-white hover:bg-gray-50 rounded-lg transition-colors w-10 h-10 flex items-center justify-center">
                     <img
@@ -5126,78 +5469,110 @@ const Messages: React.FC = (): JSX.Element => {
             {/* Chat List or Empty State */}
             {conversations.length > 0 ? (
               <div className="flex-1 flex flex-col">
-                {/* Filter Tabs */}
-                <div className="px-4 py-3">
-                  <div className="relative">
-                    {/* Gray baseline */}
-                    <div className="absolute bottom-0 -left-4 -right-4 md:left-0 md:right-0 h-px bg-gray-200"></div>
-
+                {/* Filter Tabs or Archived Header */}
+                {selectedTab === 'Archived' ? (
+                  // Archived Header - Desktop Only
+                  <div className="hidden md:block px-4 py-3 border-b border-gray-200">
                     <div className="flex items-center justify-between">
-                      <div className="flex space-x-6 relative">
+                      <div className="flex items-center space-x-2">
                         <button
                           onClick={() => setSelectedTab('All')}
-                          className={`text-sm font-medium pb-1 relative ${selectedTab === 'All'
-                            ? 'text-gray-900'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                          style={{
-                            color: selectedTab === 'All' ? '#64B5F6' : undefined
-                          }}
+                          className="p-1 hover:bg-gray-100 rounded transition-colors"
                         >
-                          All
-                          {selectedTab === 'All' && (
-                            <div
-                              className="absolute bottom-0 left-0 right-0 h-0.5"
-                              style={{ backgroundColor: '#64B5F6' }}
-                            ></div>
-                          )}
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#212121' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
                         </button>
-                        <button
-                          onClick={() => setSelectedTab('Unreads')}
-                          className={`text-sm font-medium pb-1 relative flex items-center space-x-1 ${selectedTab === 'Unreads'
-                            ? 'text-gray-900'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                          style={{
-                            color: selectedTab === 'Unreads' ? '#64B5F6' : undefined
-                          }}
-                        >
-                          <span>Unreads</span>
-                          <span
-                            className="md:hidden w-5 h-5 rounded-full flex items-center justify-center text-xs"
-                            style={{
-                              backgroundColor: '#E3F2FD',
-                              color: '#64B5F6',
-                              border: '1px solid white'
-                            }}
-                          >
-                            {conversations.filter((c: any) => c.unreadCount > 0).length}
-                          </span>
-                          {selectedTab === 'Unreads' && (
-                            <div
-                              className="absolute bottom-0 left-0 right-0 h-0.5"
-                              style={{ backgroundColor: '#64B5F6' }}
-                            ></div>
-                          )}
-                        </button>
+                        <h2 className="text-lg font-semibold" style={{ color: '#212121' }}>Archived</h2>
                       </div>
-
-                      {/* Archive Button - Mobile Only */}
-                      <button
-                        className="md:hidden pb-1 flex items-center"
-                        onClick={() => setShowMobileArchiveModal(true)}
-                      >
-                        <img src={amIcon} alt="Archived Messages" className="w-5 h-5" />
-                      </button>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>
+                        {conversations.filter((c: any) => c.isArchived).length}
+                      </span>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  // Regular Filter Tabs
+                  <div className="px-4 py-3">
+                    <div className="relative">
+                      {/* Gray baseline */}
+                      <div className="absolute bottom-0 -left-4 -right-4 md:left-0 md:right-0 h-px bg-gray-200"></div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex space-x-4 md:space-x-6 relative">
+                          <button
+                            onClick={() => setSelectedTab('All')}
+                            className={`text-sm font-medium pb-1 relative ${selectedTab === 'All'
+                              ? 'text-gray-900'
+                              : 'text-gray-500 hover:text-gray-700'
+                              }`}
+                            style={{
+                              color: selectedTab === 'All' ? '#64B5F6' : undefined
+                            }}
+                          >
+                            All
+                            {selectedTab === 'All' && (
+                              <div
+                                className="absolute bottom-0 left-0 right-0 h-0.5"
+                                style={{ backgroundColor: '#64B5F6' }}
+                              ></div>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setSelectedTab('Unreads')}
+                            className={`text-sm font-medium pb-1 relative flex items-center space-x-1 ${selectedTab === 'Unreads'
+                              ? 'text-gray-900'
+                              : 'text-gray-500 hover:text-gray-700'
+                              }`}
+                            style={{
+                              color: selectedTab === 'Unreads' ? '#64B5F6' : undefined
+                            }}
+                          >
+                            <span>Unreads</span>
+                            <span
+                              className="md:hidden w-5 h-5 rounded-full flex items-center justify-center text-xs"
+                              style={{
+                                backgroundColor: '#E3F2FD',
+                                color: '#64B5F6',
+                                border: '1px solid white'
+                              }}
+                            >
+                              {conversations.filter((c: any) => c.unreadCount > 0 && !c.isArchived).length}
+                            </span>
+                            {selectedTab === 'Unreads' && (
+                              <div
+                                className="absolute bottom-0 left-0 right-0 h-0.5"
+                                style={{ backgroundColor: '#64B5F6' }}
+                              ></div>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Archive Button - Mobile Only */}
+                        <button
+                          className="md:hidden pb-1 flex items-center"
+                          onClick={() => setShowMobileArchiveModal(true)}
+                        >
+                          <img src={amIcon} alt="Archived Messages" className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Chat Entries */}
                 <div className="flex-1 overflow-y-auto p-1">
                   {conversations
                     .filter((conv: any) => {
-                      // Exclude archived conversations
+                      // Handle Archived tab - show only archived conversations
+                      if (selectedTab === 'Archived') {
+                        if (!conv.isArchived) return false;
+                        if (!chatSearchQuery) return true;
+                        const name = `${conv.otherParticipant?.firstName || ''} ${conv.otherParticipant?.lastName || ''}`.trim();
+                        const lastMsg = conv.lastMessage?.content || '';
+                        return name.toLowerCase().includes(chatSearchQuery.toLowerCase()) ||
+                          lastMsg.toLowerCase().includes(chatSearchQuery.toLowerCase());
+                      }
+                      // For All and Unreads tabs - exclude archived conversations
                       if (conv.isArchived) return false;
                       if (selectedTab === 'Unreads') {
                         return conv.unreadCount > 0;
@@ -5255,13 +5630,19 @@ const Messages: React.FC = (): JSX.Element => {
                                   {unreadCount > 9 ? '9+' : String(unreadCount)}
                                 </div>
                               )}
+                              {/* Pin icon on profile image - bottom right */}
+                              {conv.isPinned && (
+                                <div
+                                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
+                                  style={{ backgroundColor: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
+                                >
+                                  <img src={pinBadgeIcon} alt="Pinned" className="w-2.5 h-2.5" />
+                                </div>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-1 flex-1 min-w-0">
-                                  {conv.isPinned && (
-                                    <img src={pinBadgeIcon} alt="Pinned" className="w-3 h-3 flex-shrink-0" />
-                                  )}
                                   {conv.label && (
                                     <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}>
                                       {conv.label}
@@ -5393,111 +5774,121 @@ const Messages: React.FC = (): JSX.Element => {
           </div>
 
           {/* Actions Menu Overlay and Popup - Sidebar Level */}
-          {actionsMenuOpen !== null && (
-            <>
-              {/* Semi-transparent overlay for sidebar only */}
-              <div
-                className="absolute inset-0 bg-black bg-opacity-20 z-40"
-                onClick={() => {
-                  setActionsMenuOpen(null);
-                  setActionsMenuCoords(null);
-                }}
-              ></div>
+          {actionsMenuOpen !== null && (() => {
+            // Get the conversation being acted upon
+            const actionConv = conversations.find((c: any) => c.id === actionsMenuOpen);
+            const isConvPinned = actionConv?.isPinned || false;
+            const isConvArchived = actionConv?.isArchived || false;
 
-              {/* Actions Menu */}
-              <div
-                className="actions-menu absolute bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48"
-                style={isMobileViewport && actionsMenuCoords
-                  ? {
-                    borderRadius: '24px',
-                    top: `${actionsMenuCoords.top}px`,
-                    right: `${actionsMenuCoords.right}px`
+            return (
+              <>
+                {/* Semi-transparent overlay for sidebar only */}
+                <div
+                  className="absolute inset-0 bg-black bg-opacity-20 z-40"
+                  onClick={() => {
+                    setActionsMenuOpen(null);
+                    setActionsMenuCoords(null);
+                  }}
+                ></div>
+
+                {/* Actions Menu */}
+                <div
+                  className="actions-menu absolute bg-white shadow-lg border border-gray-200 py-2 z-50 min-w-48"
+                  style={isMobileViewport && actionsMenuCoords
+                    ? {
+                      borderRadius: '24px',
+                      top: `${actionsMenuCoords.top}px`,
+                      right: `${actionsMenuCoords.right}px`
+                    }
+                    : {
+                      borderRadius: '24px',
+                      top: '21rem',
+                      right: '1rem'
+                    }
                   }
-                  : {
-                    borderRadius: '24px',
-                    top: '21rem',
-                    right: '1rem'
-                  }
-                }
-              >
-                <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
-                  <h3 className="text-sm font-thin" style={{ color: '#BABABA' }}>Actions</h3>
-                  <button
-                    onClick={() => setActionsMenuOpen(null)}
-                    className="transition-colors"
-                    style={{ color: '#374151' }}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                >
+                  <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+                    <h3 className="text-sm font-thin" style={{ color: '#BABABA' }}>Actions</h3>
+                    <button
+                      onClick={() => setActionsMenuOpen(null)}
+                      className="transition-colors"
+                      style={{ color: '#374151' }}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="py-1">
+                    <button
+                      onClick={() => handleActionSelect('Mark as read', actionsMenuOpen)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                    >
+                      <img src={actionIcon01} alt="Mark as read" className="w-4 h-4" />
+                      <span className="font-light" style={{ color: '#374151' }}>Mark as read</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleActionSelect('Add label', actionsMenuOpen)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                    >
+                      <img src={actionIcon02} alt="Add label" className="w-4 h-4" />
+                      <span className="font-light" style={{ color: '#374151' }}>Add label</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleActionSelect('Mute the chat', actionsMenuOpen)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                    >
+                      <img src={actionIcon03} alt="Mute the chat" className="w-4 h-4" />
+                      <span className="font-light" style={{ color: '#374151' }}>Mute the chat</span>
+                      <img src={muteArrowIcon} alt="Arrow" className="w-4 h-4 ml-auto" />
+                    </button>
+
+                    <button
+                      onClick={() => handleActionSelect(isConvPinned ? 'Unpin the chat' : 'Pin the chat', actionsMenuOpen)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                    >
+                      <img src={actionIcon04} alt={isConvPinned ? 'Unpin the chat' : 'Pin the chat'} className="w-4 h-4" />
+                      <span className="font-light" style={{ color: '#374151' }}>{isConvPinned ? 'Unpin the chat' : 'Pin the chat'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleActionSelect(isConvArchived ? 'Unarchive the chat' : 'Archive the chat', actionsMenuOpen)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
+                    >
+                      <img src={actionIcon05} alt={isConvArchived ? 'Unarchive the chat' : 'Archive the chat'} className="w-4 h-4" />
+                      <span className="font-light" style={{ color: '#374151' }}>{isConvArchived ? 'Unarchive the chat' : 'Archive the chat'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleActionSelect('Delete the chat', actionsMenuOpen)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 flex items-center space-x-3"
+                    >
+                      <img src={actionIcon06} alt="Delete the chat" className="w-4 h-4" />
+                      <span className="font-light" style={{ color: '#374151' }}>Delete the chat</span>
+                    </button>
+                  </div>
                 </div>
-
-                <div className="py-1">
-                  <button
-                    onClick={() => handleActionSelect('Mark as read', actionsMenuOpen)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
-                  >
-                    <img src={actionIcon01} alt="Mark as read" className="w-4 h-4" />
-                    <span className="font-light" style={{ color: '#374151' }}>Mark as read</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleActionSelect('Add label', actionsMenuOpen)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
-                  >
-                    <img src={actionIcon02} alt="Add label" className="w-4 h-4" />
-                    <span className="font-light" style={{ color: '#374151' }}>Add label</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleActionSelect('Mute the chat', actionsMenuOpen)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
-                  >
-                    <img src={actionIcon03} alt="Mute the chat" className="w-4 h-4" />
-                    <span className="font-light" style={{ color: '#374151' }}>Mute the chat</span>
-                    <img src={muteArrowIcon} alt="Arrow" className="w-4 h-4 ml-auto" />
-                  </button>
-
-                  <button
-                    onClick={() => handleActionSelect(isChatPinned ? 'Unpin the chat' : 'Pin the chat', actionsMenuOpen)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
-                  >
-                    <img src={actionIcon04} alt={isChatPinned ? 'Unpin the chat' : 'Pin the chat'} className="w-4 h-4" />
-                    <span className="font-light" style={{ color: '#374151' }}>{isChatPinned ? 'Unpin the chat' : 'Pin the chat'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleActionSelect('Archive the chat', actionsMenuOpen)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-3"
-                  >
-                    <img src={actionIcon05} alt="Archive the chat" className="w-4 h-4" />
-                    <span className="font-light" style={{ color: '#374151' }}>Archive the chat</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleActionSelect('Delete the chat', actionsMenuOpen)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 flex items-center space-x-3"
-                  >
-                    <img src={actionIcon06} alt="Delete the chat" className="w-4 h-4" />
-                    <span className="font-light" style={{ color: '#374151' }}>Delete the chat</span>
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
+              </>
+            );
+          })()}
 
           {/* Archive and Important Section - At Bottom of Sidebar - Only show when there are conversations - Hidden on mobile */}
           {conversations.length > 0 && (
             <div className="hidden md:block mt-auto bg-white px-4 py-3">
               <div className="border-t border-gray-300 mx-1 mb-3"></div>
               {/* Archived */}
-              <div className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors">
+              <div
+                className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 transition-colors"
+                onClick={() => setSelectedTab('Archived')}
+              >
                 <div className="flex items-center space-x-3">
                   <img src={archiveIcon} alt="Archived" className="w-5 h-5" style={{ color: '#6A6A6A' }} />
                   <span className="text-sm" style={{ color: '#6A6A6A' }}>Archived</span>
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>{archivedCount}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F5F5F5', color: '#6A6A6A' }}>{conversations.filter((c: any) => c.isArchived).length}</span>
               </div>
 
               {/* Mark as important */}
@@ -5915,11 +6306,20 @@ const Messages: React.FC = (): JSX.Element => {
 
                   {/* Profile Picture */}
                   <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <Link
+                    to="/account"
+                    className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full hover:ring-1 hover:ring-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                    title="Profile"
+                    aria-label="Go to profile page"
+                  >
                     <img
                       src={user?.profileImage || avatarIcon}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
+                      alt="User Icon"
+                      className="w-8 h-8 rounded-full object-cover"
+                      width="32"
+                      height="32"
                     />
+                  </Link>
                   </div>
 
                   {/* Menu Button */}
@@ -5966,8 +6366,8 @@ const Messages: React.FC = (): JSX.Element => {
                                   </div> */}
 
                         {/* Profile Section */}
-                        <div className="flex items-center justify-around">
-                          <div className="flex justify-center items-center gap-2">
+                        <div className="flex ml-6">
+                          <div className="flex items-center gap-6">
                             <img
                               src={user?.profileImage || avatarIcon}
                               alt="User avatar"
@@ -5990,7 +6390,7 @@ const Messages: React.FC = (): JSX.Element => {
                               </h3>
                             </div>
                           </div>
-                          <div style={{ position: 'relative', zIndex: 999 }}>
+                          {/* <div style={{ position: 'relative', zIndex: 999 }}>
                             <Link to="/profile-setup"
                             >
                               <div className="w-10 h-10 rounded flex items-center justify-center"
@@ -6011,7 +6411,7 @@ const Messages: React.FC = (): JSX.Element => {
                                 </svg>
                               </div>
                             </Link>
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Create a new listing button */}
@@ -6202,7 +6602,7 @@ const Messages: React.FC = (): JSX.Element => {
                               <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
-                              <span className="text-lg" style={{ color: '#BABABA' }}>{currentConversation?.otherParticipant?.rating || 0.0}</span>
+                              <span className="text-lg" style={{ color: '#BABABA' }}>{sellerProfile?.rating || currentConversation?.otherParticipant?.rating || 0.0}</span>
                             </div>
                           </div>
 
@@ -6245,10 +6645,10 @@ const Messages: React.FC = (): JSX.Element => {
                           </div>
 
                           {/* Description */}
-                          <div className="text-left">
+                          <div className="flex justify-center">
                             <p
-                              className="text-sm leading-relaxed mb-4 text-justify"
-                              style={{ color: "#BABABA", justifyContent: "center" }}
+                              className="text-sm leading-relaxed mb-4 text-center max-w-md"
+                              style={{ color: "#BABABA" }}
                             >
                               {currentConversation?.otherParticipant?.bio || 'Passionate about discovering unique products and always on the lookout for great deals. I enjoy exploring new brands, trying out innovative items, and supporting businesses that deliver quality and creativity.'}
                             </p>
@@ -6290,11 +6690,30 @@ const Messages: React.FC = (): JSX.Element => {
                     <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-6 py-4 border-b border-gray-200 transition-all duration-500 ease-in-out rounded-t-2xl">
                       <div className="flex items-center space-x-3">
                         {/* Profile Picture */}
-                        <img
-                          src={currentConversation?.otherParticipant?.profileImage || productData?.seller?.profileImage || eboAvatar}
-                          alt={currentConversation?.otherParticipant ? `${currentConversation.otherParticipant.firstName} ${currentConversation.otherParticipant.lastName}` : (productData?.seller?.name || 'User')}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => {
+                            const participant = currentConversation?.otherParticipant;
+                            if (participant?.id) {
+                              const sellerSlug = `${participant.firstName || ''} ${participant.lastName || ''}`
+                                .toLowerCase()
+                                .trim()
+                                .replace(/\s+/g, '-')
+                                .replace(/[^a-z0-9-]/g, '') || participant.id;
+
+                              sessionStorage.setItem(`seller_${sellerSlug}_data`, JSON.stringify(participant));
+                              sessionStorage.setItem(`seller_${sellerSlug}_id`, participant.id);
+
+                              navigate(`/seller/${sellerSlug}`);
+                            }
+                          }}
+                        >
+                          <img
+                            src={currentConversation?.otherParticipant?.profileImage || productData?.seller?.profileImage || eboAvatar}
+                            alt={currentConversation?.otherParticipant ? `${currentConversation.otherParticipant.firstName} ${currentConversation.otherParticipant.lastName}` : (productData?.seller?.name || 'User')}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                        </div>
                         {/* Name and Rating */}
                         <div>
                           <h3 className="text-base font-semibold text-gray-900">
@@ -6306,7 +6725,7 @@ const Messages: React.FC = (): JSX.Element => {
                             <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
-                            <span className="text-sm" style={{ color: '#BABABA' }}>{currentConversation?.otherParticipant?.rating || 0.0}</span>
+                            <span className="text-sm" style={{ color: '#BABABA' }}>{sellerProfile?.rating || currentConversation?.otherParticipant?.rating || 0.0}</span>
                           </div>
                         </div>
                       </div>
@@ -6341,7 +6760,11 @@ const Messages: React.FC = (): JSX.Element => {
                           style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(0%) saturate(0%) hue-rotate(209deg) brightness(92%) contrast(86%)' }}
                           onClick={handleUnpinMessage}
                         />
-                        <div className="px-3 py-2" style={{ backgroundColor: '#FFFFFF', borderRadius: '6px', maxWidth: '70%' }}>
+                        <div
+                          className="px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors"
+                          style={{ backgroundColor: '#FFFFFF', borderRadius: '6px', maxWidth: '70%' }}
+                          onClick={() => scrollToMessage(pinnedMessage.id)}
+                        >
                           <p className="text-sm truncate" style={{ color: '#6A6A6A' }}>
                             {pinnedMessage.text}
                           </p>
@@ -6533,7 +6956,7 @@ const Messages: React.FC = (): JSX.Element => {
 
                                       <div className="space-y-0.5">
                                         <button
-                                          onClick={() => mobileMessageOptionsId !== undefined && handleMessageOptionSelect('reply', message.id)}
+                                          onClick={() => activeMessageOptionsId != null && handleMessageOptionSelect('reply', { id: activeMessageOptionsId })}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={replyIcon} alt="Reply" className="w-4 h-4 mr-2" />
@@ -6549,13 +6972,15 @@ const Messages: React.FC = (): JSX.Element => {
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
-                                          <span className="text-xs" style={{ color: '#6B7280' }}>Mark as important</span>
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>
+                                            {messages.find(m => m.id === activeMessageOptionsId)?.isImportant ? 'Remove important' : 'Mark as important'}
+                                          </span>
                                         </button>
 
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('copy', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -6567,7 +6992,7 @@ const Messages: React.FC = (): JSX.Element => {
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('select', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -6579,7 +7004,7 @@ const Messages: React.FC = (): JSX.Element => {
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('pin', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -6593,7 +7018,7 @@ const Messages: React.FC = (): JSX.Element => {
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('delete', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -6653,7 +7078,9 @@ const Messages: React.FC = (): JSX.Element => {
                                 <div
                                   className={`rounded-2xl p-4 ${message.isIncoming ? 'rounded-bl-md cursor-pointer' : 'rounded-br-md'}`}
                                   style={{
-                                    backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6'
+                                    backgroundColor: message.isIncoming ? '#F0F8FE' : '#64B5F6',
+                                    maxWidth: '100%',
+                                    width: 'fit-content'
                                   }}
                                   onClick={() => handleIncomingMessageClick(message.id)}
                                 >
@@ -7521,7 +7948,7 @@ const Messages: React.FC = (): JSX.Element => {
                                       {/* Menu Items */}
                                       <div className="space-y-0.5">
                                         <button
-                                          onClick={() => handleMessageOptionSelect('reply', message.id)}
+                                          onClick={() => activeMessageOptionsId != null && handleMessageOptionSelect('reply', { id: activeMessageOptionsId })}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={replyIcon} alt="Reply" className="w-4 h-4 mr-2" />
@@ -7537,13 +7964,15 @@ const Messages: React.FC = (): JSX.Element => {
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
                                         >
                                           <img src={starIcon} alt="Star" className="w-4 h-4 mr-2" />
-                                          <span className="text-xs" style={{ color: '#6B7280' }}>Mark as important</span>
+                                          <span className="text-xs" style={{ color: '#6B7280' }}>
+                                            {messages.find(m => m.id === activeMessageOptionsId)?.isImportant ? 'Remove important' : 'Mark as important'}
+                                          </span>
                                         </button>
 
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('copy', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -7555,7 +7984,7 @@ const Messages: React.FC = (): JSX.Element => {
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('select', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -7567,7 +7996,7 @@ const Messages: React.FC = (): JSX.Element => {
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('pin', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -7581,7 +8010,7 @@ const Messages: React.FC = (): JSX.Element => {
                                         <button
                                           onClick={() => {
                                             if (activeMessageOptionsId != null) {
-                                              handleMessageOptionSelect('important', { id: activeMessageOptionsId });
+                                              handleMessageOptionSelect('delete', { id: activeMessageOptionsId });
                                             }
                                           }}
                                           className="w-full flex items-center px-3 py-1.5 hover:bg-gray-50 transition-colors"
@@ -8375,7 +8804,6 @@ const Messages: React.FC = (): JSX.Element => {
           </footer>
         </div>
       </div>
-      <ToastContainer position="bottom-right" autoClose={4000} />
     </>
   );
 };

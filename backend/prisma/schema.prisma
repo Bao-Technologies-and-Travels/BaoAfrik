@@ -44,6 +44,8 @@ model User {
   productLikes             ProductLike[]
   productSaves             ProductSave[]
   productReviews           ProductReview[]
+  userReviews              UserReview[] @relation("UserReviews")
+  reviewsGiven             UserReview[] @relation("UserReviewer")
   sentMessages             Message[]
   refreshTokens            RefreshToken[]
   conversationParticipants ConversationParticipant[]
@@ -163,6 +165,37 @@ model ReviewHelpfulness {
 
   @@unique([reviewId, userId])
   @@map("review_helpfulness")
+}
+
+model UserReview {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id") // User being reviewed
+  reviewerId String   @map("reviewer_id") // User who wrote the review
+  rating     Int
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User   @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User   @relation("UserReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  helpfulnessVotes UserReviewHelpfulness[]
+
+  @@unique([userId, reviewerId])
+  @@map("user_reviews")
+}
+
+model UserReviewHelpfulness {
+  id        String   @id @default(uuid())
+  reviewId  String   @map("review_id")
+  userId    String   @map("user_id")
+  isHelpful Boolean  @map("is_helpful")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  review UserReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@map("user_review_helpfulness")
 }
 
 model Message {

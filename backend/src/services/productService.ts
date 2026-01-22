@@ -724,7 +724,7 @@ export class ProductService {
     async toggleSaveProduct(productId: string, userId: string): Promise<{ saved: boolean }> {
         try {
             const isSaved = await this.isProductSaved(productId, userId);
-            
+
             if (isSaved) {
                 await this.unsaveProduct(productId, userId);
                 return { saved: false };
@@ -770,14 +770,10 @@ export class ProductService {
                 return null;
             }
 
-            // Count total reviews across all products by this seller
-            const totalReviews = await prisma.productReview.count({
-                where: {
-                    product: {
-                        sellerId: userId
-                    }
-                }
-            });
+            // Count total user reviews (not product reviews)
+            const totalReviews = await (prisma as any).userReview.count({
+                where: { userId }
+            }).catch(() => 0);
 
             return {
                 ...user,
@@ -789,7 +785,7 @@ export class ProductService {
         }
     }
 
-    // Get reviews for a seller (reviews on all products by this seller)
+    // Get reviews for a seller (user reviews, not product reviews)
     async getSellerReviews(sellerId: string, page: number = 1, limit: number = 10): Promise<{
         reviews: Array<{
             id: string;
@@ -797,9 +793,7 @@ export class ProductService {
             comment: string | null;
             createdAt: Date;
             updatedAt: Date;
-            productId: string;
-            productTitle: string;
-            user: {
+            reviewer: {
                 id: string;
                 firstName: string | null;
                 lastName: string | null;
@@ -815,89 +809,8 @@ export class ProductService {
         currentPage: number;
     }> {
         try {
-            const skip = (page - 1) * limit;
-
-            // Get all reviews for products owned by this seller
-            const reviews = await prisma.productReview.findMany({
-                where: {
-                    product: {
-                        sellerId: sellerId
-                    }
-                },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            profileImage: true
-                        }
-                    },
-                    product: {
-                        select: {
-                            id: true,
-                            title: true
-                        }
-                    },
-                    helpfulnessVotes: true
-                },
-                orderBy: { createdAt: 'desc' },
-                skip,
-                take: limit
-            });
-
-            // Get total count and rating distribution
-            const allReviews = await prisma.productReview.findMany({
-                where: {
-                    product: {
-                        sellerId: sellerId
-                    }
-                },
-                select: {
-                    rating: true
-                }
-            });
-
-            const totalReviews = allReviews.length;
-            const ratingDistribution: { [rating: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-
-            let sum = 0;
-            for (const review of allReviews) {
-                sum += review.rating;
-                if (review.rating >= 1 && review.rating <= 5) {
-                    ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
-                }
-            }
-
-            const averageRating = totalReviews > 0 ? parseFloat((sum / totalReviews).toFixed(1)) : 0;
-
-            // Format reviews with helpfulness counts
-            const formattedReviews = reviews.map(review => {
-                const helpfulYesCount = review.helpfulnessVotes.filter(v => v.isHelpful).length;
-                const helpfulNoCount = review.helpfulnessVotes.filter(v => !v.isHelpful).length;
-
-                return {
-                    id: review.id,
-                    rating: review.rating,
-                    comment: review.comment,
-                    createdAt: review.createdAt,
-                    updatedAt: review.updatedAt,
-                    productId: review.product.id,
-                    productTitle: review.product.title,
-                    user: review.user,
-                    helpfulYesCount,
-                    helpfulNoCount
-                };
-            });
-
-            return {
-                reviews: formattedReviews,
-                averageRating,
-                totalReviews,
-                ratingDistribution,
-                totalPages: Math.ceil(totalReviews / limit),
-                currentPage: page
-            };
+            // Use getUserReviews instead (user reviews, not product reviews)
+            return await this.getUserReviews(sellerId, page, limit);
         } catch (error: any) {
             throw new Error(`Error fetching seller reviews: ${error.message}`);
         }
@@ -1017,6 +930,178 @@ export class ProductService {
             };
         } catch (error: any) {
             throw new Error(`Error getting helpfulness counts: ${error.message}`);
+        }
+    }
+
+    // Create or update a user/seller review (separate from product reviews)
+    async upsertUserReview(userId: string, reviewerId: string, rating: number, comment?: string): Promise<any> {
+        try {
+            if (!userId || !reviewerId) {
+                throw new Error('User ID and Reviewer ID are required');
+            }
+
+            const user = await prisma.user.findUnique({ where: { id: userId } });
+
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            const clampedRating = Math.min(5, Math.max(1, Math.round(rating)));
+
+            const review = await (prisma as any).userReview.upsert({
+                where: {
+                    userId_reviewerId: {
+                        userId,
+                        reviewerId
+                    }
+                },
+                update: {
+                    rating: clampedRating,
+                    comment
+                },
+                create: {
+                    userId,
+                    reviewerId,
+                    rating: clampedRating,
+                    comment
+                },
+                include: {
+                    reviewer: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    }
+                }
+            });
+
+            // Update user's average rating
+            await this.updateUserRating(userId);
+
+            return review;
+        } catch (error: any) {
+            throw new Error(`Error saving user review: ${error.message}`);
+        }
+    }
+
+    // Get user/seller reviews (separate from product reviews)
+    async getUserReviews(userId: string, page: number = 1, limit: number = 10): Promise<{
+        reviews: Array<{
+            id: string;
+            rating: number;
+            comment: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            reviewer: {
+                id: string;
+                firstName: string | null;
+                lastName: string | null;
+                profileImage: string | null;
+            };
+            helpfulYesCount: number;
+            helpfulNoCount: number;
+        }>;
+        averageRating: number;
+        totalReviews: number;
+        ratingDistribution: { [rating: number]: number };
+        totalPages: number;
+        currentPage: number;
+    }> {
+        try {
+            const skip = (page - 1) * limit;
+
+            const reviews = await (prisma as any).userReview.findMany({
+                where: { userId },
+                include: {
+                    reviewer: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true
+                        }
+                    },
+                    helpfulnessVotes: true
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit
+            });
+
+            const allReviews = await (prisma as any).userReview.findMany({
+                where: { userId },
+                select: { rating: true }
+            });
+
+            const totalReviews = allReviews.length;
+            const ratingDistribution: { [rating: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+            let sum = 0;
+            for (const review of allReviews) {
+                sum += review.rating;
+                if (review.rating >= 1 && review.rating <= 5) {
+                    ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
+                }
+            }
+
+            const averageRating = totalReviews > 0 ? parseFloat((sum / totalReviews).toFixed(1)) : 0;
+
+            const formattedReviews = reviews.map((review: any) => {
+                const helpfulYesCount = review.helpfulnessVotes.filter((v: any) => v.isHelpful).length;
+                const helpfulNoCount = review.helpfulnessVotes.filter((v: any) => !v.isHelpful).length;
+
+                return {
+                    id: review.id,
+                    rating: review.rating,
+                    comment: review.comment,
+                    createdAt: review.createdAt,
+                    updatedAt: review.updatedAt,
+                    reviewer: review.reviewer,
+                    helpfulYesCount,
+                    helpfulNoCount
+                };
+            });
+
+            return {
+                reviews: formattedReviews,
+                averageRating,
+                totalReviews,
+                ratingDistribution,
+                totalPages: Math.ceil(totalReviews / limit),
+                currentPage: page
+            };
+        } catch (error: any) {
+            throw new Error(`Error fetching user reviews: ${error.message}`);
+        }
+    }
+
+    // Update user's average rating based on user reviews
+    async updateUserRating(userId: string): Promise<void> {
+        try {
+            const reviews = await (prisma as any).userReview.findMany({
+                where: { userId },
+                select: { rating: true }
+            });
+
+            if (reviews.length === 0) {
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { rating: 0 }
+                });
+                return;
+            }
+
+            const sum = reviews.reduce((acc: number, review: any) => acc + review.rating, 0);
+            const averageRating = parseFloat((sum / reviews.length).toFixed(1));
+
+            await prisma.user.update({
+                where: { id: userId },
+                data: { rating: averageRating }
+            });
+        } catch (error: any) {
+            throw new Error(`Error updating user rating: ${error.message}`);
         }
     }
 }

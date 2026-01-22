@@ -1043,4 +1043,67 @@ export class ProductController {
       });
     }
   }
+
+  // Create or update a user/seller review (separate from product reviews)
+  async createUserReview(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { userId } = req.params;
+      const { rating, comment } = req.body;
+      const reviewerId = req.user?.id;
+
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'User ID is required'
+        });
+      }
+
+      if (!reviewerId) {
+        return res.status(401).json({
+          success: false,
+          message: 'User not authenticated'
+        });
+      }
+
+      if (userId === reviewerId) {
+        return res.status(400).json({
+          success: false,
+          message: 'You cannot review yourself'
+        });
+      }
+
+      const numericRating = typeof rating === 'string' ? parseFloat(rating) : rating;
+
+      if (!numericRating || Number.isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
+        return res.status(400).json({
+          success: false,
+          message: 'Valid rating between 1 and 5 is required'
+        });
+      }
+
+      const review = await productService.upsertUserReview(userId, reviewerId, numericRating, comment);
+      const summary = await productService.getUserReviews(userId, 1, 10);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Review saved successfully',
+        data: {
+          review,
+          summary
+        }
+      });
+    } catch (error: any) {
+      if (error.message === 'User not found') {
+        return res.status(404).json({
+          success: false,
+          message: error.message
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
 }
