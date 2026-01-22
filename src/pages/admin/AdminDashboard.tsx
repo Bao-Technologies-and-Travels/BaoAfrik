@@ -46,6 +46,8 @@ import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
 import sendIcon from '../../assets/images/admin/send.svg';
 import starIcon from '../../assets/images/admin/star.svg';
 import verityIcon from '../../assets/images/admin/verity.svg';
+import grayArrowIcon from '../../assets/images/pre/gray.svg';
+import blackArrowIcon from '../../assets/images/pre/black.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -2483,54 +2485,61 @@ const AdminDashboard: React.FC = () => {
                         <div style={{
                           backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '8px',
+                          padding: '1px 6px',
                           border: '1px solid #F1F1F1',
-                          position: 'relative'
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between'
                         }}>
-                          <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                            marginBottom: '6px'
-                          }}>
-                            <span style={{
-                              fontSize: '10px',
-                              color: '#B0B0B0',
-                              fontFamily: 'Bricolage Grotesque, sans-serif',
-                              margin: 0
+                          <div>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              marginBottom: '0px',
+                              marginTop: '2px'
                             }}>
-                              Posted listings
-                            </span>
-                            <img src={peopleIcon} alt="Listings" style={{ width: '24px', height: '24px' }} />
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <p style={{ 
-                              fontSize: '20px',
-                              fontWeight: 600,
-                              color: '#212121',
-                              margin: 0,
-                              fontFamily: 'Bricolage Grotesque, sans-serif'
-                            }}>
-                              248
-                            </p>
-                            <div style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: '4px',
-                              backgroundColor: '#EDFBF0',
-                              padding: '2px 6px',
-                              borderRadius: '12px'
-                            }}>
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                              <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                              <span style={{
+                                fontSize: '9px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                margin: 0
+                              }}>
+                                Posted listings
+                              </span>
+                              <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0px', marginTop: '1px' }}>
+                              <p style={{ 
+                                fontSize: '18px',
+                                fontWeight: 600,
+                                color: '#212121',
+                                margin: 0,
+                                fontFamily: 'Bricolage Grotesque, sans-serif'
+                              }}>
+                                248
+                              </p>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '2px',
+                                backgroundColor: '#EDFBF0',
+                                padding: '1px 3px',
+                                borderRadius: '8px'
+                              }}>
+                                <svg width="7" height="7" viewBox="0 0 24 24" fill="none">
+                                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                <span style={{ color: '#22C55E', fontSize: '7px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                              </div>
                             </div>
                           </div>
                           <p style={{ 
                             color: '#9C9C9C',
                             fontSize: '8px',
                             margin: 0,
+                            marginTop: '4px',
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             Last month: 94
@@ -2540,29 +2549,69 @@ const AdminDashboard: React.FC = () => {
                         <div style={{
                           backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '8px',
+                          padding: '1px 6px',
                           border: '1px solid #F1F1F1',
-                          position: 'relative'
+                          position: 'relative',
+                          overflow: 'hidden'
                         }}>
+                          {/* Fade effect on the right */}
+                          <div 
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              right: 0,
+                              bottom: 0,
+                              width: '40px',
+                              pointerEvents: 'none',
+                              zIndex: 1,
+                              background: 'linear-gradient(to left, #FFFFFF 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)'
+                            }}
+                          />
+                          {/* Navigation button */}
+                          <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            right: '4px',
+                            transform: 'translateY(-50%)',
+                            zIndex: 2
+                          }}>
+                            <button 
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                padding: 0
+                              }}
+                            >
+                              <img src={grayArrowIcon} alt="Next" style={{ width: '20px', height: '20px', transform: 'rotate(180deg)' }} />
+                            </button>
+                          </div>
                           <div style={{
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'flex-start',
-                            marginBottom: '6px'
+                            marginBottom: '0px',
+                            marginTop: '2px'
                           }}>
                             <span style={{
-                              fontSize: '10px',
+                              fontSize: '9px',
                               color: '#B0B0B0',
                               fontFamily: 'Bricolage Grotesque, sans-serif',
                               margin: 0
                             }}>
                               Active listings
                             </span>
-                            <img src={peopleIcon} alt="Listings" style={{ width: '24px', height: '24px' }} />
+                            <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
                           </div>
-                          <div style={{ marginBottom: '6px' }}>
+                          <div style={{ marginBottom: '0px', marginTop: '1px' }}>
                             <p style={{ 
-                              fontSize: '20px',
+                              fontSize: '18px',
                               fontWeight: 600,
                               color: '#212121',
                               margin: 0,
@@ -2572,7 +2621,7 @@ const AdminDashboard: React.FC = () => {
                             </p>
                           </div>
                           <span style={{
-                            fontSize: '11px',
+                            fontSize: '8px',
                             color: '#F9A825',
                             fontFamily: 'Poppins, sans-serif',
                             cursor: 'pointer'
