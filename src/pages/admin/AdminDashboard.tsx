@@ -49,6 +49,7 @@ import verityIcon from '../../assets/images/admin/verity.svg';
 import grayArrowIcon from '../../assets/images/pre/gray.svg';
 import blackArrowIcon from '../../assets/images/pre/black.svg';
 import redtrashIcon from '../../assets/images/pre/redtrash.svg';
+import warningIcon from '../../assets/images/admin/warning.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -178,6 +179,10 @@ const AdminDashboard: React.FC = () => {
   } | null>(null);
   const sidebarMoreMenuRef = useRef<HTMLDivElement | null>(null);
   const sidebarMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [userToSuspend, setUserToSuspend] = useState<string | null>(null);
+  const [isSuspendSuccess, setIsSuspendSuccess] = useState(false);
+  const [isUserSuspended, setIsUserSuspended] = useState(false);
+  const [suspendCountdown, setSuspendCountdown] = useState(10);
 
   // Mock data for search
   const mockUsers = [
@@ -428,6 +433,26 @@ const AdminDashboard: React.FC = () => {
       window.removeEventListener('resize', onResize);
     };
   }, [sidebarMoreMenu]);
+
+  // Countdown timer for suspend success modal
+  useEffect(() => {
+    if (isSuspendSuccess && userToSuspend) {
+      setSuspendCountdown(10);
+      const interval = setInterval(() => {
+        setSuspendCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setIsUserSuspended(true);
+            setUserToSuspend(null);
+            setIsSuspendSuccess(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isSuspendSuccess, userToSuspend]);
 
   // Countdown timer for delete success modal
   useEffect(() => {
@@ -2448,12 +2473,33 @@ const AdminDashboard: React.FC = () => {
                       <p style={{
                         fontSize: '11px',
                         color: '#B0B0B0',
-                        margin: '0 0 12px 0',
+                        margin: '0 0 4px 0',
                         fontFamily: 'Poppins, sans-serif',
                         textAlign: 'center'
                       }}>
                         Last login: today at 19:25
                       </p>
+
+                      {/* Account Suspended Badge */}
+                      {isUserSuspended && (
+                        <div style={{
+                          display: 'inline-block',
+                          padding: '0px 8px',
+                          backgroundColor: '#FEF6E9',
+                          border: '1px solid #FDE4BB',
+                          borderRadius: '8px',
+                          marginBottom: '12px'
+                        }}>
+                          <span style={{
+                            fontSize: '11px',
+                            color: '#F9A825',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 300
+                          }}>
+                            Account Suspended
+                          </span>
+                        </div>
+                      )}
 
                       {/* Three Action Buttons */}
                       <div style={{
@@ -2584,22 +2630,34 @@ const AdminDashboard: React.FC = () => {
                               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
                             </div>
 
-                            {/* Suspend the user */}
+                            {/* Suspend/Unsuspend the user */}
                             <div 
+                              onClick={() => {
+                                if (isUserSuspended) {
+                                  setIsUserSuspended(false);
+                                  setSidebarMoreMenu(null);
+                                } else {
+                                  const userName = `@${selectedUserForProfile.name.split(' ')[0]}`;
+                                  setUserToSuspend(userName);
+                                  setSidebarMoreMenu(null);
+                                }
+                              }}
                               onMouseEnter={primaryHoverOn} 
                               onMouseLeave={primaryHoverOff} 
                               style={baseItemStyle}
                             >
                               <img
                                 src={suspendIcon}
-                                alt="Suspend"
+                                alt={isUserSuspended ? "Unsuspend" : "Suspend"}
                                 style={{
                                   width: '16px',
                                   height: '16px',
                                   filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
                                 }}
                               />
-                              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Suspend the user</span>
+                              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                                {isUserSuspended ? 'Unsuspend the user' : 'Suspend the user'}
+                              </span>
                             </div>
 
                             {/* Delete user account */}
@@ -2647,6 +2705,269 @@ const AdminDashboard: React.FC = () => {
                           document.body
                         );
                       })()}
+
+                    {/* Suspend Confirmation Modal */}
+                    {userToSuspend && !isSuspendSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setUserToSuspend(null);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setUserToSuspend(null)}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={warningIcon}
+                              alt="Warning"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account will be suspended. Do you wish to continue?
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setUserToSuspend(null)}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsSuspendSuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#212121',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Yes, Deactivate
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Suspend Success Modal */}
+                    {userToSuspend && isSuspendSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setIsUserSuspended(true);
+                            setUserToSuspend(null);
+                            setIsSuspendSuccess(false);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsUserSuspended(true);
+                              setUserToSuspend(null);
+                              setIsSuspendSuccess(false);
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account has been<br />
+                              successfully suspended.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsUserSuspended(false);
+                                setUserToSuspend(null);
+                                setIsSuspendSuccess(false);
+                                setSuspendCountdown(10);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsUserSuspended(true);
+                                setUserToSuspend(null);
+                                setIsSuspendSuccess(false);
+                              }}
+                              style={{
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Close · {suspendCountdown}s
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     </div>
 
                     {/* Tabs */}
