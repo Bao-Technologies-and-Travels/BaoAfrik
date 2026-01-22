@@ -2153,7 +2153,7 @@ const AdminDashboard: React.FC = () => {
                                 margin: 0
                               }}
                             >
-                              The activity "{activityToDelete}" will be<br />
+                              The activity " <span style={{ color: '#B0B0B0' }}>{activityToDelete}</span> " will be<br />
                               permanently deleted, do you<br />
                               wish to continue ?
                             </p>
@@ -2267,21 +2267,11 @@ const AdminDashboard: React.FC = () => {
 
                           {/* Icon */}
                           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
-                            <div style={{
-                              width: '80px',
-                              height: '80px',
-                              borderRadius: '50%',
-                              backgroundColor: '#E8F5E9',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}>
-                              <img
-                                src={verityIcon}
-                                alt="Success"
-                                style={{ width: '50px', height: '50px' }}
-                              />
-                            </div>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
                           </div>
 
                           {/* Text */}
@@ -2295,7 +2285,7 @@ const AdminDashboard: React.FC = () => {
                                 margin: 0
                               }}
                             >
-                              The activity "{activityToDelete}" has been successfully deleted.
+                              The activity " <span style={{ color: '#B0B0B0' }}>{activityToDelete}</span> " has been successfully deleted.
                             </p>
                           </div>
 
