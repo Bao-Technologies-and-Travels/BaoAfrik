@@ -44,6 +44,7 @@ import suspendIcon from '../../assets/images/admin/suspend.svg';
 import notifIcon from '../../assets/images/admin/notif.svg';
 import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
 import sendIcon from '../../assets/images/admin/send.svg';
+import starIcon from '../../assets/images/admin/star.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -156,6 +157,7 @@ const AdminDashboard: React.FC = () => {
   // User profile detail view state
   const [viewingUserProfile, setViewingUserProfile] = useState(false);
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<any>(null);
+  const [isAccountInfoOpen, setIsAccountInfoOpen] = useState(true);
 
   // Mock data for search
   const mockUsers = [
@@ -2106,14 +2108,17 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     {/* Account Information */}
-                    <div style={{ marginBottom: '16px' }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        marginBottom: '12px',
-                        cursor: 'pointer'
-                      }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsAccountInfoOpen(!isAccountInfoOpen)}
+                      >
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
@@ -2121,10 +2126,11 @@ const AdminDashboard: React.FC = () => {
                         }}>
                           Account Information
                         </span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isAccountInfoOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                           <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                       </div>
+                      {isAccountInfoOpen && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -2269,14 +2275,7 @@ const AdminDashboard: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      {/* Divider below Account Information */}
-                      <div style={{
-                        height: '1px',
-                        backgroundColor: '#F1F1F1',
-                        marginTop: '16px',
-                        marginLeft: '-14px',
-                        marginRight: '-14px'
-                      }} />
+                      )}
                     </div>
 
                     {/* Status Section */}
@@ -2306,52 +2305,57 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         {/* Profile Completed Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '10px',
                           border: '1px solid #F1F1F1'
                         }}>
                           <div style={{
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
+                            alignItems: 'flex-start',
+                            gap: '8px',
                             marginBottom: '8px'
                           }}>
                             <img
                               src={verifyIcon}
                               alt="Verified"
-                              style={{ width: '14px', height: '14px' }}
+                              style={{ width: '14px', height: '14px', marginTop: '2px' }}
                             />
                             <span style={{
                               fontSize: '11px',
-                              color: '#212121',
-                              fontFamily: 'Poppins, sans-serif',
-                              fontWeight: 500
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif'
                             }}>
                               Profile completed
                             </span>
                           </div>
                           <div style={{
-                            height: '4px',
-                            backgroundColor: '#E4E4E4',
-                            borderRadius: '2px',
-                            overflow: 'hidden',
-                            marginBottom: '4px'
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
                           }}>
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              20%
+                            </span>
                             <div style={{
-                              width: '20%',
-                              height: '100%',
-                              backgroundColor: '#45C55B',
-                              borderRadius: '2px'
-                            }} />
+                              flex: 1,
+                              height: '4px',
+                              backgroundColor: '#E4E4E4',
+                              borderRadius: '2px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                width: '20%',
+                                height: '100%',
+                                backgroundColor: '#45C55B',
+                                borderRadius: '2px'
+                              }} />
+                            </div>
                           </div>
-                          <span style={{
-                            fontSize: '10px',
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            20%
-                          </span>
                         </div>
                         {/* User Plan Card */}
                         <div style={{
@@ -2368,12 +2372,11 @@ const AdminDashboard: React.FC = () => {
                             marginBottom: '8px'
                           }}>
                             <img
-                              src={profileIcon}
+                              src={starIcon}
                               alt="Plan"
                               style={{
                                 width: '14px',
-                                height: '14px',
-                                filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                                height: '14px'
                               }}
                             />
                             <span style={{
@@ -2382,7 +2385,7 @@ const AdminDashboard: React.FC = () => {
                               fontFamily: 'Poppins, sans-serif',
                               fontWeight: 500
                             }}>
-                              User plan - Free
+                              User plan · Free
                             </span>
                             <div style={{
                               position: 'absolute',
@@ -2408,6 +2411,14 @@ const AdminDashboard: React.FC = () => {
                           </p>
                         </div>
                       </div>
+                      {/* Divider below Status */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '16px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
+                      }} />
                     </div>
 
                     {/* User Metrics Section */}
