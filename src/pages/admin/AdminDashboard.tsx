@@ -1000,7 +1000,7 @@ const AdminDashboard: React.FC = () => {
                             onSelect={handleCategorySelect}
                           />
                         ))}
-                      </div>
+            </div>
                     </div>
                   )}
 
@@ -2084,9 +2084,13 @@ const AdminDashboard: React.FC = () => {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      gap: '6px',
                       padding: '8px 0',
                       marginBottom: '8px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
                       borderBottom: '1px solid #F1F1F1'
                     }}>
                       <span style={{
@@ -2096,7 +2100,7 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         See user bio
                       </span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
                     </div>
@@ -2106,28 +2110,20 @@ const AdminDashboard: React.FC = () => {
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
+                        gap: '6px',
                         marginBottom: '12px',
                         cursor: 'pointer'
                       }}>
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontWeight: 500
+                          fontFamily: 'Poppins, sans-serif'
                         }}>
                           Account Information
                         </span>
-                        <img
-                          src={arrowDownIcon}
-                          alt="Expand"
-                          style={{
-                            width: '12px',
-                            height: '12px',
-                            transform: 'rotate(180deg)',
-                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                          }}
-                        />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                       </div>
                       <div style={{
                         display: 'grid',
@@ -2213,7 +2209,7 @@ const AdminDashboard: React.FC = () => {
                               marginBottom: '4px'
                             }}>
                               <img
-                                src={appNotificationIcon}
+                                src={sendIcon}
                                 alt="Mail"
                                 style={{
                                   width: '14px',
@@ -2277,7 +2273,9 @@ const AdminDashboard: React.FC = () => {
                       <div style={{
                         height: '1px',
                         backgroundColor: '#F1F1F1',
-                        marginTop: '16px'
+                        marginTop: '16px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
                       }} />
                     </div>
 
@@ -2286,28 +2284,20 @@ const AdminDashboard: React.FC = () => {
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
+                        gap: '6px',
                         marginBottom: '12px',
                         cursor: 'pointer'
                       }}>
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontWeight: 500
+                          fontFamily: 'Poppins, sans-serif'
                         }}>
                           Status
                         </span>
-                        <img
-                          src={arrowDownIcon}
-                          alt="Expand"
-                          style={{
-                            width: '12px',
-                            height: '12px',
-                            transform: 'rotate(180deg)',
-                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                          }}
-                        />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                       </div>
                       <div style={{
                         display: 'grid',
@@ -2425,28 +2415,20 @@ const AdminDashboard: React.FC = () => {
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
+                        gap: '6px',
                         marginBottom: '12px',
                         cursor: 'pointer'
                       }}>
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontWeight: 500
+                          fontFamily: 'Poppins, sans-serif'
                         }}>
                           User Metrics
                         </span>
-                        <img
-                          src={arrowDownIcon}
-                          alt="Expand"
-                          style={{
-                            width: '12px',
-                            height: '12px',
-                            transform: 'rotate(180deg)',
-                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                          }}
-                        />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                       </div>
                       <div style={{
                         display: 'grid',
