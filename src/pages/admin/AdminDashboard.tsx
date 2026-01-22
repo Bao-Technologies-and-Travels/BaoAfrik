@@ -2322,13 +2322,13 @@ const AdminDashboard: React.FC = () => {
                         <div style={{
                           backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '10px',
+                          padding: '8px',
                           border: '1px solid #F1F1F1'
                         }}>
                           <img
                             src={verityIcon}
                             alt="Verified"
-                            style={{ width: '14px', height: '14px', marginBottom: '6px' }}
+                            style={{ width: '16px', height: '16px', marginBottom: '6px' }}
                           />
                           <div style={{
                             fontSize: '10px',
@@ -2370,7 +2370,7 @@ const AdminDashboard: React.FC = () => {
                         <div style={{
                           backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '10px',
+                          padding: '8px',
                           border: '1px solid #F1F1F1',
                           position: 'relative'
                         }}>
@@ -2384,19 +2384,22 @@ const AdminDashboard: React.FC = () => {
                               src={starIcon}
                               alt="Plan"
                               style={{
-                                width: '14px',
-                                height: '14px'
+                                width: '16px',
+                                height: '16px'
                               }}
                             />
                             <div style={{
-                              width: '20px',
-                              height: '20px',
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              width: '14px',
+                              height: '14px',
+                              cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer'
+                              justifyContent: 'center'
                             }}>
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                                 <circle cx="4" cy="8" r="1.5" fill="#212121"/>
                                 <circle cx="8" cy="8" r="1.5" fill="#212121"/>
                                 <circle cx="12" cy="8" r="1.5" fill="#212121"/>
