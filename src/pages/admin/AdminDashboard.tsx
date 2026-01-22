@@ -163,6 +163,11 @@ const AdminDashboard: React.FC = () => {
   const [isAccountInfoOpen, setIsAccountInfoOpen] = useState(true);
   const [isStatusOpen, setIsStatusOpen] = useState(true);
   const [isUserMetricsOpen, setIsUserMetricsOpen] = useState(true);
+  const [activityCardMoreMenu, setActivityCardMoreMenu] = useState<{
+    anchorRect: DOMRect;
+  } | null>(null);
+  const activityCardMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const activityCardMoreMenuButtonRef = useRef<HTMLDivElement | null>(null);
 
   // Mock data for search
   const mockUsers = [
@@ -352,6 +357,12 @@ const AdminDashboard: React.FC = () => {
       if (!moreOptionsDropdown && !moreOptionsButton && moreMenu !== null) {
         setMoreMenu(null);
       }
+      // Don't close activity card more menu if clicking on the button or dropdown itself
+      const activityCardMoreOptionsDropdown = target.closest('.activity-card-more-options-dropdown');
+      const activityCardMoreOptionsButton = target.closest('.activity-card-more-options-button');
+      if (!activityCardMoreOptionsDropdown && !activityCardMoreOptionsButton && activityCardMoreMenu !== null) {
+        setActivityCardMoreMenu(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -359,6 +370,30 @@ const AdminDashboard: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue]);
+
+  // Close activity card more menu on outside click / scroll / resize (portal-safe)
+  useEffect(() => {
+    if (!activityCardMoreMenu) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const clickedMenu = !!activityCardMoreMenuRef.current?.contains(target);
+      const clickedButton = !!activityCardMoreMenuButtonRef.current?.contains(target);
+      if (!clickedMenu && !clickedButton) {
+        setActivityCardMoreMenu(null);
+      }
+    };
+    const onScroll = () => setActivityCardMoreMenu(null);
+    const onResize = () => setActivityCardMoreMenu(null);
+    document.addEventListener('mousedown', onMouseDown, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, true);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [activityCardMoreMenu]);
 
   // Close more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -1856,18 +1891,26 @@ const AdminDashboard: React.FC = () => {
                           }}>
                             Account created
                           </span>
-                          <div style={{
-                            width: '24px',
-                            height: '24px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer'
-                          }}>
+                          <div 
+                            ref={activityCardMoreMenuButtonRef}
+                            className="activity-card-more-options-button"
+                            onClick={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setActivityCardMoreMenu({ anchorRect: rect });
+                            }}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <circle cx="4" cy="8" r="1.5" fill="#4D4D4D"/>
-                              <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
-                              <circle cx="12" cy="8" r="1.5" fill="#4D4D4D"/>
+                              <circle cx="4" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                              <circle cx="8" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                              <circle cx="12" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
                             </svg>
                           </div>
                         </div>
@@ -1921,10 +1964,88 @@ const AdminDashboard: React.FC = () => {
                             19 min ago
                           </span>
                         </div>
+                        </div>
                       </div>
                     </div>
                     </div>
-                  </div>
+
+                    {/* Activity Card More Options Dropdown */}
+                    {activityCardMoreMenu && (() => {
+                      const menuWidth = 200;
+                      const margin = 8;
+                      const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, activityCardMoreMenu.anchorRect.right - menuWidth));
+                      const top = activityCardMoreMenu.anchorRect.bottom + 8;
+
+                      return createPortal(
+                        <div
+                          ref={activityCardMoreMenuRef}
+                          className="activity-card-more-options-dropdown"
+                          style={{
+                            position: 'fixed',
+                            top,
+                            left,
+                            width: `${menuWidth}px`,
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '8px',
+                            zIndex: 99999
+                          }}
+                        >
+                          {/* Delete the activity */}
+                          <div
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.cursor = 'pointer';
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              cursor: `url(${mouseCursorIcon}), auto`,
+                              transition: 'background-color 0.2s'
+                            }}
+                          >
+                            <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                            <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
+                          </div>
+
+                          {/* Close */}
+                          <div
+                            onClick={() => setActivityCardMoreMenu(null)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.cursor = 'pointer';
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: '#FAFAFA',
+                              cursor: `url(${mouseCursorIcon}), auto`,
+                              transition: 'background-color 0.2s',
+                              marginTop: '4px'
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                          </div>
+                        </div>,
+                        document.body
+                      );
+                    })()}
 
                   {/* Right: User Details Sidebar (aligned with title) */}
                   <div
