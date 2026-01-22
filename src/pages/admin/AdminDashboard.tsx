@@ -48,6 +48,7 @@ import starIcon from '../../assets/images/admin/star.svg';
 import verityIcon from '../../assets/images/admin/verity.svg';
 import grayArrowIcon from '../../assets/images/pre/gray.svg';
 import blackArrowIcon from '../../assets/images/pre/black.svg';
+import redtrashIcon from '../../assets/images/pre/redtrash.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -168,6 +169,10 @@ const AdminDashboard: React.FC = () => {
   } | null>(null);
   const activityCardMoreMenuRef = useRef<HTMLDivElement | null>(null);
   const activityCardMoreMenuButtonRef = useRef<HTMLDivElement | null>(null);
+  const [activityToDelete, setActivityToDelete] = useState<string | null>(null);
+  const [isDeleteActivitySuccess, setIsDeleteActivitySuccess] = useState(false);
+  const [isActivityDeleted, setIsActivityDeleted] = useState(false);
+  const [deleteCountdown, setDeleteCountdown] = useState(5);
 
   // Mock data for search
   const mockUsers = [
@@ -394,6 +399,26 @@ const AdminDashboard: React.FC = () => {
       window.removeEventListener('resize', onResize);
     };
   }, [activityCardMoreMenu]);
+
+  // Countdown timer for delete success modal
+  useEffect(() => {
+    if (isDeleteActivitySuccess && activityToDelete) {
+      setDeleteCountdown(5);
+      const interval = setInterval(() => {
+        setDeleteCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setIsActivityDeleted(true);
+            setActivityToDelete(null);
+            setIsDeleteActivitySuccess(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isDeleteActivitySuccess, activityToDelete]);
 
   // Close more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -1721,6 +1746,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     {/* Activity Card */}
+                    {!isActivityDeleted && (
                     <div
                       style={{
                         backgroundColor: '#FFFFFF',
@@ -1967,10 +1993,10 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    </div>
+                    )}
 
                     {/* Activity Card More Options Dropdown */}
-                    {activityCardMoreMenu && (() => {
+                    {!isActivityDeleted && activityCardMoreMenu && (() => {
                       const menuWidth = 200;
                       const margin = 8;
                       const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, activityCardMoreMenu.anchorRect.right - menuWidth));
@@ -1995,6 +2021,11 @@ const AdminDashboard: React.FC = () => {
                         >
                           {/* Delete the activity */}
                           <div
+                            onClick={() => {
+                              const activityText = `${selectedUserForProfile.name.split(' ')[0]} joined Bao'Afrik`;
+                              setActivityToDelete(activityText);
+                              setActivityCardMoreMenu(null);
+                            }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
                             }}
@@ -2046,6 +2077,282 @@ const AdminDashboard: React.FC = () => {
                         document.body
                       );
                     })()}
+
+                    {/* Delete Confirmation Modal */}
+                    {activityToDelete && !isDeleteActivitySuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setActivityToDelete(null);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '320px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setActivityToDelete(null)}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={redtrashIcon}
+                              alt="Delete"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              The activity "{activityToDelete}" will be<br />
+                              permanently deleted, do you<br />
+                              wish to continue ?
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setActivityToDelete(null)}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsDeleteActivitySuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#FF5151',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                              <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Yes, Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Delete Success Modal */}
+                    {activityToDelete && isDeleteActivitySuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setIsActivityDeleted(true);
+                            setActivityToDelete(null);
+                            setIsDeleteActivitySuccess(false);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '320px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsActivityDeleted(true);
+                              setActivityToDelete(null);
+                              setIsDeleteActivitySuccess(false);
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <div style={{
+                              width: '80px',
+                              height: '80px',
+                              borderRadius: '50%',
+                              backgroundColor: '#E8F5E9',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}>
+                              <img
+                                src={verityIcon}
+                                alt="Success"
+                                style={{ width: '50px', height: '50px' }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              The activity "{activityToDelete}" has been successfully deleted.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsActivityDeleted(false);
+                                setActivityToDelete(null);
+                                setIsDeleteActivitySuccess(false);
+                                setDeleteCountdown(5);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsActivityDeleted(true);
+                                setActivityToDelete(null);
+                                setIsDeleteActivitySuccess(false);
+                              }}
+                              style={{
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Close - {deleteCountdown}s
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Right: User Details Sidebar (aligned with title) */}
                   <div
