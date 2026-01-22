@@ -43,6 +43,7 @@ import statusIcon from '../../assets/images/pre/status.svg';
 import suspendIcon from '../../assets/images/admin/suspend.svg';
 import notifIcon from '../../assets/images/admin/notif.svg';
 import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
+import sendIcon from '../../assets/images/admin/send.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -1934,14 +1935,17 @@ const AdminDashboard: React.FC = () => {
                         backgroundColor: '#FAFAFA',
                         borderRadius: '14px',
                         padding: '14px',
-                        marginBottom: '14px'
+                        marginBottom: '14px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
                       }}
                     >
                       {/* Profile with Dot */}
                       <div style={{ position: 'relative', display: 'inline-block', marginBottom: '12px' }}>
                         <div style={{
-                          width: '58px',
-                          height: '58px',
+                          width: '50px',
+                          height: '50px',
                           borderRadius: '50%',
                           backgroundColor: '#D5E9BD',
                           border: '2px solid #FFFFFF',
@@ -1954,8 +1958,8 @@ const AdminDashboard: React.FC = () => {
                             src={selectedUserForProfile.avatar}
                             alt={selectedUserForProfile.name}
                             style={{
-                            width: '54px',
-                            height: '54px',
+                            width: '46px',
+                            height: '46px',
                               borderRadius: '50%',
                               objectFit: 'cover'
                             }}
@@ -1980,7 +1984,8 @@ const AdminDashboard: React.FC = () => {
                         fontWeight: 600,
                         color: '#212121',
                         margin: '0 0 4px 0',
-                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        textAlign: 'center'
                       }}>
                         {selectedUserForProfile.name}
                       </h3>
@@ -1990,7 +1995,8 @@ const AdminDashboard: React.FC = () => {
                         fontSize: '11px',
                         color: '#B0B0B0',
                         margin: '0 0 12px 0',
-                        fontFamily: 'Poppins, sans-serif'
+                        fontFamily: 'Poppins, sans-serif',
+                        textAlign: 'center'
                       }}>
                         Last login: today at 19:25
                       </p>
@@ -2003,7 +2009,7 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         {[
                           { icon: chatsIcon, alt: 'Chat' },
-                          { icon: exportIcon, alt: 'Download' },
+                          { icon: sendIcon, alt: 'Send' },
                           { icon: 'ellipsis', alt: 'More' }
                         ].map((action, idx) => (
                           <button
@@ -2023,9 +2029,9 @@ const AdminDashboard: React.FC = () => {
                           >
                             {action.icon === 'ellipsis' ? (
                               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <circle cx="8" cy="4" r="1.5" fill="#212121"/>
+                                <circle cx="4" cy="8" r="1.5" fill="#212121"/>
                                 <circle cx="8" cy="8" r="1.5" fill="#212121"/>
-                                <circle cx="8" cy="12" r="1.5" fill="#212121"/>
+                                <circle cx="12" cy="8" r="1.5" fill="#212121"/>
                               </svg>
                             ) : (
                               <img
