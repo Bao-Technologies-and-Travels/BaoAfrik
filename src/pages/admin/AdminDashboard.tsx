@@ -2440,22 +2440,38 @@ const AdminDashboard: React.FC = () => {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '6px',
-                          marginBottom: '12px',
-                          cursor: 'pointer'
+                          justifyContent: 'space-between',
+                          marginBottom: '12px'
                         }}
-                        onClick={() => setIsUserMetricsOpen(!isUserMetricsOpen)}
                       >
+                        <div 
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setIsUserMetricsOpen(!isUserMetricsOpen)}
+                        >
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#6A6A6A',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            User Metrics
+                          </span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isUserMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
                         <span style={{
-                          fontSize: '12px',
-                          color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif'
+                          fontSize: '11px',
+                          color: '#64B5F6',
+                          fontFamily: 'Poppins, sans-serif',
+                          cursor: 'pointer'
                         }}>
-                          User Metrics
+                          See all user metrics
                         </span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isUserMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
                       </div>
                       {isUserMetricsOpen && (
                       <div style={{
@@ -2465,91 +2481,104 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         {/* Posted Listings Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '8px',
                           border: '1px solid #F1F1F1',
                           position: 'relative'
                         }}>
                           <div style={{
-                            position: 'absolute',
-                            top: '8px',
-                            right: '8px',
-                            width: '16px',
-                            height: '16px'
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            marginBottom: '6px'
                           }}>
-                            <img
-                              src={listingboxIcon}
-                              alt="Listings"
-                              style={{
-                                width: '16px',
-                                height: '16px',
-                                filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
-                              }}
-                            />
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              margin: 0
+                            }}>
+                              Posted listings
+                            </span>
+                            <img src={peopleIcon} alt="Listings" style={{ width: '24px', height: '24px' }} />
                           </div>
-                          <div style={{
-                            fontSize: '20px',
-                            fontWeight: 600,
-                            color: '#212121',
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            marginBottom: '4px'
-                          }}>
-                            248
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <p style={{ 
+                              fontSize: '20px',
+                              fontWeight: 600,
+                              color: '#212121',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif'
+                            }}>
+                              248
+                            </p>
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '4px',
+                              backgroundColor: '#EDFBF0',
+                              padding: '2px 6px',
+                              borderRadius: '12px'
+                            }}>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                              <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                            </div>
                           </div>
-                          <div style={{
-                            fontSize: '11px',
-                            color: '#45C55B',
-                            fontFamily: 'Poppins, sans-serif',
-                            marginBottom: '4px'
-                          }}>
-                            +17.89%
-                          </div>
-                          <div style={{
-                            fontSize: '10px',
-                            color: '#939393',
+                          <p style={{ 
+                            color: '#9C9C9C',
+                            fontSize: '8px',
+                            margin: 0,
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             Last month: 94
-                          </div>
+                          </p>
                         </div>
                         {/* Active Listings Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '8px',
                           border: '1px solid #F1F1F1',
                           position: 'relative'
                         }}>
                           <div style={{
-                            position: 'absolute',
-                            top: '8px',
-                            right: '8px',
-                            width: '16px',
-                            height: '16px'
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            marginBottom: '6px'
                           }}>
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M4 8L6 10L12 4" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              margin: 0
+                            }}>
+                              Active listings
+                            </span>
+                            <img src={peopleIcon} alt="Listings" style={{ width: '24px', height: '24px' }} />
                           </div>
-                          <div style={{
-                            fontSize: '20px',
-                            fontWeight: 600,
-                            color: '#212121',
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            marginBottom: '4px'
-                          }}>
-                            217
+                          <div style={{ marginBottom: '6px' }}>
+                            <p style={{ 
+                              fontSize: '20px',
+                              fontWeight: 600,
+                              color: '#212121',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif'
+                            }}>
+                              217
+                            </p>
                           </div>
-                          <div style={{
+                          <span style={{
                             fontSize: '11px',
-                            color: '#64B5F6',
+                            color: '#F9A825',
                             fontFamily: 'Poppins, sans-serif',
-                            cursor: 'pointer',
-                            textDecoration: 'none'
+                            cursor: 'pointer'
                           }}>
                             31 inactive listings &gt;
-                          </div>
+                          </span>
                         </div>
                       </div>
                       )}
