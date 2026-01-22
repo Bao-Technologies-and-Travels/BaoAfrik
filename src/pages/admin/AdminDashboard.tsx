@@ -2394,15 +2394,13 @@ const AdminDashboard: React.FC = () => {
                               right: '8px',
                               width: '14px',
                               height: '14px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
+                              cursor: 'pointer'
                             }}>
-                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                <circle cx="4" cy="8" r="1.5" fill="#212121"/>
-                                <circle cx="8" cy="8" r="1.5" fill="#212121"/>
-                                <circle cx="12" cy="8" r="1.5" fill="#212121"/>
+                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <circle cx="7" cy="7" r="6" stroke="#B0B0B0" strokeWidth="1"/>
+                                <circle cx="4" cy="7" r="1" fill="#212121"/>
+                                <circle cx="7" cy="7" r="1" fill="#212121"/>
+                                <circle cx="10" cy="7" r="1" fill="#212121"/>
                               </svg>
                             </div>
                           </div>
