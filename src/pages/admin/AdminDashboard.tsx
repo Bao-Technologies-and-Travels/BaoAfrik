@@ -2054,6 +2054,10 @@ const AdminDashboard: React.FC = () => {
                       display: 'flex',
                       gap: '16px',
                       marginBottom: '16px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
                       borderBottom: '1px solid #F1F1F1'
                     }}>
                       {['About user', 'Reviews and rates', 'Reported issues ab...'].map((tab, idx) => (
@@ -2092,16 +2096,9 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         See user bio
                       </span>
-                      <img
-                        src={arrowDownIcon}
-                        alt="Expand"
-                        style={{
-                          width: '12px',
-                          height: '12px',
-                          transform: 'rotate(0deg)',
-                          filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                        }}
-                      />
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
                     </div>
 
                     {/* Account Information */}
@@ -2164,9 +2161,10 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               06 Dec, 2025
                             </span>
@@ -2196,9 +2194,10 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               France
                             </span>
@@ -2231,9 +2230,10 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               {selectedUserForProfile.email}
                             </span>
@@ -2263,15 +2263,22 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               From France
                             </span>
                           </div>
                         </div>
                       </div>
+                      {/* Divider below Account Information */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '16px'
+                      }} />
                     </div>
 
                     {/* Status Section */}
