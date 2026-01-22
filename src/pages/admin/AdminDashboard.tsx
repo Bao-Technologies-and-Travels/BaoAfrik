@@ -45,6 +45,7 @@ import notifIcon from '../../assets/images/admin/notif.svg';
 import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
 import sendIcon from '../../assets/images/admin/send.svg';
 import starIcon from '../../assets/images/admin/star.svg';
+import verityIcon from '../../assets/images/admin/verity.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -158,6 +159,8 @@ const AdminDashboard: React.FC = () => {
   const [viewingUserProfile, setViewingUserProfile] = useState(false);
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<any>(null);
   const [isAccountInfoOpen, setIsAccountInfoOpen] = useState(true);
+  const [isStatusOpen, setIsStatusOpen] = useState(true);
+  const [isUserMetricsOpen, setIsUserMetricsOpen] = useState(true);
 
   // Mock data for search
   const mockUsers = [
@@ -2276,17 +2279,28 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
                       )}
+                      {/* Divider below Account Information */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '12px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
+                      }} />
                     </div>
 
                     {/* Status Section */}
                     <div style={{ marginBottom: '16px' }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        marginBottom: '12px',
-                        cursor: 'pointer'
-                      }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsStatusOpen(!isStatusOpen)}
+                      >
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
@@ -2294,10 +2308,11 @@ const AdminDashboard: React.FC = () => {
                         }}>
                           Status
                         </span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isStatusOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                           <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                       </div>
+                      {isStatusOpen && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -2310,24 +2325,18 @@ const AdminDashboard: React.FC = () => {
                           padding: '10px',
                           border: '1px solid #F1F1F1'
                         }}>
+                          <img
+                            src={verityIcon}
+                            alt="Verified"
+                            style={{ width: '14px', height: '14px', marginBottom: '6px' }}
+                          />
                           <div style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: '8px',
+                            fontSize: '10px',
+                            color: '#B0B0B0',
+                            fontFamily: 'Poppins, sans-serif',
                             marginBottom: '8px'
                           }}>
-                            <img
-                              src={verifyIcon}
-                              alt="Verified"
-                              style={{ width: '14px', height: '14px', marginTop: '2px' }}
-                            />
-                            <span style={{
-                              fontSize: '11px',
-                              color: '#B0B0B0',
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              Profile completed
-                            </span>
+                            Profile completed
                           </div>
                           <div style={{
                             display: 'flex',
@@ -2359,17 +2368,17 @@ const AdminDashboard: React.FC = () => {
                         </div>
                         {/* User Plan Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '10px',
                           border: '1px solid #F1F1F1',
                           position: 'relative'
                         }}>
                           <div style={{
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            marginBottom: '8px'
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            marginBottom: '6px'
                           }}>
                             <img
                               src={starIcon}
@@ -2379,31 +2388,33 @@ const AdminDashboard: React.FC = () => {
                                 height: '14px'
                               }}
                             />
-                            <span style={{
-                              fontSize: '11px',
-                              color: '#212121',
-                              fontFamily: 'Poppins, sans-serif',
-                              fontWeight: 500
-                            }}>
-                              User plan · Free
-                            </span>
                             <div style={{
-                              position: 'absolute',
-                              top: '8px',
-                              right: '8px',
-                              width: '14px',
-                              height: '14px',
+                              width: '20px',
+                              height: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                               cursor: 'pointer'
                             }}>
-                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                <circle cx="7" cy="7" r="6" stroke="#B0B0B0" strokeWidth="1"/>
-                                <text x="7" y="9.5" textAnchor="middle" fontSize="8" fill="#B0B0B0">i</text>
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="4" cy="8" r="1.5" fill="#212121"/>
+                                <circle cx="8" cy="8" r="1.5" fill="#212121"/>
+                                <circle cx="12" cy="8" r="1.5" fill="#212121"/>
                               </svg>
                             </div>
                           </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#212121',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 500,
+                            marginBottom: '6px'
+                          }}>
+                            User plan · Free
+                          </div>
                           <p style={{
                             fontSize: '10px',
-                            color: '#939393',
+                            color: '#B0B0B0',
                             margin: 0,
                             fontFamily: 'Poppins, sans-serif'
                           }}>
@@ -2411,6 +2422,7 @@ const AdminDashboard: React.FC = () => {
                           </p>
                         </div>
                       </div>
+                      )}
                       {/* Divider below Status */}
                       <div style={{
                         height: '1px',
@@ -2423,13 +2435,16 @@ const AdminDashboard: React.FC = () => {
 
                     {/* User Metrics Section */}
                     <div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        marginBottom: '12px',
-                        cursor: 'pointer'
-                      }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsUserMetricsOpen(!isUserMetricsOpen)}
+                      >
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
@@ -2437,10 +2452,11 @@ const AdminDashboard: React.FC = () => {
                         }}>
                           User Metrics
                         </span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(180deg)' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isUserMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                           <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                       </div>
+                      {isUserMetricsOpen && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -2535,6 +2551,7 @@ const AdminDashboard: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                      )}
                     </div>
                   </div>
                 </div>
