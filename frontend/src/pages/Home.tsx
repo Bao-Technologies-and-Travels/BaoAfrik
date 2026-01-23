@@ -294,7 +294,6 @@ const Home: React.FC = () => {
   };
   const categoryDropdownRef = React.useRef<HTMLDivElement>(null);
   const productOriginDropdownRef = React.useRef<HTMLDivElement>(null);
-  const [selectedCard, setSelectedCard] = useState<{ title: string; country: string; flag: string; location: string; description: string } | null>(null);
 
   const ukCities = [
     'London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool',
@@ -591,46 +590,46 @@ const Home: React.FC = () => {
 
     return apiProducts.map((product: any, index: number) => {
       try {
-        const productId = product.id;
-        const productName = product.title || 'Unknown Product';
+        const productId = product.id || `product-${index}`;
+        const productName = product.title || product.name || 'Unknown Product';
         const productPrice = product.price || '0';
         const productCurrency = product.currency || 'GBP';
         const productCategory = product.category || 'Other';
-        const productLocation = product.location || 'Unknown Location';
-        const isVerified = product.seller?.isVerifiedSeller || false;
+        const productLocation = product.location || product.seller?.location || 'Unknown Location';
         const productOrigin = product.origin || product.placeOfOrigin || '';
+        const isVerified = product.seller?.isVerifiedSeller || false;
 
         let productImage;
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-          productImage = product.images[0]?.url;
+          productImage = product.images[0]?.url || product.images[0];
         }
 
         if (!productImage) {
           productImage = getDefaultProductImage(productCategory);
         }
 
-        const transformedProduct: FrontendProduct = {
+        return {
           id: productId,
           name: productName,
           price: productPrice.toString(),
           currency: productCurrency,
           image: productImage,
           location: productLocation,
+          origin: productOrigin,
           verified: isVerified,
-          category: productCategory,
-          origin: productOrigin
+          category: productCategory
         };
 
-        return transformedProduct;
-
       } catch (error) {
+        console.error('Error transforming product:', error, product);
         return {
-          id: index + 1000,
+          id: `error-${index}`,
           name: 'Invalid Product',
           price: '0',
           currency: 'GBP',
           image: getDefaultProductImage('Other'),
           location: 'Unknown',
+          origin: '',
           verified: false,
           category: 'Other'
         };
@@ -721,23 +720,6 @@ const Home: React.FC = () => {
   const africanCountries = countries
     .map(c => ({ name: c.name, code: c.code, flag: c.flag }))
     .sort((a, b) => a.name.localeCompare(b.name));
-
-  const formatPrice = (amount: number | string, currencyCode: string = 'GBP'): string => {
-    const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
-    const currencyCode_ = (currencyCode || 'GBP').toUpperCase();
-
-    // Currency symbol mapping
-    const currencySymbols: Record<string, string> = {
-      'GBP': '£',
-      'CAD': 'C$',
-      'EUR': '€',
-      'USD': '$',
-    };
-
-    const symbol = currencySymbols[currencyCode_] || currencyCode_;
-
-    return `${symbol} ${amountNum.toFixed(2)}`;
-  };
 
   // Format price range for requests (matching the modal logic)
   const formatPriceRange = (minPrice: number | null | undefined, maxPrice: number | null | undefined, currency: string | null | undefined): string => {
@@ -888,13 +870,12 @@ const Home: React.FC = () => {
     return false;
   };
 
-  // Auto-search when certain filters change 
+
   useEffect(() => {
-    if (searchQuery.trim() || selectedCategoryText || selectedPlaceOfOriginText || sellerLocation.trim()) {
-      // Only auto-search if we have active search criteria
+    if (searchQuery.trim() || selectedPlaceOfOriginText || sellerLocation.trim()) {
       handleSearch();
     }
-  }, [selectedCountry]);
+  }, [searchQuery, selectedPlaceOfOriginText, sellerLocation, products]);
 
   // Clear search and return to category view
   const clearSearch = () => {
@@ -907,6 +888,47 @@ const Home: React.FC = () => {
     setSearchResults([]);
     setIsSearchActive(false);
     setSelectedCountry('');
+  };
+
+  const resetAllFilters = (sectionId: string = 'default') => {
+    const isRequestSection = sectionId === 'buy-sell';
+
+    // Reset search query
+    setSearchQuery('');
+    setMobileSearchQuery('');
+    setMobileSearchSubmitted(false);
+
+    // Reset category filters
+    setSelectedCategory('');
+    setSelectedCategoryText('');
+    setActiveCategory('All');
+
+    // Reset location/origin filters based on section
+    if (isRequestSection) {
+      setRequestFilterCountry('');
+      setRequestFilterPrice('');
+      setRequestBuyerLocation('');
+    } else {
+      setSelectedCountry('');
+      setPlaceOfOrigin('');
+      setPlaceOfOriginInput('');
+      setSelectedPlaceOfOriginText('');
+      setSellerLocation('');
+      setIsSearchActive(false);
+      setSearchResults([]);
+    }
+
+    // Reset price filter
+    setSelectedPrice('');
+
+    // Close any open dropdowns
+    setOpenFilterDropdown(null);
+    setOpenPriceDropdown(null);
+
+    // Reset mobile filters if open
+    if (showMobileFilterPage) {
+      setShowMobileFilterPage(false);
+    }
   };
 
   // Handle product navigation - check if user owns the product and navigate with owner view state
@@ -1231,7 +1253,10 @@ const Home: React.FC = () => {
               {currentCountry}
             </span>
             <button
-              onClick={() => setCurrentCountry('')}
+              onClick={() => {
+                resetAllFilters(sectionId);
+                setCurrentCountry('');
+              }}
               className="flex items-center justify-center"
               style={{
                 width: '16px',
@@ -1374,139 +1399,40 @@ const Home: React.FC = () => {
     if (searchQuery.trim()) {
       const updatedHistory = [searchQuery.trim(), ...searchHistory.filter(item => item !== searchQuery.trim())].slice(0, 10);
       setSearchHistory(updatedHistory);
-      try {
-        localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
-      } catch (error) {
-        console.error('Failed to save search history:', error);
-      }
+      localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
     }
-
+    // Set search as active
+    setIsSearchActive(true);
+    // Reset to first page when searching
+    setCurrentPage(1);
     // Get all products
-    let productsToSearch: FrontendProduct[] = getAllProducts();
-    const query = searchQuery.trim().toLowerCase();
+    const allProducts = getAllProducts();
+    // Filter products based on search query and filters
+    const filtered = allProducts.filter(product => {
+      // Convert all values to lowercase for case-insensitive comparison
+      const searchTerm = searchQuery.toLowerCase().trim();
+      const productName = product.name?.toLowerCase() || '';
+      const productCategory = product.category?.toLowerCase() || '';
+      const productOrigin = product.origin?.toLowerCase() || '';
+      const productLocation = product.location?.toLowerCase() || '';
+      const selectedOrigin = selectedPlaceOfOriginText?.toLowerCase() || '';
+      const sellerLoc = sellerLocation.toLowerCase().trim();
+      // Check if product matches search query (if any)
+      const matchesSearch = !searchTerm ||
+        productName.includes(searchTerm) ||
+        productCategory.includes(searchTerm);
 
-    // Get all available categories (excluding 'All')
-    const availableCategories = Object.keys(allProductsComputed).filter(cat => cat !== 'All');
+      // Check if product matches origin (if any origin is selected)
+      const matchesOrigin = !selectedOrigin ||
+        (productOrigin && productOrigin.includes(selectedOrigin));
 
-    // IMPORTANT: Apply filters FIRST, then search query
-    // This ensures search works within the filtered set
-
-    // Apply category filter FIRST (Categories dropdown)
-    // Also sync activeCategory with selectedCategoryText for consistency
-    if (selectedCategoryText) {
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        product.category === selectedCategoryText
-      );
-      // Sync activeCategory with selectedCategoryText
-      setActiveCategory(selectedCategoryText);
-    } else if (activeCategory && activeCategory !== 'All') {
-      // If no dropdown filter but activeCategory is set (from tab click), use that
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        product.category === activeCategory
-      );
-    }
-
-    // Apply place of origin filter FIRST (Place of Origin dropdown - filters by country badge at top)
-    if (selectedPlaceOfOriginText) {
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
-        const country = getProductCountry(product.origin).name;
-        return country === selectedPlaceOfOriginText;
-      });
-    }
-
-    // Apply country filter from filter buttons (applies to both category view and search)
-    if (selectedCountry) {
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        getProductCountry(product.origin).name === selectedCountry
-      );
-    }
-
-    // Apply seller location filter (Seller Location input - filters by location at bottom)
-    if (location.trim()) {
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) =>
-        product.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
-
-    // NOW apply search query filter to the already-filtered products
-    // This ensures search works within the selected category/origin
-    if (query) {
-      // Check if query matches a category name
-      const matchingCategory = availableCategories.find(cat =>
-        cat.toLowerCase().includes(query) || query.includes(cat.toLowerCase())
-      );
-
-      productsToSearch = productsToSearch.filter((product: FrontendProduct) => {
-        // Match product name
-        const matchesName = product.name.toLowerCase().includes(query);
-        // Match location
-        const matchesLocation = product.location.toLowerCase().includes(query);
-        // Match category name
-        const matchesCategory = product.category?.toLowerCase().includes(query) || false;
-        // Match place of origin
-        const productCountry = getProductCountry(product.origin).name.toLowerCase();
-        const matchesOrigin = productCountry.includes(query) || query.includes(productCountry);
-
-        return matchesName || matchesLocation || matchesCategory || matchesOrigin;
-      });
-
-      // If search query matches a category and we have results, set that category
-      if (matchingCategory && productsToSearch.length > 0) {
-        // Check if all results belong to this category
-        const allInCategory = productsToSearch.every(p => p.category === matchingCategory);
-        if (allInCategory) {
-          setActiveCategory(matchingCategory);
-        }
-      }
-    }
-
-    // Detect category from results if not already set
-    if (productsToSearch.length > 0 && !selectedCategoryText && query) {
-      // Count products by category
-      const categoryCounts: Record<string, number> = {};
-      productsToSearch.forEach(product => {
-        const cat = product.category || 'Other';
-        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-      });
-
-      // If all results belong to one category, set that category
-      const categoriesWithResults = Object.keys(categoryCounts);
-      if (categoriesWithResults.length === 1) {
-        setActiveCategory(categoriesWithResults[0]);
-      }
-    }
-
-    // Only set search active if there's actually a search query or active filters
-    // If there's a filter but no search query, we should still show the filtered results
-    const hasSearchQuery = query.length > 0;
-    const hasActiveFilters = selectedCategoryText || selectedPlaceOfOriginText || selectedCountry || location.trim();
-
-    setSearchResults(productsToSearch);
-
-    // Only activate search mode if there's a search query OR if we have filters applied
-    // This ensures filtered products are shown even without a search query
-    if (hasSearchQuery || hasActiveFilters) {
-      setIsSearchActive(true);
-    } else {
-      // If no search query and no filters, exit search mode
-      setIsSearchActive(false);
-      setSearchResults([]);
-    }
-
-    // Scroll to search results after a short delay to allow DOM update
-    setTimeout(() => {
-      if (searchResultsRef.current) {
-        searchResultsRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      } else if (productFeedRef.current) {
-        productFeedRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }, 100);
+      // Check if product matches seller location (if any location is specified)
+      const matchesLocation = !sellerLoc ||
+        (productLocation && productLocation.includes(sellerLoc));
+      return matchesSearch && matchesOrigin && matchesLocation;
+    });
+    setSearchResults(filtered);
+    setShowSearchHistory(false);
   };
 
   // Handle Enter key press in search input
@@ -2284,10 +2210,26 @@ const Home: React.FC = () => {
                 type="text"
                 placeholder="Insert location"
                 value={sellerLocation}
-                onChange={(e) => setSellerLocation(e.target.value)}
-                onFocus={() => setFocusedSearchSection('sellerLocation')}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSellerLocation(value);
+                  if (value.trim()) {
+                    setShowSellerLocationSuggestions(true);
+                  } else {
+                    setShowSellerLocationSuggestions(false);
+                  }
+                }}
+                onFocus={() => {
+                  setFocusedSearchSection('sellerLocation');
+                  if (sellerLocation.trim()) {
+                    setShowSellerLocationSuggestions(true);
+                  }
+                }}
                 onBlur={() => {
-                  setTimeout(() => setFocusedSearchSection(null), 200);
+                  setTimeout(() => {
+                    setFocusedSearchSection(null);
+                    setShowSellerLocationSuggestions(false);
+                  }, 200);
                 }}
                 className="border-0 p-0 focus:outline-none focus:ring-0"
                 style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
@@ -2493,6 +2435,8 @@ const Home: React.FC = () => {
                     setSelectedPlaceOfOriginText('');
                     setPlaceOfOrigin('');
                     setPlaceOfOriginInput('');
+                    setIsSearchActive(false);
+                    setSearchResults([]);
                     setShowPlaceOfOriginDropdown(false);
                   }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -3693,130 +3637,128 @@ const Home: React.FC = () => {
                       )}
                     </div>
                   )}
-                </>
-              )}
 
-              {/* Products Grid */}
-              {shouldShowNoResultsState() ? (
-                <div>
-                  {/* No Results State */}
-                  <div className="text-center" style={{ padding: window.innerWidth < 640 ? '32px 16px' : '48px 16px' }}>
-                    {/* Shopping Bag with Magnifying Glass Icon */}
-                    <img
-                      src={bagIcon}
-                      alt="No products found"
-                      className="mx-auto"
-                      style={{
-                        width: window.innerWidth < 640 ? '40px' : '60px',
-                        height: window.innerWidth < 640 ? '40px' : '60px',
-                        marginBottom: window.innerWidth < 640 ? '12px' : '16px'
-                      }}
-                    />
+                  {/* Products Grid */}
+                  {shouldShowNoResultsState() ? (
+                    <div>
+                      {/* No Results State */}
+                      <div className="text-center" style={{ padding: window.innerWidth < 640 ? '32px 16px' : '48px 16px' }}>
+                        {/* Shopping Bag with Magnifying Glass Icon */}
+                        <img
+                          src={bagIcon}
+                          alt="No products found"
+                          className="mx-auto"
+                          style={{
+                            width: window.innerWidth < 640 ? '40px' : '60px',
+                            height: window.innerWidth < 640 ? '40px' : '60px',
+                            marginBottom: window.innerWidth < 640 ? '12px' : '16px'
+                          }}
+                        />
 
-                    {/* Message */}
-                    <p style={{
-                      fontSize: window.innerWidth < 640 ? '12px' : '18px',
-                      color: '#6A6A6A',
-                      fontFamily: 'Poppins, sans-serif',
-                      maxWidth: window.innerWidth < 640 ? '280px' : '500px',
-                      margin: window.innerWidth < 640 ? '0 auto 12px' : '0 auto 16px',
-                      lineHeight: '1.5'
-                    }}>
-                      Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
-                    </p>
+                        {/* Message */}
+                        <p style={{
+                          fontSize: window.innerWidth < 640 ? '12px' : '18px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif',
+                          maxWidth: window.innerWidth < 640 ? '280px' : '500px',
+                          margin: window.innerWidth < 640 ? '0 auto 12px' : '0 auto 16px',
+                          lineHeight: '1.5'
+                        }}>
+                          Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
+                        </p>
 
-                    {/* Make a Request Button */}
-                    <button
-                      onClick={handleMakeRequestClick}
-                      className="inline-flex items-center mx-auto"
-                      style={{
-                        display: 'flex',
-                        padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
-                        alignItems: 'center',
-                        gap: window.innerWidth < 640 ? '4px' : '6px',
-                        borderRadius: '8px',
-                        backgroundColor: '#F0F8FE',
-                        color: '#64B5F6',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: window.innerWidth < 640 ? '11px' : '14px',
-                        fontWeight: '500'
-                      }}
-                    >
-                      <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
-                      Make a request
-                    </button>
-                  </div>
+                        {/* Make a Request Button */}
+                        <button
+                          onClick={handleMakeRequestClick}
+                          className="inline-flex items-center mx-auto"
+                          style={{
+                            display: 'flex',
+                            padding: window.innerWidth < 640 ? '8px 16px' : '10px 20px',
+                            alignItems: 'center',
+                            gap: window.innerWidth < 640 ? '4px' : '6px',
+                            borderRadius: '8px',
+                            backgroundColor: '#F0F8FE',
+                            color: '#64B5F6',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: window.innerWidth < 640 ? '11px' : '14px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
+                          Make a request
+                        </button>
+                      </div>
 
-                  {/* Other Products Near You Section */}
-                  <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
-                    <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
-                      <h3 className="font-semibold text-gray-900" style={{
-                        fontFamily: 'Faktum, sans-serif',
-                        fontSize: window.innerWidth < 640 ? '14px' : '20px'
-                      }}>
-                        Other products near you
-                      </h3>
-                      <button className="font-medium hover:underline" style={{
-                        color: '#64B5F6',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: window.innerWidth < 640 ? '10px' : '14px'
-                      }}>
-                        View more...
-                      </button>
-                    </div>
+                      {/* Other Products Near You Section */}
+                      <div style={{ marginTop: window.innerWidth < 640 ? '32px' : '48px' }}>
+                        <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '16px' : '24px' }}>
+                          <h3 className="font-semibold text-gray-900" style={{
+                            fontFamily: 'Faktum, sans-serif',
+                            fontSize: window.innerWidth < 640 ? '14px' : '20px'
+                          }}>
+                            Other products near you
+                          </h3>
+                          <button className="font-medium hover:underline" style={{
+                            color: '#64B5F6',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: window.innerWidth < 640 ? '10px' : '14px'
+                          }}>
+                            View more...
+                          </button>
+                        </div>
 
-                    {/* Product Cards */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                      {Object.values(allProductsComputed).flat().slice(0, 6).map((product) => (
-                        <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer">
-                          {/* Product Image - Top */}
-                          <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                              style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
-                              loading="lazy"
-                              width="200"
-                              height="200"
-                            />
+                        {/* Product Cards */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
+                          {Object.values(allProductsComputed).flat().slice(0, 6).map((product) => (
+                            <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer">
+                              {/* Product Image - Top */}
+                              <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}>
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                  style={{ borderRadius: window.innerWidth < 640 ? '10px' : '12px' }}
+                                  loading="lazy"
+                                  width="200"
+                                  height="200"
+                                />
 
-                            {/* Country Badge */}
-                            <div className="absolute bg-white rounded-md shadow-sm" style={{
-                              display: 'flex',
-                              padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              gap: window.innerWidth < 640 ? '2px' : '4px',
-                              top: window.innerWidth < 640 ? '6px' : '8px',
-                              left: window.innerWidth < 640 ? '6px' : '8px'
-                            }}>
-                              <img
-                                src={getProductCountry(product.origin).flag}
-                                alt={getProductCountry(product.origin).name}
-                                className="rounded-full"
-                                style={{
-                                  width: window.innerWidth < 640 ? '10px' : '12px',
-                                  height: window.innerWidth < 640 ? '10px' : '12px',
-                                  objectFit: 'cover'
-                                }}
-                              />
-                              <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
-                                {getProductCountry(product.origin).abbreviation}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Product Content */}
-                          <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
-                            {/* Price and Verified Badge Row */}
-                            <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
-                              <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                ${product.price}
+                                {/* Country Badge */}
+                                <div className="absolute bg-white rounded-md shadow-sm" style={{
+                                  display: 'flex',
+                                  padding: window.innerWidth < 640 ? '1px 4px' : '2px 6px',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  gap: window.innerWidth < 640 ? '2px' : '4px',
+                                  top: window.innerWidth < 640 ? '6px' : '8px',
+                                  left: window.innerWidth < 640 ? '6px' : '8px'
+                                }}>
+                                  <img
+                                    src={getProductCountry(product.origin).flag}
+                                    alt={getProductCountry(product.origin).name}
+                                    className="rounded-full"
+                                    style={{
+                                      width: window.innerWidth < 640 ? '10px' : '12px',
+                                      height: window.innerWidth < 640 ? '10px' : '12px',
+                                      objectFit: 'cover'
+                                    }}
+                                  />
+                                  <span className="font-medium text-gray-800" style={{ fontSize: window.innerWidth < 640 ? '8px' : '12px' }}>
+                                    {getProductCountry(product.origin).abbreviation}
+                                  </span>
+                                </div>
                               </div>
-                              {/* {product.verified ? (
+
+                              {/* Product Content */}
+                              <div className="flex flex-col" style={{ padding: window.innerWidth < 640 ? '0 6px 6px 6px' : '0 12px 12px 12px' }}>
+                                {/* Price and Verified Badge Row */}
+                                <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
+                                  <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
+                                    ${product.price}
+                                  </div>
+                                  {/* {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                                   display: 'flex',
                                   padding: window.innerWidth < 640 ? '1px 3px' : '1px 4px',
@@ -3841,34 +3783,121 @@ const Home: React.FC = () => {
                                   <span>Unverified Seller</span>
                                 </div>
                               )} */}
+                                </div>
+
+                                {/* Product Name */}
+                                <h3 className="line-clamp-2 font-medium" style={{
+                                  fontSize: window.innerWidth < 640 ? '10px' : '13px',
+                                  color: '#212121',
+                                  marginBottom: window.innerWidth < 640 ? '4px' : '4px'
+                                }}>
+                                  {product.name}
+                                </h3>
+
+                                {/* Location and Bookmark Row */}
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center text-gray-500 flex-1 min-w-0">
+                                    <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
+                                      width: window.innerWidth < 640 ? '8px' : '10px',
+                                      height: window.innerWidth < 640 ? '8px' : '10px',
+                                      marginRight: window.innerWidth < 640 ? '3px' : '4px'
+                                    }} />
+                                    <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                  </div>
+                                  {/* Bookmark Button */}
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleSave(product.id);
+                                    }}
+                                    className="transition-colors touch-manipulation flex-shrink-0"
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      padding: '2px'
+                                    }}
+                                  >
+                                    <BookmarkIcon saved={savedProducts.has(product.id)} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      ref={productGridRef}
+                      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 overflow-x-auto scrollbar-hide"
+                    >
+                      {getProductsToDisplay().map((product) => (
+                        <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group cursor-pointer">
+                          {/* Product Image - Top */}
+                          <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
+                              loading="lazy"
+                              width="200"
+                              height="200"
+                            />
+
+                            {/* Country Badge */}
+                            <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                              <img
+                                src={getProductCountry(product.origin).flag}
+                                alt={getProductCountry(product.origin).name}
+                                className="w-3 h-3 object-cover rounded-full"
+                              />
+                              <span className="text-xs font-medium text-gray-800">
+                                {getProductCountry(product.origin).abbreviation}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Product Content */}
+                          <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
+                            {/* Price and Verified Badge Row */}
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
+                                ${product.price}
+                              </div>
+                              {/* {product.verified ? (
+                            <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                              <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
+                              <span>Verified seller</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
+                              <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
+                              <span>Unverified Seller</span>
+                            </div>
+                          )} */}
                             </div>
 
                             {/* Product Name */}
-                            <h3 className="line-clamp-2 font-medium" style={{
-                              fontSize: window.innerWidth < 640 ? '10px' : '13px',
-                              color: '#212121',
-                              marginBottom: window.innerWidth < 640 ? '4px' : '4px'
-                            }}>
-                              {product.name}
-                            </h3>
+                            <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
 
-                            {/* Location and Bookmark Row */}
+                            {/* Location and Bookmark Row - Below Product Name */}
                             <div className="flex items-center justify-between gap-2">
+                              {/* Location */}
                               <div className="flex items-center text-gray-500 flex-1 min-w-0">
-                                <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                                  width: window.innerWidth < 640 ? '8px' : '10px',
-                                  height: window.innerWidth < 640 ? '8px' : '10px',
-                                  marginRight: window.innerWidth < 640 ? '3px' : '4px'
-                                }} />
-                                <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
+                                <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
                               </div>
+
                               {/* Bookmark Button */}
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  e.stopPropagation();
                                   handleSave(product.id);
                                 }}
                                 className="transition-colors touch-manipulation flex-shrink-0"
+                                title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
                                 style={{
                                   display: 'flex',
                                   alignItems: 'center',
@@ -3883,93 +3912,8 @@ const Home: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  ref={productGridRef}
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6 overflow-x-auto scrollbar-hide"
-                >
-                  {getProductsToDisplay().map((product) => (
-                    <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 block group cursor-pointer">
-                      {/* Product Image - Top */}
-                      <div className="aspect-square relative overflow-hidden rounded-xl mb-2">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 rounded-xl"
-                          loading="lazy"
-                          width="200"
-                          height="200"
-                        />
-
-                        {/* Country Badge */}
-                        <div className="absolute top-2 left-2 bg-white rounded-md shadow-sm" style={{ display: 'flex', padding: '2px 6px', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
-                          <img
-                            src={getProductCountry(product.origin).flag}
-                            alt={getProductCountry(product.origin).name}
-                            className="w-3 h-3 object-cover rounded-full"
-                          />
-                          <span className="text-xs font-medium text-gray-800">
-                            {getProductCountry(product.origin).abbreviation}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Product Content */}
-                      <div className="px-2 pb-2 sm:px-3 sm:pb-3 flex flex-col">
-                        {/* Price and Verified Badge Row */}
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                            ${product.price}
-                          </div>
-                          {/* {product.verified ? (
-                            <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
-                              <img src={verifyIcon} alt="Verified" className="w-2 h-2" />
-                              <span>Verified seller</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center text-gray-600 bg-gray-100 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
-                              <img src={unverifyIcon} alt="Unverified" className="w-2 h-2" />
-                              <span>Unverified Seller</span>
-                            </div>
-                          )} */}
-                        </div>
-
-                        {/* Product Name */}
-                        <h3 className="mb-1 line-clamp-2 font-medium" style={{ fontSize: '13px', color: '#212121' }}>{product.name}</h3>
-
-                        {/* Location and Bookmark Row - Below Product Name */}
-                        <div className="flex items-center justify-between gap-2">
-                          {/* Location */}
-                          <div className="flex items-center text-gray-500 flex-1 min-w-0">
-                            <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
-                            <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
-                          </div>
-
-                          {/* Bookmark Button */}
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSave(product.id);
-                            }}
-                            className="transition-colors touch-manipulation flex-shrink-0"
-                            title={savedProducts.has(product.id) ? 'Remove from saved' : 'Save product'}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: '2px'
-                            }}
-                          >
-                            <BookmarkIcon saved={savedProducts.has(product.id)} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                  )}
+                </>
               )}
             </>
           )}

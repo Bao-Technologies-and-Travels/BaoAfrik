@@ -244,13 +244,34 @@ const Messages: React.FC = (): JSX.Element => {
           const created = n.createdAt ? new Date(n.createdAt) : new Date();
           const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
           const getDayLabel = (date: Date) => {
-            const d = new Date(date); const today = new Date();
-            if (d.toDateString() === today.toDateString()) return 'Today';
-            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
-            if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+            const d = new Date(date); 
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            d.setHours(0, 0, 0, 0);
+            if (d.getTime() === today.getTime()) return 'Today';
+            if (d.getTime() === yesterday.getTime()) return 'Yesterday';
             return d.toLocaleDateString();
           };
-          return { ...n, day: getDayLabel(created), time: n.time || formatTime(created) };
+          
+          // Parse meta if it's a string
+          let meta = n.meta;
+          if (typeof meta === 'string') {
+            try {
+              meta = JSON.parse(meta);
+            } catch (e) {
+              meta = null;
+            }
+          }
+          
+          return { 
+            ...n, 
+            meta,
+            day: getDayLabel(created), 
+            time: n.time || formatTime(created),
+            type: n.type || 'message'
+          };
         });
         setNotifications(items);
         if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
@@ -418,11 +439,24 @@ const Messages: React.FC = (): JSX.Element => {
 
     const onNotification = (payload: any) => {
       const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
+      
+      // Parse meta if it's a string
+      let meta = payload.meta;
+      if (typeof meta === 'string') {
+        try {
+          meta = JSON.parse(meta);
+        } catch (e) {
+          meta = null;
+        }
+      }
+      
       const normalized = {
         ...payload,
+        meta,
         day: getDayLabel(created),
         time: payload.time || formatTime(created),
-        id: payload.id || `notif-${Date.now()}-${Math.random()}`
+        id: payload.id || `notif-${Date.now()}-${Math.random()}`,
+        type: payload.type || 'message'
       };
 
       setNotifications(prev => {
@@ -441,15 +475,38 @@ const Messages: React.FC = (): JSX.Element => {
       };
 
       const created = new Date();
+      // Check if this is a reaction notification
+      const isReaction = payload.type === 'reaction' || payload.meta?.messageType === 'REACTION' || payload.meta?.type === 'reaction';
+      
+      // Build actor object if available
+      const actor = payload.actor ?? payload._actor ?? (payload.senderImage ? {
+        id: payload.senderId || payload.userId,
+        firstName: payload.senderName?.split(' ')[0] || '',
+        lastName: payload.senderName?.split(' ').slice(1).join(' ') || '',
+        profileImage: payload.senderImage || payload.senderAvatar
+      } : null);
+
       const normalized = {
         id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
         day: getDayLabel(created),
         time: payload.time || formatTime(created),
         title: payload.senderName || payload.title || 'Someone',
-        body: payload.preview || payload.body || '',
-        meta: { conversationId: payload.conversationId, messageId: payload.messageId },
+        body: isReaction ? undefined : (payload.preview || payload.body || ''),
+        meta: { 
+          conversationId: payload.conversationId, 
+          messageId: payload.messageId,
+          messageType: isReaction ? 'REACTION' : undefined,
+          type: isReaction ? 'reaction' : undefined,
+          reaction: payload.reaction,
+          preview: payload.preview,
+          senderImage: payload.senderImage || payload.senderAvatar,
+          senderName: payload.senderName
+        },
+        type: payload.type || 'NEW_MESSAGE',
         isRead: false,
-        actor: payload.actor ?? null
+        actor,
+        senderAvatar: payload.senderAvatar,
+        senderImage: payload.senderImage
       };
 
       setNotifications(prev => {
@@ -523,6 +580,60 @@ const Messages: React.FC = (): JSX.Element => {
     };
   }, [socket]);
 
+  const refreshNotifications = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) return;
+
+      const json = await res.json();
+      if (!json.success) return;
+
+      const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+      const getDayLabel = (date: Date) => {
+        const d = new Date(date); 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        d.setHours(0, 0, 0, 0);
+        if (d.getTime() === today.getTime()) return 'Today';
+        if (d.getTime() === yesterday.getTime()) return 'Yesterday';
+        return d.toLocaleDateString();
+      };
+
+      const items = (json.data.items || []).map((n: any) => {
+        const created = n.createdAt ? new Date(n.createdAt) : new Date();
+        
+        // Parse meta if it's a string
+        let meta = n.meta;
+        if (typeof meta === 'string') {
+          try {
+            meta = JSON.parse(meta);
+          } catch (e) {
+            meta = null;
+          }
+        }
+        
+        return { 
+          ...n, 
+          meta,
+          day: getDayLabel(created), 
+          time: n.time || formatTime(created),
+          type: n.type || 'message'
+        };
+      });
+      
+      setNotifications(items);
+      if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
+    } catch (e) {
+      console.warn('Failed to refresh notifications', e);
+    }
+  };
+
   const markAllAsRead = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -572,29 +683,114 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   const getNotificationSenderName = (notif: any) => {
-    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
+    // Parse meta if it's a string
+    let meta = notif.meta;
+    if (typeof meta === 'string') {
+      try {
+        meta = JSON.parse(meta);
+      } catch (e) {
+        meta = null;
+      }
+    }
+
+    // For product notifications, use seller name from meta or title
+    if (notif.type === 'product') {
+      const sellerName = meta?.sellerName || notif.meta?.sellerName || notif.title;
+      if (sellerName && sellerName !== 'A seller' && sellerName !== 'Notification') {
+        return sellerName;
+      }
+      // Try to get from actor if available
+      if (notif.actor?.firstName || notif.actor?.lastName) {
+        return `${notif.actor.firstName || ''} ${notif.actor.lastName || ''}`.trim() || 'A seller';
+      }
+      return 'A seller';
+    }
+
+    // For message notifications
+    if (notif.type === 'NEW_MESSAGE' || notif.type === 'message') {
+      if (notif.title && notif.title !== 'Notification' && notif.title !== 'Someone') {
+        return notif.title;
+      }
+      // Try to get from actor
+      if (notif.actor?.firstName || notif.actor?.lastName) {
+        return `${notif.actor.firstName || ''} ${notif.actor.lastName || ''}`.trim() || 'Someone';
+      }
+      return 'Someone';
+    }
+
+    // For other notifications
+    if (notif.title && notif.title !== 'Notification') {
       return notif.title;
     }
 
-    if (notif.title && notif.title !== 'Notification') {
-      return notif.title
-    }
+    return 'Someone';
   };
 
   const getNotificationAvatar = (notif: any) => {
-    if (notif.actor?.profileImage) {
-      return notif.actor.profileImage
+    const tryUrl = (u?: string | null) => {
+      if (!u) return null;
+      // if relative path, prefix with API url
+      if (!/^https?:\/\//i.test(u) && process.env.REACT_APP_API_URL) {
+        return `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/${u.replace(/^\//, '')}`;
+      }
+      return u;
     };
 
-    if (notif.senderAvatar) {
-      return notif.senderAvatar
-    };
-
-    if (notif.meta?.senderImage) {
-      return notif.meta.senderImage;
+    // Parse meta if it's a string
+    let meta = notif.meta;
+    if (typeof meta === 'string') {
+      try {
+        meta = JSON.parse(meta);
+      } catch (e) {
+        meta = null;
+      }
     }
 
-    return avatar;
+    // For message notifications, show sender's profile image
+    if (notif.type === 'message' || notif.type === 'NEW_MESSAGE') {
+      const srcCandidates = [
+        notif.actor?.profileImage,
+        notif.actor?.avatar,
+        notif.senderAvatar,
+        notif.senderImage,
+        meta?.senderImage,
+        meta?.actorImage,
+        notif.meta?.senderImage,
+        notif.meta?.actorImage
+      ];
+
+      for (const c of srcCandidates) {
+        const resolved = tryUrl(c);
+        if (resolved) return resolved;
+      }
+      return avatar; // Fallback to default avatar for messages
+    }
+
+    // For product notifications, show seller's image if available, otherwise logo
+    if (notif.type === 'product') {
+      const sellerImage = meta?.sellerImage || notif.meta?.sellerImage || notif.actor?.profileImage || notif.sellerImage;
+      const resolved = tryUrl(sellerImage);
+      if (resolved) return resolved;
+      // Return null for product notifications to show logo instead
+      return null;
+    }
+
+    // For other notifications, show actor image if available
+    const srcCandidates = [
+      notif.actor?.profileImage,
+      notif.actor?.avatar,
+      notif.senderAvatar,
+      meta?.senderImage,
+      meta?.actorImage,
+      notif.meta?.senderImage,
+      notif.meta?.actorImage
+    ];
+
+    for (const c of srcCandidates) {
+      const resolved = tryUrl(c);
+      if (resolved) return resolved;
+    }
+    return null; // Return null to show logo for non-message notifications
   };
 
   // Helper function to check if a message already exists in the array
@@ -3707,6 +3903,7 @@ const Messages: React.FC = (): JSX.Element => {
       const menuDropdown = target.closest('.menu-dropdown');
       const emojiPicker = target.closest('.emoji-picker-container');
       const actionsMenu = target.closest('.actions-menu');
+      const notificationDropdown = target.closest('.notification-dropdown');
 
       if (!languageSelector && isLanguageDropdownOpen) {
         setIsLanguageDropdownOpen(false);
@@ -3723,6 +3920,10 @@ const Messages: React.FC = (): JSX.Element => {
       if (!actionsMenu && actionsMenuOpen !== null) {
         setActionsMenuOpen(null);
       }
+
+      if (!notificationDropdown && isNotificationOpen) {
+        setIsNotificationOpen(false);
+      }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -3737,7 +3938,7 @@ const Messages: React.FC = (): JSX.Element => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [isLanguageDropdownOpen, isMenuDropdownOpen, showEmojiPicker, actionsMenuOpen]);
+  }, [isLanguageDropdownOpen, isMenuDropdownOpen, showEmojiPicker, actionsMenuOpen, isNotificationOpen]);
 
   // Close reaction popup when clicking outside
   useEffect(() => {
@@ -4234,11 +4435,19 @@ const Messages: React.FC = (): JSX.Element => {
                                       className="hover:opacity-80 transition-opacity"
                                     >
                                       {playingMessageId === message.id ? (
-                                        <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                        <svg
+                                          className={`w-5 h-5 ${message.isIncoming ? 'text-black' : 'text-white'} fill-current`}
+                                          viewBox="0 0 24 24"
+                                          style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
+                                        >
                                           <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }} />
                                         </svg>
                                       ) : (
-                                        <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                        <svg
+                                          className={`w-5 h-5 ${message.isIncoming ? 'text-black' : 'text-white'} fill-current`}
+                                          viewBox="0 0 24 24"
+                                          style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
+                                        >
                                           <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }} />
                                         </svg>
                                       )}
@@ -6127,19 +6336,33 @@ const Messages: React.FC = (): JSX.Element => {
                             </Link> */}
 
                   {/* Notification Icon */}
-                  <button
-                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                    className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
-                    title="Notifications"
-                    aria-label="View notifications"
-                  >
+                  <div className="relative notification-dropdown">
+                    <button
+                      onClick={async () => {
+                        if (!isNotificationOpen) {
+                          // Refresh notifications when opening dropdown
+                          await refreshNotifications();
+                        }
+                        setIsNotificationOpen(!isNotificationOpen);
+                      }}
+                      className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
+                      title="Notifications"
+                      aria-label="View notifications"
+                    >
                     <img
                       src={notificationIcon}
                       alt="Notifications"
                       className="w-5 h-5"
                       style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
                     />
+                    {notificationCount > 0 && (
+                      <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {notificationCount}
+                      </span>
+                    )}
                   </button>
+
+                  {/* Notification Dropdown */}
                   {isNotificationOpen && (
                     <div
                       className="fixed right-8 top-20 w-96 bg-white shadow-lg border border-gray-200 z-50 notification-dropdown"
@@ -6226,60 +6449,167 @@ const Messages: React.FC = (): JSX.Element => {
                                     `}
                         </style>
                         {/* Render notifications grouped by day */}
-                        {['Today', 'Yesterday'].map(day => {
-                          const dayNotifs = filteredNotifications.filter(n => n.day === day);
-                          if (dayNotifs.length === 0) return null;
+                        {(() => {
+                          // Get unique days from notifications
+                          const days = Array.from(new Set(filteredNotifications.map(n => n.day || 'Other').filter(Boolean)));
+                          return days.map(day => {
+                            const dayNotifs = filteredNotifications.filter(n => (n.day || 'Other') === day);
+                            if (dayNotifs.length === 0) return null;
 
-                          return (
-                            <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
-                              <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
+                            return (
+                              <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
+                                <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
+                                {dayNotifs.map((notif, idx) => {
+                                  // Check if this is a reaction notification
+                                  const isReaction = notif.meta?.messageType === 'REACTION' || notif.type === 'reaction' || notif.meta?.type === 'reaction';
+                                  const senderName = getNotificationSenderName(notif);
+                                  
+                                  return (
+                                    <div
+                                      key={notif.id || idx}
+                                      className="transition-colors cursor-pointer"
+                                      style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
+                                      onClick={() => handleNotificationClick(notif)}
+                                    >
+                                      <div className="flex items-start space-x-4 py-3 px-6">
+                                        <div className="relative flex-shrink-0">
+                                          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
+                                            backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
+                                            border: '2px solid white'
+                                          }}>
+                                            {(() => {
+                                              const avatarUrl = getNotificationAvatar(notif);
+                                              const isMessage = notif.type === 'message' || notif.type === 'NEW_MESSAGE';
 
-                              {dayNotifs.map((notif, idx) => (
-                                <div
-                                  key={notif.id || idx}
-                                  className="transition-colors cursor-pointer"
-                                  style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
-                                  onClick={() => handleNotificationClick(notif)}
-                                >
-                                  <div className="flex items-start space-x-4 py-3 px-6">
-                                    <div className="relative flex-shrink-0">
-                                      <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
-                                        backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
-                                        border: '2px solid white'
-                                      }}>
-                                        {notif.type === 'message' ? (
-                                          <img src={getNotificationAvatar(notif)} alt="Avatar" className="w-9 h-9 rounded-full object-cover" />
-                                        ) : (
-                                          <img src={logoIcon} alt="Logo" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
-                                        )}
-                                      </div>
-                                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
-                                        <img src={notif.type === 'message' ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
-                                      </div>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-start justify-between">
+                                              // For messages, always try to show sender's image
+                                              if (isMessage && avatarUrl) {
+                                                return (
+                                                  <img
+                                                    src={avatarUrl}
+                                                    alt="Avatar"
+                                                    className="w-9 h-9 rounded-full object-cover"
+                                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
+                                                  />
+                                                );
+                                              }
+
+                                              // For product notifications, show seller image if available
+                                              if (notif.type === 'product' && avatarUrl) {
+                                                return (
+                                                  <img
+                                                    src={avatarUrl}
+                                                    alt="Seller"
+                                                    className="w-9 h-9 rounded-full object-cover"
+                                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
+                                                  />
+                                                );
+                                              }
+
+                                              // For all other cases, show logo
+                                              return (
+                                                <img
+                                                  src={logoIcon}
+                                                  alt="Logo"
+                                                  className="w-7 h-7"
+                                                  style={{ filter: 'brightness(0) invert(1)' }}
+                                                />
+                                              );
+                                            })()}
+                                          </div>
+                                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
+                                            <img src={(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
+                                          </div>
+                                        </div>
                                         <div className="flex-1 min-w-0">
-                                          <p style={{ fontSize: '14px' }}>
-                                            <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                              {getNotificationSenderName(notif)}
-                                            </span>
-                                            <span style={{ color: '#939393' }}> {notif.body || notif.text || ''}</span>
-                                          </p>
-                                        </div>
-                                        <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
-                                          <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
-                                          {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
+                                          <div className="flex items-start justify-between">
+                                            <div className="flex-1 min-w-0">
+                                              {/* Message notifications */}
+                                              {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
+                                                <>
+                                                  <p style={{ fontSize: '14px' }}>
+                                                    {isReaction ? (
+                                                      <>
+                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                          sender
+                                                        </span>
+                                                        <span style={{ color: '#939393' }}> ({senderName}) reacted to a message</span>
+                                                      </>
+                                                    ) : (
+                                                      <>
+                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                          {senderName}
+                                                        </span>
+                                                        <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                      </>
+                                                    )}
+                                                  </p>
+                                                  {notif.meta?.preview && !isReaction && (
+                                                    <p
+                                                      className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                                                      style={{
+                                                        color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
+                                                        fontSize: '13px',
+                                                        textDecoration: 'underline'
+                                                      }}
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleNotificationClick(notif);
+                                                      }}
+                                                    >
+                                                      Click to view
+                                                    </p>
+                                                  )}
+                                                </>
+                                              ) : (
+                                                /* App notifications (product, etc.) */
+                                                <>
+                                                  <p style={{ fontSize: '14px' }}>
+                                                    {(notif.text || notif.meta?.text || notif.title) ? (
+                                                      <>
+                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                          {notif.text || notif.meta?.text || notif.title || getNotificationSenderName(notif)}
+                                                        </span>
+                                                        {(notif.additionalText || notif.meta?.additionalText) && (
+                                                          <span style={{ color: '#939393' }}> {notif.additionalText || notif.meta.additionalText}</span>
+                                                        )}
+                                                        {!notif.additionalText && !notif.meta?.additionalText && notif.body && (
+                                                          <span style={{ color: '#939393' }}> {notif.body}</span>
+                                                        )}
+                                                      </>
+                                                    ) : (
+                                                      <>
+                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                          {notif.title || getNotificationSenderName(notif)}
+                                                        </span>
+                                                        {notif.body && <span style={{ color: '#939393' }}> {notif.body}</span>}
+                                                      </>
+                                                    )}
+                                                  </p>
+                                                  {(notif.subText || notif.meta?.subText) && (
+                                                    <p className="mt-1.5" style={{ color: '#9E9E9E', fontSize: '13px' }}>
+                                                      {notif.subText || notif.meta?.subText}
+                                                    </p>
+                                                  )}
+                                                </>
+                                              )}
+                                            </div>
+                                            <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
+                                              {notif.time && (
+                                                <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
+                                              )}
+                                              {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
+                                      <div className="border-b border-gray-100" />
                                     </div>
-                                  </div>
-                                  <div className="border-b border-gray-100" />
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })}
+                                  );
+                                })}
+                              </div>
+                            );
+                          });
+                        })()}
                       </div>
 
                       {/* Footer */}
@@ -6303,6 +6633,7 @@ const Messages: React.FC = (): JSX.Element => {
                       </div>
                     </div>
                   )}
+                  </div>
 
                   {/* Profile Picture */}
                   <div className="w-10 h-10 rounded-full overflow-hidden">
@@ -7160,12 +7491,20 @@ const Messages: React.FC = (): JSX.Element => {
                                           >
                                             {playingMessageId === message.id ? (
                                               // Pause icon
-                                              <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                              <svg
+                                                className={`w-8 h-8 ${message.isIncoming ? 'text-black' : 'text-white'} fill-current`}
+                                                viewBox="0 0 24 24"
+                                                style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
+                                              >
                                                 <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" style={{ fillRule: 'evenodd' }} />
                                               </svg>
                                             ) : (
                                               // Play icon
-                                              <svg className="w-8 h-8 text-white fill-current" viewBox="0 0 24 24" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}>
+                                              <svg
+                                                className={`w-8 h-8 ${message.isIncoming ? 'text-black' : 'text-white'} fill-current`}
+                                                viewBox="0 0 24 24"
+                                                style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.3))' }}
+                                              >
                                                 <path d="M8 5v14l11-7z" style={{ fillRule: 'evenodd' }} />
                                               </svg>
                                             )}

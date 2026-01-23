@@ -16,7 +16,10 @@ const Footer: React.FC = () => {
                 src={footerLogo}
                 alt="BaoAfrik - African Marketplace Logo"
                 className="h-8 mb-4 mx-auto md:mx-0 cursor-pointer"
-                onClick={() => navigate('/')}
+                onClick={() => {
+                  navigate('/');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
               <p className="text-sm leading-relaxed" style={{ color: '#BABABA' }}>
                 Come to the meeting of African treasures
