@@ -186,12 +186,38 @@ const AdminDashboard: React.FC = () => {
   const [suspendCountdown, setSuspendCountdown] = useState(10);
   const [isManageAccessView, setIsManageAccessView] = useState(false);
   const [expandedAccessSections, setExpandedAccessSections] = useState<Set<string>>(new Set());
+  const [expandedPermissionLists, setExpandedPermissionLists] = useState<Set<string>>(new Set());
   const [accessSearchValue, setAccessSearchValue] = useState('');
+  const [isScrollable, setIsScrollable] = useState(false);
+  const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
   const [accessToggles, setAccessToggles] = useState({
     listings: true,
     messages: true,
     requests: false,
     users: false
+  });
+  const [permissionToggles, setPermissionToggles] = useState<Record<string, Record<string, boolean>>>({
+    listings: {
+      'can-create': true,
+      'can-delete': true,
+      'can-modify': true,
+      'can-review': true,
+      'can-report': true,
+      'can-share': true,
+      'can-contact': true
+    },
+    messages: {
+      'can-send-message': true,
+      'can-send-files': true
+    },
+    requests: {
+      'can-create-request': true,
+      'can-respond': true
+    },
+    users: {
+      'can-view': true,
+      'can-edit': true
+    }
   });
 
   // Mock data for search
@@ -463,6 +489,30 @@ const AdminDashboard: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isSuspendSuccess, userToSuspend]);
+
+  // Check if scrollable container has scrollable content
+  useEffect(() => {
+    if (!isManageAccessView) {
+      setIsScrollable(false);
+      return;
+    }
+    
+    const checkScrollable = () => {
+      if (scrollableContainerRef.current && expandedPermissionLists.size > 0) {
+        const container = scrollableContainerRef.current;
+        const hasScroll = container.scrollHeight > container.clientHeight;
+        setIsScrollable(hasScroll);
+      } else {
+        setIsScrollable(false);
+      }
+    };
+
+    checkScrollable();
+    // Recheck when permission lists expand/collapse
+    const timeoutId = setTimeout(checkScrollable, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [expandedPermissionLists, isManageAccessView]);
 
   // Countdown timer for delete success modal
   useEffect(() => {
@@ -3046,18 +3096,19 @@ const AdminDashboard: React.FC = () => {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '4px',
-                              padding: '4px 8px',
+                              padding: '2px 6px',
                               backgroundColor: '#F0F8FE',
-                              borderRadius: '6px'
+                              borderRadius: '6px',
+                              height: '20px'
                             }}>
                               <span style={{
-                                fontSize: '11px',
+                                fontSize: '10px',
                                 color: '#64B5F6',
                                 fontFamily: 'Poppins, sans-serif'
                               }}>
                                 85/112 Access
                               </span>
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="#64B5F6" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                               </svg>
                             </div>
@@ -3085,7 +3136,7 @@ const AdminDashboard: React.FC = () => {
 
                         {/* Description Text */}
                         <p style={{
-                          fontSize: '12px',
+                          fontSize: '11px',
                           color: '#9C9C9C',
                           fontFamily: 'Poppins, sans-serif',
                           margin: '0 0 16px 0',
@@ -3117,8 +3168,38 @@ const AdminDashboard: React.FC = () => {
                           />
                         </div>
 
-                        {/* Access Rows */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {/* Access Rows - Scrollable Container */}
+                        <div 
+                          ref={scrollableContainerRef}
+                          className="access-rows-scrollable"
+                          style={{ 
+                            position: 'relative',
+                            height: '500px',
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            paddingRight: '4px',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none'
+                          } as React.CSSProperties}
+                          onScroll={(e) => {
+                            const target = e.currentTarget;
+                            const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+                            // Update fade visibility based on scroll position
+                          }}
+                        >
+                          <style>{`
+                            .access-rows-scrollable::-webkit-scrollbar {
+                              display: none !important;
+                              width: 0 !important;
+                              height: 0 !important;
+                              background: transparent !important;
+                            }
+                            .access-rows-scrollable {
+                              -ms-overflow-style: none !important;
+                              scrollbar-width: none !important;
+                            }
+                          `}</style>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           {/* Listings Access Row */}
                           <div>
                             {/* Top Row: Title, Dot, Badge, Toggle */}
@@ -3146,7 +3227,7 @@ const AdminDashboard: React.FC = () => {
                                   18/18 Access
                                 </span>
                               </div>
-                              <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                 <input
                                   type="checkbox"
                                   checked={accessToggles.listings}
@@ -3160,16 +3241,16 @@ const AdminDashboard: React.FC = () => {
                                   right: 0,
                                   bottom: 0,
                                   backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
-                                  borderRadius: '12px',
+                                  borderRadius: '10px',
                                   transition: 'background-color 0.3s'
                                 }}>
                                   <span style={{
                                     position: 'absolute',
                                     content: '""',
-                                    height: '18px',
-                                    width: '18px',
-                                    left: accessToggles.listings ? '22px' : '3px',
-                                    bottom: '3px',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.listings ? '17px' : '3px',
+                                    bottom: '2px',
                                     backgroundColor: '#FFFFFF',
                                     borderRadius: '50%',
                                     transition: 'left 0.3s'
@@ -3202,24 +3283,91 @@ const AdminDashboard: React.FC = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 style={{
-                                  transform: expandedAccessSections.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
                                   transition: 'transform 0.2s',
                                   cursor: 'pointer',
                                   flexShrink: 0
                                 }}
                                 onClick={() => {
-                                  const newSet = new Set(expandedAccessSections);
+                                  const newSet = new Set(expandedPermissionLists);
                                   if (newSet.has('listings')) {
                                     newSet.delete('listings');
                                   } else {
                                     newSet.add('listings');
                                   }
-                                  setExpandedAccessSections(newSet);
+                                  setExpandedPermissionLists(newSet);
                                 }}
                               >
                                 <polyline points="6 9 12 15 18 9"></polyline>
                               </svg>
                             </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('listings') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create', label: 'Can create a listing' },
+                                  { key: 'can-delete', label: 'Can delete a listing' },
+                                  { key: 'can-modify', label: 'Can modify a listing' },
+                                  { key: 'can-review', label: 'Can review listings from other users' },
+                                  { key: 'can-report', label: 'Can report listing from other users' },
+                                  { key: 'can-share', label: 'Can share a listing' },
+                                  { key: 'can-contact', label: 'Can contact a seller for a listing' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '10px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.listings[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            listings: {
+                                              ...permissionToggles.listings,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '8px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '12px',
+                                          width: '12px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '14px' : '2px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
 
                           {/* Messages Access Row */}
@@ -3249,7 +3397,7 @@ const AdminDashboard: React.FC = () => {
                                   18/18 Access
                                 </span>
                               </div>
-                              <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                 <input
                                   type="checkbox"
                                   checked={accessToggles.messages}
@@ -3263,16 +3411,16 @@ const AdminDashboard: React.FC = () => {
                                   right: 0,
                                   bottom: 0,
                                   backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
-                                  borderRadius: '12px',
+                                  borderRadius: '10px',
                                   transition: 'background-color 0.3s'
                                 }}>
                                   <span style={{
                                     position: 'absolute',
                                     content: '""',
-                                    height: '18px',
-                                    width: '18px',
-                                    left: accessToggles.messages ? '22px' : '3px',
-                                    bottom: '3px',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.messages ? '17px' : '3px',
+                                    bottom: '2px',
                                     backgroundColor: '#FFFFFF',
                                     borderRadius: '50%',
                                     transition: 'left 0.3s'
@@ -3305,24 +3453,86 @@ const AdminDashboard: React.FC = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 style={{
-                                  transform: expandedAccessSections.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
                                   transition: 'transform 0.2s',
                                   cursor: 'pointer',
                                   flexShrink: 0
                                 }}
                                 onClick={() => {
-                                  const newSet = new Set(expandedAccessSections);
+                                  const newSet = new Set(expandedPermissionLists);
                                   if (newSet.has('messages')) {
                                     newSet.delete('messages');
                                   } else {
                                     newSet.add('messages');
                                   }
-                                  setExpandedAccessSections(newSet);
+                                  setExpandedPermissionLists(newSet);
                                 }}
                               >
                                 <polyline points="6 9 12 15 18 9"></polyline>
                               </svg>
                             </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('messages') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-send-message', label: 'Can send message to a user' },
+                                  { key: 'can-send-files', label: 'Can send files to a user' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '10px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.messages[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            messages: {
+                                              ...permissionToggles.messages,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '8px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '12px',
+                                          width: '12px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '14px' : '2px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
 
                           {/* Requests Access Row */}
@@ -3352,7 +3562,7 @@ const AdminDashboard: React.FC = () => {
                                   12/18 Access
                                 </span>
                               </div>
-                              <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                 <input
                                   type="checkbox"
                                   checked={accessToggles.requests}
@@ -3366,16 +3576,16 @@ const AdminDashboard: React.FC = () => {
                                   right: 0,
                                   bottom: 0,
                                   backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
-                                  borderRadius: '12px',
+                                  borderRadius: '10px',
                                   transition: 'background-color 0.3s'
                                 }}>
                                   <span style={{
                                     position: 'absolute',
                                     content: '""',
-                                    height: '18px',
-                                    width: '18px',
-                                    left: accessToggles.requests ? '22px' : '3px',
-                                    bottom: '3px',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.requests ? '17px' : '3px',
+                                    bottom: '2px',
                                     backgroundColor: '#FFFFFF',
                                     borderRadius: '50%',
                                     transition: 'left 0.3s'
@@ -3408,24 +3618,86 @@ const AdminDashboard: React.FC = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 style={{
-                                  transform: expandedAccessSections.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
                                   transition: 'transform 0.2s',
                                   cursor: 'pointer',
                                   flexShrink: 0
                                 }}
                                 onClick={() => {
-                                  const newSet = new Set(expandedAccessSections);
+                                  const newSet = new Set(expandedPermissionLists);
                                   if (newSet.has('requests')) {
                                     newSet.delete('requests');
                                   } else {
                                     newSet.add('requests');
                                   }
-                                  setExpandedAccessSections(newSet);
+                                  setExpandedPermissionLists(newSet);
                                 }}
                               >
                                 <polyline points="6 9 12 15 18 9"></polyline>
                               </svg>
                             </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('requests') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create-request', label: 'Can create a request' },
+                                  { key: 'can-respond', label: 'Can respond to a request' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '10px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.requests[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            requests: {
+                                              ...permissionToggles.requests,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '8px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '12px',
+                                          width: '12px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '14px' : '2px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
 
                           {/* Users Access Row */}
@@ -3455,7 +3727,7 @@ const AdminDashboard: React.FC = () => {
                                   18/18 Access
                                 </span>
                               </div>
-                              <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                 <input
                                   type="checkbox"
                                   checked={accessToggles.users}
@@ -3469,16 +3741,16 @@ const AdminDashboard: React.FC = () => {
                                   right: 0,
                                   bottom: 0,
                                   backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
-                                  borderRadius: '12px',
+                                  borderRadius: '10px',
                                   transition: 'background-color 0.3s'
                                 }}>
                                   <span style={{
                                     position: 'absolute',
                                     content: '""',
-                                    height: '18px',
-                                    width: '18px',
-                                    left: accessToggles.users ? '22px' : '3px',
-                                    bottom: '3px',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.users ? '17px' : '3px',
+                                    bottom: '2px',
                                     backgroundColor: '#FFFFFF',
                                     borderRadius: '50%',
                                     transition: 'left 0.3s'
@@ -3511,25 +3783,101 @@ const AdminDashboard: React.FC = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 style={{
-                                  transform: expandedAccessSections.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
                                   transition: 'transform 0.2s',
                                   cursor: 'pointer',
                                   flexShrink: 0
                                 }}
                                 onClick={() => {
-                                  const newSet = new Set(expandedAccessSections);
+                                  const newSet = new Set(expandedPermissionLists);
                                   if (newSet.has('users')) {
                                     newSet.delete('users');
                                   } else {
                                     newSet.add('users');
                                   }
-                                  setExpandedAccessSections(newSet);
+                                  setExpandedPermissionLists(newSet);
                                 }}
                               >
                                 <polyline points="6 9 12 15 18 9"></polyline>
                               </svg>
                             </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('users') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-view', label: 'Can view user profiles' },
+                                  { key: 'can-edit', label: 'Can edit user information' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '10px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.users[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            users: {
+                                              ...permissionToggles.users,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '8px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '12px',
+                                          width: '12px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '14px' : '2px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
+                          </div>
+                          {/* Fade Effect at Bottom - Only show when expanded and scrollable */}
+                          {expandedPermissionLists.size > 0 && isScrollable && (
+                            <div style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: '4px',
+                              height: '40px',
+                              background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                              pointerEvents: 'none',
+                              zIndex: 1
+                            }} />
+                          )}
                         </div>
                       </>
                     )}
