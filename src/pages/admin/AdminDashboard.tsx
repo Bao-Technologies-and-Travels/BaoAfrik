@@ -185,11 +185,14 @@ const AdminDashboard: React.FC = () => {
   const [isUserSuspended, setIsUserSuspended] = useState(false);
   const [suspendCountdown, setSuspendCountdown] = useState(10);
   const [isManageAccessView, setIsManageAccessView] = useState(false);
+  const [isManageAccessMaximized, setIsManageAccessMaximized] = useState(false);
   const [expandedAccessSections, setExpandedAccessSections] = useState<Set<string>>(new Set());
   const [expandedPermissionLists, setExpandedPermissionLists] = useState<Set<string>>(new Set());
   const [accessSearchValue, setAccessSearchValue] = useState('');
   const [isScrollable, setIsScrollable] = useState(false);
   const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
+  const maximizedScrollableContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isMaximizedScrollable, setIsMaximizedScrollable] = useState(false);
   const [accessToggles, setAccessToggles] = useState({
     listings: true,
     messages: true,
@@ -513,6 +516,24 @@ const AdminDashboard: React.FC = () => {
     
     return () => clearTimeout(timeoutId);
   }, [expandedPermissionLists, isManageAccessView]);
+
+  // Check scrollability for maximized view
+  useEffect(() => {
+    const checkMaximizedScrollable = () => {
+      if (maximizedScrollableContainerRef.current && expandedPermissionLists.size > 0) {
+        const container = maximizedScrollableContainerRef.current;
+        const hasScroll = container.scrollHeight > container.clientHeight;
+        setIsMaximizedScrollable(hasScroll);
+      } else {
+        setIsMaximizedScrollable(false);
+      }
+    };
+
+    checkMaximizedScrollable();
+    const timeoutId = setTimeout(checkMaximizedScrollable, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [expandedPermissionLists, isManageAccessMaximized]);
 
   // Countdown timer for delete success modal
   useEffect(() => {
@@ -1837,11 +1858,790 @@ const AdminDashboard: React.FC = () => {
                     display: 'grid',
                     gridTemplateColumns: '1fr 380px',
                     gap: '20px',
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    transition: 'all 0.3s ease'
                   }}
                 >
-                  {/* Left: Title + Description + Activity Card */}
+                  {/* Left: Title + Description + Activity Card OR Maximized Manage Access Content */}
                   <div>
+                  {isManageAccessMaximized && isManageAccessView ? (
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '14px',
+                      marginTop: '10px',
+                      transition: 'all 0.3s ease',
+                      animation: 'slideIn 0.3s ease'
+                    }}>
+                      <style>{`
+                        @keyframes slideIn {
+                          from {
+                            opacity: 0;
+                            transform: translateX(-20px);
+                          }
+                          to {
+                            opacity: 1;
+                            transform: translateX(0);
+                          }
+                        }
+                      `}</style>
+                      {/* Maximized Manage Access Content - Only search bar and four rows move here */}
+                      {/* Search Bar with Reduce button */}
+                      <div style={{ position: 'relative', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                        <input
+                          type="text"
+                          value={accessSearchValue}
+                          onChange={(e) => setAccessSearchValue(e.target.value)}
+                          placeholder="search"
+                          style={{
+                            maxWidth: '280px',
+                            width: '100%',
+                            padding: '8px 12px',
+                            backgroundColor: '#F1F1F1',
+                            borderRadius: '8px',
+                            border: 'none',
+                            outline: 'none',
+                            color: '#6A6A6A',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            caretColor: '#CFE8FC'
+                          }}
+                        />
+                        <button
+                          onClick={() => setIsManageAccessMaximized(false)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 8px',
+                            color: '#64B5F6',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            marginLeft: 'auto'
+                          }}
+                        >
+                          <span>Reduce the window</span>
+                          <img
+                            src={expandIcon}
+                            alt="Reduce"
+                            style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Access Rows - Scrollable Container */}
+                      <div 
+                        ref={maximizedScrollableContainerRef}
+                        className="access-rows-scrollable-maximized"
+                        style={{ 
+                          position: 'relative',
+                          height: '500px',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          paddingRight: '4px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none'
+                        } as React.CSSProperties}
+                      >
+                        <style>{`
+                          .access-rows-scrollable-maximized::-webkit-scrollbar {
+                            display: none !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                            background: transparent !important;
+                          }
+                          .access-rows-scrollable-maximized {
+                            -ms-overflow-style: none !important;
+                            scrollbar-width: none !important;
+                          }
+                        `}</style>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {/* Listings Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Listings
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.listings}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.listings ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('listings')) {
+                                    newSet.delete('listings');
+                                  } else {
+                                    newSet.add('listings');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('listings') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create', label: 'Can create a listing' },
+                                  { key: 'can-delete', label: 'Can delete a listing' },
+                                  { key: 'can-modify', label: 'Can modify a listing' },
+                                  { key: 'can-review', label: 'Can review listings from other users' },
+                                  { key: 'can-report', label: 'Can report listing from other users' },
+                                  { key: 'can-share', label: 'Can share a listing' },
+                                  { key: 'can-contact', label: 'Can contact a seller for a listing' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.listings[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            listings: {
+                                              ...permissionToggles.listings,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Messages Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Messages
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.messages}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.messages ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('messages')) {
+                                    newSet.delete('messages');
+                                  } else {
+                                    newSet.add('messages');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('messages') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-send-message', label: 'Can send message to a user' },
+                                  { key: 'can-send-files', label: 'Can send files to a user' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.messages[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            messages: {
+                                              ...permissionToggles.messages,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Requests Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Requests
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  12/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.requests}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.requests ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('requests')) {
+                                    newSet.delete('requests');
+                                  } else {
+                                    newSet.add('requests');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('requests') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create-request', label: 'Can create a request' },
+                                  { key: 'can-respond', label: 'Can respond to a request' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.requests[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            requests: {
+                                              ...permissionToggles.requests,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Users Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Users
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.users}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.users ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('users')) {
+                                    newSet.delete('users');
+                                  } else {
+                                    newSet.add('users');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('users') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-view', label: 'Can view user profiles' },
+                                  { key: 'can-edit', label: 'Can edit user information' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.users[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            users: {
+                                              ...permissionToggles.users,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Fade Effect at Bottom - Fixed at bottom of container */}
+                      {expandedPermissionLists.size > 0 && isMaximizedScrollable && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: '4px',
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }} />
+                      )}
+                    </div>
+                  ) : (
+                    <div>
                     {/* Title and Description (match overview sizing) */}
                     <div style={{ marginBottom: '12px' }}>
                       <h1
@@ -2464,6 +3264,8 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
                     )}
+                    </div>
+                  )}
                   </div>
 
                   {/* Right: User Details Sidebar (aligned with title) */}
@@ -3042,10 +3844,10 @@ const AdminDashboard: React.FC = () => {
                     )}
                     </div>
 
-                    {/* Manage Access View */}
+                    {/* Manage Access View - Header always visible when manage access view is open */}
                     {isManageAccessView && (
                       <>
-                        {/* Manage Access Header */}
+                        {/* Manage Access Header - Always visible in right sidebar */}
                         <div style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -3113,8 +3915,9 @@ const AdminDashboard: React.FC = () => {
                               </svg>
                             </div>
 
-                            {/* Expand Button */}
+                            {/* Expand Button - Always visible */}
                             <button
+                              onClick={() => setIsManageAccessMaximized(true)}
                               style={{
                                 background: 'transparent',
                                 border: 'none',
@@ -3134,7 +3937,7 @@ const AdminDashboard: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Description Text */}
+                        {/* Description Text - Always visible in right sidebar */}
                         <p style={{
                           fontSize: '11px',
                           color: '#9C9C9C',
@@ -3145,16 +3948,21 @@ const AdminDashboard: React.FC = () => {
                         }}>
                           Manage user access permissions and control what features this user can access.
                         </p>
+                      </>
+                    )}
 
+                    {/* Search Bar and Access Rows - Only show in right sidebar when NOT maximized */}
+                    {isManageAccessView && !isManageAccessMaximized && (
+                      <>
                         {/* Search Bar */}
-                        <div style={{ position: 'relative', marginBottom: '16px' }}>
+                        <div style={{ position: 'relative', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <input
                             type="text"
                             value={accessSearchValue}
                             onChange={(e) => setAccessSearchValue(e.target.value)}
                             placeholder="search"
                             style={{
-                              width: '100%',
+                              flex: 1,
                               padding: '8px 12px',
                               backgroundColor: '#F1F1F1',
                               borderRadius: '8px',
@@ -3174,7 +3982,7 @@ const AdminDashboard: React.FC = () => {
                           className="access-rows-scrollable"
                           style={{ 
                             position: 'relative',
-                            height: '500px',
+                            maxHeight: 'calc(100vh - 400px)',
                             overflowY: 'auto',
                             overflowX: 'hidden',
                             paddingRight: '4px',
@@ -3320,13 +4128,13 @@ const AdminDashboard: React.FC = () => {
                                     padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      fontSize: '10px',
+                                      fontSize: '11px',
                                       color: '#939393',
                                       fontFamily: 'Poppins, sans-serif'
                                     }}>
                                       {permission.label}
                                     </span>
-                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                       <input
                                         type="checkbox"
                                         checked={permissionToggles.listings[permission.key] || false}
@@ -3348,15 +4156,15 @@ const AdminDashboard: React.FC = () => {
                                         right: 0,
                                         bottom: 0,
                                         backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                        borderRadius: '8px',
+                                        borderRadius: '10px',
                                         transition: 'background-color 0.3s'
                                       }}>
                                         <span style={{
                                           position: 'absolute',
                                           content: '""',
-                                          height: '12px',
-                                          width: '12px',
-                                          left: (permissionToggles.listings[permission.key] || false) ? '14px' : '2px',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
                                           bottom: '2px',
                                           backgroundColor: '#FFFFFF',
                                           borderRadius: '50%',
@@ -3485,13 +4293,13 @@ const AdminDashboard: React.FC = () => {
                                     padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      fontSize: '10px',
+                                      fontSize: '11px',
                                       color: '#939393',
                                       fontFamily: 'Poppins, sans-serif'
                                     }}>
                                       {permission.label}
                                     </span>
-                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                       <input
                                         type="checkbox"
                                         checked={permissionToggles.messages[permission.key] || false}
@@ -3513,15 +4321,15 @@ const AdminDashboard: React.FC = () => {
                                         right: 0,
                                         bottom: 0,
                                         backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                        borderRadius: '8px',
+                                        borderRadius: '10px',
                                         transition: 'background-color 0.3s'
                                       }}>
                                         <span style={{
                                           position: 'absolute',
                                           content: '""',
-                                          height: '12px',
-                                          width: '12px',
-                                          left: (permissionToggles.messages[permission.key] || false) ? '14px' : '2px',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
                                           bottom: '2px',
                                           backgroundColor: '#FFFFFF',
                                           borderRadius: '50%',
@@ -3650,13 +4458,13 @@ const AdminDashboard: React.FC = () => {
                                     padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      fontSize: '10px',
+                                      fontSize: '11px',
                                       color: '#939393',
                                       fontFamily: 'Poppins, sans-serif'
                                     }}>
                                       {permission.label}
                                     </span>
-                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                       <input
                                         type="checkbox"
                                         checked={permissionToggles.requests[permission.key] || false}
@@ -3678,15 +4486,15 @@ const AdminDashboard: React.FC = () => {
                                         right: 0,
                                         bottom: 0,
                                         backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                        borderRadius: '8px',
+                                        borderRadius: '10px',
                                         transition: 'background-color 0.3s'
                                       }}>
                                         <span style={{
                                           position: 'absolute',
                                           content: '""',
-                                          height: '12px',
-                                          width: '12px',
-                                          left: (permissionToggles.requests[permission.key] || false) ? '14px' : '2px',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
                                           bottom: '2px',
                                           backgroundColor: '#FFFFFF',
                                           borderRadius: '50%',
@@ -3815,13 +4623,13 @@ const AdminDashboard: React.FC = () => {
                                     padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      fontSize: '10px',
+                                      fontSize: '11px',
                                       color: '#939393',
                                       fontFamily: 'Poppins, sans-serif'
                                     }}>
                                       {permission.label}
                                     </span>
-                                    <label style={{ position: 'relative', display: 'inline-block', width: '30px', height: '16px', cursor: 'pointer' }}>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
                                       <input
                                         type="checkbox"
                                         checked={permissionToggles.users[permission.key] || false}
@@ -3843,15 +4651,15 @@ const AdminDashboard: React.FC = () => {
                                         right: 0,
                                         bottom: 0,
                                         backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                        borderRadius: '8px',
+                                        borderRadius: '10px',
                                         transition: 'background-color 0.3s'
                                       }}>
                                         <span style={{
                                           position: 'absolute',
                                           content: '""',
-                                          height: '12px',
-                                          width: '12px',
-                                          left: (permissionToggles.users[permission.key] || false) ? '14px' : '2px',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
                                           bottom: '2px',
                                           backgroundColor: '#FFFFFF',
                                           borderRadius: '50%',
@@ -3882,8 +4690,71 @@ const AdminDashboard: React.FC = () => {
                       </>
                     )}
 
+                    {/* Empty Placeholder when Manage Access is Maximized - Shows below header */}
+                    {isManageAccessView && isManageAccessMaximized && (
+                      <div style={{
+                        position: 'relative',
+                        border: '2px dashed #D9D9D9',
+                        borderRadius: '12px',
+                        padding: '40px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '300px',
+                        textAlign: 'center',
+                        marginTop: '16px'
+                      }}>
+                        <p style={{
+                          fontSize: '12px',
+                          color: '#B0B0B0',
+                          fontFamily: 'Poppins, sans-serif',
+                          margin: '0 0 8px 0',
+                          lineHeight: '1.5'
+                        }}>
+                          The review window has been enlarged, reduce it if you want to see it appear here again.
+                        </p>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => setIsManageAccessMaximized(false)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: '#64B5F6',
+                              fontSize: '12px',
+                              fontFamily: 'Poppins, sans-serif',
+                              padding: '4px 8px'
+                            }}
+                          >
+                            <span>Reduce reviews window</span>
+                            <img
+                              src={expandIcon}
+                              alt="Reduce"
+                              style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                            />
+                          </button>
+                        </div>
+                        {/* Fade Effect at Bottom */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1,
+                          borderRadius: '0 0 12px 12px'
+                        }} />
+                      </div>
+                    )}
+
                     {/* Tabs */}
-                    {!isManageAccessView && (
+                    {!isManageAccessView && !isManageAccessMaximized && (
                     <div style={{
                       display: 'flex',
                       gap: '16px',
