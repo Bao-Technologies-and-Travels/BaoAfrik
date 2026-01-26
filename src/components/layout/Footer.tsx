@@ -1,8 +1,37 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import footerLogo from '../../assets/images/logos/text.png';
 
 const Footer: React.FC = () => {
+  const logoRef = useRef<HTMLAnchorElement>(null);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  const handleMouseDown = () => {
+    if (logoRef.current) {
+      logoRef.current.style.border = '2px solid white';
+    }
+  };
+
+  const handleMouseUp = () => {
+    setTimeout(() => {
+      if (logoRef.current) {
+        logoRef.current.style.border = 'none';
+      }
+    }, 150);
+  };
+
+  const handleBlur = () => {
+    if (logoRef.current) {
+      logoRef.current.style.border = 'none';
+    }
+  };
+
   return (
     <footer className="bg-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -10,7 +39,19 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2 text-center md:text-left">
             <div className="mb-6">
-              <Link to="/" className="inline-block focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
+              <Link 
+                ref={logoRef}
+                to="/" 
+                onClick={scrollToTop}
+                className="inline-block focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 rounded cursor-pointer"
+                style={{ 
+                  borderRadius: '8px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onBlur={handleBlur}
+              >
                 <img 
                   src={footerLogo} 
                   alt="BaoAfrik - African Marketplace Logo" 
@@ -18,14 +59,14 @@ const Footer: React.FC = () => {
                 />
               </Link>
               <p className="text-sm leading-relaxed" style={{ color: '#BABABA' }}>
-                Come to the meeting of African treasures
+                Bringing home closer to Africans abroad.
               </p>
             </div>
           </div>
 
-          {/* Products */}
+          {/* Marketplace */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Products</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Marketplace</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/category/food-spices" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Food & Spices</Link></li>
               <li><Link to="/category/fashion-textiles" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Fashion & Textiles</Link></li>
@@ -35,43 +76,41 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* About Us */}
+          {/* About BaoAfrik */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>About Us</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>About BaoAfrik</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li><Link to="/contact" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact us</Link></li>
-              <li><Link to="/about" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Bao Technologies and Travels</Link></li>
-              <li><Link to="/network" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our network</Link></li>
-              <li><Link to="/partnership" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnership</Link></li>
+              <li><Link to="/our-story" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our Story</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">How It Works</Link></li>
+              <li><Link to="/partnerships" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnerships</Link></li>
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Support */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Resources</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Support</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li><Link to="/help" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Help center</Link></li>
-              <li><Link to="/blog" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Blog</Link></li>
+              <li><Link to="/help-centre" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Help Centre</Link></li>
+              <li><Link to="/safety-trust" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Safety & Trust</Link></li>
+              <li><Link to="/contact-support" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact Support</Link></li>
             </ul>
           </div>
 
-          {/* Get in touch */}
+          {/* Legal */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Get in touch</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Legal</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li>Questions or feedback?</li>
-              <li>We'd love to hear from you</li>
+              <li><Link to="/terms" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms of Use</Link></li>
+              <li><Link to="/privacy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/cookie-policy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Cookie Policy</Link></li>
+              <li><Link to="/community-guidelines" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Community Guidelines</Link></li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-          <div className="text-sm mb-4 md:mb-0 flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" style={{ color: '#BABABA' }}>
-            <Link to="/terms" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms of Use</Link>
-            <Link to="/privacy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link>
-          </div>
+        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-end items-center text-center md:text-right">
           <div className="text-sm" style={{ color: '#BABABA' }}>
-            © {new Date().getFullYear()} All rights reserved - Bao Technologies and Travels
+            © 2026 All rights reserved - Baoafrik
           </div>
         </div>
       </div>
