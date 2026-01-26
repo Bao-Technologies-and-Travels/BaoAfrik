@@ -50,6 +50,7 @@ import grayArrowIcon from '../../assets/images/pre/gray.svg';
 import blackArrowIcon from '../../assets/images/pre/black.svg';
 import redtrashIcon from '../../assets/images/pre/redtrash.svg';
 import warningIcon from '../../assets/images/admin/warning.svg';
+import expandIcon from '../../assets/images/admin/expand.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -183,6 +184,9 @@ const AdminDashboard: React.FC = () => {
   const [isSuspendSuccess, setIsSuspendSuccess] = useState(false);
   const [isUserSuspended, setIsUserSuspended] = useState(false);
   const [suspendCountdown, setSuspendCountdown] = useState(10);
+  const [isManageAccessView, setIsManageAccessView] = useState(false);
+  const [expandedAccessSections, setExpandedAccessSections] = useState<Set<string>>(new Set());
+  const [accessSearchValue, setAccessSearchValue] = useState('');
 
   // Mock data for search
   const mockUsers = [
@@ -613,7 +617,15 @@ const AdminDashboard: React.FC = () => {
               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View user profile</span>
             </div>
 
-            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+            <div 
+              onClick={() => {
+                setIsManageAccessView(true);
+                setMoreMenu(null);
+              }}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
+              style={baseItemStyle}
+            >
               <img
                 src={pencilIcon}
                 alt="Edit access"
@@ -2614,6 +2626,10 @@ const AdminDashboard: React.FC = () => {
                           >
                             {/* Edit user access */}
                             <div 
+                              onClick={() => {
+                                setIsManageAccessView(true);
+                                setSidebarMoreMenu(null);
+                              }}
                               onMouseEnter={primaryHoverOn} 
                               onMouseLeave={primaryHoverOff} 
                               style={baseItemStyle}
@@ -2970,7 +2986,424 @@ const AdminDashboard: React.FC = () => {
                     )}
                     </div>
 
+                    {/* Manage Access View */}
+                    {isManageAccessView && (
+                      <>
+                        {/* Manage Access Header */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: '12px',
+                          paddingBottom: '12px',
+                          borderBottom: '1px solid #F1F1F1'
+                        }}>
+                          {/* Left: X button and "Manage access" text */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <button
+                              onClick={() => setIsManageAccessView(false)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                            </button>
+                            <span style={{
+                              fontSize: '14px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600
+                            }}>
+                              Manage access
+                            </span>
+                          </div>
+
+                          {/* Right: Access badge and expand button */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            {/* Access Badge */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              padding: '4px 8px',
+                              backgroundColor: '#F0F8FE',
+                              borderRadius: '6px'
+                            }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                85/112 Access
+                              </span>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+
+                            {/* Expand Button */}
+                            <button
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <img
+                                src={expandIcon}
+                                alt="Expand"
+                                style={{ width: '16px', height: '16px' }}
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Description Text */}
+                        <p style={{
+                          fontSize: '12px',
+                          color: '#9C9C9C',
+                          fontFamily: 'Poppins, sans-serif',
+                          margin: '0 0 16px 0',
+                          lineHeight: '1.5'
+                        }}>
+                          Manage user access permissions and control what features this user can access.
+                        </p>
+
+                        {/* Search Bar */}
+                        <div style={{ position: 'relative', marginBottom: '16px' }}>
+                          <input
+                            type="text"
+                            value={accessSearchValue}
+                            onChange={(e) => setAccessSearchValue(e.target.value)}
+                            placeholder="Search access permissions..."
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              paddingLeft: '36px',
+                              backgroundColor: '#F1F1F1',
+                              borderRadius: '12px',
+                              border: 'none',
+                              outline: 'none',
+                              color: '#6A6A6A',
+                              fontSize: '12px',
+                              fontFamily: 'Poppins, sans-serif',
+                              caretColor: '#CFE8FC'
+                            }}
+                          />
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#9C9C9C"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{
+                              position: 'absolute',
+                              left: '12px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              pointerEvents: 'none'
+                            }}
+                          >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                          </svg>
+                        </div>
+
+                        {/* Access Rows */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {/* Listings Access Row */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            overflow: 'hidden'
+                          }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px 14px',
+                                cursor: 'pointer',
+                                backgroundColor: expandedAccessSections.has('listings') ? '#FAFAFA' : '#FFFFFF',
+                                transition: 'background-color 0.2s'
+                              }}
+                              onClick={() => {
+                                const newSet = new Set(expandedAccessSections);
+                                if (newSet.has('listings')) {
+                                  newSet.delete('listings');
+                                } else {
+                                  newSet.add('listings');
+                                }
+                                setExpandedAccessSections(newSet);
+                              }}
+                            >
+                              <span style={{
+                                fontSize: '12px',
+                                color: '#212121',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontWeight: 500
+                              }}>
+                                Listings
+                              </span>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedAccessSections.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s'
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {expandedAccessSections.has('listings') && (
+                              <div style={{ padding: '12px 14px', borderTop: '1px solid #F1F1F1' }}>
+                                <p style={{
+                                  fontSize: '11px',
+                                  color: '#9C9C9C',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  margin: 0
+                                }}>
+                                  Access permissions for listings will appear here.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Messages Access Row */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            overflow: 'hidden'
+                          }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px 14px',
+                                cursor: 'pointer',
+                                backgroundColor: expandedAccessSections.has('messages') ? '#FAFAFA' : '#FFFFFF',
+                                transition: 'background-color 0.2s'
+                              }}
+                              onClick={() => {
+                                const newSet = new Set(expandedAccessSections);
+                                if (newSet.has('messages')) {
+                                  newSet.delete('messages');
+                                } else {
+                                  newSet.add('messages');
+                                }
+                                setExpandedAccessSections(newSet);
+                              }}
+                            >
+                              <span style={{
+                                fontSize: '12px',
+                                color: '#212121',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontWeight: 500
+                              }}>
+                                Messages
+                              </span>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedAccessSections.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s'
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {expandedAccessSections.has('messages') && (
+                              <div style={{ padding: '12px 14px', borderTop: '1px solid #F1F1F1' }}>
+                                <p style={{
+                                  fontSize: '11px',
+                                  color: '#9C9C9C',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  margin: 0
+                                }}>
+                                  Access permissions for messages will appear here.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Requests Access Row */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            overflow: 'hidden'
+                          }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px 14px',
+                                cursor: 'pointer',
+                                backgroundColor: expandedAccessSections.has('requests') ? '#FAFAFA' : '#FFFFFF',
+                                transition: 'background-color 0.2s'
+                              }}
+                              onClick={() => {
+                                const newSet = new Set(expandedAccessSections);
+                                if (newSet.has('requests')) {
+                                  newSet.delete('requests');
+                                } else {
+                                  newSet.add('requests');
+                                }
+                                setExpandedAccessSections(newSet);
+                              }}
+                            >
+                              <span style={{
+                                fontSize: '12px',
+                                color: '#212121',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontWeight: 500
+                              }}>
+                                Requests
+                              </span>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedAccessSections.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s'
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {expandedAccessSections.has('requests') && (
+                              <div style={{ padding: '12px 14px', borderTop: '1px solid #F1F1F1' }}>
+                                <p style={{
+                                  fontSize: '11px',
+                                  color: '#9C9C9C',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  margin: 0
+                                }}>
+                                  Access permissions for requests will appear here.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Users Access Row */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            overflow: 'hidden'
+                          }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px 14px',
+                                cursor: 'pointer',
+                                backgroundColor: expandedAccessSections.has('users') ? '#FAFAFA' : '#FFFFFF',
+                                transition: 'background-color 0.2s'
+                              }}
+                              onClick={() => {
+                                const newSet = new Set(expandedAccessSections);
+                                if (newSet.has('users')) {
+                                  newSet.delete('users');
+                                } else {
+                                  newSet.add('users');
+                                }
+                                setExpandedAccessSections(newSet);
+                              }}
+                            >
+                              <span style={{
+                                fontSize: '12px',
+                                color: '#212121',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontWeight: 500
+                              }}>
+                                Users
+                              </span>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedAccessSections.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s'
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {expandedAccessSections.has('users') && (
+                              <div style={{ padding: '12px 14px', borderTop: '1px solid #F1F1F1' }}>
+                                <p style={{
+                                  fontSize: '11px',
+                                  color: '#9C9C9C',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  margin: 0
+                                }}>
+                                  Access permissions for users will appear here.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
                     {/* Tabs */}
+                    {!isManageAccessView && (
                     <div style={{
                       display: 'flex',
                       gap: '16px',
@@ -3000,8 +3433,10 @@ const AdminDashboard: React.FC = () => {
                         </button>
                       ))}
                     </div>
+                    )}
 
                     {/* See user bio */}
+                    {!isManageAccessView && (
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -3025,8 +3460,11 @@ const AdminDashboard: React.FC = () => {
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
                     </div>
+                    )}
 
                     {/* Account Information */}
+                    {!isManageAccessView && (
+                    <>
                     <div style={{ marginBottom: '12px' }}>
                       <div 
                         style={{
@@ -3546,6 +3984,8 @@ const AdminDashboard: React.FC = () => {
                       </div>
                       )}
                     </div>
+                    </>
+                    )}
                   </div>
                 </div>
               </div>
