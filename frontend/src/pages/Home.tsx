@@ -1962,6 +1962,31 @@ const Home: React.FC = () => {
     };
   }, [selectedImageUrl]);
 
+  const displayedProducts = React.useMemo(() => {
+    if (isSearchActive) {
+      return searchResults;
+    }
+
+    let productsToShow: FrontendProduct[] = [];
+    if (activeCategory === 'All') {
+      productsToShow = Object.values(allProductsComputed).flat();
+    } else {
+      productsToShow = allProductsComputed[activeCategory] || [];
+    }
+    if (selectedCountry) {
+      productsToShow = productsToShow.filter((product: FrontendProduct) =>
+        getProductCountry(product.origin).name === selectedCountry
+      );
+    }
+    // Apply pagination
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return productsToShow.slice(startIndex, startIndex + itemsPerPage);
+  }, [isSearchActive, searchResults, activeCategory, allProductsComputed, selectedCountry, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, selectedCountry, searchQuery, selectedPlaceOfOriginText, sellerLocation]);
+
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Hidden file input for image selection */}

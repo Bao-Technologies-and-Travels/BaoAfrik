@@ -22,14 +22,14 @@ const Footer: React.FC = () => {
                 }}
               />
               <p className="text-sm leading-relaxed" style={{ color: '#BABABA' }}>
-                Come to the meeting of African treasures
+              Bringing home closer to Africans abroad
               </p>
             </div>
           </div>
 
           {/* Products */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Products</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Marketplace</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/?category=Food%20%26%20Spices" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Food & Spices</Link></li>
               <li><Link to="/?category=Fashion%20%26%20Textiles" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Fashion & Textiles</Link></li>
@@ -41,41 +41,43 @@ const Footer: React.FC = () => {
 
           {/* About Us */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>About Us</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>About BaoAfrik</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li><Link to="/contact" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact us</Link></li>
-              {/* <li><Link to="/about" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Bao Technologies and Travels</Link></li> */}
-              {/* <li><Link to="/network" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our network</Link></li> */}
-              <li><Link to="/partnership" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnership</Link></li>
+              <li><Link to="/our-story" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our Story</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">How It Works</Link></li>
+              <li><Link to="/partnership" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnerships</Link></li>
             </ul>
           </div>
 
           {/* Resources */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Resources</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Support</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/help" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Help center</Link></li>
-              <li><Link to="/blog" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Blog</Link></li>
+              <li><Link to="/safety" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Safety & Trust</Link></li>
+              <li><Link to="/contact" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact</Link></li>
             </ul>
           </div>
 
           {/* Get in touch */}
           <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Get in touch</h3>
+            <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Legal</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li>Questions or feedback?</li>
-              <li>We'd love to hear from you</li>
+            <li><Link to="/terms-of-use" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms Of Use</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/cookie-policy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Cookie Policy</Link></li>
+              <li><Link to="/community-guidelines" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Community Guidelines</Link></li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-          <div className="text-sm mb-4 md:mb-0 flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" style={{ color: '#BABABA' }}>
+        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-center items-center text-center md:text-left">
+          {/* <div className="text-sm mb-4 md:mb-0 flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" style={{ color: '#BABABA' }}>
             <Link to="/terms" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms of Use</Link>
             <Link to="/privacy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link>
-          </div>
+          </div> */}
           <div className="text-sm" style={{ color: '#BABABA' }}>
-            © {new Date().getFullYear()} All rights reserved - Bao Technologies and Travels
+            © {new Date().getFullYear()} BaoAfrik. All rights reserved.
           </div>
         </div>
       </div>

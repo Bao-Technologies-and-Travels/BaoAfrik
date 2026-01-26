@@ -94,8 +94,7 @@ const Notifications: React.FC = () => {
           if (match) {
             text = 'Your profile has been updated,';
             additionalText = 'you are now a seller.';
-            // Use a default subText or extract from meta if available
-            subText = meta?.subText || `Facture 6 août 2025 Séquence : 2-7480206584 N° de commande : MQKW6YTK42Documen...`;
+            subText = meta?.subText;
           }
         } else {
           // For other product messages, use the message as text

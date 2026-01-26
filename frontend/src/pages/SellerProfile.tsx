@@ -1435,7 +1435,7 @@ const SellerProfile: React.FC = () => {
                               setUserReviewText(e.target.value);
                             }
                           }}
-                          placeholder="What do you think of this article?"
+                          placeholder="What do you think of this user?"
                           className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none resize-none custom-placeholder"
                           style={{
                             border: 'none',

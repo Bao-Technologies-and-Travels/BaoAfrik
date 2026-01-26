@@ -3192,7 +3192,7 @@ const ProfileSettings: React.FC = () => {
                     {/* Right side - Language, button, profile, notifications */}
                     <div className="flex items-center space-x-4 bg-gray-50 px-4 py-2 rounded-lg">
                       {/* Language Selector */}
-                      <div className="relative language-selector">
+                      {/* <div className="relative language-selector">
                         <button
                           onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                           className="flex items-center px-2.5 py-1 border rounded-lg bg-white text-sm font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
@@ -3202,7 +3202,6 @@ const ProfileSettings: React.FC = () => {
                           <img src={arrowDownIcon} alt="Arrow" className="ml-1 w-4 h-4" />
                         </button>
 
-                        {/* Dropdown Menu */}
                         {isLanguageDropdownOpen && (
                           <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                             <div className="py-1">
@@ -3229,7 +3228,7 @@ const ProfileSettings: React.FC = () => {
                             </div>
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
                       {/* Become Seller Button */}
                       {/* <Link
