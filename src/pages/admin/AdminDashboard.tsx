@@ -52,6 +52,12 @@ import blackArrowIcon from '../../assets/images/pre/black.svg';
 import redtrashIcon from '../../assets/images/pre/redtrash.svg';
 import warningIcon from '../../assets/images/admin/warning.svg';
 import expandIcon from '../../assets/images/admin/expand.svg';
+import gotoIcon from '../../assets/images/admin/goto.svg';
+import desIcon from '../../assets/images/admin/des.svg';
+import calendarIcon from '../../assets/images/pre/calendar.svg';
+import pinIcon from '../../assets/images/pre/pin.svg';
+import chromeIcon from '../../assets/images/pre/chrome.svg';
+import deviceIcon from '../../assets/images/pre/device.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -175,6 +181,17 @@ const AdminDashboard: React.FC = () => {
   const [currentActivityLabel, setCurrentActivityLabel] = useState<string | null>(null);
   // Used to render the longer "history activities" left area on the detail page
   const [isViewingActivityHistory, setIsViewingActivityHistory] = useState(false);
+  const [selectedActivityDetail, setSelectedActivityDetail] = useState<{
+    title: string;
+    description: string;
+    time: string;
+    date: string;
+  } | null>(null);
+  const [activityDetailMoreMenu, setActivityDetailMoreMenu] = useState<{
+    anchorRect: DOMRect;
+  } | null>(null);
+  const activityDetailMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const activityDetailMoreMenuButtonRef = useRef<HTMLDivElement | null>(null);
   const [activityToDelete, setActivityToDelete] = useState<string | null>(null);
   const [isDeleteActivitySuccess, setIsDeleteActivitySuccess] = useState(false);
   const [isActivityDeleted, setIsActivityDeleted] = useState(false);
@@ -479,6 +496,30 @@ const AdminDashboard: React.FC = () => {
       window.removeEventListener('resize', onResize);
     };
   }, [sidebarMoreMenu]);
+
+  // Close activity detail more menu on outside click / scroll / resize (portal-safe)
+  useEffect(() => {
+    if (!activityDetailMoreMenu) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const clickedMenu = !!activityDetailMoreMenuRef.current?.contains(target);
+      const clickedButton = !!activityDetailMoreMenuButtonRef.current?.contains(target);
+      if (!clickedMenu && !clickedButton) {
+        setActivityDetailMoreMenu(null);
+      }
+    };
+    const onScroll = () => setActivityDetailMoreMenu(null);
+    const onResize = () => setActivityDetailMoreMenu(null);
+    document.addEventListener('mousedown', onMouseDown, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, true);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [activityDetailMoreMenu]);
 
   // Countdown timer for suspend success modal
   useEffect(() => {
@@ -2968,7 +3009,16 @@ const AdminDashboard: React.FC = () => {
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                               {group.items.map((item, idx) => (
                                 <React.Fragment key={`${group.date}-${idx}`}>
-                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '10px 0' }}>
+                                  <div 
+                                    onClick={() => {
+                                      setSelectedActivityDetail({
+                                        title: item.title,
+                                        description: item.description,
+                                        time: item.time,
+                                        date: group.date
+                                      });
+                                    }}
+                                    style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '10px 0', cursor: 'pointer' }}>
                                     {/* Profile with Notification Bell */}
                                     <div style={{ position: 'relative', flexShrink: 0 }}>
                                       <div style={{
@@ -8085,6 +8135,389 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </div>
+            </div>
+          )}
+
+          {/* Activity Detail Modal */}
+          {selectedActivityDetail && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10000,
+                backdropFilter: 'blur(4px)'
+              }}
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setSelectedActivityDetail(null);
+                  setActivityDetailMoreMenu(null);
+                }
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '18px',
+                  border: '1px solid #E9E9E9',
+                  width: '90%',
+                  maxWidth: '600px',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
+                  padding: '24px',
+                  position: 'relative'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                  <h2 style={{
+                    fontSize: '16px',
+                    color: '#212121',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: 600,
+                    margin: 0
+                  }}>
+                    Detail de l'activité
+                  </h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {/* More Options Button */}
+                    <div
+                      ref={activityDetailMoreMenuButtonRef}
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setActivityDetailMoreMenu({ anchorRect: rect });
+                      }}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="4" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
+                        <circle cx="8" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
+                        <circle cx="12" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
+                      </svg>
+                    </div>
+                    {/* Close Button */}
+                    <button
+                      onClick={() => {
+                        setSelectedActivityDetail(null);
+                        setActivityDetailMoreMenu(null);
+                      }}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Activity Profile Section */}
+                <div style={{ position: 'relative', marginBottom: '24px', minHeight: '48px' }}>
+                  {/* Profile Picture */}
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    backgroundColor: '#D5E9BD',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    position: 'absolute',
+                    left: 0,
+                    top: 0
+                  }}>
+                    {selectedUserForProfile?.avatar && (
+                      <img
+                        src={selectedUserForProfile.avatar}
+                        alt={selectedUserForProfile.name}
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '50%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    )}
+                  </div>
+                  {/* Name at top right of profile */}
+                  <div style={{
+                    position: 'absolute',
+                    left: '64px',
+                    top: 0
+                  }}>
+                    <span style={{
+                      fontSize: '14px',
+                      color: '#212121',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontWeight: 500
+                    }}>
+                      {selectedUserForProfile?.name || 'User Name'}
+                    </span>
+                  </div>
+                  {/* Activity description at bottom right of profile */}
+                  <div style={{
+                    position: 'absolute',
+                    left: '64px',
+                    top: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <span style={{
+                      fontSize: '12px',
+                      color: '#939393',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      {selectedActivityDetail.description.replace('View more', '')}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: '#64B5F6',
+                        fontFamily: 'Poppins, sans-serif',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      Go to
+                      <img
+                        src={gotoIcon}
+                        alt="Go to"
+                        style={{
+                          width: '14px',
+                          height: '14px'
+                        }}
+                      />
+                    </span>
+                  </div>
+                </div>
+
+                {/* Detail and session Section */}
+                <div style={{ marginBottom: '24px' }}>
+                  <h3 style={{
+                    fontSize: '14px',
+                    color: '#212121',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: 600,
+                    margin: '0 0 12px 0'
+                  }}>
+                    Detail and session
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {/* Today, 17:12 */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img
+                        src={calendarIcon}
+                        alt="Time"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        {selectedActivityDetail.date === 'Today' ? 'Today' : selectedActivityDetail.date === 'Yesterday' ? 'Yesterday' : selectedActivityDetail.date}, {selectedActivityDetail.time}
+                      </span>
+                    </div>
+                    {/* From Paris, France */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img
+                        src={pinIcon}
+                        alt="Location"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        From Paris, France
+                      </span>
+                    </div>
+                    {/* Chrome Browser */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img
+                        src={chromeIcon}
+                        alt="Browser"
+                        style={{
+                          width: '16px',
+                          height: '16px'
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        Chrome Browser
+                      </span>
+                    </div>
+                    {/* Desktop-6R899ET */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img
+                        src={deviceIcon}
+                        alt="Device"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        Desktop-6R899ET
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description Section */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <img
+                    src={desIcon}
+                    alt="Description"
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      flexShrink: 0,
+                      marginTop: '2px'
+                    }}
+                  />
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#B0B0B0',
+                    fontFamily: 'Poppins, sans-serif',
+                    margin: 0,
+                    lineHeight: '1.5'
+                  }}>
+                    Lorem ipsum dolor sit amet consectetur. Neque vitae rhoncus amet nec diam in. Accum san lacus egestas viverra diam in scelerisque. Magnis netus nisl ultricies aliquam.
+                  </p>
+                </div>
+
+                {/* Activity Detail More Options Dropdown */}
+                {activityDetailMoreMenu && (() => {
+                  const menuWidth = 200;
+                  const margin = 8;
+                  const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, activityDetailMoreMenu.anchorRect.right - menuWidth));
+                  const top = activityDetailMoreMenu.anchorRect.bottom + 8;
+
+                  return createPortal(
+                    <div
+                      ref={activityDetailMoreMenuRef}
+                      className="activity-detail-more-options-dropdown"
+                      style={{
+                        position: 'fixed',
+                        top,
+                        left,
+                        width: `${menuWidth}px`,
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '12px',
+                        border: '1px solid #F1F1F1',
+                        boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                        padding: '8px',
+                        zIndex: 99999
+                      }}
+                    >
+                      {/* Delete the activity */}
+                      <div
+                        onClick={() => {
+                          const activityText = selectedActivityDetail.title;
+                          setActivityToDelete(activityText);
+                          setSelectedActivityDetail(null);
+                          setActivityDetailMoreMenu(null);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.cursor = 'pointer';
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px',
+                          borderRadius: '8px',
+                          cursor: `url(${mouseCursorIcon}), auto`,
+                          transition: 'background-color 0.2s'
+                        }}
+                      >
+                        <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                        <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
+                      </div>
+
+                      {/* Close */}
+                      <div
+                        onClick={() => setActivityDetailMoreMenu(null)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.cursor = 'pointer';
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px',
+                          borderRadius: '8px',
+                          backgroundColor: '#FAFAFA',
+                          cursor: `url(${mouseCursorIcon}), auto`,
+                          transition: 'background-color 0.2s',
+                          marginTop: '4px'
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                      </div>
+                    </div>,
+                    document.body
+                  );
+                })()}
+              </div>
             </div>
           )}
         </div>
