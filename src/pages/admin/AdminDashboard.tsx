@@ -2960,7 +2960,7 @@ const AdminDashboard: React.FC = () => {
                             ]
                           }
                         ].map((group, groupIdx, groups) => (
-                          <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px' }}>
+                          <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px', marginTop: groupIdx === 0 ? '20px' : '0' }}>
                             <div style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginBottom: '10px' }}>
                               {group.date}
                             </div>
@@ -2972,8 +2972,8 @@ const AdminDashboard: React.FC = () => {
                                     {/* Profile with Notification Bell */}
                                     <div style={{ position: 'relative', flexShrink: 0 }}>
                                       <div style={{
-                                        width: '48px',
-                                        height: '48px',
+                                        width: '40px',
+                                        height: '40px',
                                         borderRadius: '50%',
                                         backgroundColor: '#D5E9BD',
                                         display: 'flex',
@@ -2992,8 +2992,8 @@ const AdminDashboard: React.FC = () => {
                                             }
                                             alt={selectedUserForProfile.name}
                                             style={{
-                                              width: '44px',
-                                              height: '44px',
+                                              width: '36px',
+                                              height: '36px',
                                               borderRadius: '50%',
                                               objectFit: 'cover'
                                             }}
@@ -3005,8 +3005,8 @@ const AdminDashboard: React.FC = () => {
                                         position: 'absolute',
                                         bottom: '-2px',
                                         right: '-2px',
-                                        width: '20px',
-                                        height: '20px',
+                                        width: '16px',
+                                        height: '16px',
                                         borderRadius: '50%',
                                         backgroundColor: '#FFFFFF',
                                         display: 'flex',
@@ -3024,8 +3024,8 @@ const AdminDashboard: React.FC = () => {
                                           }
                                           alt="Notification"
                                           style={{
-                                            width: '12px',
-                                            height: '12px',
+                                            width: '10px',
+                                            height: '10px',
                                             filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
                                           }}
                                         />
