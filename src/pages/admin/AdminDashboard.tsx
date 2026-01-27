@@ -178,6 +178,9 @@ const AdminDashboard: React.FC = () => {
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('The most relevant');
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const reviewsTotalPages = 6; // 23 reviews / 4 per page = 6 pages (rounded up)
+  const reviewsPerPage = 4;
   const [activityCardMoreMenu, setActivityCardMoreMenu] = useState<{
     anchorRect: DOMRect;
   } | null>(null);
@@ -2048,9 +2051,353 @@ const AdminDashboard: React.FC = () => {
                     transition: 'all 0.3s ease'
                   }}
                 >
-                  {/* Left: Title + Description + Activity Card OR Maximized Manage Access Content */}
+                  {/* Left: Title + Description + Activity Card OR Maximized Manage Access Content OR Maximized Reviews Content */}
                   <div>
-                  {isManageAccessMaximized && isManageAccessView ? (
+                  {isReviewsMaximized && userDetailActiveTab === 'reviews' && !isManageAccessView ? (
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '14px',
+                      marginTop: '10px',
+                      transition: 'all 0.3s ease',
+                      animation: 'slideIn 0.3s ease'
+                    }}>
+                      <style>{`
+                        @keyframes slideIn {
+                          from {
+                            opacity: 0;
+                            transform: translateX(-20px);
+                          }
+                          to {
+                            opacity: 1;
+                            transform: translateX(0);
+                          }
+                        }
+                      `}</style>
+                      {/* Top Bar: Filter Button (left) and Reduce Window (right) */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        {/* Filter Dropdown */}
+                        <div style={{ position: 'relative' }} ref={filterDropdownRef}>
+                          <button 
+                            onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                            style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '6px', 
+                              color: '#939393', 
+                              fontSize: '11px', 
+                              fontFamily: 'Poppins, sans-serif',
+                              cursor: 'pointer',
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              padding: 0,
+                              transition: 'opacity 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                              <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                              <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                              <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                              <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                            </svg>
+                            <span>{selectedFilter}</span>
+                          </button>
+                          
+                          {/* Dropdown Menu */}
+                          {filterDropdownOpen && (
+                            <div style={{ 
+                              position: 'absolute', 
+                              top: '24px', 
+                              left: 0, 
+                              backgroundColor: '#FFFFFF', 
+                              border: '1px solid #E5E7EB', 
+                              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', 
+                              zIndex: 10, 
+                              borderRadius: '8px', 
+                              padding: '4px', 
+                              minWidth: '200px', 
+                              maxWidth: '240px' 
+                            }}>
+                              {filterOptions.map((option, index) => {
+                                const isSelected = selectedFilter === option.label;
+                                return (
+                                  <button
+                                    key={option.id}
+                                    onClick={() => handleFilterSelect(option.id)}
+                                    style={{
+                                      width: '100%',
+                                      textAlign: 'left',
+                                      display: 'flex',
+                                      alignItems: 'flex-start',
+                                      gap: '8px',
+                                      backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                                      borderRadius: isSelected ? '6px' : '0',
+                                      marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
+                                      padding: '6px 8px',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                  >
+                                    <div style={{ flexShrink: 0, marginTop: '1px' }}>
+                                      {option.icon === 'star' ? (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                      ) : (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                          <circle cx="12" cy="12" r="10"/>
+                                          <path d="M12 6v6l4 2"/>
+                                        </svg>
+                                      )}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ 
+                                        fontSize: '11px', 
+                                        marginBottom: '1px', 
+                                        color: isSelected ? '#64B5F6' : '#212121',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        fontWeight: 500
+                                      }}>
+                                        {option.label}
+                                      </div>
+                                      <div style={{ 
+                                        fontSize: '9px', 
+                                        color: '#939393',
+                                        fontFamily: 'Poppins, sans-serif'
+                                      }}>
+                                        {option.description}
+                                      </div>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Reduce Window Button */}
+                        <button
+                          onClick={() => setIsReviewsMaximized(false)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#64B5F6',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            padding: '4px 8px',
+                            transition: 'opacity 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                        >
+                          <span>Reduce the window</span>
+                          <img
+                            src={expandIcon}
+                            alt="Reduce"
+                            style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Reviews List - Scrollable */}
+                      <div
+                        className="reviews-maximized-scroll-container"
+                        style={{
+                          maxHeight: '500px',
+                          overflowY: 'auto',
+                          paddingRight: '6px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none',
+                          position: 'relative',
+                          marginBottom: '16px'
+                        }}
+                      >
+                        <style>{`
+                          .reviews-maximized-scroll-container::-webkit-scrollbar {
+                            display: none !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                            background: transparent !important;
+                          }
+                          .reviews-maximized-scroll-container {
+                            -ms-overflow-style: none !important;
+                            scrollbar-width: none !important;
+                          }
+                        `}</style>
+                        {/* Render reviews based on current page */}
+                        {[1, 2, 3, 4].map((reviewNum) => {
+                          const reviewIndex = (reviewsPage - 1) * reviewsPerPage + reviewNum - 1;
+                          if (reviewIndex >= 23) return null; // Don't render beyond total reviews
+                          
+                          return (
+                            <div key={reviewNum} style={{ marginBottom: reviewNum < 4 ? '20px' : '0px' }}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                                <div style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  borderRadius: '50%',
+                                  backgroundColor: reviewNum === 1 ? '#D5E9BD' : reviewNum === 2 ? '#E3F2FD' : reviewNum === 3 ? '#F0F8FE' : '#EDFBF0',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden',
+                                  flexShrink: 0
+                                }}>
+                                  <img
+                                    src={reviewNum % 2 === 0 ? messageAvatarIcon : avatar}
+                                    alt={`Reviewer ${reviewNum}`}
+                                    style={{
+                                      width: '32px',
+                                      height: '32px',
+                                      borderRadius: '50%',
+                                      objectFit: 'cover'
+                                    }}
+                                  />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                    <span style={{
+                                      fontSize: '13px',
+                                      color: '#212121',
+                                      fontFamily: 'Poppins, sans-serif',
+                                      fontWeight: 500
+                                    }}>
+                                      {reviewNum === 1 ? 'Samine Herald' : reviewNum === 2 ? 'Kael Otto' : reviewNum === 3 ? 'Maria Santos' : 'John Doe'}
+                                    </span>
+                                    <span style={{
+                                      fontSize: '10px',
+                                      color: '#B0B0B0',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {reviewNum === 1 ? '2 Jan 2025' : reviewNum === 2 ? '2 Jan 2025' : reviewNum === 3 ? '1 Jan 2025' : '31 Dec 2024'}
+                                    </span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    {[1, 2, 3, 4].map((star) => (
+                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    ))}
+                                    {reviewNum < 5 && (
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    )}
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif',
+                                      marginLeft: '4px'
+                                    }}>
+                                      {reviewNum === 1 ? '4.3' : reviewNum === 2 ? '4.3' : reviewNum === 3 ? '5.0' : '3.0'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                lineHeight: '1.5',
+                                marginBottom: '8px',
+                                marginTop: 0
+                              }}>
+                                {reviewNum === 1 ? 'I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.' : reviewNum === 2 ? 'I\'ve found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.' : reviewNum === 3 ? 'Excellent quality! The pepper arrived fresh and well-packaged. The flavor is exactly as described and it has become a staple in my kitchen. Highly recommend this seller.' : 'The product is okay but could be better. The packaging was fine but the quality didn\'t quite meet my expectations. It\'s usable but I probably won\'t order again.'}
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#64B5F6',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  cursor: 'pointer'
+                                }}>
+                                  View the discussion ({reviewNum === 1 ? '1' : reviewNum === 2 ? '1' : reviewNum === 3 ? '2' : '0'})
+                                </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                  <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#FF5151',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    Delete the review
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Pagination */}
+                      <div style={{ 
+                        borderTop: '1px solid #E5E5E5', 
+                        paddingTop: '24px', 
+                        marginTop: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span style={{ 
+                          fontSize: '14px', 
+                          color: '#BABABA',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          {((reviewsPage - 1) * reviewsPerPage + 1)} - {Math.min(reviewsPage * reviewsPerPage, 23)} out of 23
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <button 
+                            disabled={reviewsPage === 1}
+                            onClick={() => setReviewsPage(p => Math.max(1, p - 1))}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: reviewsPage === 1 ? 'not-allowed' : 'pointer',
+                              opacity: reviewsPage === 1 ? 0.5 : 1,
+                              transition: 'opacity 0.2s',
+                              padding: 0
+                            }}
+                            onMouseEnter={(e) => {
+                              if (reviewsPage !== 1) e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onMouseLeave={(e) => {
+                              if (reviewsPage !== 1) e.currentTarget.style.opacity = '1';
+                            }}
+                          >
+                            <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
+                          </button>
+                          <button 
+                            disabled={reviewsPage >= reviewsTotalPages}
+                            onClick={() => setReviewsPage(p => Math.min(reviewsTotalPages, p + 1))}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: reviewsPage >= reviewsTotalPages ? 'not-allowed' : 'pointer',
+                              opacity: reviewsPage >= reviewsTotalPages ? 0.5 : 1,
+                              transition: 'opacity 0.2s',
+                              padding: 0
+                            }}
+                            onMouseEnter={(e) => {
+                              if (reviewsPage < reviewsTotalPages) e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onMouseLeave={(e) => {
+                              if (reviewsPage < reviewsTotalPages) e.currentTarget.style.opacity = '1';
+                            }}
+                          >
+                            <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : isManageAccessMaximized && isManageAccessView ? (
                     <div style={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '18px',
@@ -5577,6 +5924,69 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     )}
 
+                    {/* Empty Placeholder when Reviews is Maximized - Shows below header */}
+                    {!isManageAccessView && userDetailActiveTab === 'reviews' && isReviewsMaximized && (
+                      <div style={{
+                        position: 'relative',
+                        border: '2px dashed #D9D9D9',
+                        borderRadius: '12px',
+                        padding: '40px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '300px',
+                        textAlign: 'center',
+                        marginTop: '16px'
+                      }}>
+                        <p style={{
+                          fontSize: '12px',
+                          color: '#B0B0B0',
+                          fontFamily: 'Poppins, sans-serif',
+                          margin: '0 0 8px 0',
+                          lineHeight: '1.5'
+                        }}>
+                          The review window has been enlarged, reduce it if you want to see it appear here again.
+                        </p>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => setIsReviewsMaximized(false)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: '#64B5F6',
+                              fontSize: '12px',
+                              fontFamily: 'Poppins, sans-serif',
+                              padding: '4px 8px'
+                            }}
+                          >
+                            <span>Reduce reviews window</span>
+                            <img
+                              src={expandIcon}
+                              alt="Reduce"
+                              style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                            />
+                          </button>
+                        </div>
+                        {/* Fade Effect at Bottom */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1,
+                          borderRadius: '0 0 12px 12px'
+                        }} />
+                      </div>
+                    )}
+
                     {/* Tabs */}
                     {!isManageAccessView && !isManageAccessMaximized && (
                     <div style={{
@@ -5642,8 +6052,8 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     )}
 
-                    {/* Reviews and Ratings View */}
-                    {!isManageAccessView && userDetailActiveTab === 'reviews' && (
+                    {/* Reviews and Ratings View - Only show when NOT maximized */}
+                    {!isManageAccessView && userDetailActiveTab === 'reviews' && !isReviewsMaximized && (
                       <div style={{ position: 'relative' }}>
                         {/* Overall Rating Summary */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -5802,8 +6212,11 @@ const AdminDashboard: React.FC = () => {
                               color: '#64B5F6',
                               fontSize: '11px',
                               fontFamily: 'Poppins, sans-serif',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
+                              transition: 'opacity 0.2s'
                             }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                           >
                             <span>{isReviewsMaximized ? 'Minimize window' : 'Maximize window'}</span>
                             <img
