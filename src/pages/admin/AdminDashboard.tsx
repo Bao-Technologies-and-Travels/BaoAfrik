@@ -5940,7 +5940,7 @@ const AdminDashboard: React.FC = () => {
                       {[
                         { label: 'About user', key: 'about' as const },
                         { label: 'Reviews and rates', key: 'reviews' as const },
-                        { label: 'Reported issues ab...', key: 'reported' as const }
+                        { label: 'Reported issues ab...', key: 'reported' as const, badge: 17 }
                       ].map((tab) => (
                         <button
                           key={tab.key}
@@ -5954,10 +5954,29 @@ const AdminDashboard: React.FC = () => {
                             fontSize: '11px',
                             fontFamily: 'Poppins, sans-serif',
                             cursor: 'pointer',
-                            marginBottom: '-1px'
+                            marginBottom: '-1px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            opacity: userDetailActiveTab === 'reported' && tab.key !== 'reported' ? 0.5 : 1,
+                            transition: 'opacity 0.2s, color 0.2s'
                           }}
                         >
-                          {tab.label}
+                          <span>{tab.label}</span>
+                          {tab.key === 'reported' && 'badge' in tab && (
+                            <span style={{
+                              backgroundColor: '#FF5151',
+                              color: '#FFFFFF',
+                              fontSize: '10px',
+                              fontFamily: 'Poppins, sans-serif',
+                              padding: '2px 6px',
+                              borderRadius: '10px',
+                              minWidth: '20px',
+                              textAlign: 'center'
+                            }}>
+                              {tab.badge}
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -6659,6 +6678,413 @@ const AdminDashboard: React.FC = () => {
                           }} />
                         </div>
                         )}
+                      </div>
+                    )}
+
+                    {/* Reported Issues View */}
+                    {!isManageAccessView && userDetailActiveTab === 'reported' && (
+                      <div style={{ position: 'relative' }}>
+                        {/* Date Indicator */}
+                        <div style={{
+                          fontSize: '12px',
+                          color: '#939393',
+                          fontFamily: 'Poppins, sans-serif',
+                          marginBottom: '16px',
+                          marginTop: '8px'
+                        }}>
+                          Today
+                        </div>
+
+                        {/* Reported Issues List - Scrollable */}
+                        <div
+                          className="reported-issues-scroll-container"
+                          style={{
+                            maxHeight: 'calc(100vh - 500px)',
+                            overflowY: 'auto',
+                            paddingRight: '6px',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                            position: 'relative'
+                          }}
+                        >
+                          <style>{`
+                            .reported-issues-scroll-container::-webkit-scrollbar {
+                              display: none !important;
+                              width: 0 !important;
+                              height: 0 !important;
+                              background: transparent !important;
+                            }
+                            .reported-issues-scroll-container {
+                              -ms-overflow-style: none !important;
+                              scrollbar-width: none !important;
+                            }
+                          `}</style>
+                          
+                          {/* Report Card 1 */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            marginBottom: '12px',
+                            position: 'relative'
+                          }}>
+                            {/* Top Row: Report Badge and Time */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              {/* Report Badge */}
+                              <span style={{
+                                backgroundColor: '#FEF6E9',
+                                color: '#F9A825',
+                                fontSize: '10px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 500
+                              }}>
+                                Report
+                              </span>
+                              {/* Time Indicator */}
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                17:12
+                              </span>
+                            </div>
+
+                            {/* Title */}
+                            <h3 style={{
+                              fontSize: '13px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600,
+                              margin: '0 0 6px 0'
+                            }}>
+                              Fake reviews or suspicious ratings
+                            </h3>
+
+                            {/* Description */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 12px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              The seller appears to be using fake accounts or encouraging acquaintances to post misleading reviews.
+                            </p>
+
+                            {/* Reporter Section */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}>
+                              {/* Profile Picture */}
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#E3F2FD',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={avatar}
+                                  alt="Reporter"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+
+                              {/* Reporter Info */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                  fontSize: '11px',
+                                  color: '#B0B0B0',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '2px'
+                                }}>
+                                  Report by
+                                </div>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: '#6A6A6A',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Kevin Mobinnid
+                                </div>
+                              </div>
+
+                              {/* More Options Button */}
+                              <button
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  padding: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: '#B0B0B0'
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="12" cy="12" r="1"/>
+                                  <circle cx="12" cy="5" r="1"/>
+                                  <circle cx="12" cy="19" r="1"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Report Card 2 */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            marginBottom: '12px',
+                            position: 'relative'
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <span style={{
+                                backgroundColor: '#FEF6E9',
+                                color: '#F9A825',
+                                fontSize: '10px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 500
+                              }}>
+                                Report
+                              </span>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                16:45
+                              </span>
+                            </div>
+                            <h3 style={{
+                              fontSize: '13px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600,
+                              margin: '0 0 6px 0'
+                            }}>
+                              Inappropriate content or behavior
+                            </h3>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 12px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              The user has been posting inappropriate comments and engaging in harassing behavior towards other users.
+                            </p>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EDFBF0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={messageAvatarIcon}
+                                  alt="Reporter"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                  fontSize: '11px',
+                                  color: '#B0B0B0',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '2px'
+                                }}>
+                                  Report by
+                                </div>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: '#6A6A6A',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Clara Vanstone
+                                </div>
+                              </div>
+                              <button
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  padding: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: '#B0B0B0'
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="12" cy="12" r="1"/>
+                                  <circle cx="12" cy="5" r="1"/>
+                                  <circle cx="12" cy="19" r="1"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Report Card 3 */}
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            marginBottom: '12px',
+                            position: 'relative'
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <span style={{
+                                backgroundColor: '#FEF6E9',
+                                color: '#F9A825',
+                                fontSize: '10px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 500
+                              }}>
+                                Report
+                              </span>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                15:30
+                              </span>
+                            </div>
+                            <h3 style={{
+                              fontSize: '13px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600,
+                              margin: '0 0 6px 0'
+                            }}>
+                              Spam or misleading information
+                            </h3>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 12px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              Multiple listings contain misleading product descriptions and false claims about quality or origin.
+                            </p>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#F0F8FE',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={avatar}
+                                  alt="Reporter"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                  fontSize: '11px',
+                                  color: '#B0B0B0',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '2px'
+                                }}>
+                                  Report by
+                                </div>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: '#6A6A6A',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Amara Diop
+                                </div>
+                              </div>
+                              <button
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  padding: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: '#B0B0B0'
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="12" cy="12" r="1"/>
+                                  <circle cx="12" cy="5" r="1"/>
+                                  <circle cx="12" cy="19" r="1"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
 
