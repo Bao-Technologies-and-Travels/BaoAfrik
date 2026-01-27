@@ -173,6 +173,8 @@ const AdminDashboard: React.FC = () => {
   const [isAccountInfoOpen, setIsAccountInfoOpen] = useState(true);
   const [isStatusOpen, setIsStatusOpen] = useState(true);
   const [isUserMetricsOpen, setIsUserMetricsOpen] = useState(true);
+  const [userDetailActiveTab, setUserDetailActiveTab] = useState<'about' | 'reviews' | 'reported'>('about');
+  const [isReviewsMaximized, setIsReviewsMaximized] = useState(false);
   const [activityCardMoreMenu, setActivityCardMoreMenu] = useState<{
     anchorRect: DOMRect;
   } | null>(null);
@@ -5565,29 +5567,34 @@ const AdminDashboard: React.FC = () => {
                       paddingRight: '14px',
                       borderBottom: '1px solid #F1F1F1'
                     }}>
-                      {['About user', 'Reviews and rates', 'Reported issues ab...'].map((tab, idx) => (
+                      {[
+                        { label: 'About user', key: 'about' as const },
+                        { label: 'Reviews and rates', key: 'reviews' as const },
+                        { label: 'Reported issues ab...', key: 'reported' as const }
+                      ].map((tab) => (
                         <button
-                          key={idx}
+                          key={tab.key}
+                          onClick={() => setUserDetailActiveTab(tab.key)}
                           style={{
                             padding: '8px 0',
                             backgroundColor: 'transparent',
                             border: 'none',
-                            borderBottom: idx === 0 ? '2px solid #64B5F6' : '2px solid transparent',
-                            color: idx === 0 ? '#64B5F6' : '#B0B0B0',
-                          fontSize: '11px',
+                            borderBottom: userDetailActiveTab === tab.key ? '2px solid #64B5F6' : '2px solid transparent',
+                            color: userDetailActiveTab === tab.key ? '#64B5F6' : '#B0B0B0',
+                            fontSize: '11px',
                             fontFamily: 'Poppins, sans-serif',
                             cursor: 'pointer',
                             marginBottom: '-1px'
                           }}
                         >
-                          {tab}
+                          {tab.label}
                         </button>
                       ))}
                     </div>
                     )}
 
                     {/* See user bio */}
-                    {!isManageAccessView && (
+                    {!isManageAccessView && userDetailActiveTab === 'about' && (
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -5613,8 +5620,324 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     )}
 
+                    {/* Reviews and Ratings View */}
+                    {!isManageAccessView && userDetailActiveTab === 'reviews' && (
+                      <div style={{ position: 'relative' }}>
+                        {/* Overall Rating Summary */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{
+                              fontSize: '32px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600
+                            }}>
+                              4.3
+                            </span>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="#FBBC05">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          </div>
+                        </div>
+                        <div style={{
+                          fontSize: '12px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif',
+                          marginBottom: '16px'
+                        }}>
+                          456 Review
+                        </div>
+
+                        {/* Rating Distribution Bars */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                          {[70, 60, 40, 20, 10].map((width, idx) => (
+                            <div key={idx} style={{ width: '100%', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{
+                                width: `${width}%`,
+                                height: '100%',
+                                backgroundColor: '#FBBC05',
+                                borderRadius: '2px'
+                              }} />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Filter and Maximize Controls */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                          {/* Filter Dropdown */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                              <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                              <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                              <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                              <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                            </svg>
+                            <span>The most relevant</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </div>
+                          {/* Maximize/Minimize */}
+                          <div
+                            onClick={() => setIsReviewsMaximized(!isReviewsMaximized)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: '#64B5F6',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <span>{isReviewsMaximized ? 'Minimize window' : 'Maximize window'}</span>
+                            <img
+                              src={expandIcon}
+                              alt={isReviewsMaximized ? 'Minimize' : 'Maximize'}
+                              style={{
+                                width: '14px',
+                                height: '14px',
+                                transform: isReviewsMaximized ? 'rotate(180deg)' : 'none',
+                                transition: 'transform 0.3s'
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Reviews List - Scrollable with fade effect */}
+                        <div
+                          data-reviews-scroll
+                          className="reviews-scroll-container"
+                          style={{
+                            maxHeight: '400px',
+                            overflowY: 'auto',
+                            paddingRight: '6px',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                            position: 'relative',
+                            paddingBottom: '40px'
+                          }}
+                        >
+                          <style>{`
+                            .reviews-scroll-container::-webkit-scrollbar {
+                              display: none !important;
+                              width: 0 !important;
+                              height: 0 !important;
+                              background: transparent !important;
+                            }
+                            .reviews-scroll-container {
+                              -ms-overflow-style: none !important;
+                              scrollbar-width: none !important;
+                            }
+                          `}</style>
+                          {/* Review 1 - Samine Herald */}
+                          <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #F1F1F1' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              {/* Profile with square background */}
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#D5E9BD',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={avatar}
+                                  alt="Samine Herald"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    Samine Herald
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    2 Jan 2025
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                                  {[1, 2, 3, 4].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                  </svg>
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
+                                  }}>
+                                    4.3
+                                  </span>
+                                </div>
+                                <p style={{
+                                  fontSize: '11px',
+                                  color: '#939393',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  lineHeight: '1.5',
+                                  marginBottom: '8px'
+                                }}>
+                                  I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#64B5F6',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                  }}>
+                                    View the discussion (1)
+                                  </span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                    <img src={redtrashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#FF5151',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      Delete the review
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Review 2 - Kael Otto */}
+                          <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #F1F1F1' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#E3F2FD',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={messageAvatarIcon}
+                                  alt="Kael Otto"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    Kael Otto
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    2 Jan 2025
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                                  {[1, 2, 3, 4].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                  </svg>
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
+                                  }}>
+                                    4.3
+                                  </span>
+                                </div>
+                                <p style={{
+                                  fontSize: '11px',
+                                  color: '#939393',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  lineHeight: '1.5',
+                                  marginBottom: '8px'
+                                }}>
+                                  I've found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#64B5F6',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                  }}>
+                                    View the discussion (1)
+                                  </span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                    <img src={redtrashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#FF5151',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      Delete the review
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Fixed Fade Effect at Bottom */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: '6px',
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }} />
+                      </div>
+                    )}
+
                     {/* Account Information */}
-                    {!isManageAccessView && (
+                    {!isManageAccessView && userDetailActiveTab === 'about' && (
                     <>
                     <div style={{ marginBottom: '12px' }}>
                       <div 
