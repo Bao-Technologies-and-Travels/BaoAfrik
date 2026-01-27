@@ -175,6 +175,9 @@ const AdminDashboard: React.FC = () => {
   const [isUserMetricsOpen, setIsUserMetricsOpen] = useState(true);
   const [userDetailActiveTab, setUserDetailActiveTab] = useState<'about' | 'reviews' | 'reported'>('about');
   const [isReviewsMaximized, setIsReviewsMaximized] = useState(false);
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState('The most relevant');
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
   const [activityCardMoreMenu, setActivityCardMoreMenu] = useState<{
     anchorRect: DOMRect;
   } | null>(null);
@@ -250,6 +253,21 @@ const AdminDashboard: React.FC = () => {
       'can-edit': true
     }
   });
+
+  // Filter options for reviews
+  const filterOptions = [
+    { id: 'relevant', label: 'The most relevant', description: 'Show most engaging reviews first', icon: 'star' },
+    { id: 'newest', label: 'Newest', description: 'Show newest reviews first', icon: 'clock' }
+  ];
+
+  // Function to handle filter selection
+  const handleFilterSelect = (filterId: string) => {
+    const filter = filterOptions.find(f => f.id === filterId);
+    if (filter) {
+      setSelectedFilter(filter.label);
+    }
+    setFilterDropdownOpen(false);
+  };
 
   // Mock data for search
   const mockUsers = [
@@ -445,13 +463,17 @@ const AdminDashboard: React.FC = () => {
       if (!activityCardMoreOptionsDropdown && !activityCardMoreOptionsButton && activityCardMoreMenu !== null) {
         setActivityCardMoreMenu(null);
       }
+      // Close filter dropdown when clicking outside
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setFilterDropdownOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue]);
+  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, filterDropdownOpen]);
 
   // Close activity card more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -5667,17 +5689,108 @@ const AdminDashboard: React.FC = () => {
                         {/* Filter and Maximize Controls */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', marginTop: '12px' }}>
                           {/* Filter Dropdown */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                              <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
-                              <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
-                              <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
-                              <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
-                            </svg>
-                            <span>The most relevant</span>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2">
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
+                          <div style={{ position: 'relative' }} ref={filterDropdownRef}>
+                            <button 
+                              onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                              style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                color: '#939393', 
+                                fontSize: '11px', 
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                padding: 0,
+                                transition: 'opacity 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                                <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                                <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                                <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                              </svg>
+                              <span>{selectedFilter}</span>
+                            </button>
+                            
+                            {/* Dropdown Menu */}
+                            {filterDropdownOpen && (
+                              <div style={{ 
+                                position: 'absolute', 
+                                top: '24px', 
+                                left: 0, 
+                                backgroundColor: '#FFFFFF', 
+                                border: '1px solid #E5E7EB', 
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', 
+                                zIndex: 10, 
+                                borderRadius: '8px', 
+                                padding: '4px', 
+                                minWidth: '200px', 
+                                maxWidth: '240px' 
+                              }}>
+                                {filterOptions.map((option, index) => {
+                                  const isSelected = selectedFilter === option.label;
+                                  return (
+                                    <button
+                                      key={option.id}
+                                      onClick={() => handleFilterSelect(option.id)}
+                                      style={{
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: '8px',
+                                        backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                                        borderRadius: isSelected ? '6px' : '0',
+                                        marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
+                                        padding: '6px 8px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.2s'
+                                      }}
+                                    >
+                                      {/* Icon */}
+                                      <div style={{ flexShrink: 0, marginTop: '1px' }}>
+                                        {option.icon === 'star' ? (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                          </svg>
+                                        ) : (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M12 6v6l4 2"/>
+                                          </svg>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Text */}
+                                      <div style={{ flex: 1 }}>
+                                        <div style={{ 
+                                          fontSize: '11px', 
+                                          marginBottom: '1px', 
+                                          color: isSelected ? '#64B5F6' : '#212121',
+                                          fontFamily: 'Poppins, sans-serif',
+                                          fontWeight: 500
+                                        }}>
+                                          {option.label}
+                                        </div>
+                                        <div style={{ 
+                                          fontSize: '9px', 
+                                          color: '#939393',
+                                          fontFamily: 'Poppins, sans-serif'
+                                        }}>
+                                          {option.description}
+                                        </div>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
                           {/* Maximize/Minimize */}
                           <div
@@ -5717,7 +5830,7 @@ const AdminDashboard: React.FC = () => {
                             scrollbarWidth: 'none',
                             msOverflowStyle: 'none',
                             position: 'relative',
-                            paddingBottom: '40px'
+                            paddingBottom: '8px'
                           }}
                         >
                           <style>{`
@@ -6019,7 +6132,7 @@ const AdminDashboard: React.FC = () => {
                           </div>
 
                           {/* Review 4 - Additional Review */}
-                          <div style={{ marginBottom: '20px' }}>
+                          <div style={{ marginBottom: '0px' }}>
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
                               <div style={{
                                 width: '36px',
