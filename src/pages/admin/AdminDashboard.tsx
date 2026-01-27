@@ -5624,13 +5624,14 @@ const AdminDashboard: React.FC = () => {
                     {!isManageAccessView && userDetailActiveTab === 'reviews' && (
                       <div style={{ position: 'relative' }}>
                         {/* Overall Rating Summary */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{
                               fontSize: '32px',
                               color: '#212121',
                               fontFamily: 'Bricolage Grotesque, sans-serif',
-                              fontWeight: 600
+                              fontWeight: 600,
+                              lineHeight: '1'
                             }}>
                               4.3
                             </span>
@@ -5643,7 +5644,8 @@ const AdminDashboard: React.FC = () => {
                           fontSize: '12px',
                           color: '#6A6A6A',
                           fontFamily: 'Poppins, sans-serif',
-                          marginBottom: '16px'
+                          marginBottom: '16px',
+                          marginTop: '4px'
                         }}>
                           456 Review
                         </div>
@@ -5663,7 +5665,7 @@ const AdminDashboard: React.FC = () => {
                         </div>
 
                         {/* Filter and Maximize Controls */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', marginTop: '12px' }}>
                           {/* Filter Dropdown */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
                             <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
@@ -5731,7 +5733,7 @@ const AdminDashboard: React.FC = () => {
                             }
                           `}</style>
                           {/* Review 1 - Samine Herald */}
-                          <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #F1F1F1' }}>
+                          <div style={{ marginBottom: '20px' }}>
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
                               {/* Profile with square background */}
                               <div style={{
@@ -5774,7 +5776,7 @@ const AdminDashboard: React.FC = () => {
                                     2 Jan 2025
                                   </span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   {[1, 2, 3, 4].map((star) => (
                                     <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
                                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -5792,42 +5794,43 @@ const AdminDashboard: React.FC = () => {
                                     4.3
                                   </span>
                                 </div>
-                                <p style={{
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (1)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
                                   fontSize: '11px',
-                                  color: '#939393',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  lineHeight: '1.5',
-                                  marginBottom: '8px'
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
                                 }}>
-                                  I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
-                                </p>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#64B5F6',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline'
-                                  }}>
-                                    View the discussion (1)
-                                  </span>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                    <img src={redtrashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#FF5151',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      Delete the review
-                                    </span>
-                                  </div>
-                                </div>
+                                  Delete the review
+                                </span>
                               </div>
                             </div>
                           </div>
 
                           {/* Review 2 - Kael Otto */}
-                          <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #F1F1F1' }}>
+                          <div style={{ marginBottom: '20px' }}>
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
                               <div style={{
                                 width: '36px',
@@ -5869,7 +5872,7 @@ const AdminDashboard: React.FC = () => {
                                     2 Jan 2025
                                   </span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                   {[1, 2, 3, 4].map((star) => (
                                     <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
                                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -5887,36 +5890,228 @@ const AdminDashboard: React.FC = () => {
                                     4.3
                                   </span>
                                 </div>
-                                <p style={{
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              I've found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (1)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
                                   fontSize: '11px',
-                                  color: '#939393',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  lineHeight: '1.5',
-                                  marginBottom: '8px'
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
                                 }}>
-                                  I've found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.
-                                </p>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  Delete the review
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Review 3 - Additional Review */}
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#F0F8FE',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={avatar}
+                                  alt="Maria Santos"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    Maria Santos
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    1 Jan 2025
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
                                   <span style={{
                                     fontSize: '11px',
-                                    color: '#64B5F6',
+                                    color: '#939393',
                                     fontFamily: 'Poppins, sans-serif',
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline'
+                                    marginLeft: '4px'
                                   }}>
-                                    View the discussion (1)
+                                    5.0
                                   </span>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                    <img src={redtrashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#FF5151',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      Delete the review
-                                    </span>
-                                  </div>
                                 </div>
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              Excellent quality! The pepper arrived fresh and well-packaged. The flavor is exactly as described and it has become a staple in my kitchen. Highly recommend this seller.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (2)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Delete the review
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Review 4 - Additional Review */}
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EDFBF0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={messageAvatarIcon}
+                                  alt="John Doe"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    John Doe
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    31 Dec 2024
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {[1, 2, 3].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  {[4, 5].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
+                                  }}>
+                                    3.0
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              The product is okay but could be better. The packaging was fine but the quality didn't quite meet my expectations. It's usable but I probably won't order again.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (0)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Delete the review
+                                </span>
                               </div>
                             </div>
                           </div>
