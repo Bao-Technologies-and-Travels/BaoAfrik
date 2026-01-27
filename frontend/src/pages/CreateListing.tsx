@@ -2759,6 +2759,9 @@ const CreateListing: React.FC = () => {
                           >
                             Upload Photos
                           </span>
+                          <p className="text-xs mb-2 mt-6" style={{ color: '#2D2D2D' }}>
+                            You must add at least 1 product photo
+                          </p>
                         </label>
                       </div>
                     )}
@@ -3917,6 +3920,9 @@ const CreateListing: React.FC = () => {
                               Upload Photos
                             </span>
                           </label>
+                          <p className="text-xs mb-2 mt-6" style={{ color: '#2D2D2D' }}>
+                            You must add at least 1 product photo
+                          </p>
                         </>
                       )}
                     </div>

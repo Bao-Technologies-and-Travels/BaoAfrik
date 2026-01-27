@@ -433,6 +433,7 @@ const Home: React.FC = () => {
   const fetchingRequestsRef = useRef(false);
   const lastRequestFiltersRef = useRef<string | null>(null);
   const hasFetchedRef = useRef(false);
+  const isInitialMountRef = useRef(true);
 
   // useEffect for fetching requests from API
   useEffect(() => {
@@ -444,9 +445,15 @@ const Home: React.FC = () => {
       return;
     }
 
+    // Always allow the initial fetch on mount
+    const isInitialMount = isInitialMountRef.current;
+    if (isInitialMount) {
+      isInitialMountRef.current = false;
+    }
+
     // If we've fetched before AND filters haven't changed, skip
-    // But always allow the initial fetch (hasFetchedRef.current === false)
-    if (hasFetchedRef.current && lastRequestFiltersRef.current === filterKey) {
+    // But always allow the initial fetch
+    if (!isInitialMount && hasFetchedRef.current && lastRequestFiltersRef.current !== null && lastRequestFiltersRef.current === filterKey) {
       return;
     }
 
@@ -3260,6 +3267,7 @@ const Home: React.FC = () => {
                                 disabled={getCategoryPage(category) === 1}
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 aria-label="Previous page"
+                                style={{ fontWeight: getCategoryPage(category) > 1 ? 'bold' : 'normal' }}
                               >
                                 <img
                                   src={getCategoryPage(category) > 1 ? blackArrowIcon : grayArrowIcon}
@@ -3450,6 +3458,7 @@ const Home: React.FC = () => {
                                 disabled={getCategoryPage(category) === 1}
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 aria-label="Previous page"
+                                style={{ fontWeight: getCategoryPage(category) > 1 ? 'bold' : 'normal' }}
                               >
                                 <img
                                   src={getCategoryPage(category) > 1 ? blackArrowIcon : grayArrowIcon}
@@ -3945,7 +3954,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Pagination - Mobile Responsive - Hide when no search results */}
-      {!shouldShowNoResultsState() && (
+      {!shouldShowNoResultsState() && totalPages > 1 && (
         <section className="py-8 sm:py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {(() => {

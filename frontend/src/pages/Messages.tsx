@@ -1163,20 +1163,22 @@ const Messages: React.FC = (): JSX.Element => {
           );
           const convos = res.data?.data || [];
           // Merge with existing conversations to preserve local metadata (isPinned only)
-          // Trust backend for isArchived - it should persist
+          // IMPORTANT: Preserve isArchived status - archived chats stay archived even with new messages
           // Also preserve reactions and statuses from backend for persistence
           setConversations(prev => {
             const merged = convos.map((conv: any) => {
               const existing = prev.find((p: any) => String(p.id) === String(conv.id));
               if (existing) {
-                // Preserve local isPinned state, but trust backend for isArchived
-                // If conversation was archived, keep it archived even with new messages
-                const wasArchived = existing.isArchived ?? false;
+                // Preserve local isPinned state
+                // CRITICAL: If conversation was archived, keep it archived even with new messages
+                // Only unarchive if explicitly unarchived via metadata update
+                const wasArchived = existing.isArchived === true || existing.isArchived === 'true';
                 return {
                   ...conv,
                   isPinned: existing.isPinned ?? conv.isPinned ?? false,
-                  // Trust backend isArchived value, but if it was archived before, keep it archived
-                  isArchived: conv.isArchived ?? wasArchived,
+                  // Preserve archived status - if it was archived, keep it archived
+                  // Only update if backend explicitly says it's not archived AND we haven't seen it as archived locally
+                  isArchived: wasArchived ? true : (Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)),
                   // Preserve reactions and statuses from backend for persistence
                   lastMessage: conv.lastMessage ? {
                     ...conv.lastMessage,
@@ -1288,20 +1290,22 @@ const Messages: React.FC = (): JSX.Element => {
           );
           const convos = res.data?.data || [];
           // Merge with existing conversations to preserve local metadata (isPinned only)
-          // Trust backend for isArchived - it should persist
+          // IMPORTANT: Preserve isArchived status - archived chats stay archived even with new messages
           // Also preserve reactions and statuses from backend for persistence
           setConversations(prev => {
             const merged = convos.map((conv: any) => {
               const existing = prev.find((p: any) => String(p.id) === String(conv.id));
               if (existing) {
-                // Preserve local isPinned state, but trust backend for isArchived
-                // Convert to boolean to ensure consistency
-                const backendArchived = Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true);
+                // Preserve local isPinned state
+                // CRITICAL: If conversation was archived, keep it archived even with new messages
+                // Only unarchive if explicitly unarchived via metadata update
+                const wasArchived = existing.isArchived === true || existing.isArchived === 'true';
                 return {
                   ...conv,
                   isPinned: existing.isPinned ?? conv.isPinned ?? false,
-                  // Trust backend isArchived value - it should persist
-                  isArchived: backendArchived,
+                  // Preserve archived status - if it was archived, keep it archived
+                  // Only update if backend explicitly says it's not archived AND we haven't seen it as archived locally
+                  isArchived: wasArchived ? true : (Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)),
                   // Preserve reactions and statuses from backend for persistence
                   lastMessage: conv.lastMessage ? {
                     ...conv.lastMessage,
@@ -1479,20 +1483,22 @@ const Messages: React.FC = (): JSX.Element => {
           );
           const convos = res.data?.data || [];
           // Merge with existing conversations to preserve local metadata (isPinned only)
-          // Trust backend for isArchived - it should persist
+          // IMPORTANT: Preserve isArchived status - archived chats stay archived even with new messages
           // Also preserve reactions and statuses from backend for persistence
           setConversations(prev => {
             const merged = convos.map((conv: any) => {
               const existing = prev.find((p: any) => String(p.id) === String(conv.id));
               if (existing) {
-                // Preserve local isPinned state, but trust backend for isArchived
-                // Convert to boolean to ensure consistency
-                const backendArchived = Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true);
+                // Preserve local isPinned state
+                // CRITICAL: If conversation was archived, keep it archived even with new messages
+                // Only unarchive if explicitly unarchived via metadata update
+                const wasArchived = existing.isArchived === true || existing.isArchived === 'true';
                 return {
                   ...conv,
                   isPinned: existing.isPinned ?? conv.isPinned ?? false,
-                  // Trust backend isArchived value - it should persist
-                  isArchived: backendArchived,
+                  // Preserve archived status - if it was archived, keep it archived
+                  // Only update if backend explicitly says it's not archived AND we haven't seen it as archived locally
+                  isArchived: wasArchived ? true : (Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)),
                   // Preserve reactions and statuses from backend for persistence
                   lastMessage: conv.lastMessage ? {
                     ...conv.lastMessage,
@@ -1656,7 +1662,16 @@ const Messages: React.FC = (): JSX.Element => {
       setConversations(prev => {
         const updated = prev.map(conv => {
           if (String(conv.id) === String(conversationId)) {
-            return { ...conv, ...metadata };
+            // When metadata is explicitly updated (e.g., unarchive), respect the update
+            // This allows explicit unarchive to work
+            return { 
+              ...conv, 
+              ...metadata,
+              // Ensure isArchived is properly set from metadata if provided
+              isArchived: metadata.isArchived !== undefined 
+                ? Boolean(metadata.isArchived === true || metadata.isArchived === 'true')
+                : conv.isArchived
+            };
           }
           return conv;
         });
@@ -5738,7 +5753,7 @@ const Messages: React.FC = (): JSX.Element => {
           </header>
 
           {/* Chats List */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             {/* Chats Header */}
             <div className="pt-1 px-6 pb-4 md:p-6">
               {/* Desktop - Chats title and filter */}
@@ -5767,11 +5782,11 @@ const Messages: React.FC = (): JSX.Element => {
 
             {/* Chat List or Empty State */}
             {conversations.length > 0 ? (
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col min-h-0">
                 {/* Filter Tabs or Archived Header */}
                 {selectedTab === 'Archived' ? (
                   // Archived Header - Desktop Only
-                  <div className="hidden md:block px-4 py-3 border-b border-gray-200">
+                  <div className="hidden md:block px-4 py-3 border-b border-gray-200 flex-shrink-0">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <button
@@ -5791,7 +5806,7 @@ const Messages: React.FC = (): JSX.Element => {
                   </div>
                 ) : (
                   // Regular Filter Tabs
-                  <div className="px-4 py-3">
+                  <div className="px-4 py-3 flex-shrink-0">
                     <div className="relative">
                       {/* Gray baseline */}
                       <div className="absolute bottom-0 -left-4 -right-4 md:left-0 md:right-0 h-px bg-gray-200"></div>
@@ -5859,7 +5874,15 @@ const Messages: React.FC = (): JSX.Element => {
                 )}
 
                 {/* Chat Entries */}
-                <div className="flex-1 overflow-y-auto p-1">
+                <div 
+                  className="flex-1 overflow-y-auto p-1 min-h-0"
+                  style={{
+                    scrollBehavior: 'smooth',
+                    scrollbarWidth: 'none', /* Firefox */
+                    msOverflowStyle: 'none', /* IE and Edge */
+                    WebkitOverflowScrolling: 'touch', /* Smooth scrolling on iOS */
+                  }}
+                >
                   {conversations
                     .filter((conv: any) => {
                       // Handle Archived tab - show only archived conversations

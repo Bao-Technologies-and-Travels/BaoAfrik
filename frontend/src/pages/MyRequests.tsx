@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import { useToast } from '../contexts/ToastContext';
-import { getProductCountry } from '../utils/countryHelpers';
+import { useAuth } from '../contexts/AuthContext';
+import { getProductCountry, countries } from '../utils/countryHelpers';
 
 import listIcon from '../assets/images/pre/list.svg';
 import gridIcon from '../assets/images/pre/grid.svg';
 import arrowLeftIcon from '../assets/images/pre/arrow-left.svg';
 import trashIcon from '../assets/images/pre/trash.svg';
 import filterIcon from '../assets/images/pre/filter.png';
-import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
 import bulletIcon from '../assets/images/pre/bullet.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
@@ -24,6 +24,9 @@ import draftsIcon from '../assets/images/pre/drafts.svg';
 import grayArrowIcon from '../assets/images/pre/gray.svg';
 import blackArrowIcon from '../assets/images/pre/black.svg';
 import SDicon from '../assets/images/pre/SDicon.svg';
+import globyIcon from '../assets/images/pre/globy.svg';
+import locIcon from '../assets/images/pre/Loc.svg';
+import arrowDownIcon from '../assets/images/pre/arrow-down.svg';
 
 type ViewMode = 'list' | 'grid';
 
@@ -238,6 +241,7 @@ const badgeStyles = (filter: Exclude<StatusFilter, 'All Status'>) => {
 const MyRequests: React.FC = () => {
     const navigate = useNavigate();
     const { addToast } = useToast();
+    const { user } = useAuth();
     const [isMobile, setIsMobile] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [searchQuery, setSearchQuery] = useState('');
@@ -263,6 +267,202 @@ const MyRequests: React.FC = () => {
     const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
     const [requests, setRequests] = useState<Request[]>([]);
     const [isLoadingRequests, setIsLoadingRequests] = useState(true);
+    
+    // Request modal state
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [requestProductName, setRequestProductName] = useState('');
+    const [requestProductOrigin, setRequestProductOrigin] = useState('');
+    const [requestProductOriginInput, setRequestProductOriginInput] = useState('');
+    const [requestDescription, setRequestDescription] = useState('');
+    const [requestPriceRange, setRequestPriceRange] = useState('');
+    const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+    const [location, setLocation] = useState('London |  United Kingdom');
+    const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+    const [isRequestProductOriginDropdownOpen, setIsRequestProductOriginDropdownOpen] = useState(false);
+    const requestProductOriginDropdownRef = useRef<HTMLDivElement>(null);
+    const locationDropdownRef = useRef<HTMLDivElement>(null);
+    
+    // UK cities for location dropdown
+    const ukCities = [
+        'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds',
+        'Sheffield', 'Edinburgh', 'Glasgow', 'Bristol', 'Cardiff',
+        'Newcastle', 'Nottingham', 'Leicester', 'Southampton', 'Belfast'
+    ];
+    
+    // African countries for origin dropdown
+    const africanCountries = countries
+        .map(c => ({ name: c.name, code: c.code, flag: c.flag }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    // Handle "Make a Request" button click - check authentication
+    const handleMakeRequestClick = () => {
+        if (!user) {
+            addToast({
+                type: 'info',
+                title: 'Login Required',
+                message: 'Please log in to make a request',
+                duration: 3000
+            });
+            return;
+        }
+        setShowRequestModal(true);
+    };
+    
+    // Handle request form submission
+    const handleRequestSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const validateForm = () => {
+            if (!requestProductName.trim()) {
+                addToast({
+                    type: 'error',
+                    title: 'Validation Error',
+                    message: 'Product name is required',
+                    duration: 3000
+                });
+                return false;
+            }
+            if (!requestDescription.trim()) {
+                addToast({
+                    type: 'error',
+                    title: 'Validation Error',
+                    message: 'Description is required',
+                    duration: 3000
+                });
+                return false;
+            }
+            if (!requestProductOrigin && !requestProductOriginInput.trim()) {
+                addToast({
+                    type: 'error',
+                    title: 'Validation Error',
+                    message: 'Please select or type a product origin',
+                    duration: 3000
+                });
+                return false;
+            }
+            return true;
+        };
+
+        if (!validateForm()) {
+            return;
+        }
+
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            setIsSubmittingRequest(true);
+
+            let minPrice = 0;
+            let maxPrice = 1000;
+            let currency = 'GBP';
+
+            if (requestPriceRange) {
+                const range = requestPriceRange.toLowerCase();
+
+                if (range.includes('less than')) {
+                    const match = requestPriceRange.match(/less than (\d+)/i);
+                    if (match) {
+                        minPrice = 0;
+                        maxPrice = Number(match[1]);
+                    }
+                } else if (range.includes('more than')) {
+                    const match = requestPriceRange.match(/more than (\d+)/i);
+                    if (match) {
+                        minPrice = Number(match[1]);
+                        maxPrice = 1000000;
+                    }
+                } else {
+                    // Handle ranges like "10 - 50 GBP"
+                    const match = requestPriceRange.match(/(\d+)\s*-\s*(\d+)\s*(\w{3})?/i);
+                    if (match) {
+                        minPrice = Number(match[1]);
+                        maxPrice = Number(match[2]);
+                        if (match[3]) currency = match[3].toUpperCase();
+                    }
+                }
+            }
+
+            const formData = {
+                productName: requestProductName.trim(),
+                description: requestDescription.trim(),
+                origin: requestProductOrigin || requestProductOriginInput.trim(),
+                sellerLocation: location,
+                minPrice,
+                maxPrice,
+                currency,
+                status: 'PENDING'
+            };
+
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/requests`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to submit request');
+            }
+
+            // Reset form
+            setRequestProductName('');
+            setRequestProductOrigin('');
+            setRequestProductOriginInput('');
+            setRequestDescription('');
+            setRequestPriceRange('');
+
+            // Refresh requests list
+            const userStr = localStorage.getItem('user');
+            const currentUser = userStr ? JSON.parse(userStr) : null;
+            if (currentUser && currentUser.id) {
+                const refreshResponse = await fetch(`${process.env.REACT_APP_API_URL}/requests?userId=${currentUser.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (refreshResponse.ok) {
+                    const refreshResult = await refreshResponse.json();
+                    let requestsArray: Request[] = [];
+                    if (refreshResult.success && refreshResult.data) {
+                        if (Array.isArray(refreshResult.data)) {
+                            requestsArray = refreshResult.data;
+                        } else if (refreshResult.data.requests && Array.isArray(refreshResult.data.requests)) {
+                            requestsArray = refreshResult.data.requests;
+                        } else if (refreshResult.data.data && Array.isArray(refreshResult.data.data)) {
+                            requestsArray = refreshResult.data.data;
+                        }
+                    } else if (Array.isArray(refreshResult)) {
+                        requestsArray = refreshResult;
+                    } else if (refreshResult.data && Array.isArray(refreshResult.data)) {
+                        requestsArray = refreshResult.data;
+                    }
+                    setRequests(requestsArray);
+                }
+            }
+
+            setShowRequestModal(false);
+            addToast({
+                type: 'success',
+                title: 'Success',
+                message: 'Request created successfully',
+                duration: 3000
+            });
+
+        } catch (error: any) {
+            console.error('Error submitting request:', error);
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: error.message || 'Failed to submit request. Please try again.',
+                duration: 3000
+            });
+        } finally {
+            setIsSubmittingRequest(false);
+        }
+    };
 
     // Fetch requests from backend
     useEffect(() => {
@@ -658,7 +858,7 @@ const MyRequests: React.FC = () => {
             expired: { text: 'Expired', textColor: '#FF5151', bgColor: '#FFE9E9' }
         };
 
-        const config = statusConfig[request.status];
+        const config = statusConfig[request.status] || statusConfig.pending;
         const isModalOpen = statusModalOpenFor === requestId;
 
         return (
@@ -813,7 +1013,7 @@ const MyRequests: React.FC = () => {
             expired: { text: 'Expired', textColor: '#FF5151', bgColor: '#FFE9E9' }
         };
 
-        const config = statusConfig[request.status];
+        const config = statusConfig[request.status] || statusConfig.pending;
         const isStatusModalOpen = statusModalOpenFor === request.id;
         const isMoreOptionsOpen = moreOptionsOpenFor === request.id;
 
@@ -2856,7 +3056,7 @@ const MyRequests: React.FC = () => {
 
                                     {/* Make a Request Button */}
                                     <button
-                                        onClick={() => navigate('/requests')}
+                                        onClick={handleMakeRequestClick}
                                         className="inline-flex items-center mx-auto"
                                         style={{
                                             display: 'flex',
@@ -3813,6 +4013,721 @@ const MyRequests: React.FC = () => {
                         )}
                     </>
                 )}
+
+                {/* Request Modal */}
+                {showRequestModal && isMobile ? (
+                    // Mobile: Full Page Form
+                    <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        {/* Header with Title and X Button */}
+                        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+                            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                Do a request
+                            </h1>
+                            <button
+                                onClick={() => setShowRequestModal(false)}
+                                style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Form Content */}
+                        <div className="flex-1 overflow-y-auto px-4 pb-6">
+                            {/* Product Name Input */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                                    Product name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={requestProductName}
+                                    onChange={(e) => setRequestProductName(e.target.value)}
+                                    placeholder="Enter product name"
+                                    style={{
+                                        width: '100%',
+                                        padding: '6px 10px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #E4E4E4',
+                                        fontSize: '10px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+
+                            {/* Product Origin Input */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                                    Product Origin
+                                </label>
+                                <div className="relative" ref={requestProductOriginDropdownRef}>
+                                    <div className="relative flex items-center w-full">
+                                        <input
+                                            type="text"
+                                            placeholder="Type a country"
+                                            value={requestProductOrigin || requestProductOriginInput}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setRequestProductOriginInput(value);
+                                                setRequestProductOrigin('');
+                                                if (value.trim()) {
+                                                    setIsRequestProductOriginDropdownOpen(true);
+                                                }
+                                            }}
+                                            onFocus={() => {
+                                                if (requestProductOriginInput.trim() || !requestProductOrigin) {
+                                                    setIsRequestProductOriginDropdownOpen(true);
+                                                }
+                                            }}
+                                            onBlur={() => {
+                                                setTimeout(() => {
+                                                    setIsRequestProductOriginDropdownOpen(false);
+                                                }, 200);
+                                            }}
+                                            className="w-full px-3 py-2.5 border rounded-lg focus:outline-none"
+                                            style={{
+                                                border: '1px solid #E4E4E4',
+                                                borderRadius: '8px',
+                                                backgroundColor: '#FFFFFF',
+                                                minHeight: '32px',
+                                                padding: '6px 10px',
+                                                fontSize: '10px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                color: (requestProductOrigin || requestProductOriginInput) ? '#212121' : '#D9D9D9',
+                                                paddingRight: '32px'
+                                            }}
+                                        />
+                                        <img
+                                            src={arrowDownIcon}
+                                            alt="Arrow"
+                                            className="absolute right-3 w-3 h-3 transition-transform flex-shrink-0 cursor-pointer"
+                                            style={{
+                                                transform: isRequestProductOriginDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                pointerEvents: 'none'
+                                            }}
+                                        />
+                                    </div>
+                                    {isRequestProductOriginDropdownOpen && (
+                                        <div
+                                            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                                            style={{
+                                                maxHeight: '200px',
+                                                overflowY: 'auto',
+                                                borderRadius: '8px'
+                                            }}
+                                        >
+                                            <style>
+                                                {`
+                                                .request-origin-dropdown::-webkit-scrollbar {
+                                                    width: 2px;
+                                                }
+                                                .request-origin-dropdown::-webkit-scrollbar-track {
+                                                    background: transparent;
+                                                }
+                                                .request-origin-dropdown::-webkit-scrollbar-thumb {
+                                                    background-color: #E4E4E4;
+                                                    border-radius: 10px;
+                                                }
+                                            `}
+                                            </style>
+                                            <div className="request-origin-dropdown py-1">
+                                                <button
+                                                    type="button"
+                                                    onMouseDown={() => {
+                                                        setRequestProductOrigin('');
+                                                        setRequestProductOriginInput('');
+                                                        setIsRequestProductOriginDropdownOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                                    style={{
+                                                        backgroundColor: !requestProductOrigin && !requestProductOriginInput ? '#F0F8FE' : 'transparent',
+                                                        color: !requestProductOrigin && !requestProductOriginInput ? '#64B5F6' : '#6A6A6A',
+                                                        fontSize: '10px'
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={globyIcon}
+                                                        alt="Globe"
+                                                        className="w-3 h-3"
+                                                        style={{
+                                                            filter: (requestProductOrigin || requestProductOriginInput)
+                                                                ? 'grayscale(100%) brightness(0.7)'
+                                                                : 'none'
+                                                        }}
+                                                    />
+                                                    <span>Africa</span>
+                                                </button>
+                                                {africanCountries
+                                                    .filter((country) => {
+                                                        const searchTerm = requestProductOriginInput.toLowerCase().trim();
+                                                        if (!searchTerm) return true;
+                                                        return country.name.toLowerCase().includes(searchTerm);
+                                                    })
+                                                    .map((country) => (
+                                                        <button
+                                                            key={country.code}
+                                                            type="button"
+                                                            onMouseDown={() => {
+                                                                setRequestProductOrigin(country.name);
+                                                                setRequestProductOriginInput('');
+                                                                setIsRequestProductOriginDropdownOpen(false);
+                                                            }}
+                                                            className="w-full text-left px-3 py-2 transition-colors flex items-center gap-2 relative hover:bg-gray-50"
+                                                            style={{
+                                                                color: requestProductOrigin === country.name ? '#64B5F6' : '#6A6A6A',
+                                                                fontSize: '10px',
+                                                                backgroundColor: requestProductOrigin === country.name ? '#F0F8FE' : 'transparent'
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={country.flag}
+                                                                alt={country.name}
+                                                                className="object-cover rounded-full"
+                                                                style={{ width: '16px', height: '16px' }}
+                                                            />
+                                                            <span>{country.name}</span>
+                                                        </button>
+                                                    ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Description Input */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                                    Description
+                                </label>
+                                <textarea
+                                    value={requestDescription}
+                                    onChange={(e) => setRequestDescription(e.target.value)}
+                                    placeholder="Add an description"
+                                    rows={5}
+                                    style={{
+                                        width: '100%',
+                                        padding: '6px 10px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #E4E4E4',
+                                        fontSize: '9px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        outline: 'none',
+                                        resize: 'none',
+                                        color: requestDescription ? '#212121' : '#D9D9D9'
+                                    }}
+                                />
+                            </div>
+
+                            {/* Location Section */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '-2px' }}>
+                                    Your location
+                                </label>
+                                <div className="relative location-dropdown-container" ref={locationDropdownRef}>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5">
+                                            <img src={locIcon} alt="Location" style={{ width: '12px', height: '12px' }} />
+                                            <input
+                                                type="text"
+                                                value={location}
+                                                readOnly
+                                                className="text-xs font-medium border-none focus:outline-none cursor-default"
+                                                style={{ color: '#64B5F6', backgroundColor: 'transparent', fontSize: '10px' }}
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                                            style={{
+                                                padding: '4px 8px',
+                                                borderRadius: '8px',
+                                                backgroundColor: '#F0F8FE',
+                                                color: '#64B5F6',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                fontSize: '9px',
+                                                fontFamily: 'Poppins, sans-serif'
+                                            }}
+                                        >
+                                            Change location
+                                        </button>
+                                    </div>
+                                    {/* Location Dropdown */}
+                                    {isLocationDropdownOpen && (
+                                        <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
+                                            <div className="p-2 max-h-60 overflow-auto">
+                                                <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
+                                                {ukCities.map((city) => (
+                                                    <button
+                                                        key={city}
+                                                        type="button"
+                                                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                                                        onClick={() => {
+                                                            setLocation(`${city} | United Kingdom`);
+                                                            setIsLocationDropdownOpen(false);
+                                                        }}
+                                                        style={{ fontSize: '10px' }}
+                                                    >
+                                                        {city}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Price Range Section */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <h3 style={{ fontSize: '13px', color: '#212121', marginBottom: '8px', fontWeight: '500' }}>
+                                    How much would you like to pay for the product?
+                                </h3>
+                                <div className="flex gap-2" style={{ marginBottom: '6px', flexWrap: 'wrap' }}>
+                                    {['Less than 10 GBP', '10 - 50 GBP', '50 - 100 GBP', '100 - 200 GBP'].map((range) => (
+                                        <button
+                                            key={range}
+                                            onClick={() => setRequestPriceRange(range)}
+                                            style={{
+                                                width: 'calc(50% - 4px)',
+                                                padding: '6px 8px',
+                                                borderRadius: '8px',
+                                                border: `1px solid ${requestPriceRange === range ? 'transparent' : '#E4E4E4'}`,
+                                                backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
+                                                color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
+                                                cursor: 'pointer',
+                                                fontSize: '9px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                textAlign: 'center',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            {range}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setRequestPriceRange('More than 200 GBP')}
+                                    style={{
+                                        width: '100%',
+                                        padding: '6px 8px',
+                                        borderRadius: '8px',
+                                        border: `1px solid ${requestPriceRange === 'More than 200 GBP' ? 'transparent' : '#E4E4E4'}`,
+                                        backgroundColor: requestPriceRange === 'More than 200 GBP' ? '#F0F8FE' : '#FFF',
+                                        color: requestPriceRange === 'More than 200 GBP' ? '#64B5F6' : '#6A6A6A',
+                                        cursor: 'pointer',
+                                        fontSize: '9px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    More than 200 GBP
+                                </button>
+                            </div>
+
+                            {/* Create Request Button */}
+                            <button
+                                style={{
+                                    display: 'flex',
+                                    width: '100%',
+                                    height: '36px',
+                                    padding: '8px',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    flexShrink: 0,
+                                    borderRadius: '8px',
+                                    backgroundColor: '#F9A825',
+                                    color: '#FFF',
+                                    border: 'none',
+                                    cursor: isSubmittingRequest ? 'not-allowed' : 'pointer',
+                                    marginTop: '20px',
+                                    fontSize: '11px',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: '400',
+                                    margin: '0 auto',
+                                    opacity: isSubmittingRequest ? 0.7 : 1
+                                }}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleRequestSubmit(e as any);
+                                }}
+                                disabled={isSubmittingRequest}
+                            >
+                                {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
+                            </button>
+                        </div>
+                    </div>
+                ) : showRequestModal && !isMobile ? (
+                    // Desktop/Tablet: Modal Overlay
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: '#0000001A',
+                            zIndex: 9998,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                        onClick={() => setShowRequestModal(false)}
+                    >
+                        {/* Request Modal */}
+                        <div
+                            style={{
+                                width: '580px',
+                                height: 'auto',
+                                maxHeight: '90vh',
+                                flexShrink: 0,
+                                borderRadius: '30px',
+                                background: '#FFF',
+                                padding: '24px 32px',
+                                position: 'relative',
+                                fontFamily: 'Poppins, sans-serif',
+                                overflowY: 'auto'
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
+                                <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '600' }}>
+                                    Do a request
+                                </h2>
+                                <button
+                                    onClick={() => setShowRequestModal(false)}
+                                    style={{
+                                        width: '24px',
+                                        height: '24px',
+                                        color: '#212121',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        fontSize: '20px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            {/* Product Name Input */}
+                            <div style={{ marginBottom: '12px' }}>
+                                <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
+                                    Product name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={requestProductName}
+                                    onChange={(e) => setRequestProductName(e.target.value)}
+                                    placeholder="Enter product name"
+                                    style={{
+                                        width: '100%',
+                                        padding: '8px 12px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #E4E4E4',
+                                        fontSize: '12px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+
+                            {/* Product Origin Input */}
+                            <div style={{ marginBottom: '12px' }}>
+                                <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
+                                    Product Origin
+                                </label>
+                                <div style={{ position: 'relative' }} ref={requestProductOriginDropdownRef}>
+                                    <div className="relative flex items-center w-full">
+                                        <input
+                                            type="text"
+                                            placeholder="Type a country"
+                                            value={requestProductOrigin || requestProductOriginInput}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setRequestProductOriginInput(value);
+                                                setRequestProductOrigin('');
+                                                if (value.trim()) {
+                                                    setIsRequestProductOriginDropdownOpen(true);
+                                                }
+                                            }}
+                                            onFocus={() => {
+                                                if (requestProductOriginInput.trim() || !requestProductOrigin) {
+                                                    setIsRequestProductOriginDropdownOpen(true);
+                                                }
+                                            }}
+                                            onBlur={() => {
+                                                setTimeout(() => {
+                                                    setIsRequestProductOriginDropdownOpen(false);
+                                                }, 200);
+                                            }}
+                                            style={{
+                                                width: '100%',
+                                                padding: '8px 12px',
+                                                paddingRight: '36px',
+                                                borderRadius: '8px',
+                                                border: '1px solid #E4E4E4',
+                                                fontSize: '12px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                outline: 'none',
+                                                color: (requestProductOrigin || requestProductOriginInput) ? '#212121' : '#D9D9D9'
+                                            }}
+                                        />
+                                        <img
+                                            src={arrowDownIcon}
+                                            alt="Arrow"
+                                            className="absolute right-3 w-3 h-3 transition-transform flex-shrink-0"
+                                            style={{
+                                                transform: isRequestProductOriginDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                pointerEvents: 'none'
+                                            }}
+                                        />
+                                    </div>
+                                    {isRequestProductOriginDropdownOpen && (
+                                        <div
+                                            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                                            style={{
+                                                maxHeight: '280px',
+                                                overflowY: 'auto',
+                                                borderRadius: '8px'
+                                            }}
+                                        >
+                                            <style>
+                                                {`
+                                                .request-origin-dropdown::-webkit-scrollbar {
+                                                    width: 2px;
+                                                }
+                                                .request-origin-dropdown::-webkit-scrollbar-track {
+                                                    background: transparent;
+                                                }
+                                                .request-origin-dropdown::-webkit-scrollbar-thumb {
+                                                    background-color: #E4E4E4;
+                                                    border-radius: 10px;
+                                                }
+                                            `}
+                                            </style>
+                                            <div className="request-origin-dropdown py-1">
+                                                <button
+                                                    type="button"
+                                                    onMouseDown={() => {
+                                                        setRequestProductOrigin('');
+                                                        setRequestProductOriginInput('');
+                                                        setIsRequestProductOriginDropdownOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                                    style={{
+                                                        backgroundColor: !requestProductOrigin && !requestProductOriginInput ? '#F0F8FE' : 'transparent',
+                                                        color: !requestProductOrigin && !requestProductOriginInput ? '#64B5F6' : '#6A6A6A',
+                                                        fontSize: '11px'
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={globyIcon}
+                                                        alt="Globe"
+                                                        className="w-4 h-4"
+                                                        style={{
+                                                            filter: (requestProductOrigin || requestProductOriginInput)
+                                                                ? 'grayscale(100%) brightness(0.7)'
+                                                                : 'none'
+                                                        }}
+                                                    />
+                                                    <span>Africa</span>
+                                                </button>
+                                                {africanCountries
+                                                    .filter((country) => {
+                                                        const searchTerm = requestProductOriginInput.toLowerCase().trim();
+                                                        if (!searchTerm) return true;
+                                                        return country.name.toLowerCase().includes(searchTerm);
+                                                    })
+                                                    .map((country) => (
+                                                        <button
+                                                            key={country.code}
+                                                            type="button"
+                                                            onMouseDown={() => {
+                                                                setRequestProductOrigin(country.name);
+                                                                setRequestProductOriginInput('');
+                                                                setIsRequestProductOriginDropdownOpen(false);
+                                                            }}
+                                                            className="w-full text-left px-4 py-2 transition-colors flex items-center gap-2 relative hover:bg-gray-50"
+                                                            style={{
+                                                                color: requestProductOrigin === country.name ? '#64B5F6' : '#6A6A6A',
+                                                                fontSize: '11px',
+                                                                backgroundColor: requestProductOrigin === country.name ? '#F0F8FE' : 'transparent'
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={country.flag}
+                                                                alt={country.name}
+                                                                className="object-cover rounded-full"
+                                                                style={{ width: '16px', height: '16px' }}
+                                                            />
+                                                            <span>{country.name}</span>
+                                                        </button>
+                                                    ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Description Input */}
+                            <div style={{ marginBottom: '12px' }}>
+                                <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
+                                    Description
+                                </label>
+                                <textarea
+                                    value={requestDescription}
+                                    onChange={(e) => setRequestDescription(e.target.value)}
+                                    placeholder="Add an description"
+                                    rows={3}
+                                    style={{
+                                        width: '100%',
+                                        padding: '8px 12px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #E4E4E4',
+                                        fontSize: '11px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        outline: 'none',
+                                        resize: 'none',
+                                        color: requestDescription ? '#212121' : '#D9D9D9'
+                                    }}
+                                />
+                            </div>
+
+                            {/* Location Section */}
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '-4px' }}>
+                                    Your location
+                                </label>
+                                <div className="relative location-dropdown-container" ref={locationDropdownRef}>
+                                    <div className="flex items-center justify-between">
+                                        <input
+                                            type="text"
+                                            value={location}
+                                            readOnly
+                                            className="text-xs font-medium border-none focus:outline-none cursor-default"
+                                            style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                                            className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
+                                            style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
+                                        >
+                                            Change location
+                                        </button>
+                                    </div>
+                                    {/* Location Dropdown */}
+                                    {isLocationDropdownOpen && (
+                                        <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
+                                            <div className="p-2 max-h-60 overflow-auto">
+                                                <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
+                                                {ukCities.map((city) => (
+                                                    <button
+                                                        key={city}
+                                                        type="button"
+                                                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
+                                                        onClick={() => {
+                                                            setLocation(`${city} | United Kingdom`);
+                                                            setIsLocationDropdownOpen(false);
+                                                        }}
+                                                    >
+                                                        {city}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Price Range Section */}
+                            <div style={{ marginBottom: '16px' }}>
+                                <h3 style={{ fontSize: '14px', color: '#212121', marginBottom: '10px', fontWeight: '500' }}>
+                                    How much would you like to pay for the product?
+                                </h3>
+                                <div className="flex gap-2" style={{ marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    {['Less than 10 GBP', '10 - 50 GBP', '50 - 100 GBP', '100 - 200 GBP'].map((range) => (
+                                        <button
+                                            key={range}
+                                            onClick={() => setRequestPriceRange(range)}
+                                            style={{
+                                                width: '110px',
+                                                padding: '8px 10px',
+                                                borderRadius: '8px',
+                                                border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#E4E4E4'}`,
+                                                backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
+                                                color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
+                                                cursor: 'pointer',
+                                                fontSize: '12px',
+                                                fontFamily: 'Poppins, sans-serif',
+                                                textAlign: 'center',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        >
+                                            {range}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setRequestPriceRange('More than 200 GBP')}
+                                    style={{
+                                        width: '228px',
+                                        padding: '8px 10px',
+                                        borderRadius: '8px',
+                                        border: `1px solid ${requestPriceRange === 'More than 200 GBP' ? '#64B5F6' : '#E4E4E4'}`,
+                                        backgroundColor: requestPriceRange === 'More than 200 GBP' ? '#F0F8FE' : '#FFF',
+                                        color: requestPriceRange === 'More than 200 GBP' ? '#64B5F6' : '#6A6A6A',
+                                        cursor: 'pointer',
+                                        fontSize: '12px',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    More than 200 GBP
+                                </button>
+                            </div>
+
+                            {/* Create Request Button */}
+                            <button
+                                style={{
+                                    display: 'flex',
+                                    width: '480px',
+                                    height: '40px',
+                                    padding: '10px',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    flexShrink: 0,
+                                    borderRadius: '8px',
+                                    backgroundColor: '#F9A825',
+                                    color: '#FFF',
+                                    border: 'none',
+                                    cursor: isSubmittingRequest ? 'not-allowed' : 'pointer',
+                                    fontSize: '14px',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: '400',
+                                    margin: '0 auto',
+                                    opacity: isSubmittingRequest ? 0.7 : 1
+                                }}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleRequestSubmit(e as any);
+                                }}
+                                disabled={isSubmittingRequest}
+                            >
+                                {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
+                            </button>
+                        </div>
+                    </div>
+                ) : null}
 
                 {/* Footer */}
                 <footer className="bg-white">
