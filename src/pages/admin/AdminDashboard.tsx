@@ -42,6 +42,7 @@ import pencilIcon from '../../assets/images/pre/pencil.svg';
 import statusIcon from '../../assets/images/pre/status.svg';
 import suspendIcon from '../../assets/images/admin/suspend.svg';
 import notifIcon from '../../assets/images/admin/notif.svg';
+import keyIcon from '../../assets/images/pre/key.svg';
 import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
 import sendIcon from '../../assets/images/admin/send.svg';
 import starIcon from '../../assets/images/admin/star.svg';
@@ -171,6 +172,9 @@ const AdminDashboard: React.FC = () => {
   } | null>(null);
   const activityCardMoreMenuRef = useRef<HTMLDivElement | null>(null);
   const activityCardMoreMenuButtonRef = useRef<HTMLDivElement | null>(null);
+  const [currentActivityLabel, setCurrentActivityLabel] = useState<string | null>(null);
+  // Used to render the longer "history activities" left area on the detail page
+  const [isViewingActivityHistory, setIsViewingActivityHistory] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<string | null>(null);
   const [isDeleteActivitySuccess, setIsDeleteActivitySuccess] = useState(false);
   const [isActivityDeleted, setIsActivityDeleted] = useState(false);
@@ -703,6 +707,7 @@ const AdminDashboard: React.FC = () => {
                 if (user) {
                   setSelectedUserForProfile(user);
                   setViewingUserProfile(true);
+                  setIsViewingActivityHistory(false);
                   setMoreMenu(null);
                 }
               }}
@@ -730,6 +735,7 @@ const AdminDashboard: React.FC = () => {
                   setSelectedUserForProfile(user);
                   setViewingUserProfile(true);
                   setIsManageAccessView(true);
+                  setIsViewingActivityHistory(false);
                   setMoreMenu(null);
                 }
               }}
@@ -757,6 +763,7 @@ const AdminDashboard: React.FC = () => {
                   setViewingUserProfile(true);
                   const userName = `@${user.name.split(' ')[0]}`;
                   setUserToSuspend(userName);
+                  setIsViewingActivityHistory(false);
                   setMoreMenu(null);
                 }
               }}
@@ -795,7 +802,39 @@ const AdminDashboard: React.FC = () => {
           </>
         ) : (
           <>
-            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+            <div
+              onClick={() => {
+                const activityRow = usersActivitiesRows.find(r => r.email === moreMenu.email);
+                if (activityRow) {
+                  const userForProfile = {
+                    name: activityRow.name,
+                    email: activityRow.email,
+                    avatar: activityRow.avatar,
+                    avatarBg: activityRow.avatarBg,
+                    plan: activityRow.plan,
+                    isNewUser: activityRow.isNewUser,
+                    verified: false
+                  };
+                  setSelectedUserForProfile(userForProfile);
+                  setViewingUserProfile(true);
+                  setIsViewingActivityHistory(true);
+                  // ensure no other detail flows are forced open
+                  setIsManageAccessView(false);
+                  setIsManageAccessMaximized(false);
+                  setActivityToDelete(null);
+                  setIsDeleteActivitySuccess(false);
+                  setIsActivityDeleted(false);
+                  setUserToSuspend(null);
+                  setIsSuspendSuccess(false);
+                  setUserToDeleteAccount(null);
+                  setIsDeleteUserSuccess(false);
+                  setMoreMenu(null);
+                }
+              }}
+              onMouseEnter={primaryHoverOn}
+              onMouseLeave={primaryHoverOff}
+              style={baseItemStyle}
+            >
               <img
                 src={viewIcon}
                 alt="View"
@@ -824,6 +863,7 @@ const AdminDashboard: React.FC = () => {
                   };
                   setSelectedUserForProfile(userForProfile);
                   setViewingUserProfile(true);
+                  setIsViewingActivityHistory(false);
                   // Trigger delete flow on the detail page
                   const activityText = `${activityRow.name.split(' ')[0]} ${activityRow.activity}`;
                   setActivityToDelete(activityText);
@@ -1158,9 +1198,18 @@ const AdminDashboard: React.FC = () => {
                   src={arrowLeftIcon}
                   alt="Back"
                   style={{ width: '14px', height: '14px', cursor: 'pointer', flexShrink: 0 }}
-                  onClick={() => setViewingUserProfile(false)}
+                  onClick={() => {
+                    setViewingUserProfile(false);
+                    setIsViewingActivityHistory(false);
+                  }}
                 />
-                <span style={{ cursor: 'pointer' }} onClick={() => setViewingUserProfile(false)}>
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setViewingUserProfile(false);
+                    setIsViewingActivityHistory(false);
+                  }}
+                >
                   Homepage
                 </span>
                 <span style={{ color: '#D4D4D4' }}>·</span>
@@ -1168,6 +1217,7 @@ const AdminDashboard: React.FC = () => {
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
                     setViewingUserProfile(false);
+                    setIsViewingActivityHistory(false);
                     setUsersToggle('list');
                   }}
                 >
@@ -2746,6 +2796,336 @@ const AdminDashboard: React.FC = () => {
                         padding: '16px'
                       }}
                     >
+                    {isViewingActivityHistory ? (
+                      <div
+                        className="activity-history-scroll"
+                        style={{
+                          maxHeight: '540px',
+                          overflowY: 'auto',
+                          paddingRight: '6px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none'
+                        } as React.CSSProperties}
+                      >
+                        <style>{`
+                          .activity-history-scroll::-webkit-scrollbar {
+                            display: none !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                            background: transparent !important;
+                          }
+                          .activity-history-scroll {
+                            -ms-overflow-style: none !important;
+                            scrollbar-width: none !important;
+                          }
+                        `}</style>
+
+                        {/* Top Bar: Search + Export + Sort (same as default view) */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            marginBottom: '12px'
+                          }}
+                        >
+                          {/* Search Bar */}
+                          <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
+                            <input
+                              type="text"
+                              placeholder="Search an activity?"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: '#6A6A6A',
+                                backgroundColor: '#F1F1F1',
+                                outline: 'none',
+                                caretColor: '#CFE8FC'
+                              }}
+                            />
+                          </div>
+
+                          {/* Export Data Button + Sort By Dropdown */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              marginLeft: 'auto',
+                              flexShrink: 0
+                            }}
+                          >
+                            {/* Export Data Button */}
+                            <button
+                              style={{
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                color: '#64B5F6',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>Export data</span>
+                              <img
+                                src={exportIcon}
+                                alt="Export"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter:
+                                    'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                                }}
+                              />
+                            </button>
+
+                            {/* Sort By Dropdown */}
+                            <select
+                              style={{
+                                padding: '4px 10px',
+                                paddingRight: '28px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: '#939393',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer',
+                                appearance: 'none',
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'none',
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 8px center',
+                                backgroundSize: '12px'
+                              }}
+                            >
+                              <option>Sort by</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {[
+                          {
+                            date: 'Today',
+                            items: [
+                              {
+                                title: 'Listing modified',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} modified a listing`,
+                                time: '19 min ago'
+                              },
+                              {
+                                title: 'Listing added',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} added a new listing`,
+                                time: '17:12'
+                              }
+                            ]
+                          },
+                          {
+                            date: 'Yesterday',
+                            items: [
+                              {
+                                title: 'Reviewed a user',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} reviewed the user @Hirald Jockovic`,
+                                time: '17:12'
+                              },
+                              {
+                                title: 'Contact a seller',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} contact the seller @Emanuelle Keinth`,
+                                time: '17:12'
+                              }
+                            ]
+                          },
+                          {
+                            date: 'Mon, 21 Dec 2025',
+                            items: [
+                              {
+                                title: 'Enable Two-step authentification',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} enable two step authentification`,
+                                time: '17:12'
+                              },
+                              {
+                                title: 'Account created',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} ${selectedUserForProfile?.name.split(' ').slice(1).join(' ') || ''} joined Bao'Afrik`,
+                                time: '19 min ago'
+                              }
+                            ]
+                          }
+                        ].map((group, groupIdx, groups) => (
+                          <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px' }}>
+                            <div style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginBottom: '10px' }}>
+                              {group.date}
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              {group.items.map((item, idx) => (
+                                <React.Fragment key={`${group.date}-${idx}`}>
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '10px 0' }}>
+                                    {/* Profile with Notification Bell */}
+                                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                                      <div style={{
+                                        width: '48px',
+                                        height: '48px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#D5E9BD',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden'
+                                      }}>
+                                        {selectedUserForProfile?.avatar && (
+                                          <img
+                                            src={
+                                              [
+                                                selectedUserForProfile?.avatar,
+                                                avatar,
+                                                messageAvatarIcon
+                                              ][(groupIdx * 2 + idx) % 3] || selectedUserForProfile?.avatar
+                                            }
+                                            alt={selectedUserForProfile.name}
+                                            style={{
+                                              width: '44px',
+                                              height: '44px',
+                                              borderRadius: '50%',
+                                              objectFit: 'cover'
+                                            }}
+                                          />
+                                        )}
+                                      </div>
+                                      {/* Notification Bell Icon */}
+                                      <div style={{
+                                        position: 'absolute',
+                                        bottom: '-2px',
+                                        right: '-2px',
+                                        width: '20px',
+                                        height: '20px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#FFFFFF',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #F1F1F1',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                                      }}>
+                                        <img
+                                          src={
+                                            (group.date === 'Mon, 21 Dec 2025' && item.title.includes('Two-step')) ||
+                                            (group.date === 'Yesterday' && item.title.includes('Contact a seller'))
+                                              ? keyIcon
+                                              : notifIcon
+                                          }
+                                          alt="Notification"
+                                          style={{
+                                            width: '12px',
+                                            height: '12px',
+                                            filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+
+                                    {/* Activity Content */}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0px',
+                                        marginTop: '4px'
+                                      }}>
+                                        <span style={{
+                                          fontSize: '12px',
+                                          color: '#6A6A6A',
+                                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                                          fontWeight: 500
+                                        }}>
+                                          {item.title}
+                                        </span>
+                                        <div
+                                          ref={activityCardMoreMenuButtonRef}
+                                          className="activity-card-more-options-button"
+                                          onClick={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setCurrentActivityLabel(item.title);
+                                            setActivityCardMoreMenu({ anchorRect: rect });
+                                          }}
+                                          style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer'
+                                          }}
+                                        >
+                                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="4" cy="8" r="1.5" fill="#4D4D4D"/>
+                                            <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
+                                            <circle cx="12" cy="8" r="1.5" fill="#4D4D4D"/>
+                                          </svg>
+                                        </div>
+                                      </div>
+                                      <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: '8px',
+                                        flexWrap: 'wrap'
+                                      }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                                          <span style={{
+                                            fontSize: '11px',
+                                            color: '#939393',
+                                            fontFamily: 'Poppins, sans-serif'
+                                          }}>
+                                            {item.description.replace('View more', '')}
+                                          </span>
+                                          <span
+                                            style={{
+                                              fontSize: '11px',
+                                              color: '#64B5F6',
+                                              fontFamily: 'Poppins, sans-serif',
+                                              cursor: 'pointer',
+                                              textDecoration: 'underline'
+                                            }}
+                                          >
+                                            View more
+                                          </span>
+                                        </div>
+                                        <span style={{
+                                          fontSize: '10px',
+                                          color: '#B0B0B0',
+                                          fontFamily: 'Poppins, sans-serif'
+                                        }}>
+                                          {item.time}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {idx !== group.items.length - 1 && (
+                                    <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%' }} />
+                                  )}
+                                </React.Fragment>
+                              ))}
+                            </div>
+
+                            {groupIdx !== groups.length - 1 && (
+                              <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%', marginTop: '18px' }} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                    <div style={{ display: 'contents' }}>
                     {/* Top Bar: Search + Export + Sort */}
                     <div style={{
                       display: 'flex',
@@ -2913,6 +3293,7 @@ const AdminDashboard: React.FC = () => {
                             className="activity-card-more-options-button"
                             onClick={(e) => {
                               const rect = e.currentTarget.getBoundingClientRect();
+                              setCurrentActivityLabel('Account created');
                               setActivityCardMoreMenu({ anchorRect: rect });
                             }}
                             style={{
@@ -2985,6 +3366,8 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
                     )}
+                    </div>
+                    )}
 
                     {/* Activity Card More Options Dropdown */}
                     {!isActivityDeleted && activityCardMoreMenu && (() => {
@@ -3013,7 +3396,9 @@ const AdminDashboard: React.FC = () => {
                           {/* Delete the activity */}
                           <div
                             onClick={() => {
-                              const activityText = `${selectedUserForProfile.name.split(' ')[0]} joined Bao'Afrik`;
+                              const activityText =
+                                currentActivityLabel ||
+                                `${selectedUserForProfile.name.split(' ')[0]} joined Bao'Afrik`;
                               setActivityToDelete(activityText);
                               setActivityCardMoreMenu(null);
                             }}
