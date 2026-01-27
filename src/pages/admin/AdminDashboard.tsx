@@ -184,6 +184,12 @@ const AdminDashboard: React.FC = () => {
   const [activityCardMoreMenu, setActivityCardMoreMenu] = useState<{
     anchorRect: DOMRect;
   } | null>(null);
+  const [reportedIssueMoreMenu, setReportedIssueMoreMenu] = useState<{
+    anchorRect: DOMRect;
+    reportId: string;
+  } | null>(null);
+  const reportedIssueMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const reportedIssueMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const activityCardMoreMenuRef = useRef<HTMLDivElement | null>(null);
   const activityCardMoreMenuButtonRef = useRef<HTMLDivElement | null>(null);
   const [currentActivityLabel, setCurrentActivityLabel] = useState<string | null>(null);
@@ -470,13 +476,19 @@ const AdminDashboard: React.FC = () => {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
         setFilterDropdownOpen(false);
       }
+      // Close reported issue more menu when clicking outside
+      const reportedIssueMoreOptionsDropdown = target.closest('.reported-issue-more-options-dropdown');
+      const reportedIssueMoreButton = target.closest('[data-report-more-button="true"]');
+      if (!reportedIssueMoreOptionsDropdown && !reportedIssueMoreButton && reportedIssueMoreMenu !== null) {
+        setReportedIssueMoreMenu(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, filterDropdownOpen]);
+  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, filterDropdownOpen, reportedIssueMoreMenu]);
 
   // Close activity card more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -6813,6 +6825,17 @@ const AdminDashboard: React.FC = () => {
 
                               {/* More Options Button */}
                               <button
+                                data-report-more-button="true"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  if (reportedIssueMoreMenu?.reportId === 'report-1') {
+                                    setReportedIssueMoreMenu(null);
+                                  } else {
+                                    setReportedIssueMoreMenu({ anchorRect: rect, reportId: 'report-1' });
+                                    reportedIssueMoreMenuButtonRef.current = e.currentTarget;
+                                  }
+                                }}
                                 style={{
                                   background: 'transparent',
                                   cursor: 'pointer',
@@ -6823,13 +6846,13 @@ const AdminDashboard: React.FC = () => {
                                   width: '20px',
                                   height: '20px',
                                   borderRadius: '50%',
-                                  border: '1px solid #B0B0B0'
+                                  border: `1px solid ${reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}`
                                 }}
                               >
                                 <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
-                                  <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0"/>
-                                  <circle cx="5" cy="1.5" r="1" fill="#B0B0B0"/>
-                                  <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="1.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}/>
                                 </svg>
                               </button>
                             </div>
@@ -7051,6 +7074,17 @@ const AdminDashboard: React.FC = () => {
                                 </div>
                               </div>
                               <button
+                                data-report-more-button="true"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  if (reportedIssueMoreMenu?.reportId === 'report-3') {
+                                    setReportedIssueMoreMenu(null);
+                                  } else {
+                                    setReportedIssueMoreMenu({ anchorRect: rect, reportId: 'report-3' });
+                                    reportedIssueMoreMenuButtonRef.current = e.currentTarget;
+                                  }
+                                }}
                                 style={{
                                   background: 'transparent',
                                   cursor: 'pointer',
@@ -7061,13 +7095,13 @@ const AdminDashboard: React.FC = () => {
                                   width: '20px',
                                   height: '20px',
                                   borderRadius: '50%',
-                                  border: '1px solid #B0B0B0'
+                                  border: `1px solid ${reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}`
                                 }}
                               >
                                 <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
-                                  <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0"/>
-                                  <circle cx="5" cy="1.5" r="1" fill="#B0B0B0"/>
-                                  <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="1.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}/>
                                 </svg>
                               </button>
                             </div>
@@ -7075,6 +7109,88 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Reported Issue More Options Dropdown */}
+                    {reportedIssueMoreMenu && (() => {
+                      const menuWidth = 200;
+                      const margin = 8;
+                      const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, reportedIssueMoreMenu.anchorRect.right - menuWidth));
+                      const top = reportedIssueMoreMenu.anchorRect.bottom + 8;
+
+                      return createPortal(
+                        <div
+                          ref={reportedIssueMoreMenuRef}
+                          className="reported-issue-more-options-dropdown"
+                          style={{
+                            position: 'fixed',
+                            top,
+                            left,
+                            width: `${menuWidth}px`,
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '8px',
+                            zIndex: 99999
+                          }}
+                        >
+                          {/* Delete the report */}
+                          <div
+                            onClick={() => {
+                              // Handle delete report action
+                              setReportedIssueMoreMenu(null);
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.cursor = 'pointer';
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              cursor: `url(${mouseCursorIcon}), auto`,
+                              transition: 'background-color 0.2s'
+                            }}
+                          >
+                            <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                            <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the report</span>
+                          </div>
+
+                          {/* Close */}
+                          <div
+                            onClick={() => setReportedIssueMoreMenu(null)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.cursor = 'pointer';
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: '#FAFAFA',
+                              cursor: `url(${mouseCursorIcon}), auto`,
+                              transition: 'background-color 0.2s',
+                              marginTop: '4px'
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                          </div>
+                        </div>,
+                        document.body
+                      );
+                    })()}
 
                     {/* Account Information */}
                     {!isManageAccessView && userDetailActiveTab === 'about' && (
