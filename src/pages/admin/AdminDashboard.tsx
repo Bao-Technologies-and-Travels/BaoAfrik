@@ -55,9 +55,9 @@ import expandIcon from '../../assets/images/admin/expand.svg';
 import gotoIcon from '../../assets/images/admin/goto.svg';
 import desIcon from '../../assets/images/admin/des.svg';
 import calendarIcon from '../../assets/images/pre/calendar.svg';
-import pinIcon from '../../assets/images/pre/pin.svg';
-import chromeIcon from '../../assets/images/pre/chrome.svg';
-import deviceIcon from '../../assets/images/pre/device.svg';
+import locIcon from '../../assets/images/admin/loc.svg';
+import globeIcon from '../../assets/images/admin/globe.svg';
+import monitorIcon from '../../assets/images/admin/monitor.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -186,6 +186,8 @@ const AdminDashboard: React.FC = () => {
     description: string;
     time: string;
     date: string;
+    avatarIndex?: number;
+    iconType?: 'bell' | 'key';
   } | null>(null);
   const [activityDetailMoreMenu, setActivityDetailMoreMenu] = useState<{
     anchorRect: DOMRect;
@@ -3011,11 +3013,16 @@ const AdminDashboard: React.FC = () => {
                                 <React.Fragment key={`${group.date}-${idx}`}>
                                   <div 
                                     onClick={() => {
+                                      const avatarIndex = (groupIdx * 2 + idx) % 3;
+                                      const isKeyIcon = (group.date === 'Mon, 21 Dec 2025' && item.title.includes('Two-step')) ||
+                                                        (group.date === 'Yesterday' && item.title.includes('Contact a seller'));
                                       setSelectedActivityDetail({
                                         title: item.title,
                                         description: item.description,
                                         time: item.time,
-                                        date: group.date
+                                        date: group.date,
+                                        avatarIndex,
+                                        iconType: isKeyIcon ? 'key' : 'bell'
                                       });
                                     }}
                                     style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '10px 0', cursor: 'pointer' }}>
@@ -8166,25 +8173,25 @@ const AdminDashboard: React.FC = () => {
                   backgroundColor: '#FFFFFF',
                   borderRadius: '18px',
                   border: '1px solid #E9E9E9',
-                  width: '90%',
-                  maxWidth: '600px',
-                  maxHeight: '90vh',
+                  width: '85%',
+                  maxWidth: '560px',
+                  maxHeight: '85vh',
                   overflowY: 'auto',
-                  padding: '24px',
+                  padding: '20px',
                   position: 'relative'
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <h2 style={{
-                    fontSize: '16px',
+                    fontSize: '14px',
                     color: '#212121',
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                     fontWeight: 600,
                     margin: 0
                   }}>
-                    Detail de l'activité
+                    Activity Details
                   </h2>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     {/* More Options Button */}
@@ -8195,15 +8202,15 @@ const AdminDashboard: React.FC = () => {
                         setActivityDetailMoreMenu({ anchorRect: rect });
                       }}
                       style={{
-                        width: '24px',
-                        height: '24px',
+                        width: '20px',
+                        height: '20px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         cursor: 'pointer'
                       }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                         <circle cx="4" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
                         <circle cx="8" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
                         <circle cx="12" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
@@ -8216,8 +8223,8 @@ const AdminDashboard: React.FC = () => {
                         setActivityDetailMoreMenu(null);
                       }}
                       style={{
-                        width: '24px',
-                        height: '24px',
+                        width: '20px',
+                        height: '20px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -8227,7 +8234,7 @@ const AdminDashboard: React.FC = () => {
                         padding: 0
                       }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                       </svg>
@@ -8236,44 +8243,72 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Activity Profile Section */}
-                <div style={{ position: 'relative', marginBottom: '24px', minHeight: '48px' }}>
+                <div style={{ position: 'relative', marginBottom: '18px', minHeight: '32px' }}>
                   {/* Profile Picture */}
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    backgroundColor: '#D5E9BD',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0
-                  }}>
-                    {selectedUserForProfile?.avatar && (
+                  <div style={{ position: 'relative', flexShrink: 0, display: 'inline-block' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      backgroundColor: '#D5E9BD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden'
+                    }}>
+                      {selectedUserForProfile?.avatar && (
+                        <img
+                          src={
+                            selectedActivityDetail.avatarIndex !== undefined
+                              ? [selectedUserForProfile.avatar, avatar, messageAvatarIcon][selectedActivityDetail.avatarIndex] || selectedUserForProfile.avatar
+                              : selectedUserForProfile.avatar
+                          }
+                          alt={selectedUserForProfile.name}
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      )}
+                    </div>
+                    {/* Notification Bell/Key Icon */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '-2px',
+                      right: '-2px',
+                      width: '14px',
+                      height: '14px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '1px solid #F1F1F1',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                    }}>
                       <img
-                        src={selectedUserForProfile.avatar}
-                        alt={selectedUserForProfile.name}
+                        src={selectedActivityDetail.iconType === 'key' ? keyIcon : notifIcon}
+                        alt="Notification"
                         style={{
-                          width: '44px',
-                          height: '44px',
-                          borderRadius: '50%',
-                          objectFit: 'cover'
+                          width: '8px',
+                          height: '8px',
+                          filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
                         }}
                       />
-                    )}
+                    </div>
                   </div>
                   {/* Name at top right of profile */}
                   <div style={{
                     position: 'absolute',
-                    left: '64px',
-                    top: 0
+                    left: '48px',
+                    top: '-2px'
                   }}>
                     <span style={{
-                      fontSize: '14px',
+                      fontSize: '13px',
                       color: '#212121',
-                      fontFamily: 'Poppins, sans-serif',
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
                       fontWeight: 500
                     }}>
                       {selectedUserForProfile?.name || 'User Name'}
@@ -8282,15 +8317,15 @@ const AdminDashboard: React.FC = () => {
                   {/* Activity description at bottom right of profile */}
                   <div style={{
                     position: 'absolute',
-                    left: '64px',
-                    top: '24px',
+                    left: '48px',
+                    top: '22px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
+                    gap: '6px',
                     flexWrap: 'wrap'
                   }}>
                     <span style={{
-                      fontSize: '12px',
+                      fontSize: '11px',
                       color: '#939393',
                       fontFamily: 'Poppins, sans-serif'
                     }}>
@@ -8298,7 +8333,7 @@ const AdminDashboard: React.FC = () => {
                     </span>
                     <span
                       style={{
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#64B5F6',
                         fontFamily: 'Poppins, sans-serif',
                         cursor: 'pointer',
@@ -8313,8 +8348,8 @@ const AdminDashboard: React.FC = () => {
                         src={gotoIcon}
                         alt="Go to"
                         style={{
-                          width: '14px',
-                          height: '14px'
+                          width: '12px',
+                          height: '12px'
                         }}
                       />
                     </span>
@@ -8322,30 +8357,30 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Detail and session Section */}
-                <div style={{ marginBottom: '24px' }}>
+                <div style={{ marginBottom: '20px' }}>
                   <h3 style={{
-                    fontSize: '14px',
+                    fontSize: '13px',
                     color: '#212121',
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                     fontWeight: 600,
-                    margin: '0 0 12px 0'
+                    margin: '0 0 10px 0'
                   }}>
                     Detail and session
                   </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {/* Today, 17:12 */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <img
                         src={calendarIcon}
                         alt="Time"
                         style={{
-                          width: '16px',
-                          height: '16px',
+                          width: '14px',
+                          height: '14px',
                           filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
                       <span style={{
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
@@ -8355,16 +8390,16 @@ const AdminDashboard: React.FC = () => {
                     {/* From Paris, France */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <img
-                        src={pinIcon}
+                        src={locIcon}
                         alt="Location"
                         style={{
-                          width: '16px',
-                          height: '16px',
+                          width: '14px',
+                          height: '14px',
                           filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
                       <span style={{
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
@@ -8374,15 +8409,16 @@ const AdminDashboard: React.FC = () => {
                     {/* Chrome Browser */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <img
-                        src={chromeIcon}
+                        src={globeIcon}
                         alt="Browser"
                         style={{
-                          width: '16px',
-                          height: '16px'
+                          width: '14px',
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
                       <span style={{
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
@@ -8392,16 +8428,16 @@ const AdminDashboard: React.FC = () => {
                     {/* Desktop-6R899ET */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <img
-                        src={deviceIcon}
+                        src={monitorIcon}
                         alt="Device"
                         style={{
-                          width: '16px',
-                          height: '16px',
+                          width: '14px',
+                          height: '14px',
                           filter: 'brightness(0) saturate(100%) invert(58%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
                       <span style={{
-                        fontSize: '12px',
+                        fontSize: '11px',
                         color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
@@ -8412,19 +8448,19 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Description Section */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '16px' }}>
                   <img
                     src={desIcon}
                     alt="Description"
                     style={{
-                      width: '20px',
-                      height: '20px',
+                      width: '18px',
+                      height: '18px',
                       flexShrink: 0,
                       marginTop: '2px'
                     }}
                   />
                   <p style={{
-                    fontSize: '12px',
+                    fontSize: '11px',
                     color: '#B0B0B0',
                     fontFamily: 'Poppins, sans-serif',
                     margin: 0,
