@@ -180,6 +180,9 @@ const AdminDashboard: React.FC = () => {
   } | null>(null);
   const sidebarMoreMenuRef = useRef<HTMLDivElement | null>(null);
   const sidebarMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [userToDeleteAccount, setUserToDeleteAccount] = useState<string | null>(null);
+  const [isDeleteUserSuccess, setIsDeleteUserSuccess] = useState(false);
+  const [deleteUserCountdown, setDeleteUserCountdown] = useState(5);
   const [userToSuspend, setUserToSuspend] = useState<string | null>(null);
   const [isSuspendSuccess, setIsSuspendSuccess] = useState(false);
   const [isUserSuspended, setIsUserSuspended] = useState(false);
@@ -554,6 +557,32 @@ const AdminDashboard: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isDeleteActivitySuccess, activityToDelete]);
+
+  // Countdown timer for delete user success modal
+  useEffect(() => {
+    if (isDeleteUserSuccess && userToDeleteAccount) {
+      setDeleteUserCountdown(5);
+      const interval = setInterval(() => {
+        setDeleteUserCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            // After countdown, close flow and return to users list
+            const deletedEmail = selectedUserForProfile?.email;
+            setUserToDeleteAccount(null);
+            setIsDeleteUserSuccess(false);
+            if (deletedEmail) {
+              setRemovedUserEmails((prevSet) => new Set(prevSet).add(deletedEmail));
+            }
+            setViewingUserProfile(false);
+            setUsersToggle('list');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isDeleteUserSuccess, userToDeleteAccount, selectedUserForProfile]);
 
   // Close more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -3576,6 +3605,11 @@ const AdminDashboard: React.FC = () => {
 
                             {/* Delete user account */}
                             <div
+                              onClick={() => {
+                                const userName = `@${selectedUserForProfile.name.split(' ')[0]}`;
+                                setUserToDeleteAccount(userName);
+                                setSidebarMoreMenu(null);
+                              }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
                               }}
@@ -3647,7 +3681,7 @@ const AdminDashboard: React.FC = () => {
                             borderRadius: '30px',
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '30px',
-                            maxWidth: '420px',
+                            maxWidth: '380px',
                             width: '90%',
                             minHeight: '280px',
                             position: 'relative',
@@ -3772,7 +3806,7 @@ const AdminDashboard: React.FC = () => {
                             borderRadius: '30px',
                             boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
                             padding: '30px',
-                            maxWidth: '420px',
+                            maxWidth: '380px',
                             width: '90%',
                             minHeight: '280px',
                             position: 'relative',
@@ -3883,6 +3917,290 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     )}
                     </div>
+
+                    {/* Delete User Confirmation Modal */}
+                    {userToDeleteAccount && !isDeleteUserSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setUserToDeleteAccount(null);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setUserToDeleteAccount(null)}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={redtrashIcon}
+                              alt="Delete"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToDeleteAccount}</span> account
+                              <br />
+                              will be permanently deleted,
+                              <br />
+                              do you wish to continue ?
+                            </p>
+                          </div>
+
+                          {/* Buttons (match screenshot layout) */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                // Confirm delete
+                                setIsDeleteUserSuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 18px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                color: '#FF5151',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                              Yes, Delete
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setUserToDeleteAccount(null)}
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                borderRadius: '12px',
+                                border: '1px solid #EDEDED',
+                                padding: '10px 18px',
+                                cursor: 'pointer',
+                                color: '#9C9C9C',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              No, Deactivate account
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Delete User Success Modal */}
+                    {userToDeleteAccount && isDeleteUserSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            const deletedEmail = selectedUserForProfile?.email;
+                            setUserToDeleteAccount(null);
+                            setIsDeleteUserSuccess(false);
+                            if (deletedEmail) {
+                              setRemovedUserEmails((prevSet) => new Set(prevSet).add(deletedEmail));
+                            }
+                            setViewingUserProfile(false);
+                            setUsersToggle('list');
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const deletedEmail = selectedUserForProfile?.email;
+                              setUserToDeleteAccount(null);
+                              setIsDeleteUserSuccess(false);
+                              if (deletedEmail) {
+                                setRemovedUserEmails((prevSet) => new Set(prevSet).add(deletedEmail));
+                              }
+                              setViewingUserProfile(false);
+                              setUsersToggle('list');
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToDeleteAccount}</span> account has been<br />
+                              successfully deleted.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                // Undo (placeholder): return to detail without deleting
+                                setUserToDeleteAccount(null);
+                                setIsDeleteUserSuccess(false);
+                                setDeleteUserCountdown(5);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const deletedEmail = selectedUserForProfile?.email;
+                                setUserToDeleteAccount(null);
+                                setIsDeleteUserSuccess(false);
+                                if (deletedEmail) {
+                                  setRemovedUserEmails((prevSet) => new Set(prevSet).add(deletedEmail));
+                                }
+                                setViewingUserProfile(false);
+                                setUsersToggle('list');
+                              }}
+                              style={{
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Back to users list · {deleteUserCountdown}s
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Manage Access View - Header always visible when manage access view is open */}
                     {isManageAccessView && (
