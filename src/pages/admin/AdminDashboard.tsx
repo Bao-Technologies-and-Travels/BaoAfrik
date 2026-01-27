@@ -5940,7 +5940,7 @@ const AdminDashboard: React.FC = () => {
                       {[
                         { label: 'About user', key: 'about' as const },
                         { label: 'Reviews and rates', key: 'reviews' as const },
-                        { label: 'Reported issues ab...', key: 'reported' as const, badge: 17 }
+                        { label: 'Reported issues ab...', key: 'reported' as const }
                       ].map((tab) => (
                         <button
                           key={tab.key}
@@ -5955,28 +5955,10 @@ const AdminDashboard: React.FC = () => {
                             fontFamily: 'Poppins, sans-serif',
                             cursor: 'pointer',
                             marginBottom: '-1px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            opacity: userDetailActiveTab === 'reported' && tab.key !== 'reported' ? 0.5 : 1,
-                            transition: 'opacity 0.2s, color 0.2s'
+                            transition: 'color 0.2s'
                           }}
                         >
-                          <span>{tab.label}</span>
-                          {tab.key === 'reported' && 'badge' in tab && (
-                            <span style={{
-                              backgroundColor: '#FF5151',
-                              color: '#FFFFFF',
-                              fontSize: '10px',
-                              fontFamily: 'Poppins, sans-serif',
-                              padding: '2px 6px',
-                              borderRadius: '10px',
-                              minWidth: '20px',
-                              textAlign: 'center'
-                            }}>
-                              {tab.badge}
-                            </span>
-                          )}
+                          {tab.label}
                         </button>
                       ))}
                     </div>
@@ -6699,7 +6681,7 @@ const AdminDashboard: React.FC = () => {
                         <div
                           className="reported-issues-scroll-container"
                           style={{
-                            maxHeight: 'calc(100vh - 500px)',
+                            maxHeight: 'calc(100vh - 400px)',
                             overflowY: 'auto',
                             paddingRight: '6px',
                             scrollbarWidth: 'none',
@@ -6833,19 +6815,21 @@ const AdminDashboard: React.FC = () => {
                               <button
                                 style={{
                                   background: 'transparent',
-                                  border: 'none',
                                   cursor: 'pointer',
-                                  padding: '4px',
+                                  padding: '2px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  color: '#B0B0B0'
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: '1px solid #B0B0B0'
                                 }}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <circle cx="12" cy="12" r="1"/>
-                                  <circle cx="12" cy="5" r="1"/>
-                                  <circle cx="12" cy="19" r="1"/>
+                                <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
+                                  <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0"/>
                                 </svg>
                               </button>
                             </div>
@@ -6950,19 +6934,21 @@ const AdminDashboard: React.FC = () => {
                               <button
                                 style={{
                                   background: 'transparent',
-                                  border: 'none',
                                   cursor: 'pointer',
-                                  padding: '4px',
+                                  padding: '2px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  color: '#B0B0B0'
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: '1px solid #B0B0B0'
                                 }}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <circle cx="12" cy="12" r="1"/>
-                                  <circle cx="12" cy="5" r="1"/>
-                                  <circle cx="12" cy="19" r="1"/>
+                                <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
+                                  <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0"/>
                                 </svg>
                               </button>
                             </div>
@@ -7067,19 +7053,21 @@ const AdminDashboard: React.FC = () => {
                               <button
                                 style={{
                                   background: 'transparent',
-                                  border: 'none',
                                   cursor: 'pointer',
-                                  padding: '4px',
+                                  padding: '2px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  color: '#B0B0B0'
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: '1px solid #B0B0B0'
                                 }}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <circle cx="12" cy="12" r="1"/>
-                                  <circle cx="12" cy="5" r="1"/>
-                                  <circle cx="12" cy="19" r="1"/>
+                                <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
+                                  <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0"/>
                                 </svg>
                               </button>
                             </div>
