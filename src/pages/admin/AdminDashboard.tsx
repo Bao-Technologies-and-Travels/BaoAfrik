@@ -696,8 +696,13 @@ const AdminDashboard: React.FC = () => {
 
             <div 
               onClick={() => {
-                setIsManageAccessView(true);
-                setMoreMenu(null);
+                const user = usersListRows.find(u => u.email === moreMenu.email);
+                if (user) {
+                  setSelectedUserForProfile(user);
+                  setViewingUserProfile(true);
+                  setIsManageAccessView(true);
+                  setMoreMenu(null);
+                }
               }}
               onMouseEnter={primaryHoverOn} 
               onMouseLeave={primaryHoverOff} 
@@ -715,7 +720,21 @@ const AdminDashboard: React.FC = () => {
               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
             </div>
 
-            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+            <div 
+              onClick={() => {
+                const user = usersListRows.find(u => u.email === moreMenu.email);
+                if (user) {
+                  setSelectedUserForProfile(user);
+                  setViewingUserProfile(true);
+                  const userName = `@${user.name.split(' ')[0]}`;
+                  setUserToSuspend(userName);
+                  setMoreMenu(null);
+                }
+              }}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
+              style={baseItemStyle}
+            >
               <img
                 src={suspendIcon}
                 alt="Suspend"
@@ -761,6 +780,27 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div
+              onClick={() => {
+                const activityRow = usersActivitiesRows.find(r => r.email === moreMenu.email);
+                if (activityRow) {
+                  // Convert activity row to user profile format and navigate to detail page
+                  const userForProfile = {
+                    name: activityRow.name,
+                    email: activityRow.email,
+                    avatar: activityRow.avatar,
+                    avatarBg: activityRow.avatarBg,
+                    plan: activityRow.plan,
+                    isNewUser: activityRow.isNewUser,
+                    verified: false
+                  };
+                  setSelectedUserForProfile(userForProfile);
+                  setViewingUserProfile(true);
+                  // Trigger delete flow on the detail page
+                  const activityText = `${activityRow.name.split(' ')[0]} ${activityRow.activity}`;
+                  setActivityToDelete(activityText);
+                  setMoreMenu(null);
+                }
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
               }}
