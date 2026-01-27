@@ -5711,7 +5711,7 @@ const AdminDashboard: React.FC = () => {
                           data-reviews-scroll
                           className="reviews-scroll-container"
                           style={{
-                            maxHeight: '400px',
+                            maxHeight: '350px',
                             overflowY: 'auto',
                             paddingRight: '6px',
                             scrollbarWidth: 'none',
