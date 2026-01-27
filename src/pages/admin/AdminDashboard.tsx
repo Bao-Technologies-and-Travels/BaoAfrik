@@ -5924,68 +5924,6 @@ const AdminDashboard: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Empty Placeholder when Reviews is Maximized - Shows below header */}
-                    {!isManageAccessView && userDetailActiveTab === 'reviews' && isReviewsMaximized && (
-                      <div style={{
-                        position: 'relative',
-                        border: '2px dashed #D9D9D9',
-                        borderRadius: '12px',
-                        padding: '40px 20px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '300px',
-                        textAlign: 'center',
-                        marginTop: '16px'
-                      }}>
-                        <p style={{
-                          fontSize: '12px',
-                          color: '#B0B0B0',
-                          fontFamily: 'Poppins, sans-serif',
-                          margin: '0 0 8px 0',
-                          lineHeight: '1.5'
-                        }}>
-                          The review window has been enlarged, reduce it if you want to see it appear here again.
-                        </p>
-                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                          <button
-                            onClick={() => setIsReviewsMaximized(false)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              color: '#64B5F6',
-                              fontSize: '12px',
-                              fontFamily: 'Poppins, sans-serif',
-                              padding: '4px 8px'
-                            }}
-                          >
-                            <span>Reduce reviews window</span>
-                            <img
-                              src={expandIcon}
-                              alt="Reduce"
-                              style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
-                            />
-                          </button>
-                        </div>
-                        {/* Fade Effect at Bottom */}
-                        <div style={{
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          height: '40px',
-                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-                          pointerEvents: 'none',
-                          zIndex: 1,
-                          borderRadius: '0 0 12px 12px'
-                        }} />
-                      </div>
-                    )}
 
                     {/* Tabs */}
                     {!isManageAccessView && !isManageAccessMaximized && (
@@ -6052,10 +5990,10 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     )}
 
-                    {/* Reviews and Ratings View - Only show when NOT maximized */}
-                    {!isManageAccessView && userDetailActiveTab === 'reviews' && !isReviewsMaximized && (
+                    {/* Reviews and Ratings View */}
+                    {!isManageAccessView && userDetailActiveTab === 'reviews' && (
                       <div style={{ position: 'relative' }}>
-                        {/* Overall Rating Summary */}
+                        {/* Overall Rating Summary - Always visible */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{
@@ -6082,7 +6020,7 @@ const AdminDashboard: React.FC = () => {
                           456 Review
                         </div>
 
-                        {/* Rating Distribution Bars */}
+                        {/* Rating Distribution Bars - Always visible */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                           {[70, 60, 40, 20, 10].map((width, idx) => (
                             <div key={idx} style={{ width: '100%', height: '4px', backgroundColor: '#E9E9E9', borderRadius: '2px', overflow: 'hidden' }}>
@@ -6096,8 +6034,72 @@ const AdminDashboard: React.FC = () => {
                           ))}
                         </div>
 
-                        {/* Filter and Maximize Controls */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', marginTop: '12px' }}>
+                        {/* Empty State - Only show when maximized */}
+                        {isReviewsMaximized && (
+                          <div style={{
+                            position: 'relative',
+                            border: '2px dashed #D9D9D9',
+                            borderRadius: '12px',
+                            padding: '40px 20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: '300px',
+                            textAlign: 'center',
+                            marginTop: '12px'
+                          }}>
+                            <p style={{
+                              fontSize: '12px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 8px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              The review window has been enlarged, reduce it if you want to see it appear here again.
+                            </p>
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                              <button
+                                onClick={() => setIsReviewsMaximized(false)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  color: '#64B5F6',
+                                  fontSize: '12px',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  padding: '4px 8px'
+                                }}
+                              >
+                                <span>Reduce reviews window</span>
+                                <img
+                                  src={expandIcon}
+                                  alt="Reduce"
+                                  style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                                />
+                              </button>
+                            </div>
+                            {/* Fade Effect at Bottom */}
+                            <div style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              height: '40px',
+                              background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                              pointerEvents: 'none',
+                              zIndex: 1,
+                              borderRadius: '0 0 12px 12px'
+                            }} />
+                          </div>
+                        )}
+
+                        {/* Filter and Maximize Controls - Only show when NOT maximized */}
+                        {!isReviewsMaximized && (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', marginTop: '12px' }}>
                           {/* Filter Dropdown */}
                           <div style={{ position: 'relative' }} ref={filterDropdownRef}>
                             <button 
@@ -6231,8 +6233,10 @@ const AdminDashboard: React.FC = () => {
                             />
                           </div>
                         </div>
+                        )}
 
-                        {/* Reviews List - Scrollable with fade effect */}
+                        {/* Reviews List - Only show when NOT maximized */}
+                        {!isReviewsMaximized && (
                         <div
                           data-reviews-scroll
                           className="reviews-scroll-container"
@@ -6641,19 +6645,20 @@ const AdminDashboard: React.FC = () => {
                               </div>
                             </div>
                           </div>
+                          
+                          {/* Fixed Fade Effect at Bottom */}
+                          <div style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: '6px',
+                            height: '40px',
+                            background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                            pointerEvents: 'none',
+                            zIndex: 1
+                          }} />
                         </div>
-
-                        {/* Fixed Fade Effect at Bottom */}
-                        <div style={{
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: '6px',
-                          height: '40px',
-                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-                          pointerEvents: 'none',
-                          zIndex: 1
-                        }} />
+                        )}
                       </div>
                     )}
 
