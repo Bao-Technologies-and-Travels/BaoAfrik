@@ -43,6 +43,7 @@ export interface PublicUser {
   isVerifiedSeller: boolean;
   provider?: string;
   lastLoginAt?: Date;
+  cookiePreferences?: string;
 }
 
 export interface LoginResponse {

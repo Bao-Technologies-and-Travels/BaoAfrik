@@ -38,6 +38,7 @@ model User {
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
   lastLoginAt      DateTime? @map("last_login_at")
+  cookiePreferences String?  @map("cookie_preferences") // 'all', 'none', 'essential', or JSON string for granular preferences
 
   // Relations
   products                 Product[]

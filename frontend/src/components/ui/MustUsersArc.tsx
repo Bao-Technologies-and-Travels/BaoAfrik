@@ -54,7 +54,7 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
   };
 
   // Original arc parameters
-  const centerX = width / 2;
+    const centerX = width / 2;
   const centerY = width * 0.85;
   const radius = width * 0.42;
 
@@ -68,15 +68,15 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
     // Position along semi-circle arc
     const x = centerX + radius * Math.cos(angleRad);
     const y = centerY + radius * Math.sin(angleRad);
-
+    
     // Bars oriented radially outward from center
     return { x, y, rotation: angleDeg };
   };
 
   return (
     <div className="relative flex flex-col items-center" style={{ width: `${width}px` }}>
-      <svg
-        width={width}
+      <svg 
+        width={width} 
         height={width * 0.75}
         className="relative"
         style={{ overflow: 'visible' }}
@@ -93,7 +93,7 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
           // Use unfilledBarPath for ALL bars to ensure identical orientation, spacing, and placement
           // Only the color differs between filled (blue) and unfilled (gray) bars
           const barPath = unfilledBarPath;
-
+          
           return (
             <g key={index} transform={transform}>
               {isPartial ? (
@@ -105,7 +105,7 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
                         <rect x="0" y="0" width="52" height={22 * currentPartialProgress} />
                       </clipPath>
                     </defs>
-                    <path
+                    <path 
                       d={unfilledBarPath}
                       fill={barColor}
                       clipPath={`url(#partial-clip-${index})`}
@@ -113,8 +113,8 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
                   </g>
                 </>
               ) : (
-                <path
-                  d={barPath}
+                <path 
+                  d={barPath} 
                   fill={barColor}
                   stroke={!isFilled ? '#E5E7EB' : 'none'}
                   strokeWidth={!isFilled ? '0.5' : '0'}
@@ -130,14 +130,14 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
         className="absolute"
         style={{
           bottom: '10px',
-          left: '50%',
+        left: '50%', 
           transform: 'translateX(-50%)',
           textAlign: 'center'
         }}
       >
-        <p
+        <p 
           className="font-bold text-[#212121] mb-1"
-          style={{
+          style={{ 
             fontSize: '1rem',
             fontFamily: 'Bricolage Grotesque, sans-serif',
             lineHeight: '1.1',
@@ -146,9 +146,9 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
         >
           {percentage.toFixed(2)}%
         </p>
-        <p
+        <p 
           className="text-[#B0B0B0]"
-          style={{
+          style={{ 
             fontSize: '0.65rem',
             fontFamily: 'Poppins, sans-serif',
             marginTop: '4px',
@@ -168,7 +168,7 @@ const MustUsersArc: React.FC<MustUsersArcProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div
+          <div 
             className="rounded-full"
             style={{ width: '8px', height: '8px', backgroundColor: '#F4F4F4', border: '1px solid #E5E7EB' }}
           />

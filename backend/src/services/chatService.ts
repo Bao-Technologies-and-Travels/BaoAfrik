@@ -127,7 +127,31 @@ export class ChatService {
                             status: true
                         }
                     },
-                    lastMessage: true
+                    lastMessage: {
+                        include: {
+                            statuses: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            id: true
+                                        }
+                                    }
+                                }
+                            },
+                            reactions: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            firstName: true,
+                                            lastName: true,
+                                            profileImage: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 orderBy: {
                     updatedAt: 'desc'
@@ -189,8 +213,8 @@ export class ChatService {
                 let waveformData = null;
                 if (lastMessage?.productData) {
                     try {
-                        const parsedProductData = typeof lastMessage.productData === 'string' 
-                            ? JSON.parse(lastMessage.productData) 
+                        const parsedProductData = typeof lastMessage.productData === 'string'
+                            ? JSON.parse(lastMessage.productData)
                             : lastMessage.productData;
                         if (parsedProductData && typeof parsedProductData === 'object') {
                             voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
@@ -302,7 +326,7 @@ export class ChatService {
 
                 const lastMessage = conversation.lastMessage || conversation.messages[0] || null;
                 let decryptedContent = '';
-                
+
                 if (lastMessage) {
                     try {
                         if (lastMessage.encryptionIv && lastMessage.encryptionAuthTag && lastMessage.content) {
@@ -340,8 +364,8 @@ export class ChatService {
                 let waveformData = null;
                 if (lastMessage?.productData) {
                     try {
-                        const parsedProductData = typeof lastMessage.productData === 'string' 
-                            ? JSON.parse(lastMessage.productData) 
+                        const parsedProductData = typeof lastMessage.productData === 'string'
+                            ? JSON.parse(lastMessage.productData)
                             : lastMessage.productData;
                         if (parsedProductData && typeof parsedProductData === 'object') {
                             voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
@@ -509,7 +533,7 @@ export class ChatService {
                 if (parsedProductData && typeof parsedProductData === 'object') {
                     voiceDuration = parsedProductData._voiceDuration || parsedProductData.voiceDuration || null;
                     waveformData = parsedProductData._waveformData || parsedProductData.waveformData || null;
-            
+
                 }
 
                 // Decrypt replyTo content if present
@@ -586,7 +610,7 @@ export class ChatService {
                         };
                     }
                 }
-                
+
                 return {
                     ...message,
                     content: '[Secure message - decryption failed]',
@@ -694,18 +718,18 @@ export class ChatService {
     }
 
     private async checkDbEncryptAvailable(): Promise<boolean> {
-    try {
-        const testMessage = 'test-' + Date.now();
-        const result = await prisma.$queryRaw<Array<{ encrypted: string }>>`SELECT db_encrypt(${testMessage}) as encrypted`;
-        const encrypted = result[0]?.encrypted;
-        if (!encrypted) {
-            throw new Error('No result from db_encrypt');
+        try {
+            const testMessage = 'test-' + Date.now();
+            const result = await prisma.$queryRaw<Array<{ encrypted: string }>>`SELECT db_encrypt(${testMessage}) as encrypted`;
+            const encrypted = result[0]?.encrypted;
+            if (!encrypted) {
+                throw new Error('No result from db_encrypt');
+            }
+            return true;
+        } catch (error) {
+            return false;
         }
-        return true;
-    } catch (error) {
-        return false;
     }
-}
 
     async createConversation(data: CreateConversationData) {
         // Check if db_encrypt function exists (outside transaction)
@@ -728,20 +752,20 @@ export class ChatService {
             });
 
             // Check if conversation already exists
-            const existingConv = possibleConvs.find((conv: any) => conv.participants.length === 2);
+            // const existingConv = possibleConvs.find((conv: any) => conv.participants.length === 2);
 
-            if (existingConv) {
-                if (data.productData) {
-                    await tx.conversation.update({
-                        where: { id: existingConv.id },
-                        data: {
-                            productData: JSON.stringify(data.productData)
-                        }
-                    });
-                    existingConv.productData = JSON.stringify(data.productData);
-                }
-                return existingConv;
-            }
+            // if (existingConv) {
+            //     if (data.productData) {
+            //         await tx.conversation.update({
+            //             where: { id: existingConv.id },
+            //             data: {
+            //                 productData: JSON.stringify(data.productData)
+            //             }
+            //         });
+            //         existingConv.productData = JSON.stringify(data.productData);
+            //     }
+            //     return existingConv;
+            // }
 
             const now = new Date();
 
@@ -1098,7 +1122,7 @@ export class ChatService {
             let parsedProductData = null;
             let voiceDuration = null;
             let waveformData = null;
-            
+
             // Parse productData if present
             if (msg.productData) {
                 try {
@@ -1112,7 +1136,7 @@ export class ChatService {
                     // Ignore parse errors
                 }
             }
-            
+
             return {
                 ...msg,
                 content: this.decryptMessage(msg.content, msg.encryptionIv, msg.encryptionAuthTag),

@@ -637,28 +637,36 @@ export class WebSocketService {
       // Broadcast message to all in the conversation room except sender
       socket.to(`conversation:${conversationId}`).emit('receive_message', { ...messageResponse, isIncoming: true });
 
-      // Notify sender of delivered status
-      socket.emit('message_status_updated', {
+      // Notify sender of delivered status - broadcast to all participants
+      const deliveredStatus = {
         messageId: message.id,
         conversationId: conversationId,
         status: 'DELIVERED',
         updatedAt: new Date()
-      });
+      };
+      
+      // Send to sender
+      socket.emit('message_status_updated', deliveredStatus);
+      
+      // Broadcast to conversation room
+      this.io.to(`conversation:${conversationId}`).emit('message_status_updated', deliveredStatus);
 
       // Also deliver directly to each recipient socket (in case they haven't joined the room yet)
+      // AND broadcast to all participants' personal rooms for dynamic updates
       for (const recipientId of recipientIds) {
         const recipientSocketId = this.userSockets.get(recipientId);
         if (recipientSocketId) {
           this.io.to(recipientSocketId).emit('receive_message', { ...messageResponse, isIncoming: true });
           // Deliver status to recipient
-          this.io.to(recipientSocketId).emit('message_status_updated', {
-            messageId: message.id,
-            conversationId: conversationId,
-            status: 'DELIVERED',
-            updatedAt: new Date()
-          });
+          this.io.to(recipientSocketId).emit('message_status_updated', deliveredStatus);
         }
+        
+        // Also send to participant's personal room (works even if not in conversation room)
+        this.io.to(recipientId).emit('message_status_updated', deliveredStatus);
       }
+      
+      // Also send to sender's personal room for consistency
+      this.io.to(senderId).emit('message_status_updated', deliveredStatus);
 
       // Also send notifications and counts to each recipient's personal room
       for (const recipientId of recipientIds) {
@@ -830,12 +838,35 @@ export class WebSocketService {
       });
 
       // Also send status updates for each message to mark as read
+      // Broadcast to conversation room AND to all participants' personal rooms
       for (const messageId of messageIds) {
-        this.io.to(`conversation:${conversationId}`).emit('message_status_updated', {
+        const statusUpdate = {
           messageId,
           conversationId,
           status: 'READ',
           updatedAt: new Date()
+        };
+        
+        // Broadcast to conversation room
+        this.io.to(`conversation:${conversationId}`).emit('message_status_updated', statusUpdate);
+        
+        // Also broadcast to all participants' personal rooms (even if not actively in conversation)
+        prisma.conversation.findUnique({
+          where: { id: conversationId },
+          include: {
+            participants: {
+              select: { userId: true }
+            }
+          }
+        }).then(conversation => {
+          if (conversation?.participants) {
+            for (const participant of conversation.participants) {
+              // Send to all participants so status updates work even when not actively in conversation
+              this.io.to(participant.userId).emit('message_status_updated', statusUpdate);
+            }
+          }
+        }).catch(() => {
+          // Silently ignore errors
         });
       }
     } catch (error) {
@@ -1017,8 +1048,20 @@ export class WebSocketService {
                   }
                 });
 
-                // Emit real-time notification
+                // Emit real-time notification - broadcast to all participants even if not in conversation
                 this.io.to(participant.userId).emit('new_message_notification', {
+                  conversationId: message.conversationId,
+                  messageId: messageId,
+                  preview,
+                  senderName,
+                  senderId: userId,
+                  senderImage: socket.user?.profileImage || null,
+                  type: 'reaction',
+                  reaction: result.reaction
+                });
+                
+                // Also broadcast to conversation room for real-time updates
+                this.io.to(`conversation:${message.conversationId}`).emit('new_message_notification', {
                   conversationId: message.conversationId,
                   messageId: messageId,
                   preview,

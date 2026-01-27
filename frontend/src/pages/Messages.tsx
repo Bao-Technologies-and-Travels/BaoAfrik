@@ -295,9 +295,16 @@ const Messages: React.FC = (): JSX.Element => {
         const convos = res.data?.data || [];
         // Trust backend for isArchived - ensure it's properly set from backend
         // Convert to boolean to ensure consistency
+        // Also ensure reactions and statuses are preserved from backend
         const normalizedConvos = convos.map((conv: any) => ({
           ...conv,
-          isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)
+          isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true),
+          // Preserve reactions and statuses from backend for persistence
+          lastMessage: conv.lastMessage ? {
+            ...conv.lastMessage,
+            reactions: conv.lastMessage.reactions || [],
+            statuses: conv.lastMessage.statuses || []
+          } : null
         }));
         // Sort: pinned first, then by lastMessageAt
         const sorted = normalizedConvos.sort((a: any, b: any) => {
@@ -848,9 +855,11 @@ const Messages: React.FC = (): JSX.Element => {
       ? msg.isIncoming
       : (msg?.senderId && currentUserId ? msg.senderId !== currentUserId : false);
     // Ensure reaction, metadata fields, and replyTo are preserved
-    // Load reactions from backend - can be in reaction field (single) or reactions array (all)
-    const reaction = msg?.reaction || null;
-    const reactions = msg?.reactions || (reaction ? [{ reaction, userId: msg?.senderId || null }] : []);
+    // Load reactions from backend - backend returns all reactions in reactions array
+    // The reaction field is the user's own reaction (if any), reactions array has all reactions
+    const reactions = msg?.reactions || [];
+    // Get the most recent reaction for display (or user's reaction if available)
+    const reaction = msg?.reaction || (reactions.length > 0 ? reactions[reactions.length - 1]?.reaction : null);
     const isPinned = msg?.isPinned || false;
     const isArchived = msg?.isArchived || false;
     const isImportant = msg?.isImportant || false;
@@ -1155,6 +1164,7 @@ const Messages: React.FC = (): JSX.Element => {
           const convos = res.data?.data || [];
           // Merge with existing conversations to preserve local metadata (isPinned only)
           // Trust backend for isArchived - it should persist
+          // Also preserve reactions and statuses from backend for persistence
           setConversations(prev => {
             const merged = convos.map((conv: any) => {
               const existing = prev.find((p: any) => String(p.id) === String(conv.id));
@@ -1166,10 +1176,24 @@ const Messages: React.FC = (): JSX.Element => {
                   ...conv,
                   isPinned: existing.isPinned ?? conv.isPinned ?? false,
                   // Trust backend isArchived value, but if it was archived before, keep it archived
-                  isArchived: conv.isArchived ?? wasArchived
+                  isArchived: conv.isArchived ?? wasArchived,
+                  // Preserve reactions and statuses from backend for persistence
+                  lastMessage: conv.lastMessage ? {
+                    ...conv.lastMessage,
+                    reactions: conv.lastMessage.reactions || existing.lastMessage?.reactions || [],
+                    statuses: conv.lastMessage.statuses || existing.lastMessage?.statuses || []
+                  } : null
                 };
               }
-              return conv;
+              // For new conversations, ensure reactions and statuses are included
+              return {
+                ...conv,
+                lastMessage: conv.lastMessage ? {
+                  ...conv.lastMessage,
+                  reactions: conv.lastMessage.reactions || [],
+                  statuses: conv.lastMessage.statuses || []
+                } : null
+              };
             });
             // Sort: pinned first, then by lastMessageAt
             return merged.sort((a: any, b: any) => {
@@ -1265,6 +1289,7 @@ const Messages: React.FC = (): JSX.Element => {
           const convos = res.data?.data || [];
           // Merge with existing conversations to preserve local metadata (isPinned only)
           // Trust backend for isArchived - it should persist
+          // Also preserve reactions and statuses from backend for persistence
           setConversations(prev => {
             const merged = convos.map((conv: any) => {
               const existing = prev.find((p: any) => String(p.id) === String(conv.id));
@@ -1276,13 +1301,24 @@ const Messages: React.FC = (): JSX.Element => {
                   ...conv,
                   isPinned: existing.isPinned ?? conv.isPinned ?? false,
                   // Trust backend isArchived value - it should persist
-                  isArchived: backendArchived
+                  isArchived: backendArchived,
+                  // Preserve reactions and statuses from backend for persistence
+                  lastMessage: conv.lastMessage ? {
+                    ...conv.lastMessage,
+                    reactions: conv.lastMessage.reactions || existing.lastMessage?.reactions || [],
+                    statuses: conv.lastMessage.statuses || existing.lastMessage?.statuses || []
+                  } : null
                 };
               }
-              // For new conversations, also ensure isArchived is boolean
+              // For new conversations, also ensure isArchived is boolean and include reactions/statuses
               return {
                 ...conv,
-                isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)
+                isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true),
+                lastMessage: conv.lastMessage ? {
+                  ...conv.lastMessage,
+                  reactions: conv.lastMessage.reactions || [],
+                  statuses: conv.lastMessage.statuses || []
+                } : null
               };
             });
             // Sort: pinned first, then by lastMessageAt
@@ -1363,16 +1399,31 @@ const Messages: React.FC = (): JSX.Element => {
       );
 
       // Also update conversations list to reflect status changes in last message
+      // This ensures status updates work even when not actively in the conversation
       if (data.conversationId) {
         setConversations(prev =>
           prev.map(conv => {
             if (String(conv.id) === String(data.conversationId) && conv.lastMessage) {
               if (String(conv.lastMessage.id) === statusKey) {
+                // Update status in lastMessage.statuses array
+                const updatedStatuses = conv.lastMessage.statuses || [];
+                const statusIndex = updatedStatuses.findIndex((s: any) => s.userId === user?.id);
+                const newStatus = {
+                  userId: user?.id || '',
+                  status: normalizedStatus.toUpperCase(),
+                  updatedAt: new Date().toISOString()
+                };
+                
+                const finalStatuses = statusIndex >= 0
+                  ? updatedStatuses.map((s: any, idx: number) => idx === statusIndex ? newStatus : s)
+                  : [...updatedStatuses, newStatus];
+                
                 return {
                   ...conv,
                   lastMessage: {
                     ...conv.lastMessage,
-                    status: normalizedStatus
+                    status: normalizedStatus,
+                    statuses: finalStatuses
                   }
                 };
               }
@@ -1429,6 +1480,7 @@ const Messages: React.FC = (): JSX.Element => {
           const convos = res.data?.data || [];
           // Merge with existing conversations to preserve local metadata (isPinned only)
           // Trust backend for isArchived - it should persist
+          // Also preserve reactions and statuses from backend for persistence
           setConversations(prev => {
             const merged = convos.map((conv: any) => {
               const existing = prev.find((p: any) => String(p.id) === String(conv.id));
@@ -1440,13 +1492,24 @@ const Messages: React.FC = (): JSX.Element => {
                   ...conv,
                   isPinned: existing.isPinned ?? conv.isPinned ?? false,
                   // Trust backend isArchived value - it should persist
-                  isArchived: backendArchived
+                  isArchived: backendArchived,
+                  // Preserve reactions and statuses from backend for persistence
+                  lastMessage: conv.lastMessage ? {
+                    ...conv.lastMessage,
+                    reactions: conv.lastMessage.reactions || existing.lastMessage?.reactions || [],
+                    statuses: conv.lastMessage.statuses || existing.lastMessage?.statuses || []
+                  } : null
                 };
               }
-              // For new conversations, also ensure isArchived is boolean
+              // For new conversations, also ensure isArchived is boolean and include reactions/statuses
               return {
                 ...conv,
-                isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true)
+                isArchived: Boolean(conv.isArchived === true || conv.isArchived === 'true' || conv.metadata?.isArchived === true),
+                lastMessage: conv.lastMessage ? {
+                  ...conv.lastMessage,
+                  reactions: conv.lastMessage.reactions || [],
+                  statuses: conv.lastMessage.statuses || []
+                } : null
               };
             });
             // Sort: pinned first, then by lastMessageAt
@@ -2437,8 +2500,30 @@ const Messages: React.FC = (): JSX.Element => {
   };
 
   // Render sidebar status indicator
-  const renderSidebarStatus = (messageId: string | number) => {
-    const status = messageStatuses[String(messageId)] || 'sending';
+  const renderSidebarStatus = (messageId: string | number, message?: any) => {
+    // Get status from messageStatuses state (real-time updates) or from message.statuses array (backend)
+    let status: MessageStatus = 'sent';
+    
+    // First check real-time state (for dynamic updates)
+    const stateStatus = messageStatuses[String(messageId)];
+    if (stateStatus) {
+      status = stateStatus;
+    } else if (message && message.statuses && Array.isArray(message.statuses)) {
+      // Fallback to backend statuses array
+      const userStatus = message.statuses.find((s: any) => s.userId === user?.id);
+      if (userStatus) {
+        const s = (userStatus.status || '').toLowerCase();
+        if (s === 'delivered') status = 'delivered';
+        else if (s === 'read') status = 'read';
+        else if (s === 'sent' || s === 'sending') status = s as MessageStatus;
+      }
+    } else if (message && message.status) {
+      // Fallback to message.status field
+      const s = (message.status || '').toLowerCase();
+      if (s === 'delivered') status = 'delivered';
+      else if (s === 'read') status = 'read';
+      else if (s === 'sent' || s === 'sending') status = s as MessageStatus;
+    }
 
     switch (status) {
       case 'sending':
@@ -2465,7 +2550,12 @@ const Messages: React.FC = (): JSX.Element => {
           </div>
         );
       default:
-        return null;
+        // Default to sent status (single checkmark)
+        return (
+          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        );
     }
   };
 
@@ -5796,6 +5886,8 @@ const Messages: React.FC = (): JSX.Element => {
                       const otherParticipant = conv.otherParticipant;
                       const participantName = `${otherParticipant?.firstName || ''} ${otherParticipant?.lastName || ''}`.trim() || 'Unknown User';
                       const participantAvatar = otherParticipant?.profileImage || eboAvatar;
+                      // Prefer explicit label, fall back to product title so each conversation shows the product name
+                      const conversationLabel = conv.label || conv.product?.title || null;
                       const lastMessage = conv.lastMessage;
                       const isIncoming = lastMessage && lastMessage.senderId !== user?.id;
                       const lastMessagePreview = formatLastMessagePreview(lastMessage, isIncoming);
@@ -5852,9 +5944,9 @@ const Messages: React.FC = (): JSX.Element => {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-1 flex-1 min-w-0">
-                                  {conv.label && (
+                                  {conversationLabel && (
                                     <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}>
-                                      {conv.label}
+                                      {conversationLabel}
                                     </span>
                                   )}
                                   <h3 className="text-sm md:text-base font-medium md:font-semibold text-gray-900 truncate">{participantName}</h3>
@@ -5944,11 +6036,32 @@ const Messages: React.FC = (): JSX.Element => {
                                   {isIncoming && unreadCount > 0 ? (
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#64B5F6' }}></div>
                                   ) : lastMessage && !isIncoming ? (
-                                    lastMessage.id ? renderSidebarStatus(lastMessage.id) : (
-                                      <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                      </svg>
-                                    )
+                                    (() => {
+                                      // Get status from lastMessage.statuses array (from backend) or messageStatuses state
+                                      // Always show status for sent messages
+                                      let status: MessageStatus = 'sent';
+                                      
+                                      // First check backend statuses array
+                                      if (lastMessage.statuses && Array.isArray(lastMessage.statuses) && lastMessage.statuses.length > 0) {
+                                        // Find status for current user (sender)
+                                        const userStatus = lastMessage.statuses.find((s: any) => s.userId === user?.id);
+                                        if (userStatus) {
+                                          const s = (userStatus.status || '').toLowerCase();
+                                          if (s === 'delivered') status = 'delivered';
+                                          else if (s === 'read') status = 'read';
+                                          else if (s === 'sent' || s === 'sending') status = s as MessageStatus;
+                                        }
+                                      }
+                                      
+                                      // Override with real-time state updates (for dynamic updates)
+                                      const stateStatus = messageStatuses[String(lastMessage.id)];
+                                      if (stateStatus) {
+                                        status = stateStatus;
+                                      }
+                                      
+                                      // Always render status indicator for sent messages
+                                      return renderSidebarStatus(lastMessage.id, lastMessage);
+                                    })()
                                   ) : null}
                                 </div>
                               </div>

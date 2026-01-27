@@ -61,4 +61,6 @@ router.put('/change-password', authenticateToken, validateChangePassword, authCo
 router.put('/profile', authenticateToken, validateUpdateProfile, authController.updateProfile);
 router.get('/me', authenticateToken, validateUpdateProfile, authController.getCurrentUser);
 router.delete('/delete-user', authenticateToken, validateDeleteUser, authController.deleteUser);
+router.put('/cookie-preferences', authenticateToken, authController.updateCookiePreferences);
+router.get('/cookie-preferences', authenticateToken, authController.getCookiePreferences);
 export default router;

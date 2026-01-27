@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getProductCountry, countries } from '../utils/countryHelpers';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import Header from '../components/layout/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
@@ -19,7 +18,7 @@ import blackArrowIcon from '../assets/images/pre/black.svg';
 import locationIcon from '../assets/images/pre/PL.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
-import unverifyIcon from '../assets/images/pre/unverify.svg';
+// import unverifyIcon from '../assets/images/pre/unverify.svg';
 import globyIcon from '../assets/images/pre/globy.svg';
 import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
@@ -37,9 +36,7 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
-import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import SDicon from '../assets/images/pre/SDicon.svg';
-import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 
 interface BaseProduct {
   id: string;
@@ -146,7 +143,6 @@ const Home: React.FC = () => {
   );
   const productGridRef = React.useRef<HTMLDivElement>(null);
   const productFeedRef = React.useRef<HTMLDivElement>(null);
-  const categoryRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
   const searchResultsRef = React.useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -252,6 +248,7 @@ const Home: React.FC = () => {
   const [hoveredLocationSuggestion, setHoveredLocationSuggestion] = useState<string | null>(null);
   const [requestUserLocation, setRequestUserLocation] = useState('');
   const [showChangeLocationModal, setShowChangeLocationModal] = useState(false);
+  const [showCookiesModal, setShowCookiesModal] = useState(false);
 
   const locationSuggestions = [
     'Pakse, Laos',
@@ -749,54 +746,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // Search functionality
-  const filteredProducts = (): FrontendProduct[] => {
-    let productsToFilter: FrontendProduct[] = [];
-
-    if (selectedCategory && allProductsComputed[selectedCategory]) {
-      productsToFilter = allProductsComputed[selectedCategory];
-    } else {
-      // Get all products from all categories
-      productsToFilter = Object.values(allProductsComputed).flat();
-    }
-
-    // Apply search filter if there's a search query
-    if (searchQuery.trim()) {
-      productsToFilter = productsToFilter.filter((product: FrontendProduct) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.location.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Apply place of origin filter
-    if (placeOfOrigin) {
-      productsToFilter = productsToFilter.filter((product: FrontendProduct) =>
-        product.location.toLowerCase().includes(placeOfOrigin.toLowerCase())
-      );
-    }
-
-    // Apply country filter if a specific country is selected
-    if (selectedCountry) {
-      productsToFilter = productsToFilter.filter((product: FrontendProduct) =>
-        getProductCountry(product.origin).name === selectedCountry
-      );
-    }
-
-    return productsToFilter;
-  };
-
-  // Get filtered products based on active category or search results
-  const getFilteredProducts = (): FrontendProduct[] => {
-    if (isSearchActive) {
-      return searchResults;
-    }
-
-    if (activeCategory === 'All') {
-      return Object.values(allProductsComputed).flat();
-    }
-    return allProductsComputed[activeCategory] || [];
-  };
-
   // Get products to display
   const productsToDisplay = React.useMemo(() => {
     if (isSearchActive) {
@@ -1019,6 +968,58 @@ const Home: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Function to update cookie preferences on backend
+  const updateCookiePreferences = async (preferences: string) => {
+    if (!user) {
+      // If user is not logged in, just store in localStorage
+      localStorage.setItem('cookiesAccepted', preferences);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        localStorage.setItem('cookiesAccepted', preferences);
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/cookie-preferences`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ preferences })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          localStorage.setItem('cookiesAccepted', preferences);
+        }
+      } else {
+        // If API call fails, still store in localStorage
+        localStorage.setItem('cookiesAccepted', preferences);
+        console.warn('Failed to update cookie preferences on server, stored locally');
+      }
+    } catch (error) {
+      // If API call fails, still store in localStorage
+      localStorage.setItem('cookiesAccepted', preferences);
+      console.error('Error updating cookie preferences:', error);
+    }
+  };
+
+  // Check if cookies modal should be shown (first visit after login/signup)
+  useEffect(() => {
+    // Only show if user is logged in (not visitor) and hasn't seen the modal
+    if (user) {
+      const cookiesModalSeen = localStorage.getItem('cookiesModalSeen');
+      if (!cookiesModalSeen) {
+        setShowCookiesModal(true);
+      }
+    }
+  }, [user]);
+
   // Re-run search when country filter changes and search is active
   useEffect(() => {
     if (isSearchActive) {
@@ -1150,7 +1151,6 @@ const Home: React.FC = () => {
             style={{
               backgroundColor: isMobile ? '#FFFFFF' : '#FAFAFA',
               border: isMobile ? 'none' : '1px solid #E4E4E4',
-              borderColor: '#E4E4E4',
               padding: isMobile ? '5px 8px' : '7px 14px',
               borderRadius: '8px',
               fontFamily: 'Poppins, sans-serif',
@@ -1277,7 +1277,6 @@ const Home: React.FC = () => {
             style={{
               backgroundColor: isMobile ? '#FFFFFF' : '#FAFAFA',
               border: isMobile ? 'none' : '1px solid #E4E4E4',
-              borderColor: '#E4E4E4',
               padding: isMobile ? '5px 7px' : '7px 10px',
               borderRadius: '8px',
               fontFamily: 'Poppins, sans-serif',
@@ -3159,7 +3158,7 @@ const Home: React.FC = () => {
                               {/* Price and Verified Badge Row */}
                               <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                 <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                  ${product.price}
+                                  £ {product.price}
                                 </div>
                                 {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3337,7 +3336,7 @@ const Home: React.FC = () => {
                                     {/* Price and Verified Badge Row */}
                                     <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                       <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                        ${product.price}
+                                        £ {product.price}
                                       </div>
                                       {/* {product.verified ? (
                                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3531,7 +3530,7 @@ const Home: React.FC = () => {
                                     {/* Price and Verified Badge Row */}
                                     <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                       <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                        ${product.price}
+                                        £ {product.price}
                                       </div>
                                       {/* {product.verified ? (
                                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3781,7 +3780,7 @@ const Home: React.FC = () => {
                                 {/* Price and Verified Badge Row */}
                                 <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                   <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                    ${product.price}
+                                    £ {product.price}
                                   </div>
                                   {/* {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3888,7 +3887,7 @@ const Home: React.FC = () => {
                             {/* Price and Verified Badge Row */}
                             <div className="flex items-center justify-between mb-1">
                               <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                                ${product.price}
+                                £ {product.price}
                               </div>
                               {/* {product.verified ? (
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
@@ -3953,14 +3952,29 @@ const Home: React.FC = () => {
               // Generate pagination numbers dynamically
               const paginationNumbers: number[] = [];
 
-              if (totalPages <= 5) {
-                // Show all pages if total is 5 or less
+              if (totalPages <= 7) {
+                // Show all pages if total is 7 or less
                 for (let i = 1; i <= totalPages; i++) {
                   paginationNumbers.push(i);
                 }
               } else {
-                // Show first 3 pages
-                paginationNumbers.push(1, 2, 3);
+                // Show pages around current page with ellipsis
+                if (currentPage <= 4) {
+                  // Show first 5 pages when near the start
+                  for (let i = 1; i <= 5; i++) {
+                    paginationNumbers.push(i);
+                  }
+                } else if (currentPage >= totalPages - 3) {
+                  // Show last 5 pages when near the end
+                  for (let i = totalPages - 4; i <= totalPages; i++) {
+                    paginationNumbers.push(i);
+                  }
+                } else {
+                  // Show current page and 2 pages on each side
+                  for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                    paginationNumbers.push(i);
+                  }
+                }
               }
 
               // Handle "Go to" functionality
@@ -4005,35 +4019,84 @@ const Home: React.FC = () => {
                       </button>
 
                       <div className="flex items-center" style={{ gap: isMobile ? '24px' : '36px' }}>
+                        {/* Show page 1 and ellipsis if first page is not in paginationNumbers */}
+                        {totalPages > 7 && !paginationNumbers.includes(1) && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setCurrentPage(1);
+                              }}
+                              style={{
+                                color: 1 === currentPage ? '#212121' : '#B0B0B0',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: isMobile ? '12px' : '16px',
+                                cursor: 'pointer',
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                margin: 0
+                              }}
+                              aria-label="Go to page 1"
+                            >
+                              1
+                            </button>
+                            <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '12px' : '16px' }}>…</span>
+                          </>
+                        )}
+
                         {paginationNumbers.map((page) => (
-                          <span
+                          <button
                             key={page}
-                            onClick={() => setCurrentPage(page)}
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCurrentPage(page);
+                            }}
                             style={{
                               fontFamily: 'Bricolage Grotesque, sans-serif',
                               fontSize: isMobile ? '12px' : '16px',
                               color: page === currentPage ? '#212121' : '#B0B0B0',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
+                              background: 'none',
+                              border: 'none',
+                              padding: 0,
+                              margin: 0
                             }}
+                            aria-label={`Go to page ${page}`}
                           >
                             {page}
-                          </span>
+                          </button>
                         ))}
 
-                        {totalPages > 5 && (
+                        {/* Show ellipsis and last page if last page is not in paginationNumbers */}
+                        {totalPages > 7 && !paginationNumbers.includes(totalPages) && (
                           <>
                             <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: isMobile ? '12px' : '16px' }}>…</span>
-                            <span
-                              onClick={() => setCurrentPage(totalPages)}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setCurrentPage(totalPages);
+                              }}
                               style={{
-                                color: '#B0B0B0',
+                                color: totalPages === currentPage ? '#212121' : '#B0B0B0',
                                 fontFamily: 'Bricolage Grotesque, sans-serif',
                                 fontSize: isMobile ? '12px' : '16px',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                margin: 0
                               }}
+                              aria-label={`Go to page ${totalPages}`}
                             >
                               {totalPages}
-                            </span>
+                            </button>
                           </>
                         )}
                       </div>
@@ -4181,7 +4244,7 @@ const Home: React.FC = () => {
                   className="w-full border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
                   style={{
                     backgroundColor: '#FFFFFF',
-                    borderColor: '#E4E4E4',
+                    border: '1px solid #E4E4E4',
                     fontFamily: 'Poppins, sans-serif',
                     fontSize: window.innerWidth < 640 ? '10px' : '14px',
                     color: '#6A6A6A',
@@ -4644,7 +4707,6 @@ const Home: React.FC = () => {
                           className="flex items-center justify-center gap-1.5 mx-auto"
                           style={{
                             backgroundColor: '#FFFFFF',
-                            borderColor: '#F9A825',
                             border: '1px solid #F9A825',
                             color: '#F9A825',
                             fontWeight: 'normal',
@@ -4801,7 +4863,7 @@ const Home: React.FC = () => {
                     }}
                     className="w-full px-3 py-2.5 border rounded-lg focus:outline-none"
                     style={{
-                      borderColor: '#E4E4E4',
+                      border: '1px solid #E4E4E4',
                       borderRadius: '8px',
                       backgroundColor: '#FFFFFF',
                       minHeight: '32px',
@@ -5806,7 +5868,7 @@ const Home: React.FC = () => {
                   onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                   className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
                   style={{
-                    borderColor: '#E9E9E9',
+                    border: '1px solid #E9E9E9',
                     borderRadius: '8px',
                     backgroundColor: '#FFFFFF',
                     minHeight: '44px'
@@ -5895,7 +5957,7 @@ const Home: React.FC = () => {
                   onClick={() => setIsProductOriginDropdownOpen(!isProductOriginDropdownOpen)}
                   className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
                   style={{
-                    borderColor: '#E9E9E9',
+                    border: '1px solid #E9E9E9',
                     borderRadius: '8px',
                     backgroundColor: '#FFFFFF',
                     minHeight: '44px'
@@ -6003,7 +6065,7 @@ const Home: React.FC = () => {
                 placeholder="Choose seller location"
                 className="w-full px-3 py-2.5 border rounded-lg"
                 style={{
-                  borderColor: '#E9E9E9',
+                  border: '1px solid #E9E9E9',
                   borderRadius: '8px',
                   backgroundColor: '#FFFFFF',
                   color: '#212121',
@@ -6929,7 +6991,7 @@ const Home: React.FC = () => {
                                   {/* Price and Verified Badge Row */}
                                   <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
                                     <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
-                                      ${product.price}
+                                      £ {product.price}
                                     </div>
                                     {/* {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -7064,7 +7126,7 @@ const Home: React.FC = () => {
                               {/* Price and Verified Badge Row */}
                               <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
                                 <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
-                                  ${product.price}
+                                  £ {product.price}
                                 </div>
                                 {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -7169,6 +7231,209 @@ const Home: React.FC = () => {
               >
                 Search
               </button>
+            </div>
+          )}
+
+          {/* Cookies Modal */}
+          {showCookiesModal && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: '#0000001A',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                fontFamily: 'Poppins, sans-serif'
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  padding: '20px',
+                  maxWidth: '800px',
+                  width: '90%',
+                  position: 'relative'
+                }}
+              >
+                {/* Header */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '12px'
+                  }}
+                >
+                  <h2
+                    style={{
+                      color: '#212121',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      margin: 0,
+                      flex: 1
+                    }}
+                  >
+                    Accept the use of cookies
+                  </h2>
+                  <button
+                    onClick={async () => {
+                      setShowCookiesModal(false);
+                      localStorage.setItem('cookiesModalSeen', 'true');
+                      // If user closes without choosing, default to 'essential' cookies
+                      const currentPreference = localStorage.getItem('cookiesAccepted');
+                      if (!currentPreference) {
+                        await updateCookiePreferences('essential');
+                      }
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#212121',
+                      fontSize: '20px',
+                      cursor: 'pointer',
+                      padding: 0,
+                      marginLeft: '16px',
+                      lineHeight: 1,
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Content */}
+                <div style={{ marginBottom: '16px' }}>
+                  <p
+                    style={{
+                      color: '#9C9C9C',
+                      fontSize: '12px',
+                      lineHeight: '1.5',
+                      margin: 0,
+                      marginBottom: '12px'
+                    }}
+                  >
+                    We use cookies to improve your browsing experience, serve personalized content and analyze our trafic.<br />
+                    By clicking " Accept all cookies" you agree to the storing of cookies on your device.
+                  </p>
+                  <p
+                    style={{
+                      color: '#9C9C9C',
+                      fontSize: '12px',
+                      lineHeight: '1.5',
+                      margin: 0
+                    }}
+                  >
+                    You can customize your setting by clicking " Manage Preferences ". For more details see our{' '}
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate('/cookies-policy');
+                      }}
+                      style={{
+                        color: '#64B5F6',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Cookies Policy
+                    </a>
+                  </p>
+                </div>
+
+                {/* Footer */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '16px'
+                  }}
+                >
+                  {/* Left side - Buttons */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '10px',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <button
+                      onClick={async () => {
+                        setShowCookiesModal(false);
+                        localStorage.setItem('cookiesModalSeen', 'true');
+                        await updateCookiePreferences('all');
+                      }}
+                      style={{
+                        backgroundColor: '#F9A825',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '8px 16px',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Accept all cookies
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowCookiesModal(false);
+                        localStorage.setItem('cookiesModalSeen', 'true');
+                        // TODO: Navigate to manage preferences page
+                      }}
+                      style={{
+                        backgroundColor: '#F0F8FE',
+                        color: '#64B5F6',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '8px 16px',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        fontFamily: 'Poppins, sans-serif',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Manage preferences
+                    </button>
+                  </div>
+
+                  {/* Right side - Decline text */}
+                  <button
+                    onClick={async () => {
+                      setShowCookiesModal(false);
+                      localStorage.setItem('cookiesModalSeen', 'true');
+                      await updateCookiePreferences('none');
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#6A6A6A',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontFamily: 'Poppins, sans-serif',
+                      textDecoration: 'none',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Decline all cookies
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

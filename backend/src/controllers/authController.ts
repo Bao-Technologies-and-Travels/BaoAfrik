@@ -265,6 +265,12 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     data: { lastLoginAt: new Date() }
   });
 
+  // Get cookie preferences
+  const userWithCookies = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { cookiePreferences: true }
+  });
+
   // Create public user object
   const publicUser: PublicUser = {
     id: user.id,
@@ -277,6 +283,7 @@ export const login = asyncHandler(async (req: Request<{}, {}, LoginRequest>, res
     isVerifiedSeller: user.isVerifiedSeller,
     provider: user.provider || undefined,
     lastLoginAt: user.lastLoginAt || undefined,
+    cookiePreferences: userWithCookies?.cookiePreferences || undefined,
   };
 
   logger.info('User logged in successfully', {
@@ -409,6 +416,12 @@ export const verifyLoginOTP = asyncHandler(async (req: Request, res: Response) =
     data: { lastLoginAt: new Date() }
   });
 
+  // Get cookie preferences
+  const userWithCookies = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { cookiePreferences: true }
+  });
+
   // Create public user object
   const publicUser: PublicUser = {
     id: user.id,
@@ -421,6 +434,7 @@ export const verifyLoginOTP = asyncHandler(async (req: Request, res: Response) =
     isVerifiedSeller: user.isVerifiedSeller,
     provider: user.provider || undefined,
     lastLoginAt: user.lastLoginAt || undefined,
+    cookiePreferences: userWithCookies?.cookiePreferences || undefined,
   };
 
   logger.info('User logged in successfully with 2FA', {
@@ -676,6 +690,7 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
       lastLoginAt: true,
       createdAt: true,
       updatedAt: true,
+      cookiePreferences: true,
     }
   });
 
@@ -1044,6 +1059,83 @@ export const deleteUser = asyncHandler(async (req: Request<{}, {}, DeleteUserReq
   res.json(response);
 })
 
+/**
+ * Update cookie preferences
+ */
+export const updateCookiePreferences = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw createUnauthorizedError('User not authenticated');
+  }
+
+  const { preferences } = req.body;
+
+  if (!preferences || typeof preferences !== 'string') {
+    throw createValidationError('Cookie preferences are required and must be a string');
+  }
+
+  // Validate preferences value
+  const validPreferences = ['all', 'none', 'essential'];
+  if (!validPreferences.includes(preferences) && !preferences.startsWith('{')) {
+    throw createValidationError('Invalid cookie preferences. Must be "all", "none", "essential", or a JSON string');
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: req.user.id },
+    data: { cookiePreferences: preferences },
+    select: {
+      id: true,
+      email: true,
+      cookiePreferences: true,
+      updatedAt: true,
+    }
+  });
+
+  logger.info('Cookie preferences updated successfully', {
+    userId: req.user.id,
+    preferences
+  });
+
+  const response: ApiResponse = {
+    success: true,
+    message: 'Cookie preferences updated successfully',
+    data: {
+      cookiePreferences: updatedUser.cookiePreferences
+    }
+  };
+
+  res.json(response);
+});
+
+/**
+ * Get cookie preferences
+ */
+export const getCookiePreferences = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw createUnauthorizedError('User not authenticated');
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    select: {
+      id: true,
+      cookiePreferences: true,
+    }
+  });
+
+  if (!user) {
+    throw createValidationError('User not found');
+  }
+
+  const response: ApiResponse = {
+    success: true,
+    data: {
+      cookiePreferences: user.cookiePreferences || null
+    }
+  };
+
+  res.json(response);
+});
+
 export default {
   register,
   login,
@@ -1058,5 +1150,7 @@ export default {
   changePassword,
   verifyResetCode,
   deleteUser,
-  verifyLoginOTP
+  verifyLoginOTP,
+  updateCookiePreferences,
+  getCookiePreferences
 };

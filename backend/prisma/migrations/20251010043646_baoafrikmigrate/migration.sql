@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "last_login_at" TIMESTAMP(3),
+    "cookie_preferences" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

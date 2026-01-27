@@ -21,6 +21,7 @@ interface User {
   lastLoginAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  cookiePreferences?: string;
 }
 
 interface AuthContextType {

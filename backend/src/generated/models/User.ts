@@ -65,6 +65,7 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   lastLoginAt: Date | null
+  cookiePreferences: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -96,6 +97,7 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   lastLoginAt: Date | null
+  cookiePreferences: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -127,6 +129,7 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   lastLoginAt: number
+  cookiePreferences: number
   _all: number
 }
 
@@ -170,6 +173,7 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  cookiePreferences?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -201,6 +205,7 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  cookiePreferences?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -232,6 +237,7 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  cookiePreferences?: true
   _all?: true
 }
 
@@ -350,6 +356,7 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   lastLoginAt: Date | null
+  cookiePreferences: string | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -404,6 +411,7 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  cookiePreferences?: Prisma.StringNullableFilter<"User"> | string | null
   products?: Prisma.ProductListRelationFilter
   productLikes?: Prisma.ProductLikeListRelationFilter
   productSaves?: Prisma.ProductSaveListRelationFilter
@@ -453,6 +461,7 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cookiePreferences?: Prisma.SortOrderInput | Prisma.SortOrder
   products?: Prisma.ProductOrderByRelationAggregateInput
   productLikes?: Prisma.ProductLikeOrderByRelationAggregateInput
   productSaves?: Prisma.ProductSaveOrderByRelationAggregateInput
@@ -505,6 +514,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  cookiePreferences?: Prisma.StringNullableFilter<"User"> | string | null
   products?: Prisma.ProductListRelationFilter
   productLikes?: Prisma.ProductLikeListRelationFilter
   productSaves?: Prisma.ProductSaveListRelationFilter
@@ -554,6 +564,7 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cookiePreferences?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -593,6 +604,7 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  cookiePreferences?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -624,6 +636,7 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -673,6 +686,7 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -722,6 +736,7 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -771,6 +786,7 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -820,6 +836,7 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -851,6 +868,7 @@ export type UserUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -882,6 +900,7 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -913,6 +932,7 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  cookiePreferences?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -949,6 +969,7 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  cookiePreferences?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -980,6 +1001,7 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  cookiePreferences?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -1316,6 +1338,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -1364,6 +1387,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -1428,6 +1452,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -1476,6 +1501,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -1524,6 +1550,7 @@ export type UserCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
   productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
@@ -1572,6 +1599,7 @@ export type UserUncheckedCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
   productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
@@ -1636,6 +1664,7 @@ export type UserUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
   productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
@@ -1684,6 +1713,7 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
   productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
@@ -1732,6 +1762,7 @@ export type UserCreateWithoutProductLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
   productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
@@ -1780,6 +1811,7 @@ export type UserUncheckedCreateWithoutProductLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
   productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
@@ -1844,6 +1876,7 @@ export type UserUpdateWithoutProductLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
   productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
@@ -1892,6 +1925,7 @@ export type UserUncheckedUpdateWithoutProductLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
   productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
@@ -1940,6 +1974,7 @@ export type UserCreateWithoutProductSavesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
@@ -1988,6 +2023,7 @@ export type UserUncheckedCreateWithoutProductSavesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
@@ -2052,6 +2088,7 @@ export type UserUpdateWithoutProductSavesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
@@ -2100,6 +2137,7 @@ export type UserUncheckedUpdateWithoutProductSavesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
@@ -2148,6 +2186,7 @@ export type UserCreateWithoutProductReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -2196,6 +2235,7 @@ export type UserUncheckedCreateWithoutProductReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -2260,6 +2300,7 @@ export type UserUpdateWithoutProductReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -2308,6 +2349,7 @@ export type UserUncheckedUpdateWithoutProductReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -2356,6 +2398,7 @@ export type UserCreateWithoutUserReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -2404,6 +2447,7 @@ export type UserUncheckedCreateWithoutUserReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -2457,6 +2501,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -2505,6 +2550,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -2569,6 +2615,7 @@ export type UserUpdateWithoutUserReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -2617,6 +2664,7 @@ export type UserUncheckedUpdateWithoutUserReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -2676,6 +2724,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -2724,6 +2773,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -2772,6 +2822,7 @@ export type UserCreateWithoutSentMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -2820,6 +2871,7 @@ export type UserUncheckedCreateWithoutSentMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -2884,6 +2936,7 @@ export type UserUpdateWithoutSentMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -2932,6 +2985,7 @@ export type UserUncheckedUpdateWithoutSentMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -2980,6 +3034,7 @@ export type UserCreateWithoutSentMessageStatusesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -3028,6 +3083,7 @@ export type UserUncheckedCreateWithoutSentMessageStatusesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -3092,6 +3148,7 @@ export type UserUpdateWithoutSentMessageStatusesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -3140,6 +3197,7 @@ export type UserUncheckedUpdateWithoutSentMessageStatusesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -3188,6 +3246,7 @@ export type UserCreateWithoutMessageReactionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -3236,6 +3295,7 @@ export type UserUncheckedCreateWithoutMessageReactionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -3300,6 +3360,7 @@ export type UserUpdateWithoutMessageReactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -3348,6 +3409,7 @@ export type UserUncheckedUpdateWithoutMessageReactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -3396,6 +3458,7 @@ export type UserCreateWithoutMessageMetadataInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -3444,6 +3507,7 @@ export type UserUncheckedCreateWithoutMessageMetadataInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -3508,6 +3572,7 @@ export type UserUpdateWithoutMessageMetadataInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -3556,6 +3621,7 @@ export type UserUncheckedUpdateWithoutMessageMetadataInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -3604,6 +3670,7 @@ export type UserCreateWithoutConversationParticipantsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -3652,6 +3719,7 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -3716,6 +3784,7 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -3764,6 +3833,7 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -3812,6 +3882,7 @@ export type UserCreateWithoutConversationMetadataInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -3860,6 +3931,7 @@ export type UserUncheckedCreateWithoutConversationMetadataInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -3924,6 +3996,7 @@ export type UserUpdateWithoutConversationMetadataInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -3972,6 +4045,7 @@ export type UserUncheckedUpdateWithoutConversationMetadataInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -4020,6 +4094,7 @@ export type UserCreateWithoutProductRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -4068,6 +4143,7 @@ export type UserUncheckedCreateWithoutProductRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -4132,6 +4208,7 @@ export type UserUpdateWithoutProductRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -4180,6 +4257,7 @@ export type UserUncheckedUpdateWithoutProductRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -4228,6 +4306,7 @@ export type UserCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -4276,6 +4355,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -4340,6 +4420,7 @@ export type UserUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -4388,6 +4469,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -4436,6 +4518,7 @@ export type UserCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -4484,6 +4567,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -4548,6 +4632,7 @@ export type UserUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -4596,6 +4681,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -4644,6 +4730,7 @@ export type UserCreateWithoutTwoFactorAuthInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -4692,6 +4779,7 @@ export type UserUncheckedCreateWithoutTwoFactorAuthInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -4756,6 +4844,7 @@ export type UserUpdateWithoutTwoFactorAuthInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -4804,6 +4893,7 @@ export type UserUncheckedUpdateWithoutTwoFactorAuthInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -4852,6 +4942,7 @@ export type UserCreateWithoutSocialAccountsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveCreateNestedManyWithoutUserInput
@@ -4900,6 +4991,7 @@ export type UserUncheckedCreateWithoutSocialAccountsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  cookiePreferences?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
   productLikes?: Prisma.ProductLikeUncheckedCreateNestedManyWithoutUserInput
   productSaves?: Prisma.ProductSaveUncheckedCreateNestedManyWithoutUserInput
@@ -4964,6 +5056,7 @@ export type UserUpdateWithoutSocialAccountsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUpdateManyWithoutUserNestedInput
@@ -5012,6 +5105,7 @@ export type UserUncheckedUpdateWithoutSocialAccountsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cookiePreferences?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
   productLikes?: Prisma.ProductLikeUncheckedUpdateManyWithoutUserNestedInput
   productSaves?: Prisma.ProductSaveUncheckedUpdateManyWithoutUserNestedInput
@@ -5235,6 +5329,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  cookiePreferences?: boolean
   products?: boolean | Prisma.User$productsArgs<ExtArgs>
   productLikes?: boolean | Prisma.User$productLikesArgs<ExtArgs>
   productSaves?: boolean | Prisma.User$productSavesArgs<ExtArgs>
@@ -5285,6 +5380,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  cookiePreferences?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -5316,6 +5412,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  cookiePreferences?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -5347,9 +5444,10 @@ export type UserSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  cookiePreferences?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "firstName" | "lastName" | "phoneNumber" | "phoneCode" | "passwordHash" | "profileImage" | "gender" | "bio" | "location" | "birthDate" | "emailVerified" | "emailVerificationCode" | "emailVerificationExpires" | "passwordResetToken" | "passwordResetTokenExpires" | "passwordResetCode" | "passwordResetExpires" | "provider" | "providerId" | "isActive" | "isVerifiedSeller" | "rating" | "totalSales" | "createdAt" | "updatedAt" | "lastLoginAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "firstName" | "lastName" | "phoneNumber" | "phoneCode" | "passwordHash" | "profileImage" | "gender" | "bio" | "location" | "birthDate" | "emailVerified" | "emailVerificationCode" | "emailVerificationExpires" | "passwordResetToken" | "passwordResetTokenExpires" | "passwordResetCode" | "passwordResetExpires" | "provider" | "providerId" | "isActive" | "isVerifiedSeller" | "rating" | "totalSales" | "createdAt" | "updatedAt" | "lastLoginAt" | "cookiePreferences", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   products?: boolean | Prisma.User$productsArgs<ExtArgs>
   productLikes?: boolean | Prisma.User$productLikesArgs<ExtArgs>
@@ -5425,6 +5523,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     updatedAt: Date
     lastLoginAt: Date | null
+    cookiePreferences: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -5894,6 +5993,7 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly cookiePreferences: Prisma.FieldRef<"User", 'String'>
 }
     
 

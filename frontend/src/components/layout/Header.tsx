@@ -142,21 +142,9 @@ const Header: React.FC<HeaderProps> = ({
 
   const isHomePage = location.pathname === "/";
 
-  const handleProfileSetup = () => {
-    navigate("/profile-setup");
-  };
-
   const handleNotificationClick = async (notif: any) => {
     if (notif.id) {
       await markAsRead(notif.id);
-    }
-
-    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
-      navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
-      setIsNotificationOpen(false);
-    } else {
-      navigate('/notifications', { state: { notificationId: notif.id } });
-      setIsNotificationOpen(false);
     }
   };
 
@@ -1358,7 +1346,7 @@ const Header: React.FC<HeaderProps> = ({
                 <>
                   {/* Language Toggle for mobile */}
                   <div className="relative" style={{ marginRight: window.innerWidth < 640 ? '8px' : '4px' }}>
-                    <button
+                    {/* <button
                       onClick={toggleLanguageDropdown}
                       className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
                       style={{
@@ -1370,13 +1358,12 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       {selectedLanguage}
                       <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: window.innerWidth < 640 ? '12px' : '16px', height: window.innerWidth < 640 ? '12px' : '16px' }} />
-                    </button>
+                    </button> */}
 
                     {/* Language Dropdown for mobile */}
                     {isLanguageDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                        {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                           <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                           <button
                             onClick={() => setIsLanguageDropdownOpen(false)}
@@ -1386,10 +1373,10 @@ const Header: React.FC<HeaderProps> = ({
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
-                        </div>
+                        </div> */}
 
                         {/* Language Options */}
-                        <div className="py-2">
+                        {/* <div className="py-2">
                           <button
                             onClick={() => handleLanguageChange('EN')}
                             className={`w-full flex items-center px-4 py-2 text-sm transition-colors duration-200 ${selectedLanguage === 'EN'
@@ -1449,7 +1436,7 @@ const Header: React.FC<HeaderProps> = ({
                             />
                             Spanish
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     )}
                   </div>
@@ -1512,7 +1499,7 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="flex items-center space-x-2">
                   {/* Translation Toggle */}
                   <div className="relative">
-                    <button
+                    {/* <button
                       onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                       className="flex items-center border rounded-lg bg-white font-normal hover:bg-gray-50 focus:outline-none transition-colors duration-200"
                       style={{
@@ -1525,13 +1512,13 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       {selectedLanguage}
                       <img src={arrowDownIcon} alt="Arrow" className="ml-1" style={{ width: '12px', height: '12px' }} />
-                    </button>
+                    </button> */}
 
                     {/* Language Dropdown */}
                     {isLanguageDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-3 z-50">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
+                        {/* <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
                           <h3 className="text-sm font-medium text-gray-700">Language :</h3>
                           <button
                             onClick={() => setIsLanguageDropdownOpen(false)}
@@ -1541,10 +1528,10 @@ const Header: React.FC<HeaderProps> = ({
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
-                        </div>
+                        </div> */}
 
                         {/* Language Options */}
-                        <div className="py-2">
+                        {/* <div className="py-2">
                           <button
                             onClick={() => {
                               setSelectedLanguage('EN');
@@ -1585,7 +1572,7 @@ const Header: React.FC<HeaderProps> = ({
                             <img src="https://flagcdn.com/w20/es.png" alt="Spain flag" className="w-5 h-5 object-cover rounded-full mr-3" />
                             Spanish
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     )}
                   </div>

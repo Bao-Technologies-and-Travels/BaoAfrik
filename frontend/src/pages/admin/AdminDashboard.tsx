@@ -43,6 +43,14 @@ import statusIcon from '../../assets/images/pre/status.svg';
 import suspendIcon from '../../assets/images/admin/suspend.svg';
 import notifIcon from '../../assets/images/admin/notif.svg';
 import arrowLeftIcon from '../../assets/images/pre/arrow-left.svg';
+import sendIcon from '../../assets/images/admin/send.svg';
+import starIcon from '../../assets/images/admin/star.svg';
+import verityIcon from '../../assets/images/admin/verity.svg';
+import grayArrowIcon from '../../assets/images/pre/gray.svg';
+import blackArrowIcon from '../../assets/images/pre/black.svg';
+import redtrashIcon from '../../assets/images/pre/redtrash.svg';
+import warningIcon from '../../assets/images/admin/warning.svg';
+import expandIcon from '../../assets/images/admin/expand.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -155,6 +163,65 @@ const AdminDashboard: React.FC = () => {
   // User profile detail view state
   const [viewingUserProfile, setViewingUserProfile] = useState(false);
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<any>(null);
+  const [isAccountInfoOpen, setIsAccountInfoOpen] = useState(true);
+  const [isStatusOpen, setIsStatusOpen] = useState(true);
+  const [isUserMetricsOpen, setIsUserMetricsOpen] = useState(true);
+  const [activityCardMoreMenu, setActivityCardMoreMenu] = useState<{
+    anchorRect: DOMRect;
+  } | null>(null);
+  const activityCardMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const activityCardMoreMenuButtonRef = useRef<HTMLDivElement | null>(null);
+  const [activityToDelete, setActivityToDelete] = useState<string | null>(null);
+  const [isDeleteActivitySuccess, setIsDeleteActivitySuccess] = useState(false);
+  const [isActivityDeleted, setIsActivityDeleted] = useState(false);
+  const [deleteCountdown, setDeleteCountdown] = useState(5);
+  const [sidebarMoreMenu, setSidebarMoreMenu] = useState<{
+    anchorRect: DOMRect;
+  } | null>(null);
+  const sidebarMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const sidebarMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [userToSuspend, setUserToSuspend] = useState<string | null>(null);
+  const [isSuspendSuccess, setIsSuspendSuccess] = useState(false);
+  const [isUserSuspended, setIsUserSuspended] = useState(false);
+  const [suspendCountdown, setSuspendCountdown] = useState(10);
+  const [isManageAccessView, setIsManageAccessView] = useState(false);
+  const [isManageAccessMaximized, setIsManageAccessMaximized] = useState(false);
+  const [expandedAccessSections, setExpandedAccessSections] = useState<Set<string>>(new Set());
+  const [expandedPermissionLists, setExpandedPermissionLists] = useState<Set<string>>(new Set());
+  const [accessSearchValue, setAccessSearchValue] = useState('');
+  const [isScrollable, setIsScrollable] = useState(false);
+  const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
+  const maximizedScrollableContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isMaximizedScrollable, setIsMaximizedScrollable] = useState(false);
+  const [accessToggles, setAccessToggles] = useState({
+    listings: true,
+    messages: true,
+    requests: false,
+    users: false
+  });
+  const [permissionToggles, setPermissionToggles] = useState<Record<string, Record<string, boolean>>>({
+    listings: {
+      'can-create': true,
+      'can-delete': true,
+      'can-modify': true,
+      'can-review': true,
+      'can-report': true,
+      'can-share': true,
+      'can-contact': true
+    },
+    messages: {
+      'can-send-message': true,
+      'can-send-files': true
+    },
+    requests: {
+      'can-create-request': true,
+      'can-respond': true
+    },
+    users: {
+      'can-view': true,
+      'can-edit': true
+    }
+  });
 
   // Mock data for search
   const mockUsers = [
@@ -344,6 +411,12 @@ const AdminDashboard: React.FC = () => {
       if (!moreOptionsDropdown && !moreOptionsButton && moreMenu !== null) {
         setMoreMenu(null);
       }
+      // Don't close activity card more menu if clicking on the button or dropdown itself
+      const activityCardMoreOptionsDropdown = target.closest('.activity-card-more-options-dropdown');
+      const activityCardMoreOptionsButton = target.closest('.activity-card-more-options-button');
+      if (!activityCardMoreOptionsDropdown && !activityCardMoreOptionsButton && activityCardMoreMenu !== null) {
+        setActivityCardMoreMenu(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -351,6 +424,136 @@ const AdminDashboard: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue]);
+
+  // Close activity card more menu on outside click / scroll / resize (portal-safe)
+  useEffect(() => {
+    if (!activityCardMoreMenu) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const clickedMenu = !!activityCardMoreMenuRef.current?.contains(target);
+      const clickedButton = !!activityCardMoreMenuButtonRef.current?.contains(target);
+      if (!clickedMenu && !clickedButton) {
+        setActivityCardMoreMenu(null);
+      }
+    };
+    const onScroll = () => setActivityCardMoreMenu(null);
+    const onResize = () => setActivityCardMoreMenu(null);
+    document.addEventListener('mousedown', onMouseDown, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, true);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [activityCardMoreMenu]);
+
+  // Close sidebar more menu on outside click / scroll / resize (portal-safe)
+  useEffect(() => {
+    if (!sidebarMoreMenu) return;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const clickedMenu = !!sidebarMoreMenuRef.current?.contains(target);
+      const clickedButton = !!sidebarMoreMenuButtonRef.current?.contains(target);
+      if (!clickedMenu && !clickedButton) {
+        setSidebarMoreMenu(null);
+      }
+    };
+    const onScroll = () => setSidebarMoreMenu(null);
+    const onResize = () => setSidebarMoreMenu(null);
+    document.addEventListener('mousedown', onMouseDown, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, true);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [sidebarMoreMenu]);
+
+  // Countdown timer for suspend success modal
+  useEffect(() => {
+    if (isSuspendSuccess && userToSuspend) {
+      setSuspendCountdown(10);
+      const interval = setInterval(() => {
+        setSuspendCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setIsUserSuspended(true);
+            setUserToSuspend(null);
+            setIsSuspendSuccess(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isSuspendSuccess, userToSuspend]);
+
+  // Check if scrollable container has scrollable content
+  useEffect(() => {
+    if (!isManageAccessView) {
+      setIsScrollable(false);
+      return;
+    }
+    
+    const checkScrollable = () => {
+      if (scrollableContainerRef.current && expandedPermissionLists.size > 0) {
+        const container = scrollableContainerRef.current;
+        const hasScroll = container.scrollHeight > container.clientHeight;
+        setIsScrollable(hasScroll);
+      } else {
+        setIsScrollable(false);
+      }
+    };
+
+    checkScrollable();
+    // Recheck when permission lists expand/collapse
+    const timeoutId = setTimeout(checkScrollable, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [expandedPermissionLists, isManageAccessView]);
+
+  // Check scrollability for maximized view
+  useEffect(() => {
+    const checkMaximizedScrollable = () => {
+      if (maximizedScrollableContainerRef.current && expandedPermissionLists.size > 0) {
+        const container = maximizedScrollableContainerRef.current;
+        const hasScroll = container.scrollHeight > container.clientHeight;
+        setIsMaximizedScrollable(hasScroll);
+      } else {
+        setIsMaximizedScrollable(false);
+      }
+    };
+
+    checkMaximizedScrollable();
+    const timeoutId = setTimeout(checkMaximizedScrollable, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [expandedPermissionLists, isManageAccessMaximized]);
+
+  // Countdown timer for delete success modal
+  useEffect(() => {
+    if (isDeleteActivitySuccess && activityToDelete) {
+      setDeleteCountdown(5);
+      const interval = setInterval(() => {
+        setDeleteCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setIsActivityDeleted(true);
+            setActivityToDelete(null);
+            setIsDeleteActivitySuccess(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isDeleteActivitySuccess, activityToDelete]);
 
   // Close more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -491,7 +694,20 @@ const AdminDashboard: React.FC = () => {
               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View user profile</span>
             </div>
 
-            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+            <div 
+              onClick={() => {
+                const user = usersListRows.find(u => u.email === moreMenu.email);
+                if (user) {
+                  setSelectedUserForProfile(user);
+                  setViewingUserProfile(true);
+                  setIsManageAccessView(true);
+                  setMoreMenu(null);
+                }
+              }}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
+              style={baseItemStyle}
+            >
               <img
                 src={pencilIcon}
                 alt="Edit access"
@@ -504,7 +720,21 @@ const AdminDashboard: React.FC = () => {
               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
             </div>
 
-            <div onMouseEnter={primaryHoverOn} onMouseLeave={primaryHoverOff} style={baseItemStyle}>
+            <div 
+              onClick={() => {
+                const user = usersListRows.find(u => u.email === moreMenu.email);
+                if (user) {
+                  setSelectedUserForProfile(user);
+                  setViewingUserProfile(true);
+                  const userName = `@${user.name.split(' ')[0]}`;
+                  setUserToSuspend(userName);
+                  setMoreMenu(null);
+                }
+              }}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
+              style={baseItemStyle}
+            >
               <img
                 src={suspendIcon}
                 alt="Suspend"
@@ -550,6 +780,27 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div
+              onClick={() => {
+                const activityRow = usersActivitiesRows.find(r => r.email === moreMenu.email);
+                if (activityRow) {
+                  // Convert activity row to user profile format and navigate to detail page
+                  const userForProfile = {
+                    name: activityRow.name,
+                    email: activityRow.email,
+                    avatar: activityRow.avatar,
+                    avatarBg: activityRow.avatarBg,
+                    plan: activityRow.plan,
+                    isNewUser: activityRow.isNewUser,
+                    verified: false
+                  };
+                  setSelectedUserForProfile(userForProfile);
+                  setViewingUserProfile(true);
+                  // Trigger delete flow on the detail page
+                  const activityText = `${activityRow.name.split(' ')[0]} ${activityRow.activity}`;
+                  setActivityToDelete(activityText);
+                  setMoreMenu(null);
+                }
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
               }}
@@ -863,8 +1114,8 @@ const AdminDashboard: React.FC = () => {
             justifyContent: 'space-between',
             marginBottom: '16px'
           }}>
-            {/* Left Side: Search (overview) OR Breadcrumbs (details) */}
-            {viewingUserProfile ? (
+            {/* Left Side: Search (default) OR Breadcrumbs (only for user-profile detail view) */}
+            {selectedSidebarOption === 'users' && viewingUserProfile && selectedUserForProfile ? (
               <nav style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -884,7 +1135,15 @@ const AdminDashboard: React.FC = () => {
                   Homepage
                 </span>
                 <span style={{ color: '#D4D4D4' }}>·</span>
-                <span style={{ cursor: 'pointer' }}>Users activities</span>
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setViewingUserProfile(false);
+                    setUsersToggle('list');
+                  }}
+                >
+                  Users activities
+                </span>
                 <span style={{ color: '#D4D4D4' }}>·</span>
                 <span style={{ color: '#4D4D4D', fontWeight: 500 }}>User activity details</span>
               </nav>
@@ -991,7 +1250,7 @@ const AdminDashboard: React.FC = () => {
                             onSelect={handleCategorySelect}
                           />
                         ))}
-                      </div>
+            </div>
                     </div>
                   )}
 
@@ -1639,11 +1898,790 @@ const AdminDashboard: React.FC = () => {
                     display: 'grid',
                     gridTemplateColumns: '1fr 380px',
                     gap: '20px',
-                    alignItems: 'start'
+                    alignItems: 'start',
+                    transition: 'all 0.3s ease'
                   }}
                 >
-                  {/* Left: Title + Description + Activity Card */}
+                  {/* Left: Title + Description + Activity Card OR Maximized Manage Access Content */}
                   <div>
+                  {isManageAccessMaximized && isManageAccessView ? (
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '14px',
+                      marginTop: '10px',
+                      transition: 'all 0.3s ease',
+                      animation: 'slideIn 0.3s ease'
+                    }}>
+                      <style>{`
+                        @keyframes slideIn {
+                          from {
+                            opacity: 0;
+                            transform: translateX(-20px);
+                          }
+                          to {
+                            opacity: 1;
+                            transform: translateX(0);
+                          }
+                        }
+                      `}</style>
+                      {/* Maximized Manage Access Content - Only search bar and four rows move here */}
+                      {/* Search Bar with Reduce button */}
+                      <div style={{ position: 'relative', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                        <input
+                          type="text"
+                          value={accessSearchValue}
+                          onChange={(e) => setAccessSearchValue(e.target.value)}
+                          placeholder="search"
+                          style={{
+                            maxWidth: '280px',
+                            width: '100%',
+                            padding: '8px 12px',
+                            backgroundColor: '#F1F1F1',
+                            borderRadius: '8px',
+                            border: 'none',
+                            outline: 'none',
+                            color: '#6A6A6A',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            caretColor: '#CFE8FC'
+                          }}
+                        />
+                        <button
+                          onClick={() => setIsManageAccessMaximized(false)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 8px',
+                            color: '#64B5F6',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            marginLeft: 'auto'
+                          }}
+                        >
+                          <span>Reduce the window</span>
+                          <img
+                            src={expandIcon}
+                            alt="Reduce"
+                            style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Access Rows - Scrollable Container */}
+                      <div 
+                        ref={maximizedScrollableContainerRef}
+                        className="access-rows-scrollable-maximized"
+                        style={{ 
+                          position: 'relative',
+                          height: '500px',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          paddingRight: '4px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none'
+                        } as React.CSSProperties}
+                      >
+                        <style>{`
+                          .access-rows-scrollable-maximized::-webkit-scrollbar {
+                            display: none !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                            background: transparent !important;
+                          }
+                          .access-rows-scrollable-maximized {
+                            -ms-overflow-style: none !important;
+                            scrollbar-width: none !important;
+                          }
+                        `}</style>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {/* Listings Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Listings
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.listings}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.listings ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('listings')) {
+                                    newSet.delete('listings');
+                                  } else {
+                                    newSet.add('listings');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('listings') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create', label: 'Can create a listing' },
+                                  { key: 'can-delete', label: 'Can delete a listing' },
+                                  { key: 'can-modify', label: 'Can modify a listing' },
+                                  { key: 'can-review', label: 'Can review listings from other users' },
+                                  { key: 'can-report', label: 'Can report listing from other users' },
+                                  { key: 'can-share', label: 'Can share a listing' },
+                                  { key: 'can-contact', label: 'Can contact a seller for a listing' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.listings[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            listings: {
+                                              ...permissionToggles.listings,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Messages Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Messages
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.messages}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.messages ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('messages')) {
+                                    newSet.delete('messages');
+                                  } else {
+                                    newSet.add('messages');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('messages') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-send-message', label: 'Can send message to a user' },
+                                  { key: 'can-send-files', label: 'Can send files to a user' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.messages[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            messages: {
+                                              ...permissionToggles.messages,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Requests Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Requests
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  12/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.requests}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.requests ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('requests')) {
+                                    newSet.delete('requests');
+                                  } else {
+                                    newSet.add('requests');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('requests') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create-request', label: 'Can create a request' },
+                                  { key: 'can-respond', label: 'Can respond to a request' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.requests[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            requests: {
+                                              ...permissionToggles.requests,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Users Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Users
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.users}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.users ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('users')) {
+                                    newSet.delete('users');
+                                  } else {
+                                    newSet.add('users');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('users') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-view', label: 'Can view user profiles' },
+                                  { key: 'can-edit', label: 'Can edit user information' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.users[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            users: {
+                                              ...permissionToggles.users,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Fade Effect at Bottom - Fixed at bottom of container */}
+                      {expandedPermissionLists.size > 0 && isMaximizedScrollable && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: '4px',
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }} />
+                      )}
+                    </div>
+                  ) : (
+                    <div>
                     {/* Title and Description (match overview sizing) */}
                     <div style={{ marginBottom: '12px' }}>
                       <h1
@@ -1670,6 +2708,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     {/* Activity Card */}
+                    {!isActivityDeleted && (
                     <div
                       style={{
                         backgroundColor: '#FFFFFF',
@@ -1682,80 +2721,88 @@ const AdminDashboard: React.FC = () => {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
                       gap: '12px',
-                      marginBottom: '16px'
+                      marginBottom: '12px'
                     }}>
                       {/* Search Bar */}
-                      <div style={{ flex: 1, position: 'relative' }}>
+                      <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
                         <input
                           type="text"
                           placeholder="Search an activity?"
                           style={{
                             width: '100%',
-                            padding: '10px 12px',
-                            border: '1px solid #F1F1F1',
-                            borderRadius: '10px',
+                            padding: '8px 12px',
+                            border: 'none',
+                            borderRadius: '12px',
                             fontSize: '12px',
                             fontFamily: 'Poppins, sans-serif',
-                            color: '#212121',
-                            backgroundColor: '#FAFAFA',
-                            outline: 'none'
+                            color: '#6A6A6A',
+                            backgroundColor: '#F1F1F1',
+                            outline: 'none',
+                            caretColor: '#CFE8FC'
                           }}
                         />
                       </div>
 
-                      {/* Export Data Button */}
-                      <button style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '8px 12px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#64B5F6',
-                        fontSize: '11px',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}>
-                        <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px' }} />
-                        Export data
-                      </button>
-
-                      {/* Sort By Dropdown */}
-                      <select
-                        value={usersSortBy}
-                        onChange={(e) => setUsersSortBy(e.target.value)}
-                        style={{
-                          padding: '8px 28px 8px 12px',
-                          border: '1px solid #F1F1F1',
-                          borderRadius: '10px',
+                      {/* Export Data Button + Sort By Dropdown */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
+                        {/* Export Data Button */}
+                        <button style={{
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#64B5F6',
                           fontSize: '11px',
                           fontFamily: 'Poppins, sans-serif',
-                          color: '#212121',
+                          padding: 0
+                        }}>
+                          <span style={{ color: '#64B5F6' }}>Export data</span>
+                          <img
+                            src={exportIcon}
+                            alt="Export"
+                            style={{
+                              width: '14px',
+                              height: '14px',
+                              filter:
+                                'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                            }}
+                          />
+                        </button>
+
+                        {/* Sort By Dropdown */}
+                        <select style={{
+                          padding: '4px 10px',
+                          paddingRight: '28px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          fontSize: '11px',
+                          color: '#939393',
                           backgroundColor: '#FFFFFF',
                           cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
                           appearance: 'none',
                           WebkitAppearance: 'none',
                           MozAppearance: 'none',
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23B0B0B0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'right 8px center'
-                        }}
-                      >
-                        <option>Sort by</option>
-                        <option>Date (Newest)</option>
-                        <option>Date (Oldest)</option>
-                        <option>Activity Type</option>
-                      </select>
+                          backgroundPosition: 'right 8px center',
+                          backgroundSize: '12px'
+                        }}>
+                          <option>Sort by</option>
+                        </select>
+                      </div>
                     </div>
 
                     {/* Date Header */}
                     <div style={{
                       color: '#939393',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontFamily: 'Poppins, sans-serif',
-                      marginBottom: '12px'
+                      marginTop: '16px',
+                      marginBottom: '16px'
                     }}>
                       Mon, 21 Dec 2025
                     </div>
@@ -1763,9 +2810,7 @@ const AdminDashboard: React.FC = () => {
                     {/* Activity Entry */}
                     <div style={{
                       display: 'flex',
-                      gap: '12px',
-                      paddingBottom: '16px',
-                      borderBottom: '1px solid #F1F1F1'
+                      gap: '12px'
                     }}>
                       {/* Profile with Notification Bell */}
                       <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -1823,28 +2868,37 @@ const AdminDashboard: React.FC = () => {
                           display: 'flex',
                           alignItems: 'flex-start',
                           justifyContent: 'space-between',
-                          marginBottom: '4px'
+                          marginBottom: '0px',
+                          marginTop: '4px'
                         }}>
                           <span style={{
-                            fontSize: '13px',
+                            fontSize: '12px',
                             color: '#6A6A6A',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
                             fontWeight: 500
                           }}>
                             Account created
                           </span>
-                          <div style={{
-                            width: '24px',
-                            height: '24px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer'
-                          }}>
+                          <div 
+                            ref={activityCardMoreMenuButtonRef}
+                            className="activity-card-more-options-button"
+                            onClick={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setActivityCardMoreMenu({ anchorRect: rect });
+                            }}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <circle cx="8" cy="4" r="1.5" fill="#4D4D4D"/>
-                              <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
-                              <circle cx="8" cy="12" r="1.5" fill="#4D4D4D"/>
+                              <circle cx="4" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                              <circle cx="8" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                              <circle cx="12" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
                             </svg>
                           </div>
                         </div>
@@ -1857,14 +2911,14 @@ const AdminDashboard: React.FC = () => {
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#939393',
                               fontFamily: 'Poppins, sans-serif'
                             }}>
                               This user @
                             </span>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#939393',
                               fontFamily: 'Poppins, sans-serif',
                               fontWeight: 500
@@ -1872,7 +2926,7 @@ const AdminDashboard: React.FC = () => {
                               {selectedUserForProfile.name.split(' ')[0]}
                             </span>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '11px',
                               color: '#B0B0B0',
                               fontFamily: 'Poppins, sans-serif'
                             }}>
@@ -1880,27 +2934,378 @@ const AdminDashboard: React.FC = () => {
                             </span>
                             <span
                               style={{
-                                fontSize: '12px',
+                                fontSize: '11px',
                                 color: '#64B5F6',
                                 fontFamily: 'Poppins, sans-serif',
                                 cursor: 'pointer',
-                                textDecoration: 'none'
+                                textDecoration: 'underline'
                               }}
                             >
                               View more
                             </span>
                           </div>
                           <span style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             color: '#B0B0B0',
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             19 min ago
                           </span>
                         </div>
+                        </div>
                       </div>
                     </div>
+                    )}
+
+                    {/* Activity Card More Options Dropdown */}
+                    {!isActivityDeleted && activityCardMoreMenu && (() => {
+                      const menuWidth = 200;
+                      const margin = 8;
+                      const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, activityCardMoreMenu.anchorRect.right - menuWidth));
+                      const top = activityCardMoreMenu.anchorRect.bottom + 8;
+
+                      return createPortal(
+                        <div
+                          ref={activityCardMoreMenuRef}
+                          className="activity-card-more-options-dropdown"
+                          style={{
+                            position: 'fixed',
+                            top,
+                            left,
+                            width: `${menuWidth}px`,
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #F1F1F1',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '8px',
+                            zIndex: 99999
+                          }}
+                        >
+                          {/* Delete the activity */}
+                          <div
+                            onClick={() => {
+                              const activityText = `${selectedUserForProfile.name.split(' ')[0]} joined Bao'Afrik`;
+                              setActivityToDelete(activityText);
+                              setActivityCardMoreMenu(null);
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.cursor = 'pointer';
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              cursor: `url(${mouseCursorIcon}), auto`,
+                              transition: 'background-color 0.2s'
+                            }}
+                          >
+                            <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                            <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the activity</span>
+                          </div>
+
+                          {/* Close */}
+                          <div
+                            onClick={() => setActivityCardMoreMenu(null)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.cursor = 'pointer';
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '8px',
+                              borderRadius: '8px',
+                              backgroundColor: '#FAFAFA',
+                              cursor: `url(${mouseCursorIcon}), auto`,
+                              transition: 'background-color 0.2s',
+                              marginTop: '4px'
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                          </div>
+                        </div>,
+                        document.body
+                      );
+                    })()}
+
+                    {/* Delete Confirmation Modal */}
+                    {activityToDelete && !isDeleteActivitySuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setActivityToDelete(null);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '320px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setActivityToDelete(null)}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={redtrashIcon}
+                              alt="Delete"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              The activity " <span style={{ color: '#B0B0B0' }}>{activityToDelete}</span> " will be<br />
+                              permanently deleted, do you<br />
+                              wish to continue ?
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setActivityToDelete(null)}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsDeleteActivitySuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#FF5151',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                              <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Yes, Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Delete Success Modal */}
+                    {activityToDelete && isDeleteActivitySuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setIsActivityDeleted(true);
+                            setActivityToDelete(null);
+                            setIsDeleteActivitySuccess(false);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '320px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsActivityDeleted(true);
+                              setActivityToDelete(null);
+                              setIsDeleteActivitySuccess(false);
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              The activity " <span style={{ color: '#B0B0B0' }}>{activityToDelete}</span> " has been successfully deleted.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsActivityDeleted(false);
+                                setActivityToDelete(null);
+                                setIsDeleteActivitySuccess(false);
+                                setDeleteCountdown(5);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsActivityDeleted(true);
+                                setActivityToDelete(null);
+                                setIsDeleteActivitySuccess(false);
+                              }}
+                              style={{
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Close - {deleteCountdown}s
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     </div>
+                  )}
                   </div>
 
                   {/* Right: User Details Sidebar (aligned with title) */}
@@ -1909,7 +3314,8 @@ const AdminDashboard: React.FC = () => {
                       backgroundColor: '#FFFFFF',
                       borderRadius: '18px',
                       border: '1px solid #F1F1F1',
-                      padding: '14px'
+                      padding: '14px',
+                      marginTop: '10px'
                     }}
                   >
                     {/* Top Section: User Profile */}
@@ -1918,14 +3324,17 @@ const AdminDashboard: React.FC = () => {
                         backgroundColor: '#FAFAFA',
                         borderRadius: '14px',
                         padding: '14px',
-                        marginBottom: '14px'
+                        marginBottom: '14px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
                       }}
                     >
                       {/* Profile with Dot */}
                       <div style={{ position: 'relative', display: 'inline-block', marginBottom: '12px' }}>
                         <div style={{
-                          width: '58px',
-                          height: '58px',
+                          width: '50px',
+                          height: '50px',
                           borderRadius: '50%',
                           backgroundColor: '#D5E9BD',
                           border: '2px solid #FFFFFF',
@@ -1938,8 +3347,8 @@ const AdminDashboard: React.FC = () => {
                             src={selectedUserForProfile.avatar}
                             alt={selectedUserForProfile.name}
                             style={{
-                            width: '54px',
-                            height: '54px',
+                            width: '46px',
+                            height: '46px',
                               borderRadius: '50%',
                               objectFit: 'cover'
                             }}
@@ -1964,7 +3373,8 @@ const AdminDashboard: React.FC = () => {
                         fontWeight: 600,
                         color: '#212121',
                         margin: '0 0 4px 0',
-                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        textAlign: 'center'
                       }}>
                         {selectedUserForProfile.name}
                       </h3>
@@ -1973,11 +3383,33 @@ const AdminDashboard: React.FC = () => {
                       <p style={{
                         fontSize: '11px',
                         color: '#B0B0B0',
-                        margin: '0 0 12px 0',
-                        fontFamily: 'Poppins, sans-serif'
+                        margin: '0 0 4px 0',
+                        fontFamily: 'Poppins, sans-serif',
+                        textAlign: 'center'
                       }}>
                         Last login: today at 19:25
                       </p>
+
+                      {/* Account Suspended Badge */}
+                      {isUserSuspended && (
+                        <div style={{
+                          display: 'inline-block',
+                          padding: '0px 8px',
+                          backgroundColor: '#FEF6E9',
+                          border: '1px solid #FDE4BB',
+                          borderRadius: '8px',
+                          marginBottom: '12px'
+                        }}>
+                          <span style={{
+                            fontSize: '11px',
+                            color: '#F9A825',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 300
+                          }}>
+                            Account Suspended
+                          </span>
+                        </div>
+                      )}
 
                       {/* Three Action Buttons */}
                       <div style={{
@@ -1987,51 +3419,1390 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         {[
                           { icon: chatsIcon, alt: 'Chat' },
-                          { icon: exportIcon, alt: 'Download' },
+                          { icon: sendIcon, alt: 'Send' },
                           { icon: 'ellipsis', alt: 'More' }
-                        ].map((action, idx) => (
-                          <button
-                            key={idx}
+                        ].map((action, idx) => {
+                          const isMoreButton = action.icon === 'ellipsis';
+                          const isMoreMenuOpen = isMoreButton && sidebarMoreMenu !== null;
+                          return (
+                            <button
+                              key={idx}
+                              ref={isMoreButton ? sidebarMoreMenuButtonRef : null}
+                              onClick={(e) => {
+                                if (isMoreButton) {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setSidebarMoreMenu(prev => prev ? null : { anchorRect: rect });
+                                }
+                              }}
+                              style={{
+                                width: '34px',
+                                height: '34px',
+                                borderRadius: '50%',
+                                backgroundColor: isMoreMenuOpen ? '#F0F8FE' : '#FFFFFF',
+                                border: isMoreMenuOpen ? '1px solid #CFE8FC' : 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.02)'
+                              }}
+                            >
+                              {action.icon === 'ellipsis' ? (
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                  <circle cx="4" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                  <circle cx="8" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                  <circle cx="12" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                </svg>
+                              ) : (
+                                <img
+                                  src={action.icon}
+                                  alt={action.alt}
+                                  style={{
+                                    width: '16px',
+                                    height: '16px',
+                                    filter: 'brightness(0) saturate(100%) invert(13%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
+                                  }}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Sidebar More Options Dropdown */}
+                      {sidebarMoreMenu && (() => {
+                        const menuWidth = 200;
+                        const margin = 8;
+                        const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, sidebarMoreMenu.anchorRect.right - menuWidth));
+                        const top = sidebarMoreMenu.anchorRect.bottom + 8;
+
+                        const primaryHoverOn = (e: React.MouseEvent<HTMLDivElement>) => {
+                          e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                          e.currentTarget.style.backgroundColor = '#F0F8FE';
+                          const icon = e.currentTarget.querySelector('img');
+                          const text = e.currentTarget.querySelector('span');
+                          if (icon) (icon as HTMLImageElement).style.filter =
+                            'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
+                          if (text) (text as HTMLElement).style.color = '#64B5F6';
+                        };
+                        const primaryHoverOff = (e: React.MouseEvent<HTMLDivElement>) => {
+                          e.currentTarget.style.cursor = 'pointer';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          const icon = e.currentTarget.querySelector('img');
+                          const text = e.currentTarget.querySelector('span');
+                          if (icon) (icon as HTMLImageElement).style.filter =
+                            'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+                          if (text) (text as HTMLElement).style.color = '#939393';
+                        };
+
+                        const baseItemStyle: React.CSSProperties = {
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px',
+                          borderRadius: '8px',
+                          cursor: `url(${mouseCursorIcon}), auto`,
+                          transition: 'background-color 0.2s'
+                        };
+
+                        return createPortal(
+                          <div
+                            ref={sidebarMoreMenuRef}
+                            className="sidebar-more-options-dropdown"
                             style={{
-                              width: '34px',
-                              height: '34px',
-                              borderRadius: '50%',
+                              position: 'fixed',
+                              top,
+                              left,
+                              width: `${menuWidth}px`,
                               backgroundColor: '#FFFFFF',
-                              border: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.02)'
+                              borderRadius: '12px',
+                              border: '1px solid #F1F1F1',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              padding: '8px',
+                              zIndex: 99999
                             }}
                           >
-                            {action.icon === 'ellipsis' ? (
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <circle cx="8" cy="4" r="1.5" fill="#212121"/>
-                                <circle cx="8" cy="8" r="1.5" fill="#212121"/>
-                                <circle cx="8" cy="12" r="1.5" fill="#212121"/>
-                              </svg>
-                            ) : (
+                            {/* Edit user access */}
+                            <div 
+                              onClick={() => {
+                                setIsManageAccessView(true);
+                                setSidebarMoreMenu(null);
+                              }}
+                              onMouseEnter={primaryHoverOn} 
+                              onMouseLeave={primaryHoverOff} 
+                              style={baseItemStyle}
+                            >
                               <img
-                                src={action.icon}
-                                alt={action.alt}
+                                src={pencilIcon}
+                                alt="Edit access"
                                 style={{
                                   width: '16px',
                                   height: '16px',
-                                  filter: 'brightness(0) saturate(100%) invert(13%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(95%)'
+                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
                                 }}
                               />
-                            )}
+                              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
+                            </div>
+
+                            {/* Suspend/Unsuspend the user */}
+                            <div 
+                              onClick={() => {
+                                if (isUserSuspended) {
+                                  setIsUserSuspended(false);
+                                  setSidebarMoreMenu(null);
+                                } else {
+                                  const userName = `@${selectedUserForProfile.name.split(' ')[0]}`;
+                                  setUserToSuspend(userName);
+                                  setSidebarMoreMenu(null);
+                                }
+                              }}
+                              onMouseEnter={primaryHoverOn} 
+                              onMouseLeave={primaryHoverOff} 
+                              style={baseItemStyle}
+                            >
+                              <img
+                                src={suspendIcon}
+                                alt={isUserSuspended ? "Unsuspend" : "Suspend"}
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
+                                {isUserSuspended ? 'Unsuspend the user' : 'Suspend the user'}
+                              </span>
+                            </div>
+
+                            {/* Delete user account */}
+                            <div
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.cursor = 'pointer';
+                              }}
+                              style={baseItemStyle}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+                              <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete user account</span>
+                            </div>
+
+                            {/* Close */}
+                            <div
+                              onClick={() => setSidebarMoreMenu(null)}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.cursor = 'pointer';
+                              }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '8px',
+                                borderRadius: '8px',
+                                backgroundColor: '#FAFAFA',
+                                cursor: `url(${mouseCursorIcon}), auto`,
+                                transition: 'background-color 0.2s',
+                                marginTop: '4px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                              <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+                            </div>
+                          </div>,
+                          document.body
+                        );
+                      })()}
+
+                    {/* Suspend Confirmation Modal */}
+                    {userToSuspend && !isSuspendSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setUserToSuspend(null);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setUserToSuspend(null)}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
                           </button>
-                        ))}
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={warningIcon}
+                              alt="Warning"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account will be suspended. Do you wish to continue?
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setUserToSuspend(null)}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsSuspendSuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#212121',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Yes, Deactivate
+                            </button>
+                          </div>
+                        </div>
                       </div>
+                    )}
+
+                    {/* Suspend Success Modal */}
+                    {userToSuspend && isSuspendSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setIsUserSuspended(true);
+                            setUserToSuspend(null);
+                            setIsSuspendSuccess(false);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsUserSuspended(true);
+                              setUserToSuspend(null);
+                              setIsSuspendSuccess(false);
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account has been<br />
+                              successfully suspended.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsUserSuspended(false);
+                                setUserToSuspend(null);
+                                setIsSuspendSuccess(false);
+                                setSuspendCountdown(10);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsUserSuspended(true);
+                                setUserToSuspend(null);
+                                setIsSuspendSuccess(false);
+                              }}
+                              style={{
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Close · {suspendCountdown}s
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     </div>
 
+                    {/* Manage Access View - Header always visible when manage access view is open */}
+                    {isManageAccessView && (
+                      <>
+                        {/* Manage Access Header - Always visible in right sidebar */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: '8px'
+                        }}>
+                          {/* Left: X button and "Manage access" text */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <button
+                              onClick={() => setIsManageAccessView(false)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                            </button>
+                            <span style={{
+                              fontSize: '14px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600
+                            }}>
+                              Manage access
+                            </span>
+                          </div>
+
+                          {/* Right: Access badge and expand button */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            {/* Access Badge */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              padding: '2px 6px',
+                              backgroundColor: '#F0F8FE',
+                              borderRadius: '6px',
+                              height: '20px'
+                            }}>
+                              <span style={{
+                                fontSize: '10px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                85/112 Access
+                              </span>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="#64B5F6" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+
+                            {/* Expand Button - Always visible */}
+                            <button
+                              onClick={() => setIsManageAccessMaximized(true)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <img
+                                src={expandIcon}
+                                alt="Expand"
+                                style={{ width: '16px', height: '16px' }}
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Description Text - Always visible in right sidebar */}
+                        <p style={{
+                          fontSize: '11px',
+                          color: '#9C9C9C',
+                          fontFamily: 'Poppins, sans-serif',
+                          margin: '0 0 16px 0',
+                          lineHeight: '1.5',
+                          marginTop: '0px'
+                        }}>
+                          Manage user access permissions and control what features this user can access.
+                        </p>
+                      </>
+                    )}
+
+                    {/* Search Bar and Access Rows - Only show in right sidebar when NOT maximized */}
+                    {isManageAccessView && !isManageAccessMaximized && (
+                      <>
+                        {/* Search Bar */}
+                        <div style={{ position: 'relative', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <input
+                            type="text"
+                            value={accessSearchValue}
+                            onChange={(e) => setAccessSearchValue(e.target.value)}
+                            placeholder="search"
+                            style={{
+                              flex: 1,
+                              padding: '8px 12px',
+                              backgroundColor: '#F1F1F1',
+                              borderRadius: '8px',
+                              border: 'none',
+                              outline: 'none',
+                              color: '#6A6A6A',
+                              fontSize: '12px',
+                              fontFamily: 'Poppins, sans-serif',
+                              caretColor: '#CFE8FC'
+                            }}
+                          />
+                        </div>
+
+                        {/* Access Rows - Scrollable Container */}
+                        <div 
+                          ref={scrollableContainerRef}
+                          className="access-rows-scrollable"
+                          style={{ 
+                            position: 'relative',
+                            maxHeight: 'calc(100vh - 400px)',
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            paddingRight: '4px',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none'
+                          } as React.CSSProperties}
+                          onScroll={(e) => {
+                            const target = e.currentTarget;
+                            const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+                            // Update fade visibility based on scroll position
+                          }}
+                        >
+                          <style>{`
+                            .access-rows-scrollable::-webkit-scrollbar {
+                              display: none !important;
+                              width: 0 !important;
+                              height: 0 !important;
+                              background: transparent !important;
+                            }
+                            .access-rows-scrollable {
+                              -ms-overflow-style: none !important;
+                              scrollbar-width: none !important;
+                            }
+                          `}</style>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {/* Listings Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Listings
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.listings}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.listings ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('listings')) {
+                                    newSet.delete('listings');
+                                  } else {
+                                    newSet.add('listings');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('listings') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create', label: 'Can create a listing' },
+                                  { key: 'can-delete', label: 'Can delete a listing' },
+                                  { key: 'can-modify', label: 'Can modify a listing' },
+                                  { key: 'can-review', label: 'Can review listings from other users' },
+                                  { key: 'can-report', label: 'Can report listing from other users' },
+                                  { key: 'can-share', label: 'Can share a listing' },
+                                  { key: 'can-contact', label: 'Can contact a seller for a listing' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.listings[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            listings: {
+                                              ...permissionToggles.listings,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Messages Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Messages
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.messages}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.messages ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('messages')) {
+                                    newSet.delete('messages');
+                                  } else {
+                                    newSet.add('messages');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('messages') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-send-message', label: 'Can send message to a user' },
+                                  { key: 'can-send-files', label: 'Can send files to a user' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.messages[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            messages: {
+                                              ...permissionToggles.messages,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Requests Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Requests
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  12/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.requests}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.requests ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('requests')) {
+                                    newSet.delete('requests');
+                                  } else {
+                                    newSet.add('requests');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('requests') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create-request', label: 'Can create a request' },
+                                  { key: 'can-respond', label: 'Can respond to a request' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.requests[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            requests: {
+                                              ...permissionToggles.requests,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Users Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Users
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.users}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
+                                  <span style={{
+                                    position: 'absolute',
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.users ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('users')) {
+                                    newSet.delete('users');
+                                  } else {
+                                    newSet.add('users');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('users') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-view', label: 'Can view user profiles' },
+                                  { key: 'can-edit', label: 'Can edit user information' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
+                                  }}>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
+                                    }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.users[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            users: {
+                                              ...permissionToggles.users,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
+                                      <span style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
+                                      }}>
+                                        <span style={{
+                                          position: 'absolute',
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          </div>
+                          {/* Fade Effect at Bottom - Only show when expanded and scrollable */}
+                          {expandedPermissionLists.size > 0 && isScrollable && (
+                            <div style={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: '4px',
+                              height: '40px',
+                              background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                              pointerEvents: 'none',
+                              zIndex: 1
+                            }} />
+                          )}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Empty Placeholder when Manage Access is Maximized - Shows below header */}
+                    {isManageAccessView && isManageAccessMaximized && (
+                      <div style={{
+                        position: 'relative',
+                        border: '2px dashed #D9D9D9',
+                        borderRadius: '12px',
+                        padding: '40px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '300px',
+                        textAlign: 'center',
+                        marginTop: '16px'
+                      }}>
+                        <p style={{
+                          fontSize: '12px',
+                          color: '#B0B0B0',
+                          fontFamily: 'Poppins, sans-serif',
+                          margin: '0 0 8px 0',
+                          lineHeight: '1.5'
+                        }}>
+                          The review window has been enlarged, reduce it if you want to see it appear here again.
+                        </p>
+                        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => setIsManageAccessMaximized(false)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: '#64B5F6',
+                              fontSize: '12px',
+                              fontFamily: 'Poppins, sans-serif',
+                              padding: '4px 8px'
+                            }}
+                          >
+                            <span>Reduce reviews window</span>
+                            <img
+                              src={expandIcon}
+                              alt="Reduce"
+                              style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                            />
+                          </button>
+                        </div>
+                        {/* Fade Effect at Bottom */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1,
+                          borderRadius: '0 0 12px 12px'
+                        }} />
+                      </div>
+                    )}
+
                     {/* Tabs */}
+                    {!isManageAccessView && !isManageAccessMaximized && (
                     <div style={{
                       display: 'flex',
                       gap: '16px',
                       marginBottom: '16px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
                       borderBottom: '1px solid #F1F1F1'
                     }}>
                       {['About user', 'Reviews and rates', 'Reported issues ab...'].map((tab, idx) => (
@@ -2053,14 +4824,20 @@ const AdminDashboard: React.FC = () => {
                         </button>
                       ))}
                     </div>
+                    )}
 
                     {/* See user bio */}
+                    {!isManageAccessView && (
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      gap: '6px',
                       padding: '8px 0',
                       marginBottom: '8px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
                       borderBottom: '1px solid #F1F1F1'
                     }}>
                       <span style={{
@@ -2070,46 +4847,38 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         See user bio
                       </span>
-                      <img
-                        src={arrowDownIcon}
-                        alt="Expand"
-                        style={{
-                          width: '12px',
-                          height: '12px',
-                          transform: 'rotate(0deg)',
-                          filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                        }}
-                      />
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
                     </div>
+                    )}
 
                     {/* Account Information */}
-                    <div style={{ marginBottom: '16px' }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '12px',
-                        cursor: 'pointer'
-                      }}>
+                    {!isManageAccessView && (
+                    <>
+                    <div style={{ marginBottom: '12px' }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsAccountInfoOpen(!isAccountInfoOpen)}
+                      >
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontWeight: 500
+                          fontFamily: 'Poppins, sans-serif'
                         }}>
                           Account Information
                         </span>
-                        <img
-                          src={arrowDownIcon}
-                          alt="Expand"
-                          style={{
-                            width: '12px',
-                            height: '12px',
-                            transform: 'rotate(180deg)',
-                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                          }}
-                        />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isAccountInfoOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                       </div>
+                      {isAccountInfoOpen && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -2142,9 +4911,10 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               06 Dec, 2025
                             </span>
@@ -2174,9 +4944,10 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               France
                             </span>
@@ -2192,7 +4963,7 @@ const AdminDashboard: React.FC = () => {
                               marginBottom: '4px'
                             }}>
                               <img
-                                src={appNotificationIcon}
+                                src={sendIcon}
                                 alt="Mail"
                                 style={{
                                   width: '14px',
@@ -2209,9 +4980,10 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               {selectedUserForProfile.email}
                             </span>
@@ -2241,45 +5013,51 @@ const AdminDashboard: React.FC = () => {
                               </span>
                             </div>
                             <span style={{
-                              fontSize: '12px',
+                              fontSize: '10px',
                               color: '#939393',
-                              fontFamily: 'Poppins, sans-serif'
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
                             }}>
                               From France
                             </span>
                           </div>
                         </div>
                       </div>
+                      )}
+                      {/* Divider below Account Information */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '12px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
+                      }} />
                     </div>
 
                     {/* Status Section */}
                     <div style={{ marginBottom: '16px' }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '12px',
-                        cursor: 'pointer'
-                      }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsStatusOpen(!isStatusOpen)}
+                      >
                         <span style={{
                           fontSize: '12px',
                           color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontWeight: 500
+                          fontFamily: 'Poppins, sans-serif'
                         }}>
                           Status
                         </span>
-                        <img
-                          src={arrowDownIcon}
-                          alt="Expand"
-                          style={{
-                            width: '12px',
-                            height: '12px',
-                            transform: 'rotate(180deg)',
-                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
-                          }}
-                        />
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isStatusOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                       </div>
+                      {isStatusOpen && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -2287,84 +5065,74 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         {/* Profile Completed Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '8px',
                           border: '1px solid #F1F1F1'
                         }}>
+                          <img
+                            src={verityIcon}
+                            alt="Verified"
+                            style={{ width: '16px', height: '16px', marginBottom: '6px' }}
+                          />
+                          <div style={{
+                            fontSize: '10px',
+                            color: '#B0B0B0',
+                            fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '8px'
+                          }}>
+                            Profile completed
+                          </div>
                           <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '6px',
-                            marginBottom: '8px'
+                            gap: '8px'
                           }}>
-                            <img
-                              src={verifyIcon}
-                              alt="Verified"
-                              style={{ width: '14px', height: '14px' }}
-                            />
                             <span style={{
-                              fontSize: '11px',
-                              color: '#212121',
-                              fontFamily: 'Poppins, sans-serif',
-                              fontWeight: 500
+                              fontSize: '10px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
                             }}>
-                              Profile completed
+                              20%
                             </span>
-                          </div>
-                          <div style={{
-                            height: '4px',
-                            backgroundColor: '#E4E4E4',
-                            borderRadius: '2px',
-                            overflow: 'hidden',
-                            marginBottom: '4px'
-                          }}>
                             <div style={{
-                              width: '20%',
-                              height: '100%',
-                              backgroundColor: '#45C55B',
-                              borderRadius: '2px'
-                            }} />
+                              flex: 1,
+                              height: '4px',
+                              backgroundColor: '#E4E4E4',
+                              borderRadius: '2px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                width: '20%',
+                                height: '100%',
+                                backgroundColor: '#45C55B',
+                                borderRadius: '2px'
+                              }} />
+                            </div>
                           </div>
-                          <span style={{
-                            fontSize: '10px',
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            20%
-                          </span>
                         </div>
                         {/* User Plan Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '8px',
                           border: '1px solid #F1F1F1',
                           position: 'relative'
                         }}>
                           <div style={{
                             display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            marginBottom: '8px'
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            marginBottom: '6px'
                           }}>
                             <img
-                              src={profileIcon}
+                              src={starIcon}
                               alt="Plan"
                               style={{
-                                width: '14px',
-                                height: '14px',
-                                filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                                width: '16px',
+                                height: '16px'
                               }}
                             />
-                            <span style={{
-                              fontSize: '11px',
-                              color: '#212121',
-                              fontFamily: 'Poppins, sans-serif',
-                              fontWeight: 500
-                            }}>
-                              User plan - Free
-                            </span>
                             <div style={{
                               position: 'absolute',
                               top: '8px',
@@ -2375,13 +5143,24 @@ const AdminDashboard: React.FC = () => {
                             }}>
                               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                 <circle cx="7" cy="7" r="6" stroke="#B0B0B0" strokeWidth="1"/>
-                                <text x="7" y="9.5" textAnchor="middle" fontSize="8" fill="#B0B0B0">i</text>
+                                <circle cx="4" cy="7" r="1" fill="#212121"/>
+                                <circle cx="7" cy="7" r="1" fill="#212121"/>
+                                <circle cx="10" cy="7" r="1" fill="#212121"/>
                               </svg>
                             </div>
                           </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#212121',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 500,
+                            marginBottom: '6px'
+                          }}>
+                            User plan · Free
+                          </div>
                           <p style={{
                             fontSize: '10px',
-                            color: '#939393',
+                            color: '#B0B0B0',
                             margin: 0,
                             fontFamily: 'Poppins, sans-serif'
                           }}>
@@ -2389,36 +5168,57 @@ const AdminDashboard: React.FC = () => {
                           </p>
                         </div>
                       </div>
+                      )}
+                      {/* Divider below Status */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '16px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
+                      }} />
                     </div>
 
                     {/* User Metrics Section */}
                     <div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '12px',
-                        cursor: 'pointer'
-                      }}>
-                        <span style={{
-                          fontSize: '12px',
-                          color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontWeight: 500
-                        }}>
-                          User Metrics
-                        </span>
-                        <img
-                          src={arrowDownIcon}
-                          alt="Expand"
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: '12px'
+                        }}
+                      >
+                        <div 
                           style={{
-                            width: '12px',
-                            height: '12px',
-                            transform: 'rotate(180deg)',
-                            filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer'
                           }}
-                        />
+                          onClick={() => setIsUserMetricsOpen(!isUserMetricsOpen)}
+                        >
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#6A6A6A',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            User Metrics
+                          </span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isUserMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                        <span style={{
+                          fontSize: '11px',
+                          color: '#64B5F6',
+                          fontFamily: 'Poppins, sans-serif',
+                          cursor: 'pointer'
+                        }}>
+                          See all user metrics
+                        </span>
                       </div>
+                      {isUserMetricsOpen && (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -2426,94 +5226,157 @@ const AdminDashboard: React.FC = () => {
                       }}>
                         {/* Posted Listings Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '1px 6px',
                           border: '1px solid #F1F1F1',
-                          position: 'relative'
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between'
                         }}>
-                          <div style={{
-                            position: 'absolute',
-                            top: '8px',
-                            right: '8px',
-                            width: '16px',
-                            height: '16px'
-                          }}>
-                            <img
-                              src={listingboxIcon}
-                              alt="Listings"
-                              style={{
-                                width: '16px',
-                                height: '16px',
-                                filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
-                              }}
-                            />
+                          <div>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              marginBottom: '0px',
+                              marginTop: '2px'
+                            }}>
+                              <span style={{
+                                fontSize: '9px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                margin: 0
+                              }}>
+                                Posted listings
+                              </span>
+                              <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0px', marginTop: '1px' }}>
+                              <p style={{ 
+                                fontSize: '18px',
+                                fontWeight: 600,
+                                color: '#212121',
+                                margin: 0,
+                                fontFamily: 'Bricolage Grotesque, sans-serif'
+                              }}>
+                                248
+                              </p>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '2px',
+                                backgroundColor: '#EDFBF0',
+                                padding: '1px 3px',
+                                borderRadius: '8px'
+                              }}>
+                                <svg width="7" height="7" viewBox="0 0 24 24" fill="none">
+                                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                <span style={{ color: '#22C55E', fontSize: '7px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                              </div>
+                            </div>
                           </div>
-                          <div style={{
-                            fontSize: '20px',
-                            fontWeight: 600,
-                            color: '#212121',
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            marginBottom: '4px'
-                          }}>
-                            248
-                          </div>
-                          <div style={{
-                            fontSize: '11px',
-                            color: '#45C55B',
-                            fontFamily: 'Poppins, sans-serif',
-                            marginBottom: '4px'
-                          }}>
-                            +17.89%
-                          </div>
-                          <div style={{
-                            fontSize: '10px',
-                            color: '#939393',
+                          <p style={{ 
+                            color: '#9C9C9C',
+                            fontSize: '8px',
+                            margin: 0,
+                            marginTop: '4px',
                             fontFamily: 'Poppins, sans-serif'
                           }}>
                             Last month: 94
-                          </div>
+                          </p>
                         </div>
                         {/* Active Listings Card */}
                         <div style={{
-                          backgroundColor: '#FAFAFA',
+                          backgroundColor: '#FFFFFF',
                           borderRadius: '10px',
-                          padding: '12px',
+                          padding: '1px 6px',
                           border: '1px solid #F1F1F1',
-                          position: 'relative'
+                          position: 'relative',
+                          overflow: 'hidden'
                         }}>
+                          {/* Fade effect on the right */}
+                          <div 
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              right: 0,
+                              bottom: 0,
+                              width: '40px',
+                              pointerEvents: 'none',
+                              zIndex: 1,
+                              background: 'linear-gradient(to left, #FFFFFF 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)'
+                            }}
+                          />
+                          {/* Navigation button */}
                           <div style={{
                             position: 'absolute',
-                            top: '8px',
-                            right: '8px',
-                            width: '16px',
-                            height: '16px'
+                            top: '50%',
+                            right: '4px',
+                            transform: 'translateY(-50%)',
+                            zIndex: 2
                           }}>
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M4 8L6 10L12 4" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            <button 
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                padding: 0
+                              }}
+                            >
+                              <img src={grayArrowIcon} alt="Next" style={{ width: '20px', height: '20px', transform: 'rotate(180deg)' }} />
+                            </button>
                           </div>
                           <div style={{
-                            fontSize: '20px',
-                            fontWeight: 600,
-                            color: '#212121',
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            marginBottom: '4px'
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            marginBottom: '0px',
+                            marginTop: '2px'
                           }}>
-                            217
+                            <span style={{
+                              fontSize: '9px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              margin: 0
+                            }}>
+                              Active listings
+                            </span>
+                            <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
                           </div>
-                          <div style={{
-                            fontSize: '11px',
-                            color: '#64B5F6',
+                          <div style={{ marginBottom: '0px', marginTop: '1px' }}>
+                            <p style={{ 
+                              fontSize: '18px',
+                              fontWeight: 600,
+                              color: '#212121',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif'
+                            }}>
+                              217
+                            </p>
+                          </div>
+                          <span style={{
+                            fontSize: '8px',
+                            color: '#F9A825',
                             fontFamily: 'Poppins, sans-serif',
-                            cursor: 'pointer',
-                            textDecoration: 'none'
+                            cursor: 'pointer'
                           }}>
                             31 inactive listings &gt;
-                          </div>
+                          </span>
                         </div>
                       </div>
+                      )}
                     </div>
+                    </>
+                    )}
                   </div>
                 </div>
               </div>

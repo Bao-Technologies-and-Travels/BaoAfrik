@@ -61,6 +61,7 @@ import { io, Socket } from "socket.io-client";
 import { useSocket } from '../contexts/socketContext'
 import { useToast } from "../contexts/ToastContext";
 import { useNotificationToast } from '../contexts/NotificationToastContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import { countries } from '../utils/countries';
 import { gcpStorageService } from '../services/gcpStorageService';
 import { sortedCountryPhoneCodes } from '../utils/countryPhoneCodes';
@@ -239,9 +240,8 @@ const ProfileSettings: React.FC = () => {
   const [calendarDate, setCalendarDate] = useState(new Date());
   const contextSocket = useSocket();
   const [notificationTab, setNotificationTab] = useState<'all' | 'unread' | 'messages'>('all');
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [notifications, setNotifications] = useState<any[]>([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const { notifications, notificationCount, refreshNotifications, markAsRead, markAllAsRead: markAllAsReadContext } = useNotifications();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<{ code: string; name: string } | null>(null);
@@ -258,160 +258,16 @@ const ProfileSettings: React.FC = () => {
     navigate("/login");
   };
 
-  // fetch notifications on mount
+  // Refresh notifications when dropdown opens
   useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) return;
-
-        const json = await res.json();
-        if (!mounted || !json.success) return;
-
-        const items = (json.data.items || []).map((n: any) => {
-          const created = n.createdAt ? new Date(n.createdAt) : new Date();
-          const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-          const getDayLabel = (date: Date) => {
-            const d = new Date(date); const today = new Date();
-            if (d.toDateString() === today.toDateString()) return 'Today';
-            const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
-            if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
-            return d.toLocaleDateString();
-          };
-          return { ...n, day: getDayLabel(created), time: n.time || formatTime(created) };
-        });
-        setNotifications(items);
-        if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
-      } catch (e) {
-        console.warn('Failed to load notifications', e);
-      }
-    };
-    load();
-    return () => { mounted = false; };
-  }, []);
-
-  // fetch unread counts
-  useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/notifications/unread-count`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) return;
-        const json = await res.json();
-        if (json.success && json.data) {
-          setNotificationCount(json.data.unreadCount ?? 0);
-        }
-      } catch (e) {
-        // ignore
-      }
+    if (isNotificationOpen) {
+      refreshNotifications();
     }
-    fetchUnread();
-  }, []);
-
-  // socket events
-  useEffect(() => {
-    if (!socket) return;
-
-    const formatTime = (date: Date) =>
-      date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-    const getDayLabel = (date: Date) => {
-      const d = new Date(date);
-      const today = new Date();
-      if (d.toDateString() === today.toDateString()) {
-        return 'Today';
-      };
-      const yesterday = new Date();
-      yesterday.setDate(today.getDate() - 1);
-      if (d.toDateString() === yesterday.toDateString()) {
-        return 'Yesterday';
-      };
-      return d.toLocaleDateString();
-    };
-
-    const onNotification = (payload: any) => {
-      const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
-      const normalized = {
-        ...payload,
-        day: getDayLabel(created),
-        time: payload.time || formatTime(created),
-        id: payload.id || `notif-${Date.now()}-${Math.random()}`
-      };
-
-      setNotifications(prev => {
-        const existsById = prev.some(n => n.id === normalized.id);
-        const existsByMeta = normalized.meta?.messageId ? prev.some(n => n.meta?.messageId === normalized.meta.messageId) : false;
-        if (existsById || existsByMeta) return prev;
-        return [normalized, ...prev];
-      });
-      setNotificationCount(prev => prev + 1);
-    };
-
-    const onNewMessageNotification = (payload: any) => {
-      if (payload?.messageId) {
-        const has = notifications.some(n => n.meta?.messageId === payload.messageId);
-        if (has) return;
-      };
-
-      const created = new Date();
-      const normalized = {
-        id: payload.id || `tmp-${Date.now()}-${Math.random()}`,
-        day: getDayLabel(created),
-        time: payload.time || formatTime(created),
-        title: payload.senderName || payload.title || 'Someone',
-        body: payload.preview || payload.body || '',
-        meta: { conversationId: payload.conversationId, messageId: payload.messageId },
-        isRead: false,
-        actor: payload.actor ?? null
-      };
-
-      setNotifications(prev => {
-        const existsByMeta = payload?.messageId ? prev.some(n => n.meta?.messageId === payload.messageId) : false;
-        if (existsByMeta) return prev;
-        return [normalized, ...prev];
-      });
-      setNotificationCount(prev => prev + 1);
-    };
-
-    const onNotificationCount = (payload: any) => {
-      const count = (payload && (payload.totalUnread ?? payload.unreadCount ?? payload.total)) as number | undefined;
-      if (typeof count === 'number') {
-        setNotificationCount(count);
-      }
-    };
-
-    socket.on('notification', onNotification);
-    socket.on('new_message_notification', onNewMessageNotification);
-    socket.on('notification_count', onNotificationCount);
-
-    return () => {
-      socket.off('notification', onNotification);
-      socket.off('new_message_notification', onNewMessageNotification);
-      socket.off('notification_count', onNotificationCount);
-    };
-  }, [socket]);
+  }, [isNotificationOpen, refreshNotifications]);
 
   const markAllAsRead = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      await fetch(`${process.env.REACT_APP_API_URL}/notifications/mark-all-read`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
-      setNotificationCount(0);
-      setNotificationTab('all');
-    } catch (e) {
-      console.warn('Failed to mark all as read', e);
-    }
+    await markAllAsReadContext();
+    setNotificationTab('all');
   };
 
   const filteredNotifications = notifications.filter(notif => {
@@ -422,20 +278,8 @@ const ProfileSettings: React.FC = () => {
   });
 
   const handleNotificationClick = async (notif: any) => {
-    setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
-
-    if (!notif.id) {
-      // nothing to persist
-    } else {
-      try {
-        const token = localStorage.getItem('accessToken');
-        await fetch(`${process.env.REACT_APP_API_URL}/notifications/${notif.id}/read`, {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-        });
-      } catch (e) {
-        console.warn('Failed to mark notification read', e);
-      }
+    if (notif.id) {
+      await markAsRead(notif.id);
     }
 
     if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
@@ -448,29 +292,114 @@ const ProfileSettings: React.FC = () => {
   };
 
   const getNotificationSenderName = (notif: any) => {
-    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.title) {
+    // Parse meta if it's a string
+    let meta = notif.meta;
+    if (typeof meta === 'string') {
+      try {
+        meta = JSON.parse(meta);
+      } catch (e) {
+        meta = null;
+      }
+    }
+
+    // For product notifications, use seller name from meta or title
+    if (notif.type === 'product') {
+      const sellerName = meta?.sellerName || notif.meta?.sellerName || notif.title;
+      if (sellerName && sellerName !== 'A seller' && sellerName !== 'Notification') {
+        return sellerName;
+      }
+      // Try to get from actor if available
+      if (notif.actor?.firstName || notif.actor?.lastName) {
+        return `${notif.actor.firstName || ''} ${notif.actor.lastName || ''}`.trim() || 'A seller';
+      }
+      return 'A seller';
+    }
+
+    // For message notifications
+    if (notif.type === 'NEW_MESSAGE' || notif.type === 'message') {
+      if (notif.title && notif.title !== 'Notification' && notif.title !== 'Someone') {
+        return notif.title;
+      }
+      // Try to get from actor
+      if (notif.actor?.firstName || notif.actor?.lastName) {
+        return `${notif.actor.firstName || ''} ${notif.actor.lastName || ''}`.trim() || 'Someone';
+      }
+      return 'Someone';
+    }
+
+    // For other notifications
+    if (notif.title && notif.title !== 'Notification') {
       return notif.title;
     }
 
-    if (notif.title && notif.title !== 'Notification') {
-      return notif.title
-    }
+    return 'Someone';
   };
 
   const getNotificationAvatar = (notif: any) => {
-    if (notif.actor?.profileImage) {
-      return notif.actor.profileImage
+    const tryUrl = (u?: string | null) => {
+      if (!u) return null;
+      // if relative path, prefix with API url
+      if (!/^https?:\/\//i.test(u) && process.env.REACT_APP_API_URL) {
+        return `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/${u.replace(/^\//, '')}`;
+      }
+      return u;
     };
 
-    if (notif.senderAvatar) {
-      return notif.senderAvatar
-    };
-
-    if (notif.meta?.senderImage) {
-      return notif.meta.senderImage;
+    // Parse meta if it's a string
+    let meta = notif.meta;
+    if (typeof meta === 'string') {
+      try {
+        meta = JSON.parse(meta);
+      } catch (e) {
+        meta = null;
+      }
     }
 
-    return avatar;
+    // For message notifications, show sender's profile image
+    if (notif.type === 'message' || notif.type === 'NEW_MESSAGE') {
+      const srcCandidates = [
+        notif.actor?.profileImage,
+        notif.actor?.avatar,
+        notif.senderAvatar,
+        notif.senderImage,
+        meta?.senderImage,
+        meta?.actorImage,
+        notif.meta?.senderImage,
+        notif.meta?.actorImage
+      ];
+
+      for (const c of srcCandidates) {
+        const resolved = tryUrl(c);
+        if (resolved) return resolved;
+      }
+      return avatar; // Fallback to default avatar for messages
+    }
+
+    // For product notifications, show seller's image if available, otherwise logo
+    if (notif.type === 'product') {
+      const sellerImage = meta?.sellerImage || notif.meta?.sellerImage || notif.actor?.profileImage || notif.sellerImage;
+      const resolved = tryUrl(sellerImage);
+      if (resolved) return resolved;
+      // Return null for product notifications to show logo instead
+      return null;
+    }
+
+    // For other notifications, show actor image if available
+    const srcCandidates = [
+      notif.actor?.profileImage,
+      notif.actor?.avatar,
+      notif.senderAvatar,
+      meta?.senderImage,
+      meta?.actorImage,
+      notif.meta?.senderImage,
+      notif.meta?.actorImage
+    ];
+
+    for (const c of srcCandidates) {
+      const resolved = tryUrl(c);
+      if (resolved) return resolved;
+    }
+    return null; // Return null to show logo for non-message notifications
   };
 
   // Function to reload user data from backend
@@ -3248,7 +3177,13 @@ const ProfileSettings: React.FC = () => {
                       {/* Notification Button */}
                       <div className="relative notification-dropdown">
                         <button
-                          onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                          onClick={async () => {
+                            if (!isNotificationOpen) {
+                              // Refresh notifications when opening dropdown
+                              await refreshNotifications();
+                            }
+                            setIsNotificationOpen(!isNotificationOpen);
+                          }}
                           className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 focus:outline-none transition-all duration-200 relative"
                           title="Notifications"
                           aria-label="View notifications"
@@ -3259,10 +3194,10 @@ const ProfileSettings: React.FC = () => {
                             className="w-6 h-6"
                             style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
                           />
-                          {unreadCount > 0 && (
-                            <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF0000' }}>
-                              <span className="text-white font-medium" style={{ fontSize: '9px' }}>{unreadCount}</span>
-                            </div>
+                          {notificationCount > 0 && (
+                            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                              {notificationCount}
+                            </span>
                           )}
                         </button>
 
@@ -3347,66 +3282,156 @@ const ProfileSettings: React.FC = () => {
                             >
                               <style>
                                 {`
-                                                    .notification-dropdown::-webkit-scrollbar {
-                                                      display: none;
-                                                    }
-                                                  `}
+                                  .notification-dropdown::-webkit-scrollbar {
+                                    display: none;
+                                  }
+                                `}
                               </style>
                               {/* Render notifications grouped by day */}
-                              {['Today', 'Yesterday'].map(day => {
-                                const dayNotifs = filteredNotifications.filter(n => n.day === day);
-                                if (dayNotifs.length === 0) return null;
+                              {(() => {
+                                // Get unique days from notifications
+                                const days = Array.from(new Set(filteredNotifications.map(n => n.day || 'Other').filter(Boolean)));
+                                return days.map(day => {
+                                  const dayNotifs = filteredNotifications.filter(n => (n.day || 'Other') === day);
+                                  if (dayNotifs.length === 0) return null;
 
-                                return (
-                                  <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
-                                    <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
+                                  return (
+                                    <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
+                                      <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
+                                      {dayNotifs.map((notif, idx) => (
+                                        <div
+                                          key={notif.id || idx}
+                                          className="transition-colors cursor-pointer"
+                                          style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
+                                          onClick={() => handleNotificationClick(notif)}
+                                        >
+                                          <div className="flex items-start space-x-4 py-3 px-6">
+                                            <div className="relative flex-shrink-0">
+                                              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
+                                                backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
+                                                border: '2px solid white'
+                                              }}>
+                                                {(() => {
+                                                  const avatarUrl = getNotificationAvatar(notif);
+                                                  const isMessage = notif.type === 'message' || notif.type === 'NEW_MESSAGE';
 
-                                    {dayNotifs.map((notif, idx) => (
-                                      <div
-                                        key={notif.id || idx}
-                                        className="transition-colors cursor-pointer"
-                                        style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
-                                        onClick={() => handleNotificationClick(notif)}
-                                      >
-                                        <div className="flex items-start space-x-4 py-3 px-6">
-                                          <div className="relative flex-shrink-0">
-                                            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
-                                              backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
-                                              border: '2px solid white'
-                                            }}>
-                                              {notif.type === 'message' ? (
-                                                <img src={getNotificationAvatar(notif)} alt="Avatar" className="w-9 h-9 rounded-full object-cover" />
-                                              ) : (
-                                                <img src={logoIcon} alt="Logo" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
-                                              )}
+                                                  // For messages, always try to show sender's image
+                                                  if (isMessage && avatarUrl) {
+                                                    return (
+                                                      <img
+                                                        src={avatarUrl}
+                                                        alt="Avatar"
+                                                        className="w-9 h-9 rounded-full object-cover"
+                                                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
+                                                      />
+                                                    );
+                                                  }
+
+                                                  // For product notifications, show seller image if available
+                                                  if (notif.type === 'product' && avatarUrl) {
+                                                    return (
+                                                      <img
+                                                        src={avatarUrl}
+                                                        alt="Seller"
+                                                        className="w-9 h-9 rounded-full object-cover"
+                                                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
+                                                      />
+                                                    );
+                                                  }
+
+                                                  // For all other cases, show logo
+                                                  return (
+                                                    <img
+                                                      src={logoIcon}
+                                                      alt="Logo"
+                                                      className="w-7 h-7"
+                                                      style={{ filter: 'brightness(0) invert(1)' }}
+                                                    />
+                                                  );
+                                                })()}
+                                              </div>
+                                              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
+                                                <img src={(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
+                                              </div>
                                             </div>
-                                            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
-                                              <img src={notif.type === 'message' ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-start justify-between">
+                                                <div className="flex-1 min-w-0">
+                                                  {/* Message notifications */}
+                                                  {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
+                                                    <>
+                                                      <p style={{ fontSize: '14px' }}>
+                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                          {getNotificationSenderName(notif)}
+                                                        </span>
+                                                        <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                      </p>
+                                                      {notif.meta?.preview && (
+                                                        <p
+                                                          className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                                                          style={{
+                                                            color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
+                                                            fontSize: '13px',
+                                                            textDecoration: 'underline'
+                                                          }}
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleNotificationClick(notif);
+                                                          }}
+                                                        >
+                                                          Click to view
+                                                        </p>
+                                                      )}
+                                                    </>
+                                                  ) : (
+                                                    /* App notifications (product, etc.) */
+                                                    <>
+                                                      <p style={{ fontSize: '14px' }}>
+                                                        {(notif.text || notif.meta?.text || notif.title) ? (
+                                                          <>
+                                                            <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                              {notif.text || notif.meta?.text || notif.title || getNotificationSenderName(notif)}
+                                                            </span>
+                                                            {(notif.additionalText || notif.meta?.additionalText) && (
+                                                              <span style={{ color: '#939393' }}> {notif.additionalText || notif.meta.additionalText}</span>
+                                                            )}
+                                                            {!notif.additionalText && !notif.meta?.additionalText && notif.body && (
+                                                              <span style={{ color: '#939393' }}> {notif.body}</span>
+                                                            )}
+                                                          </>
+                                                        ) : (
+                                                          <>
+                                                            <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                              {notif.title || getNotificationSenderName(notif)}
+                                                            </span>
+                                                            {notif.body && <span style={{ color: '#939393' }}> {notif.body}</span>}
+                                                          </>
+                                                        )}
+                                                      </p>
+                                                      {(notif.subText || notif.meta?.subText) && (
+                                                        <p className="mt-1.5" style={{ color: '#9E9E9E', fontSize: '13px' }}>
+                                                          {notif.subText || notif.meta?.subText}
+                                                        </p>
+                                                      )}
+                                                    </>
+                                                  )}
+                                                </div>
+                                                <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
+                                                  {notif.time && (
+                                                    <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
+                                                  )}
+                                                  {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
+                                                </div>
+                                              </div>
                                             </div>
                                           </div>
-                                          <div className="flex-1 min-w-0">
-                                            <div className="flex items-start justify-between">
-                                              <div className="flex-1 min-w-0">
-                                                <p style={{ fontSize: '14px' }}>
-                                                  <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                    {getNotificationSenderName(notif)}
-                                                  </span>
-                                                  <span style={{ color: '#939393' }}> {notif.body || notif.text || ''}</span>
-                                                </p>
-                                              </div>
-                                              <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
-                                                <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
-                                                {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
-                                              </div>
-                                            </div>
-                                          </div>
+                                          <div className="border-b border-gray-100" />
                                         </div>
-                                        <div className="border-b border-gray-100" />
-                                      </div>
-                                    ))}
-                                  </div>
-                                );
-                              })}
+                                      ))}
+                                    </div>
+                                  );
+                                });
+                              })()}
                             </div>
 
                             {/* Footer */}

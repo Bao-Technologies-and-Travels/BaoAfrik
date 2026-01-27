@@ -1171,7 +1171,6 @@ const CreateListing: React.FC = () => {
   };
 
   const handlePostListing = async () => {
-    // if (!validateRequiredFields()) return;
     setIsPostingListing(true);
     setIsSavingDraft(false);
 
@@ -1208,6 +1207,13 @@ const CreateListing: React.FC = () => {
         return;
       }
 
+      // Ensure at least one image has been uploaded
+      if (images.length === 0 && imageUrls.length === 0) {
+        addToast({ type: 'error', title: 'Image required', message: 'At least 1 photo of the product must be uploaded', duration: 2000 });
+        setIsPostingListing(false);
+        return;
+      }
+
       // Build payload with correct types (omit undefined/null if required)
       const payload: any = {
         title: title?.trim() || '',
@@ -1218,7 +1224,6 @@ const CreateListing: React.FC = () => {
         category,
         origin: origin || undefined,
         location: location || undefined,
-        // saleType,
         deliveryAvailable: Boolean(deliveryAvailable)
       };
 
