@@ -7,6 +7,7 @@ import ov2Icon from '../../assets/images/admin/ov2.svg';
 import perfomanceIcon from '../../assets/images/admin/perfomance.svg';
 import userIcon from '../../assets/images/admin/user.svg';
 import listingboxIcon from '../../assets/images/admin/listingbox.svg';
+import listing2Icon from '../../assets/images/admin/listing2.svg';
 import requesticonIcon from '../../assets/images/admin/requesticon.svg';
 import chatsIcon from '../../assets/images/admin/chats.svg';
 import clockIcon from '../../assets/images/admin/clock.svg';
@@ -159,6 +160,13 @@ const AdminDashboard: React.FC = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedUserEmails, setSelectedUserEmails] = useState<Set<string>>(new Set());
   const [removedUserEmails, setRemovedUserEmails] = useState<Set<string>>(new Set());
+
+  // Listings management page state (same table layout, data changes)
+  const [listingsToggle, setListingsToggle] = useState<'activities' | 'list'>('activities');
+  const [listingsActivityTab, setListingsActivityTab] = useState<'all' | 'posted' | 'reviewed' | 'reported'>('all');
+  const [listingsSortBy, setListingsSortBy] = useState('Sort by');
+  const [listingsPage, setListingsPage] = useState(1);
+  const [listingsGoTo, setListingsGoTo] = useState('');
 
   // More options dropdown (portal)
   const [moreMenu, setMoreMenu] = useState<{
@@ -314,6 +322,160 @@ const AdminDashboard: React.FC = () => {
     { name: 'Kevin Roland Tadjil', email: 'kevin.roland@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post a new listing', plan: 'Pro plan', avatar, avatarBg: '#F6F0FF', isNewUser: false, type: 'posted' as const },
   ];
 
+  // Mock data for Listings Management table (activities)
+  const listingsActivitiesRows = [
+    {
+      productName: 'Snails from South Africa',
+      price: 'USD 45.90',
+      status: 'Under review' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Posted new listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage1,
+      authorAvatar: avatar,
+      authorAvatarBg: '#E3F2FD',
+      type: 'posted' as const
+    },
+    {
+      productName: 'Coconut Oil',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Posted new listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Starter Plan',
+      verified: true,
+      isNewUser: false,
+      productImage: productImage2,
+      authorAvatar: messageAvatarIcon,
+      authorAvatarBg: '#F0F8FE',
+      type: 'posted' as const
+    },
+    {
+      productName: 'African Wristband',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Posted new listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Starter Plan',
+      verified: true,
+      isNewUser: false,
+      productImage: productImage3,
+      authorAvatar: avatar,
+      authorAvatarBg: '#EDFBF0',
+      type: 'posted' as const
+    },
+    {
+      productName: 'Bitter Cola',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Posted new listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Pro Plan',
+      verified: true,
+      isNewUser: false,
+      productImage: productImage1,
+      authorAvatar: messageAvatarIcon,
+      authorAvatarBg: '#F4F4F4',
+      type: 'posted' as const
+    },
+    {
+      productName: 'Schrimps',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Posted new listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage2,
+      authorAvatar: avatar,
+      authorAvatarBg: '#E3F2FD',
+      type: 'posted' as const
+    },
+    {
+      productName: 'Coconut Oil',
+      price: 'USD 45.90',
+      status: 'Deleted' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Deleted a listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage3,
+      authorAvatar: avatar,
+      authorAvatarBg: '#E3F2FD',
+      type: 'reported' as const
+    },
+    {
+      productName: 'Coconut Oil',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Modified a listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage1,
+      authorAvatar: messageAvatarIcon,
+      authorAvatarBg: '#E3F2FD',
+      type: 'reviewed' as const
+    },
+    {
+      productName: 'Coconut Oil',
+      price: 'USD 45.90',
+      status: 'Deleted' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Deleted a listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage2,
+      authorAvatar: avatar,
+      authorAvatarBg: '#E3F2FD',
+      type: 'reported' as const
+    },
+    {
+      productName: 'Coconut Oil',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Reviewed a listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage3,
+      authorAvatar: messageAvatarIcon,
+      authorAvatarBg: '#E3F2FD',
+      type: 'reviewed' as const
+    },
+    {
+      productName: 'Coconut Oil',
+      price: 'USD 45.90',
+      status: 'Active' as const,
+      date: 'Mon, 21 Dec 2024',
+      activity: 'Reported a listing',
+      authorName: 'Clara Vanstone',
+      plan: 'Free Plan',
+      verified: false,
+      isNewUser: true,
+      productImage: productImage1,
+      authorAvatar: avatar,
+      authorAvatarBg: '#E3F2FD',
+      type: 'reported' as const
+    }
+  ];
+
   // Mock data for Users List table
   const usersListRows = [
     { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Free Plan', avatar, avatarBg: '#E3F2FD', isNewUser: true, verified: false },
@@ -348,6 +510,25 @@ const AdminDashboard: React.FC = () => {
   const usersPaginationNumbers = [1, 2, 3];
   const pagedUsersRows = (usersToggle === 'activities' ? filteredUsersActivitiesRows : filteredUsersListRows)
     .slice((usersPage - 1) * usersPageSize, usersPage * usersPageSize);
+
+  const filteredListingsActivitiesRows =
+    (listingsActivityTab === 'all'
+      ? listingsActivitiesRows
+      : listingsActivitiesRows.filter((r) => r.type === listingsActivityTab));
+
+  const listingsPageSize = 6;
+  const listingsTotalPages = 48; // match screenshot pagination
+  const listingsPaginationNumbers = [1, 2, 3];
+  const pagedListingsRows = filteredListingsActivitiesRows
+    .slice((listingsPage - 1) * listingsPageSize, listingsPage * listingsPageSize);
+
+  const getListingStatusColor = (status: string) => {
+    const s = status.toLowerCase();
+    if (s.includes('under')) return '#F9A825';
+    if (s.includes('active')) return '#70E183';
+    if (s.includes('deleted')) return '#FF5151';
+    return '#939393';
+  };
 
   const getPlanBadgeStyle = (plan: string) => {
     const p = plan.toLowerCase();
@@ -1073,7 +1254,7 @@ const AdminDashboard: React.FC = () => {
       section: 'MANAGEMENT',
       value: 'listings',
       label: 'Listings',
-      activeIcon: listingboxIcon,
+      activeIcon: listing2Icon,
       inactiveIcon: listingboxIcon
     },
     {
@@ -8910,6 +9091,403 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
             )
+          ) : selectedSidebarOption === 'listings' ? (
+            <div style={{ paddingRight: '14px' }}>
+              {/* Listings Management Header */}
+              <div style={{ marginTop: '10px', marginBottom: '16px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h1 style={{
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: '#202224',
+                    margin: '0 0 2px 0',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}>
+                    {listingsToggle === 'activities' ? 'Listing activities' : 'Listing lists'}
+                  </h1>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <p style={{
+                      color: '#9C9C9C',
+                      fontSize: '12px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Stay informed about listing trends, behavior and have a comprehensive activity tracking.
+                    </p>
+
+                    {/* Toggle (aligned with description) */}
+                    <div style={{
+                      backgroundColor: '#F4F4F4',
+                      borderRadius: '9px',
+                      padding: '3px',
+                      display: 'flex',
+                      gap: '3px',
+                      flexShrink: 0,
+                      border: '1px solid #F1F1F1'
+                    }}>
+                      {[
+                        { key: 'activities', label: 'Listing Activities' },
+                        { key: 'list', label: 'Listing lists' }
+                      ].map((t) => {
+                        const isActive = listingsToggle === (t.key as 'activities' | 'list');
+                        return (
+                          <button
+                            key={t.key}
+                            onClick={() => setListingsToggle(t.key as 'activities' | 'list')}
+                            style={{
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '6px 10px',
+                              borderRadius: '7px',
+                              backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                              color: isActive ? '#64B5F6' : '#939393',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: 1,
+                              whiteSpace: 'nowrap',
+                              boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.05)' : 'none'
+                            }}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main table container */}
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                padding: '14px',
+                border: '1px solid #F1F1F1'
+              }}>
+                {/* Top bar: tabs + Export data + Sort by */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                    {[
+                      { key: 'all', label: 'All listings activities' },
+                      { key: 'posted', label: 'Posted' },
+                      { key: 'reviewed', label: 'Reviewed' },
+                      { key: 'reported', label: 'Reported' }
+                    ].map((t) => {
+                      const isActive = listingsActivityTab === (t.key as any);
+                      return (
+                        <div
+                          key={t.key}
+                          onClick={() => {
+                            setListingsActivityTab(t.key as any);
+                            setListingsPage(1);
+                          }}
+                          style={{
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            color: isActive ? '#64B5F6' : '#B0B0B0',
+                            cursor: 'pointer',
+                            paddingBottom: '8px',
+                            borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {t.label}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button
+                      type="button"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#64B5F6',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <span>Export data</span>
+                      <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px' }} />
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>Sort by</span>
+                      <button
+                        type="button"
+                        onClick={() => setListingsSortBy((prev) => (prev === 'Sort by' ? 'Most recent' : 'Sort by'))}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#939393',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0
+                        }}
+                      >
+                        <span>{listingsSortBy}</span>
+                        <img src={arrowDownIcon} alt="Sort" style={{ width: '14px', height: '14px' }} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
+
+                {/* Column headers */}
+                <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0 12px 0' }}>
+                  {[
+                    { key: 'Listings', label: 'Listings' },
+                    { key: 'Date of creation', label: 'Date of creation' },
+                    { key: 'Activity', label: 'Activity' },
+                    { key: 'Author', label: 'Author' },
+                    { key: 'Actions', label: 'Actions' }
+                  ].map((h) => (
+                    <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {h.label}
+                      {h.key !== 'Actions' && (
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 8l-6-6-6 6" />
+                          <path d="M18 16l-6 6-6-6" />
+                        </svg>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1' }} />
+
+                {/* Rows */}
+                <div>
+                  {pagedListingsRows.map((row, idx) => (
+                    <div
+                      key={`${row.productName}-${idx}`}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr',
+                        gap: '10px',
+                        padding: '14px 8px',
+                        borderBottom: idx < pagedListingsRows.length - 1 ? '1px solid #F1F1F1' : 'none',
+                        backgroundColor: 'transparent',
+                        borderRadius: 0
+                      }}
+                    >
+                      {/* Listings column */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
+                          <img src={row.productImage} alt={row.productName} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {row.productName}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', minWidth: 0 }}>
+                            <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.price}</span>
+                            <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
+                            <span style={{ fontSize: '10px', color: getListingStatusColor(row.status), fontFamily: 'Bricolage Grotesque, sans-serif', whiteSpace: 'nowrap' }}>
+                              {row.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date of creation */}
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.date}</div>
+
+                      {/* Activity */}
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.activity}</div>
+
+                      {/* Author */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: row.authorAvatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          <img src={row.authorAvatar} alt={row.authorName} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.authorName}
+                            </span>
+                            {row.isNewUser && (
+                              <span style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '8px', borderRadius: '4px', padding: '2px 6px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
+                                New user
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                            <span style={{ fontSize: '10px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.plan}</span>
+                            <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#B0B0B0', display: 'inline-block' }} />
+                            <span style={{ fontSize: '10px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
+                              {row.verified ? 'Verified' : 'Unverified'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}>
+                        <button
+                          type="button"
+                          style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            border: '0.3px solid #B0B0B0',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer',
+                            padding: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                            <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination (same as users) */}
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '8px' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button
+                      aria-label="Previous page"
+                      onClick={() => setListingsPage((p) => Math.max(1, p - 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F0F0F0',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                      {listingsPaginationNumbers.map((page) => (
+                        <span
+                          key={page}
+                          onClick={() => setListingsPage(page)}
+                          style={{
+                            cursor: 'pointer',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '14px',
+                            color: listingsPage === page ? '#212121' : '#B0B0B0',
+                            fontWeight: listingsPage === page ? 600 : 500
+                          }}
+                        >
+                          {page}
+                        </span>
+                      ))}
+                      <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>...</span>
+                      <span
+                        onClick={() => setListingsPage(listingsTotalPages)}
+                        style={{
+                          cursor: 'pointer',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          color: listingsPage === listingsTotalPages ? '#212121' : '#B0B0B0',
+                          fontWeight: listingsPage === listingsTotalPages ? 600 : 500
+                        }}
+                      >
+                        {listingsTotalPages}
+                      </span>
+                    </div>
+
+                    <button
+                      aria-label="Next page"
+                      onClick={() => setListingsPage((p) => Math.min(listingsTotalPages, p + 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E9E9E9',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+                    <input
+                      type="text"
+                      placeholder="e.g 40"
+                      value={listingsGoTo}
+                      onChange={(e) => setListingsGoTo(e.target.value)}
+                      style={{
+                        border: '1px solid #BABABA',
+                        borderRadius: '8px',
+                        padding: '6px 10px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        color: '#D9D9D9',
+                        width: '64px',
+                        textAlign: 'center'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const n = parseInt(listingsGoTo, 10);
+                        if (!Number.isNaN(n)) setListingsPage(Math.min(listingsTotalPages, Math.max(1, n)));
+                      }}
+                      style={{
+                        backgroundColor: '#212121',
+                        color: '#FFFFFF',
+                        borderRadius: '8px',
+                        padding: '6px 14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Go
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : (
           <div>
             {/* Metrics Cards and Reported Issues Container */}
