@@ -281,14 +281,6 @@ const ProfileSettings: React.FC = () => {
     if (notif.id) {
       await markAsRead(notif.id);
     }
-
-    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
-      navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
-      setIsNotificationOpen(false);
-    } else {
-      navigate('/notifications', { state: { notificationId: notif.id } });
-      setIsNotificationOpen(false);
-    }
   };
 
   const getNotificationSenderName = (notif: any) => {
@@ -3357,16 +3349,44 @@ const ProfileSettings: React.FC = () => {
                                             <div className="flex-1 min-w-0">
                                               <div className="flex items-start justify-between">
                                                 <div className="flex-1 min-w-0">
-                                                  {/* Message notifications */}
-                                                  {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
-                                                    <>
-                                                      <p style={{ fontSize: '14px' }}>
-                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                          {getNotificationSenderName(notif)}
-                                                        </span>
-                                                        <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
-                                                      </p>
-                                                      {notif.meta?.preview && (
+                                              {/* Message notifications */}
+                                              {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
+                                                <>
+                                                  <p style={{ fontSize: '14px' }}>
+                                                    {(() => {
+                                                      const isReaction =
+                                                        notif.meta?.messageType === 'REACTION' ||
+                                                        notif.meta?.type === 'reaction' ||
+                                                        Boolean(notif.meta?.reaction);
+                                                      const senderName = getNotificationSenderName(notif);
+                                                      const reactionValue = notif.meta?.reaction;
+
+                                                      if (isReaction && reactionValue) {
+                                                        return (
+                                                          <>
+                                                            <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                              {senderName}
+                                                            </span>
+                                                            <span style={{ color: '#939393' }}> reacted "{reactionValue}" to a message</span>
+                                                          </>
+                                                        );
+                                                      }
+
+                                                      return (
+                                                        <>
+                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                            {senderName}
+                                                          </span>
+                                                          <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                        </>
+                                                      );
+                                                    })()}
+                                                  </p>
+                                                  {notif.meta?.preview && !(
+                                                    notif.meta?.messageType === 'REACTION' ||
+                                                    notif.meta?.type === 'reaction' ||
+                                                    Boolean(notif.meta?.reaction)
+                                                  ) && (
                                                         <p
                                                           className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
                                                           style={{

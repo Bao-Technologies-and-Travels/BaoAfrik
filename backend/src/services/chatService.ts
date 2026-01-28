@@ -736,36 +736,103 @@ export class ChatService {
         const dbEncryptAvailable = await this.checkDbEncryptAvailable();
 
         return await prisma.$transaction(async (tx: any) => {
-            // Find conversations where both users are participants
-            const possibleConvs = await tx.conversation.findMany({
-                where: {
-                    participants: {
-                        some: { userId: data.creatorId }
+            // If productId is provided, check if a conversation already exists for this product between these users
+            if (data.productId) {
+                // Find all conversations with this productId
+                const productConvs = await tx.conversation.findMany({
+                    where: {
+                        productId: data.productId
                     },
-                    AND: [
-                        { participants: { some: { userId: data.participantId } } }
-                    ]
-                },
-                include: {
-                    participants: true
+                    include: {
+                        participants: {
+                            include: {
+                                user: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true,
+                                        profileImage: true
+                                    }
+                                }
+                            }
+                        },
+                        product: {
+                            select: {
+                                id: true,
+                                title: true,
+                                price: true,
+                                images: true,
+                                seller: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Check if any of these conversations has both users as participants (exactly 2 participants)
+                const existingConv = productConvs.find((conv: any) => {
+                    const participantIds = conv.participants.map((p: any) => p.userId);
+                    const hasCreator = participantIds.includes(data.creatorId);
+                    const hasParticipant = participantIds.includes(data.participantId);
+                    const hasExactlyTwo = participantIds.length === 2;
+                    return hasCreator && hasParticipant && hasExactlyTwo;
+                });
+
+                // If conversation exists for this product, return it
+                if (existingConv) {
+                    // Update productData if provided (to ensure it's current)
+                    if (data.productData) {
+                        await tx.conversation.update({
+                            where: { id: existingConv.id },
+                            data: {
+                                productData: JSON.stringify(data.productData),
+                                updatedAt: new Date()
+                            }
+                        });
+                        existingConv.productData = JSON.stringify(data.productData);
+                    }
+                    return existingConv;
                 }
-            });
+            } else {
+                // For non-product conversations (e.g., requests), check if conversation exists
+                // Find conversations where both users are participants
+                const possibleConvs = await tx.conversation.findMany({
+                    where: {
+                        productId: null, // Only check conversations without products
+                        participants: {
+                            some: { userId: data.creatorId }
+                        },
+                        AND: [
+                            { participants: { some: { userId: data.participantId } } }
+                        ]
+                    },
+                    include: {
+                        participants: true
+                    }
+                });
 
-            // Check if conversation already exists
-            // const existingConv = possibleConvs.find((conv: any) => conv.participants.length === 2);
+                // Check if conversation already exists (exactly 2 participants)
+                const existingConv = possibleConvs.find((conv: any) => conv.participants.length === 2);
 
-            // if (existingConv) {
-            //     if (data.productData) {
-            //         await tx.conversation.update({
-            //             where: { id: existingConv.id },
-            //             data: {
-            //                 productData: JSON.stringify(data.productData)
-            //             }
-            //         });
-            //         existingConv.productData = JSON.stringify(data.productData);
-            //     }
-            //     return existingConv;
-            // }
+                if (existingConv) {
+                    if (data.productData) {
+                        await tx.conversation.update({
+                            where: { id: existingConv.id },
+                            data: {
+                                productData: JSON.stringify(data.productData),
+                                updatedAt: new Date()
+                            }
+                        });
+                        existingConv.productData = JSON.stringify(data.productData);
+                    }
+                    return existingConv;
+                }
+            }
 
             const now = new Date();
 

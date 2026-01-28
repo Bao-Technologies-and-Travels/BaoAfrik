@@ -675,12 +675,40 @@ const Header: React.FC<HeaderProps> = ({
                                               {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
                                                 <>
                                                   <p style={{ fontSize: '14px' }}>
-                                                    <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                      {getNotificationSenderName(notif)}
-                                                    </span>
-                                                    <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                    {(() => {
+                                                      const isReaction =
+                                                        notif.meta?.messageType === 'REACTION' ||
+                                                        notif.meta?.type === 'reaction' ||
+                                                        Boolean(notif.meta?.reaction);
+                                                      const senderName = getNotificationSenderName(notif);
+                                                      const reactionValue = notif.meta?.reaction;
+
+                                                      if (isReaction && reactionValue) {
+                                                        return (
+                                                          <>
+                                                            <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                              {senderName}
+                                                            </span>
+                                                            <span style={{ color: '#939393' }}> reacted "{reactionValue}" to a message</span>
+                                                          </>
+                                                        );
+                                                      }
+
+                                                      return (
+                                                        <>
+                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                            {senderName}
+                                                          </span>
+                                                          <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                        </>
+                                                      );
+                                                    })()}
                                                   </p>
-                                                  {notif.meta?.preview && (
+                                                  {notif.meta?.preview && !(
+                                                    notif.meta?.messageType === 'REACTION' ||
+                                                    notif.meta!.type === 'reaction' ||
+                                                    Boolean(notif.meta?.reaction)
+                                                  ) && (
                                                     <p
                                                       className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
                                                       style={{

@@ -1097,13 +1097,13 @@ const SellerProfile: React.FC = () => {
               </div>
 
               {/* Useful link */}
-              <div>
+              {/* <div>
                 <h4 className="text-base font-semibold mb-3" style={{ color: '#6A6A6A' }}>Useful link</h4>
                 <div className="flex items-center space-x-2">
                   <img src={locationIcon} alt="Link" className="w-4 h-4" />
                   <span className="text-sm" style={{ color: '#64B5F6' }}>user-randomlink.com</span>
                 </div>
-              </div>
+              </div> */}
 
               {/* Member Since */}
               <div>

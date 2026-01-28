@@ -747,10 +747,30 @@ const Notifications: React.FC = () => {
                             <div className="flex-1 min-w-0">
                               <p style={{ fontSize: '15px', color: notif.isRead ? '#939393' : '#616161' }}>
                                 {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
-                                  <>
-                                    <span className="font-semibold">{getActorName(notif)}</span>
-                                    <span> {notif.body || 'sent you a message'}</span>
-                                  </>
+                                  (() => {
+                                    const isReaction =
+                                      notif.meta?.messageType === 'REACTION' ||
+                                      notif.meta?.type === 'reaction' ||
+                                      Boolean((notif as any).meta?.reaction);
+                                    const senderName = getActorName(notif);
+                                    const reactionValue = (notif as any).meta?.reaction;
+
+                                    if (isReaction && reactionValue) {
+                                      return (
+                                        <>
+                                          <span className="font-semibold">{senderName}</span>
+                                          <span> reacted "{reactionValue}" to a message</span>
+                                        </>
+                                      );
+                                    }
+
+                                    return (
+                                      <>
+                                        <span className="font-semibold">{senderName}</span>
+                                        <span> {notif.body || 'sent you a message'}</span>
+                                      </>
+                                    );
+                                  })()
                                 ) : (
                                   <>
                                     <span className="font-semibold">{notif.title}</span>
@@ -759,7 +779,11 @@ const Notifications: React.FC = () => {
                                 )}
                               </p>
 
-                              {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') && (
+                              {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') && !(
+                                notif.meta?.messageType === 'REACTION' ||
+                                notif.meta?.type === 'reaction' ||
+                                Boolean((notif as any).meta?.reaction)
+                              ) && (
                                 <p
                                   className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
                                   style={{

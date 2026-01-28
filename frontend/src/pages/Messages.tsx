@@ -664,7 +664,16 @@ const Messages: React.FC = (): JSX.Element => {
   });
 
   const handleNotificationClick = async (notif: any) => {
+    // Check if notification was already read
+    const wasAlreadyRead = notifications.find(n => n.id === notif.id)?.isRead;
+    
+    // Update local state optimistically
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+    
+    // Update count only if it wasn't already read
+    if (!wasAlreadyRead) {
+      setNotificationCount(prev => Math.max(0, prev - 1));
+    }
 
     if (!notif.id) {
       // nothing to persist
@@ -675,17 +684,11 @@ const Messages: React.FC = (): JSX.Element => {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
+        // Refresh notifications to get accurate count from backend
+        await refreshNotifications();
       } catch (e) {
         console.warn('Failed to mark notification read', e);
       }
-    }
-
-    if ((notif.type === 'NEW_MESSAGE' || notif.type === 'message') && notif.meta?.conversationId) {
-      navigate('/messages', { state: { conversationId: notif.meta.conversationId } });
-      setIsNotificationOpen(false);
-    } else {
-      navigate('/notifications', { state: { notificationId: notif.id } });
-      setIsNotificationOpen(false);
     }
   };
 
@@ -2415,7 +2418,8 @@ const Messages: React.FC = (): JSX.Element => {
     setSelectedEmoji(emojiObject.emoji);
     // Add the emoji to the message input
     setMessageText(prev => prev + emojiObject.emoji);
-    setShowEmojiPicker(false);
+    // Keep emoji picker open to allow multiple selections
+    // setShowEmojiPicker(false);
     // Trigger typing detection when emoji is added
     handleTypingDetection();
   };
@@ -2455,6 +2459,27 @@ const Messages: React.FC = (): JSX.Element => {
   // Function to format last message text for sidebar - returns object with type and content
   const formatLastMessagePreview = (message: any, isIncoming: boolean = false): { type: 'text' | 'audio' | 'image' | 'document'; text: string; duration?: number } => {
     if (!message) return { type: 'text', text: '' };
+
+    // If there are reactions on this message, treat the most recent reaction
+    // as the "last message" in the sidebar preview.
+    const reactionEntries = Array.isArray(message.reactions) ? message.reactions : [];
+    const latestReaction = reactionEntries.length > 0 ? reactionEntries[reactionEntries.length - 1] : null;
+    if (latestReaction && latestReaction.reaction) {
+      const reactorUser = latestReaction.user || {};
+      const reactorId = latestReaction.userId || reactorUser.id;
+      const isYou = user?.id && reactorId && String(user.id) === String(reactorId);
+
+      const first = reactorUser.firstName || '';
+      const last = reactorUser.lastName || '';
+      const otherName = `${first} ${last}`.trim() || 'User';
+      const displayName = isYou ? 'You' : otherName;
+
+      const reactionText = latestReaction.reaction;
+      return {
+        type: 'text',
+        text: `${displayName} reacted "${reactionText}" to a message`
+      };
+    }
 
     // Check for audio/voice message - check multiple sources
     const isVoiceMessage = message.audioUrl ||
@@ -3305,12 +3330,8 @@ const Messages: React.FC = (): JSX.Element => {
       const messageContent = (content.trim() || preFilledMessage.trim() || '');
       const tempId = `temp_${Date.now()}_${Math.random()}`;
 
-      // Prepare productData for sending - only if this is the first message (no messages sent yet)
-      // Check if any message in the conversation already has productData
-      const hasExistingProductInquiry = messages.some(m => m.isProductInquiry || m.productData);
-
       let productDataToSend: any = null;
-      if (productData && !hasExistingProductInquiry && !isMessageSent) {
+      if (productData && !isMessageSent) {
         productDataToSend = {
           id: productData.id,
           name: productData.name || productData.title,
@@ -3332,7 +3353,6 @@ const Messages: React.FC = (): JSX.Element => {
         setProductData(null);
       }
 
-      // Create temporary message for optimistic UI (will be replaced by backend response)
       // Include selected files for preview while uploading
       const images: File[] = [];
       const documents: File[] = [];
@@ -4218,10 +4238,10 @@ const Messages: React.FC = (): JSX.Element => {
                     {/* Website and Location - Side by Side */}
                     <div className="flex items-center justify-center space-x-3 mb-2">
                       {/* Website */}
-                      <div className="flex items-center space-x-0.5">
+                      {/* <div className="flex items-center space-x-0.5">
                         <img src={earthIcon} alt="Website" className="w-3 h-3" />
                         <span style={{ fontSize: '10px', color: '#64B5F6' }}>user-randomlink.com</span>
-                      </div>
+                      </div> */}
 
                       {/* Location */}
                       <div className="flex items-center space-x-0.5">
@@ -5912,8 +5932,16 @@ const Messages: React.FC = (): JSX.Element => {
                       // Prefer explicit label, fall back to product title so each conversation shows the product name
                       const conversationLabel = conv.label || conv.product?.title || null;
                       const lastMessage = conv.lastMessage;
-                      const isIncoming = lastMessage && lastMessage.senderId !== user?.id;
-                      const lastMessagePreview = formatLastMessagePreview(lastMessage, isIncoming);
+                      // If we have reactions on the lastMessage, treat the *latest reaction* as the "last message" for preview
+                      // and compute incoming/outgoing based on the reactor (not the original message sender).
+                      const reactionEntries = Array.isArray(lastMessage?.reactions) ? lastMessage.reactions : [];
+                      const latestReaction = reactionEntries.length > 0 ? reactionEntries[reactionEntries.length - 1] : null;
+                      const reactorId = latestReaction?.userId || latestReaction?.user?.id;
+                      const isIncomingPreview = latestReaction?.reaction
+                        ? (String(reactorId) !== String(user?.id))
+                        : (lastMessage && lastMessage.senderId !== user?.id);
+
+                      const lastMessagePreview = formatLastMessagePreview(lastMessage, isIncomingPreview);
                       const lastMessageTime = lastMessage?.createdAt
                         ? new Date(lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : (conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
@@ -6004,7 +6032,7 @@ const Messages: React.FC = (): JSX.Element => {
                                     </span>
                                   ) : lastMessagePreview.text ? (
                                     <>
-                                      {isIncoming ? null : (
+                                      {isIncomingPreview ? null : (
                                         <span
                                           className="px-1 py-0.5 rounded text-xs font-medium mr-1"
                                           style={{
@@ -6056,9 +6084,9 @@ const Messages: React.FC = (): JSX.Element => {
                                   )}
                                 </p>
                                 <div className="flex items-center ml-2">
-                                  {isIncoming && unreadCount > 0 ? (
+                                  {isIncomingPreview && unreadCount > 0 ? (
                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#64B5F6' }}></div>
-                                  ) : lastMessage && !isIncoming ? (
+                                  ) : lastMessage && !isIncomingPreview ? (
                                     (() => {
                                       // Get status from lastMessage.statuses array (from backend) or messageStatuses state
                                       // Always show status for sent messages
@@ -7075,7 +7103,7 @@ const Messages: React.FC = (): JSX.Element => {
 
                           {/* Seller Info */}
                           <div className="flex items-center justify-center space-x-6 text-sm mb-4">
-                            <div className="flex items-center space-x-2">
+                            {/* <div className="flex items-center space-x-2">
                               <img
                                 src={earthIcon}
                                 alt="Website"
@@ -7084,7 +7112,7 @@ const Messages: React.FC = (): JSX.Element => {
                               <span style={{ color: "#64B5F6" }}>
                                 {currentConversation?.otherParticipant?.website || 'user-randomlink.com'}
                               </span>
-                            </div>
+                            </div> */}
                             <div className="flex items-center space-x-2">
                               <img
                                 src={locIcon}

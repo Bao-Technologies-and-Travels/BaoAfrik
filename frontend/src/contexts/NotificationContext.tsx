@@ -162,21 +162,31 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       const token = localStorage.getItem('accessToken');
       if (!token) return;
 
+      // Check if notification is already read before making the request
+      const wasAlreadyRead = notifications.find(n => n.id === notificationId)?.isRead;
+
       await fetch(`${process.env.REACT_APP_API_URL}/notifications/${notificationId}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
 
       // Update local state optimistically
-      setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n));
-      setNotificationCount(prev => Math.max(0, prev - 1));
+      setNotifications(prev => {
+        const updated = prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n);
+        // Recalculate count from unread notifications (only if it wasn't already read)
+        if (!wasAlreadyRead) {
+          const unreadCount = updated.filter(n => !n.isRead).length;
+          setNotificationCount(unreadCount);
+        }
+        return updated;
+      });
 
-      // Refresh to ensure persistence
+      // Refresh to ensure persistence and get accurate count from backend
       await refreshNotifications();
     } catch (e) {
       console.warn('Failed to mark notification as read', e);
     }
-  }, [refreshNotifications]);
+  }, [refreshNotifications, notifications]);
 
   // Mark all notifications as read
   const markAllAsRead = useCallback(async () => {
