@@ -58,6 +58,7 @@ import calendarIcon from '../../assets/images/pre/calendar.svg';
 import locIcon from '../../assets/images/admin/loc.svg';
 import globeIcon from '../../assets/images/admin/globe.svg';
 import monitorIcon from '../../assets/images/admin/monitor.svg';
+import deleteIcon from '../../assets/images/admin/delete.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -220,6 +221,10 @@ const AdminDashboard: React.FC = () => {
   const [userToDeleteAccount, setUserToDeleteAccount] = useState<string | null>(null);
   const [isDeleteUserSuccess, setIsDeleteUserSuccess] = useState(false);
   const [deleteUserCountdown, setDeleteUserCountdown] = useState(5);
+  const [reportToDelete, setReportToDelete] = useState<{ reportId: string; reportTitle: string; reporterName: string } | null>(null);
+  const [isDeleteReportSuccess, setIsDeleteReportSuccess] = useState(false);
+  const [deleteReportCountdown, setDeleteReportCountdown] = useState(5);
+  const [deletedReportIds, setDeletedReportIds] = useState<Set<string>>(new Set());
   const [userToSuspend, setUserToSuspend] = useState<string | null>(null);
   const [isSuspendSuccess, setIsSuspendSuccess] = useState(false);
   const [isUserSuspended, setIsUserSuspended] = useState(false);
@@ -669,6 +674,28 @@ const AdminDashboard: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isDeleteUserSuccess, userToDeleteAccount, selectedUserForProfile]);
+
+  // Countdown timer for delete report success modal
+  useEffect(() => {
+    if (isDeleteReportSuccess && reportToDelete) {
+      setDeleteReportCountdown(5);
+      const interval = setInterval(() => {
+        setDeleteReportCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            if (reportToDelete) {
+              setDeletedReportIds((prevSet) => new Set(prevSet).add(reportToDelete.reportId));
+            }
+            setReportToDelete(null);
+            setIsDeleteReportSuccess(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isDeleteReportSuccess, reportToDelete]);
 
   // Close more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -6715,6 +6742,7 @@ const AdminDashboard: React.FC = () => {
                           `}</style>
                           
                           {/* Report Card 1 */}
+                          {!deletedReportIds.has('report-1') && (
                           <div style={{
                             backgroundColor: '#FFFFFF',
                             border: '1px solid #F1F1F1',
@@ -6857,8 +6885,10 @@ const AdminDashboard: React.FC = () => {
                               </button>
                             </div>
                           </div>
+                          )}
 
                           {/* Report Card 2 */}
+                          {!deletedReportIds.has('report-2') && (
                           <div style={{
                             backgroundColor: '#FFFFFF',
                             border: '1px solid #F1F1F1',
@@ -6976,8 +7006,10 @@ const AdminDashboard: React.FC = () => {
                               </button>
                             </div>
                           </div>
+                          )}
 
                           {/* Report Card 3 */}
+                          {!deletedReportIds.has('report-3') && (
                           <div style={{
                             backgroundColor: '#FFFFFF',
                             border: '1px solid #F1F1F1',
@@ -7106,6 +7138,8 @@ const AdminDashboard: React.FC = () => {
                               </button>
                             </div>
                           </div>
+                          )}
+
                         </div>
                       </div>
                     )}
@@ -7137,7 +7171,14 @@ const AdminDashboard: React.FC = () => {
                           {/* Delete the report */}
                           <div
                             onClick={() => {
-                              // Handle delete report action
+                              // Set report to delete based on reportId
+                              const reportData = reportedIssueMoreMenu.reportId === 'report-1' 
+                                ? { reportId: 'report-1', reportTitle: 'Fake reviews or suspicious ratings', reporterName: 'Kevin Mobinnid' }
+                                : reportedIssueMoreMenu.reportId === 'report-2'
+                                ? { reportId: 'report-2', reportTitle: 'Inappropriate content or behavior', reporterName: 'Esther Howard' }
+                                : { reportId: 'report-3', reportTitle: 'Spam or misleading information', reporterName: 'Esther Howard' };
+                              setReportToDelete(reportData);
+                              setIsDeleteReportSuccess(false);
                               setReportedIssueMoreMenu(null);
                             }}
                             onMouseEnter={(e) => {
@@ -7191,6 +7232,277 @@ const AdminDashboard: React.FC = () => {
                         document.body
                       );
                     })()}
+
+                    {/* Delete Report Confirmation Modal */}
+                    {reportToDelete && !isDeleteReportSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setReportToDelete(null);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '320px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setReportToDelete(null)}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={deleteIcon}
+                              alt="Delete"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0,
+                                fontWeight: 600
+                              }}
+                            >
+                              The report " <span style={{ color: '#B0B0B0', fontWeight: 400 }}>{reportToDelete.reportTitle}</span> " for the user <span style={{ color: '#64B5F6', fontWeight: 400 }}>@{reportToDelete.reporterName}</span> will be permanently deleted, do you wish to continue ?
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setReportToDelete(null)}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsDeleteReportSuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#FF5151',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                              <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Yes, Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Delete Report Success Modal */}
+                    {reportToDelete && isDeleteReportSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            if (reportToDelete) {
+                              setDeletedReportIds((prevSet) => new Set(prevSet).add(reportToDelete.reportId));
+                            }
+                            setReportToDelete(null);
+                            setIsDeleteReportSuccess(false);
+                          }
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '420px',
+                            width: '90%',
+                            minHeight: '320px',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (reportToDelete) {
+                                setDeletedReportIds((prevSet) => new Set(prevSet).add(reportToDelete.reportId));
+                              }
+                              setReportToDelete(null);
+                              setIsDeleteReportSuccess(false);
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              The report " <span style={{ color: '#B0B0B0' }}>{reportToDelete.reportTitle}</span> " has been successfully deleted.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReportToDelete(null);
+                                setIsDeleteReportSuccess(false);
+                                setDeleteReportCountdown(5);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (reportToDelete) {
+                                  setDeletedReportIds((prevSet) => new Set(prevSet).add(reportToDelete.reportId));
+                                }
+                                setReportToDelete(null);
+                                setIsDeleteReportSuccess(false);
+                              }}
+                              style={{
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <span style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>
+                                Close {deleteReportCountdown > 0 ? `· ${deleteReportCountdown}s` : ''}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Account Information */}
                     {!isManageAccessView && userDetailActiveTab === 'about' && (
