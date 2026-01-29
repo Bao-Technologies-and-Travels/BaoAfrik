@@ -177,11 +177,42 @@ const AdminDashboard: React.FC = () => {
   } | null>(null);
   const listingsMoreMenuRef = useRef<HTMLDivElement | null>(null);
   const listingsMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mainContentScrollRef = useRef<HTMLDivElement | null>(null);
   const [removedListingIds, setRemovedListingIds] = useState<Set<number>>(new Set());
   const [isListingsSelectionMode, setIsListingsSelectionMode] = useState(false);
   const [selectedListingIds, setSelectedListingIds] = useState<Set<number>>(new Set());
   const [hoveredListingRowKey, setHoveredListingRowKey] = useState<string | null>(null);
   const [selectedListingRowKey, setSelectedListingRowKey] = useState<string | null>(null);
+  const [viewingListingDetail, setViewingListingDetail] = useState(false);
+  const [selectedListingForDetail, setSelectedListingForDetail] = useState<{
+    id: number;
+    productName: string;
+    price: string;
+    productImage: string;
+    productImage1?: string;
+    productImage2?: string;
+    productImage3?: string;
+    date: string;
+    status?: string;
+    authorName: string;
+    authorAvatar: string;
+    authorAvatarBg: string;
+    plan: string;
+    location?: string;
+    category?: string[];
+    description?: string;
+    sellerName?: string;
+    sellerAvatar?: string;
+    sellerVerified?: boolean;
+    sellerRating?: number;
+    viewed?: number;
+    viewedTrend?: string;
+    activeListings?: number;
+    inactiveListings?: number;
+  } | null>(null);
+  const [listingDetailActiveTab, setListingDetailActiveTab] = useState<'about' | 'reviews' | 'reported'>('about');
+  const [listingDetailSelectedImageIndex, setListingDetailSelectedImageIndex] = useState(0);
+  const [isListingMetricsOpen, setIsListingMetricsOpen] = useState(true);
 
   // More options dropdown (portal)
   const [moreMenu, setMoreMenu] = useState<{
@@ -755,6 +786,13 @@ const AdminDashboard: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, filterDropdownOpen, reportedIssueMoreMenu, listingsMoreMenu]);
+
+  // Scroll main content to top when opening listing detail so the detail view is visible
+  useEffect(() => {
+    if (viewingListingDetail && selectedListingForDetail && mainContentScrollRef.current) {
+      mainContentScrollRef.current.scrollTo(0, 0);
+    }
+  }, [viewingListingDetail, selectedListingForDetail]);
 
   // Close activity card more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -1368,7 +1406,46 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <div
-          onClick={() => {
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const listingId = listingsMoreMenu.listingId;
+            const fromPage = (pagedListingsRows as Array<{ id: number }>).find((r) => r.id === listingId);
+            const fromActivity = listingsActivitiesRows.find((r: any) => r.id === listingId);
+            const fromList = listingsListRows.find((r: any) => r.id === listingId);
+            const row = fromPage || fromActivity || fromList;
+            if (row) {
+              setSelectedSidebarOption('listings');
+              setSelectedListingForDetail({
+                id: (row as any).id,
+                productName: (row as any).productName,
+                price: (row as any).price,
+                productImage: (row as any).productImage,
+                productImage1: productImage1,
+                productImage2: productImage2,
+                productImage3: productImage3,
+                date: (row as any).date,
+                status: (row as any).status,
+                authorName: (row as any).authorName,
+                authorAvatar: (row as any).authorAvatar,
+                authorAvatarBg: (row as any).authorAvatarBg,
+                plan: (row as any).plan,
+                location: 'London | United Kingdom',
+                category: ['Cameroun', 'Spices'],
+                description: "Premium white pepper sourced from the fertile soils of Africa. Known for its mild aromatic heat and rich flavour, it adds an authentic touch of home to your dishes, perfect for the diaspora seeking a taste of tradition.",
+                sellerName: (row as any).authorName || 'Joaquin EDIMO',
+                sellerAvatar: (row as any).authorAvatar || avatar,
+                sellerVerified: true,
+                sellerRating: 4.3,
+                viewed: 248,
+                viewedTrend: '↑17,89%',
+                activeListings: 217,
+                inactiveListings: 31
+              });
+              setViewingListingDetail(true);
+              setListingDetailActiveTab('about');
+              setListingDetailSelectedImageIndex(0);
+            }
             setListingsMoreMenu(null);
           }}
           onMouseEnter={primaryHoverOn}
@@ -1695,7 +1772,7 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Main Content Area */}
-        <div style={{ flex: 1, padding: '16px', paddingRight: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 32px)' }} className="admin-content-scroll">
+        <div ref={mainContentScrollRef} style={{ flex: 1, padding: '16px', paddingRight: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 32px)' }} className="admin-content-scroll">
           {/* Top Navigation Bar */}
           <div style={{ 
             display: 'flex', 
@@ -1745,6 +1822,47 @@ const AdminDashboard: React.FC = () => {
                 </span>
                 <span style={{ color: '#D4D4D4' }}>·</span>
                 <span style={{ color: '#4D4D4D', fontWeight: 500 }}>User activity details</span>
+              </nav>
+            ) : selectedSidebarOption === 'listings' && viewingListingDetail && selectedListingForDetail ? (
+              <nav style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif',
+                color: '#BABABA',
+                minWidth: 0
+              }}>
+                <img
+                  src={arrowLeftIcon}
+                  alt="Back"
+                  style={{ width: '14px', height: '14px', cursor: 'pointer', flexShrink: 0 }}
+                  onClick={() => {
+                    setViewingListingDetail(false);
+                    setSelectedListingForDetail(null);
+                  }}
+                />
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setViewingListingDetail(false);
+                    setSelectedListingForDetail(null);
+                  }}
+                >
+                  Homepage
+                </span>
+                <span style={{ color: '#D4D4D4' }}>·</span>
+                <span
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setViewingListingDetail(false);
+                    setSelectedListingForDetail(null);
+                  }}
+                >
+                  Listing activities
+                </span>
+                <span style={{ color: '#D4D4D4' }}>·</span>
+                <span style={{ color: '#4D4D4D', fontWeight: 500 }}>Listing activity details</span>
               </nav>
             ) : (
               <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
@@ -9322,7 +9440,353 @@ const AdminDashboard: React.FC = () => {
             </div>
             )
           ) : selectedSidebarOption === 'listings' ? (
-            <div style={{ paddingRight: '14px' }}>
+            <div key={viewingListingDetail && selectedListingForDetail ? 'listing-detail' : 'listing-list'} style={{ paddingRight: '14px' }}>
+              {viewingListingDetail && selectedListingForDetail ? (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 380px',
+                    gap: '20px',
+                    alignItems: 'start',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {/* Left: Listing activity log */}
+                  <div>
+                    <div style={{ marginBottom: '12px' }}>
+                      <h1 style={{
+                        fontSize: '16px',
+                        fontWeight: 600,
+                        color: '#202224',
+                        margin: '0 0 2px 0',
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        Listing activity details
+                      </h1>
+                      <p style={{
+                        color: '#9C9C9C',
+                        fontSize: '12px',
+                        margin: 0,
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        Lorem ipsum dolor sit amet consectetur. Amet mi porttitor duis facilisis amet erat urna.
+                      </p>
+                    </div>
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '16px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                        <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
+                          <input
+                            type="text"
+                            placeholder="Search an activity?"
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              border: 'none',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontFamily: 'Poppins, sans-serif',
+                              color: '#6A6A6A',
+                              backgroundColor: '#F1F1F1',
+                              outline: 'none',
+                              caretColor: '#CFE8FC'
+                            }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
+                          <button style={{
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#64B5F6',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            padding: 0
+                          }}>
+                            <span style={{ color: '#64B5F6' }}>Export data</span>
+                            <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)' }} />
+                          </button>
+                          <select style={{
+                            padding: '4px 10px',
+                            paddingRight: '28px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            color: '#939393',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer',
+                            appearance: 'none',
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'none',
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 8px center',
+                            backgroundSize: '12px'
+                          }}>
+                            <option>Sort by</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginTop: '16px', marginBottom: '16px' }}>
+                        Mon, 21 Dec 2025
+                      </div>
+                      {[
+                        { title: 'Listing created', desc: 'This listing was added to the platform.', time: '19 min ago' },
+                        { title: 'Listing updated', desc: 'Price and description were updated.', time: '2 hours ago' },
+                        { title: 'Status changed', desc: 'Listing set to Active.', time: '1 day ago' }
+                      ].map((entry, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: '12px', marginBottom: idx < 2 ? '16px' : 0 }}>
+                          <div style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '50%',
+                            backgroundColor: '#D5E9BD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden',
+                            flexShrink: 0
+                          }}>
+                            <img src={selectedListingForDetail.productImage} alt="" style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>{entry.title}</span>
+                            <p style={{ fontSize: '11px', color: '#939393', fontFamily: 'Poppins, sans-serif', margin: '4px 0 0 0' }}>{entry.desc}</p>
+                            <span style={{ fontSize: '10px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>{entry.time}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right: Listing detail sidebar */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    border: '1px solid #F1F1F1',
+                    padding: '14px',
+                    marginTop: '10px'
+                  }}>
+                    {/* Image gallery */}
+                    <div style={{ marginBottom: '14px' }}>
+                      <div style={{ width: '100%', aspectRatio: '1', borderRadius: '14px', overflow: 'hidden', backgroundColor: '#FAFAFA', marginBottom: '10px' }}>
+                        <img
+                          src={[selectedListingForDetail.productImage, selectedListingForDetail.productImage1, selectedListingForDetail.productImage2, selectedListingForDetail.productImage3].filter(Boolean)[listingDetailSelectedImageIndex] || selectedListingForDetail.productImage}
+                          alt={selectedListingForDetail.productName}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {[selectedListingForDetail.productImage, selectedListingForDetail.productImage1, selectedListingForDetail.productImage2, selectedListingForDetail.productImage3].filter(Boolean).slice(0, 4).map((img, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setListingDetailSelectedImageIndex(i)}
+                            style={{
+                              width: '56px',
+                              height: '56px',
+                              borderRadius: '10px',
+                              border: listingDetailSelectedImageIndex === i ? '2px solid #64B5F6' : '1px solid #F1F1F1',
+                              overflow: 'hidden',
+                              padding: 0,
+                              cursor: 'pointer',
+                              backgroundColor: '#FAFAFA',
+                              flexShrink: 0
+                            }}
+                          >
+                            <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </button>
+                        ))}
+                        <div style={{ marginLeft: 'auto', color: '#B0B0B0' }}>
+                          <button style={{ width: '28px', height: '28px', border: 'none', borderRadius: '8px', backgroundColor: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <circle cx="4" cy="8" r="1.5" fill="#B0B0B0"/>
+                              <circle cx="8" cy="8" r="1.5" fill="#B0B0B0"/>
+                              <circle cx="12" cy="8" r="1.5" fill="#B0B0B0"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tabs */}
+                    <div style={{
+                      display: 'flex',
+                      gap: '16px',
+                      marginBottom: '16px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
+                      borderBottom: '1px solid #F1F1F1'
+                    }}>
+                      {[
+                        { label: 'About the listing', key: 'about' as const },
+                        { label: 'Reviews and rates', key: 'reviews' as const },
+                        { label: 'Reported issues about', key: 'reported' as const }
+                      ].map((tab) => (
+                        <button
+                          key={tab.key}
+                          onClick={() => setListingDetailActiveTab(tab.key)}
+                          style={{
+                            padding: '8px 0',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderBottom: listingDetailActiveTab === tab.key ? '2px solid #64B5F6' : '2px solid transparent',
+                            color: listingDetailActiveTab === tab.key ? '#64B5F6' : '#B0B0B0',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            cursor: 'pointer',
+                            marginBottom: '-1px',
+                            transition: 'color 0.2s'
+                          }}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {listingDetailActiveTab === 'about' && (
+                      <>
+                        <p style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif', margin: '0 0 8px 0' }}>{selectedListingForDetail.productName}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '2px 8px',
+                            borderRadius: '8px',
+                            backgroundColor: '#EDFBF0',
+                            color: '#22C55E',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 500
+                          }}>
+                            {selectedListingForDetail.status || 'Active'}
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '18px', fontWeight: 600, color: '#212121', margin: '0 0 4px 0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedListingForDetail.price}</p>
+                        <p style={{ fontSize: '11px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', margin: '0 0 12px 0' }}>Posted {selectedListingForDetail.date}</p>
+                        {selectedListingForDetail.location && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>{selectedListingForDetail.location}</span>
+                          </div>
+                        )}
+                        {selectedListingForDetail.category && selectedListingForDetail.category.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                            {selectedListingForDetail.category.map((cat, i) => (
+                              <span key={i} style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '4px 10px',
+                                borderRadius: '8px',
+                                border: '1px solid #FF5151',
+                                color: '#6A6A6A',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                {cat}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {selectedListingForDetail.description && (
+                          <p style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', margin: '0 0 4px 0', lineHeight: 1.5 }}>
+                            {selectedListingForDetail.description.slice(0, 120)}...
+                          </p>
+                        )}
+                        <span style={{ fontSize: '12px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif', cursor: 'pointer' }}>Read more</span>
+
+                        {/* Seller info */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginTop: '16px',
+                          paddingTop: '16px',
+                          borderTop: '1px solid #F1F1F1'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            overflow: 'hidden',
+                            flexShrink: 0
+                          }}>
+                            <img src={selectedListingForDetail.sellerAvatar || selectedListingForDetail.authorAvatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                          <div>
+                            <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>{selectedListingForDetail.sellerName || selectedListingForDetail.authorName}</span>
+                            {selectedListingForDetail.sellerVerified && (
+                              <span style={{ marginLeft: '6px', fontSize: '10px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Verified Seller</span>
+                            )}
+                            {selectedListingForDetail.sellerRating != null && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>{selectedListingForDetail.sellerRating}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Listing metrics */}
+                        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #F1F1F1' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => setIsListingMetricsOpen(!isListingMetricsOpen)}>
+                              <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Listing Metrics</span>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" style={{ transform: isListingMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
+                          </div>
+                          {isListingMetricsOpen && (
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                              <div style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                                <span style={{ fontSize: '9px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Viewed</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                                  <p style={{ fontSize: '18px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedListingForDetail.viewed ?? 248}</p>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px', backgroundColor: '#EDFBF0', padding: '1px 3px', borderRadius: '8px' }}>
+                                    <span style={{ color: '#22C55E', fontSize: '7px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>{selectedListingForDetail.viewedTrend ?? '↑17,89%'}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', padding: '8px', border: '1px solid #F1F1F1', position: 'relative' }}>
+                                <span style={{ fontSize: '9px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Active listings</span>
+                                <p style={{ fontSize: '18px', fontWeight: 600, color: '#212121', margin: '4px 0 0 0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedListingForDetail.activeListings ?? 217}</p>
+                                <span style={{ fontSize: '8px', color: '#F9A825', fontFamily: 'Poppins, sans-serif', cursor: 'pointer' }}>{selectedListingForDetail.inactiveListings ?? 31} inactive listings &gt;</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {listingDetailActiveTab === 'reviews' && (
+                      <div style={{ padding: '8px 0' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '32px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}>4.3</span>
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="#FBBC05"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <p style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>456 Review</p>
+                      </div>
+                    )}
+                    {listingDetailActiveTab === 'reported' && (
+                      <div style={{ padding: '8px 0' }}>
+                        <p style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>No reported issues for this listing.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+              <div style={{ display: 'contents' }}>
               {/* Listings Management Header */}
               <div style={{ marginTop: '10px', marginBottom: '16px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -10085,6 +10549,8 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
+            )}
             </div>
           ) : (
           <div>
