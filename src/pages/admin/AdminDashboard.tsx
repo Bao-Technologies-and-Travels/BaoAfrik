@@ -9677,8 +9677,17 @@ const AdminDashboard: React.FC = () => {
                       </div>
 
                       {/* Actions */}
-                      {!isListingsSelectionMode && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative', paddingLeft: '64px' }}>
+                      {isListingsSelectionMode ? (
+                        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2px', paddingLeft: '64px' }}>
+                          {selectedListingIds.has(rowId!) && (
+                            <span style={{ fontSize: '11px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Selected</span>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative', paddingLeft: '64px' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
                             type="button"
                             style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
