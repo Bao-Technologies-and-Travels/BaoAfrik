@@ -64,6 +64,14 @@ import reviewIcon from '../../assets/images/admin/review.svg';
 import activeIcon from '../../assets/images/pre/active.svg';
 import inactiveIcon from '../../assets/images/pre/inactive.svg';
 
+// Fruit images for listing detail right sidebar (clear, nice fruit photos)
+const listingDetailFruitImages = [
+  'https://images.unsplash.com/photo-1547514701-42782101795e?w=400',
+  'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400',
+  'https://images.unsplash.com/photo-1582053833986-ff4a2d4c6f85?w=400',
+  'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=400'
+];
+
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
   option: { key: string; label: string; icon: string };
@@ -2008,6 +2016,9 @@ const AdminDashboard: React.FC = () => {
             -ms-overflow-style: none;
             scrollbar-width: none;
           }
+          .listing-detail-thumbnails-scroll::-webkit-scrollbar { height: 4px; }
+          .listing-detail-thumbnails-scroll::-webkit-scrollbar-track { background: #F1F1F1; border-radius: 4px; }
+          .listing-detail-thumbnails-scroll::-webkit-scrollbar-thumb { background: #B0B0B0; border-radius: 4px; }
         `}
       </style>
       <div className="flex">
@@ -9775,44 +9786,108 @@ const AdminDashboard: React.FC = () => {
                     padding: '14px',
                     marginTop: '10px'
                   }}>
-                    {/* Image gallery */}
+                    {/* Image gallery – reduced height, ProductDetail-style thumbnails, scroll, small more-options (screenshot 2–4), fruit images */}
                     <div style={{ marginBottom: '14px' }}>
-                      <div style={{ width: '100%', aspectRatio: '1', borderRadius: '14px', overflow: 'hidden', backgroundColor: '#FAFAFA', marginBottom: '10px' }}>
+                      {/* Main image – reduced height (screenshot 4) */}
+                      <div style={{ position: 'relative', width: '100%', height: '220px', borderRadius: '14px', overflow: 'hidden', backgroundColor: '#FAFAFA', marginBottom: '10px' }}>
                         <img
-                          src={[selectedListingForDetail.productImage, selectedListingForDetail.productImage1, selectedListingForDetail.productImage2, selectedListingForDetail.productImage3].filter(Boolean)[listingDetailSelectedImageIndex] || selectedListingForDetail.productImage}
+                          src={listingDetailFruitImages[listingDetailSelectedImageIndex]}
                           alt={selectedListingForDetail.productName}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {[selectedListingForDetail.productImage, selectedListingForDetail.productImage1, selectedListingForDetail.productImage2, selectedListingForDetail.productImage3].filter(Boolean).slice(0, 4).map((img, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setListingDetailSelectedImageIndex(i)}
-                            style={{
-                              width: '56px',
-                              height: '56px',
-                              borderRadius: '10px',
-                              border: listingDetailSelectedImageIndex === i ? '2px solid #64B5F6' : '1px solid #F1F1F1',
-                              overflow: 'hidden',
-                              padding: 0,
-                              cursor: 'pointer',
-                              backgroundColor: '#FAFAFA',
-                              flexShrink: 0
-                            }}
-                          >
-                            <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          </button>
-                        ))}
-                        <div style={{ marginLeft: 'auto', color: '#B0B0B0' }}>
-                          <button style={{ width: '28px', height: '28px', border: 'none', borderRadius: '8px', backgroundColor: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <circle cx="4" cy="8" r="1.5" fill="#B0B0B0"/>
-                              <circle cx="8" cy="8" r="1.5" fill="#B0B0B0"/>
-                              <circle cx="12" cy="8" r="1.5" fill="#B0B0B0"/>
-                            </svg>
-                          </button>
+                        {/* Carousel indicators (screenshot 3) – bottom center */}
+                        <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '999px', backgroundColor: 'rgba(33,33,33,0.6)' }}>
+                          {listingDetailFruitImages.map((_, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => setListingDetailSelectedImageIndex(index)}
+                              style={{
+                                width: listingDetailSelectedImageIndex === index ? 16 : 6,
+                                height: 6,
+                                borderRadius: '999px',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'pointer',
+                                backgroundColor: listingDetailSelectedImageIndex === index ? '#FFFFFF' : '#B0B0B0',
+                                transition: 'width 0.2s, background-color 0.2s'
+                              }}
+                            />
+                          ))}
                         </div>
+                      </div>
+                      {/* Thumbnail row – smaller, ProductDetail look, horizontal scroll (screenshot 3) */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            overflowX: 'auto',
+                            flex: 1,
+                            minWidth: 0,
+                            paddingBottom: '4px',
+                            scrollbarWidth: 'thin',
+                            msOverflowStyle: 'scrollbar'
+                          }}
+                          className="listing-detail-thumbnails-scroll"
+                        >
+                          {listingDetailFruitImages.map((img, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => setListingDetailSelectedImageIndex(i)}
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '8px',
+                                border: listingDetailSelectedImageIndex === i ? '2px solid #9E9E9E' : '1px solid #F1F1F1',
+                                overflow: 'hidden',
+                                padding: 0,
+                                cursor: 'pointer',
+                                backgroundColor: '#FAFAFA',
+                                flexShrink: 0,
+                                position: 'relative'
+                              }}
+                            >
+                              <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              {listingDetailSelectedImageIndex === i && (
+                                <>
+                                  <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.6)' }} />
+                                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #FFFFFF', backgroundColor: '#F9A825' }}>
+                                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M5 13l4 4L19 7" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        {/* More options – circular, light gray border, three dots, small (screenshot 2) */}
+                        <button
+                          type="button"
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            border: '1px solid #E0E0E0',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                            <circle cx="4" cy="8" r="1.25" fill="#9E9E9E" />
+                            <circle cx="8" cy="8" r="1.25" fill="#9E9E9E" />
+                            <circle cx="12" cy="8" r="1.25" fill="#9E9E9E" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
 
