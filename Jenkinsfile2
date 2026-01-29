@@ -100,7 +100,7 @@ pipeline {
                             git reset --hard origin/${BRANCH}
                             echo "Repository updated successfully."
                         else
-                            # Clone the repository if it doesn\'t exist
+                            # Clone the repository if it does not exist
                             git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
                             echo "Repository cloned successfully."
                         fi
