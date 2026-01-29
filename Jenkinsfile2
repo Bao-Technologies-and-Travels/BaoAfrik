@@ -88,7 +88,7 @@ pipeline {
                 echo 'Cloning repository...'
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
-                    cd ~/prod
+                    cd /home/ashprincepageo/prod
 
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
