@@ -60,6 +60,7 @@ import locIcon from '../../assets/images/admin/loc.svg';
 import globeIcon from '../../assets/images/admin/globe.svg';
 import monitorIcon from '../../assets/images/admin/monitor.svg';
 import deleteIcon from '../../assets/images/admin/delete.svg';
+import reviewIcon from '../../assets/images/admin/review.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -164,6 +165,7 @@ const AdminDashboard: React.FC = () => {
   // Listings management page state (same table layout, data changes)
   const [listingsToggle, setListingsToggle] = useState<'activities' | 'list'>('activities');
   const [listingsActivityTab, setListingsActivityTab] = useState<'all' | 'posted' | 'reviewed' | 'reported'>('all');
+  const [listingsListTab, setListingsListTab] = useState<'all' | 'active' | 'inactive' | 'dayleft' | 'under_review'>('all');
   const [listingsSortBy, setListingsSortBy] = useState('Sort by');
   const [listingsPage, setListingsPage] = useState(1);
   const [listingsGoTo, setListingsGoTo] = useState('');
@@ -497,6 +499,36 @@ const AdminDashboard: React.FC = () => {
     }
   ];
 
+  // Mock data for Listings List table (status badges: Active, Inactive, Under review, x Day left)
+  type ListingListStatus = 'Active' | 'Inactive' | 'Under review' | '3 Day left' | '5 Day left';
+  type ListingListStatusFilter = 'active' | 'inactive' | 'under_review' | 'dayleft';
+  const listingsListRows: Array<{
+    id: number;
+    productName: string;
+    price: string;
+    date: string;
+    status: ListingListStatus;
+    statusFilterKey: ListingListStatusFilter;
+    authorName: string;
+    plan: string;
+    verified: boolean;
+    isNewUser: boolean;
+    productImage: string;
+    authorAvatar: string;
+    authorAvatarBg: string;
+  }> = [
+    { id: 11, productName: 'Snails from South Africa', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Under review', statusFilterKey: 'under_review', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 12, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Starter Plan', verified: true, isNewUser: false, productImage: productImage2, authorAvatar: messageAvatarIcon, authorAvatarBg: '#F0F8FE' },
+    { id: 13, productName: 'African Wristband', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Starter Plan', verified: true, isNewUser: false, productImage: productImage3, authorAvatar: avatar, authorAvatarBg: '#EDFBF0' },
+    { id: 14, productName: 'Bitter Cola', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: '3 Day left', statusFilterKey: 'dayleft', authorName: 'Clara Vanstone', plan: 'Pro Plan', verified: true, isNewUser: false, productImage: productImage1, authorAvatar: messageAvatarIcon, authorAvatarBg: '#F4F4F4' },
+    { id: 15, productName: 'Schrimps', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage2, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 16, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Inactive', statusFilterKey: 'inactive', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage3, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 17, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Under review', statusFilterKey: 'under_review', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: messageAvatarIcon, authorAvatarBg: '#E3F2FD' },
+    { id: 18, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: '5 Day left', statusFilterKey: 'dayleft', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage2, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 19, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Inactive', statusFilterKey: 'inactive', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage3, authorAvatar: messageAvatarIcon, authorAvatarBg: '#E3F2FD' },
+    { id: 20, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+  ];
+
   // Mock data for Users List table
   const usersListRows = [
     { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', plan: 'Free Plan', avatar, avatarBg: '#E3F2FD', isNewUser: true, verified: false },
@@ -537,11 +569,21 @@ const AdminDashboard: React.FC = () => {
     : listingsActivitiesRows.filter((r) => r.type === listingsActivityTab))
     .filter((r) => !removedListingIds.has((r as any).id));
 
+  const filteredListingsListRows = (() => {
+    let filtered = listingsListRows.filter((r) => !removedListingIds.has(r.id));
+    if (listingsListTab === 'active') filtered = filtered.filter((r) => r.statusFilterKey === 'active');
+    if (listingsListTab === 'inactive') filtered = filtered.filter((r) => r.statusFilterKey === 'inactive');
+    if (listingsListTab === 'dayleft') filtered = filtered.filter((r) => r.statusFilterKey === 'dayleft');
+    if (listingsListTab === 'under_review') filtered = filtered.filter((r) => r.statusFilterKey === 'under_review');
+    return filtered;
+  })();
+
   const listingsPageSize = 6;
   const listingsTotalPages = 48; // match screenshot pagination
   const listingsPaginationNumbers = [1, 2, 3];
-  const pagedListingsRows = filteredListingsActivitiesRows
-    .slice((listingsPage - 1) * listingsPageSize, listingsPage * listingsPageSize);
+  const pagedListingsRows = listingsToggle === 'activities'
+    ? filteredListingsActivitiesRows.slice((listingsPage - 1) * listingsPageSize, listingsPage * listingsPageSize)
+    : filteredListingsListRows.slice((listingsPage - 1) * listingsPageSize, listingsPage * listingsPageSize);
 
   const getListingStatusColor = (status: string) => {
     const s = status.toLowerCase();
@@ -549,6 +591,15 @@ const AdminDashboard: React.FC = () => {
     if (s.includes('active')) return '#70E183';
     if (s.includes('deleted')) return '#FF5151';
     return '#939393';
+  };
+
+  const getListingListStatusBadgeStyle = (status: ListingListStatus): { backgroundColor: string; color: string; icon: string | null } => {
+    const s = status.toLowerCase();
+    if (s.includes('under review')) return { backgroundColor: '#F5EFFF', color: '#B78AF7', icon: reviewIcon };
+    if (s.includes('active')) return { backgroundColor: '#EDFBF0', color: '#22C55E', icon: null };
+    if (s.includes('inactive')) return { backgroundColor: '#FFE9E9', color: '#FF5151', icon: null };
+    if (s.includes('day left')) return { backgroundColor: '#FFF8E9', color: '#F9A825', icon: null };
+    return { backgroundColor: '#F4F4F4', color: '#939393', icon: null };
   };
 
   const getPlanBadgeStyle = (plan: string) => {
@@ -9290,7 +9341,7 @@ const AdminDashboard: React.FC = () => {
                       margin: 0,
                       fontFamily: 'Poppins, sans-serif'
                     }}>
-                      Stay informed about listing trends, behavior and have a comprehensive activity tracking.
+                      {listingsToggle === 'activities' ? 'Stay informed about listing trends, behavior and have a comprehensive activity tracking.' : 'Explore, manage, and monitor all listed listing in BAO Afrik platform with ease.'}
                     </p>
 
                     {/* Toggle (aligned with description) */}
@@ -9311,7 +9362,7 @@ const AdminDashboard: React.FC = () => {
                         return (
                           <button
                             key={t.key}
-                            onClick={() => setListingsToggle(t.key as 'activities' | 'list')}
+                            onClick={() => { setListingsToggle(t.key as 'activities' | 'list'); setListingsPage(1); }}
                             style={{
                               border: 'none',
                               cursor: 'pointer',
@@ -9335,6 +9386,71 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
+              {/* Metrics Cards (only for Listings list) */}
+              {listingsToggle === 'list' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>All listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>569</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EDFBF0', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
+                        </div>
+                      </div>
+                      <img src={statIcon} alt="All listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Active listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>321</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EDFBF0', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
+                        </div>
+                      </div>
+                      <img src={activelistingsIcon} alt="Active listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Inactive listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>204</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#FFE9E9', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                          </div>
+                        </div>
+                      </div>
+                      <img src={listingboxIcon} alt="Inactive listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Suspended Listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>13</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#F4F4F4', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <span style={{ color: '#939393', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
+                          </div>
+                        </div>
+                      </div>
+                      <img src={stat3Icon} alt="Suspended Listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Main table container */}
               <div style={{
                 backgroundColor: '#FFFFFF',
@@ -9342,40 +9458,68 @@ const AdminDashboard: React.FC = () => {
                 border: '1px solid #F1F1F1',
                 padding: '12px 14px'
               }}>
-                {/* Top bar: tabs + export + sort OR selection controls (match User Activities) */}
+                {/* Top bar: tabs + export + sort OR selection controls (match User list/Activities) */}
                 {!isListingsSelectionMode ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '26px', flexWrap: 'wrap' }}>
-                      {[
-                        { key: 'all', label: 'All listings activities' },
-                        { key: 'posted', label: 'Posted' },
-                        { key: 'reviewed', label: 'Reviewed' },
-                        { key: 'reported', label: 'Reported' },
-                      ].map((tab) => {
-                        const isActive = listingsActivityTab === (tab.key as any);
-                        return (
-                          <button
-                            key={tab.key}
-                            onClick={() => {
-                              setListingsActivityTab(tab.key as any);
-                              setListingsPage(1);
-                            }}
-                            style={{
-                              border: 'none',
-                              background: 'transparent',
-                              padding: '0 0 10px 0',
-                              cursor: 'pointer',
-                              fontSize: '11px',
-                              fontFamily: 'Poppins, sans-serif',
-                              color: isActive ? '#64B5F6' : '#B0B0B0',
-                              fontWeight: 400,
-                              borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                            }}
-                          >
-                            {tab.label}
-                          </button>
-                        );
-                      })}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: listingsToggle === 'list' ? '26px' : '26px', flexWrap: 'wrap' }}>
+                      {listingsToggle === 'activities' ? (
+                        [
+                          { key: 'all', label: 'All listings activities' },
+                          { key: 'posted', label: 'Posted' },
+                          { key: 'reviewed', label: 'Reviewed' },
+                          { key: 'reported', label: 'Reported' },
+                        ].map((tab) => {
+                          const isActive = listingsActivityTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => { setListingsActivityTab(tab.key as any); setListingsPage(1); }}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        [
+                          { key: 'all', label: 'All listings' },
+                          { key: 'active', label: 'Active' },
+                          { key: 'inactive', label: 'Inactive' },
+                          { key: 'dayleft', label: 'Day left' },
+                          { key: 'under_review', label: 'Under review' },
+                        ].map((tab) => {
+                          const isActive = listingsListTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => { setListingsListTab(tab.key as any); setListingsPage(1); }}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      )}
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
@@ -9529,7 +9673,7 @@ const AdminDashboard: React.FC = () => {
                   {[
                     { key: 'Listings', label: 'Listings' },
                     { key: 'Date of creation', label: 'Date of creation' },
-                    { key: 'Activity', label: 'Activity' },
+                    { key: listingsToggle === 'list' ? 'Status' : 'Activity', label: listingsToggle === 'list' ? 'Status' : 'Activity' },
                     { key: 'Author', label: 'Author' },
                     { key: 'Actions', label: 'Actions' }
                   ].map((h) => (
@@ -9545,7 +9689,7 @@ const AdminDashboard: React.FC = () => {
                         marginLeft:
                           h.key === 'Date of creation'
                             ? '40px'
-                            : h.key === 'Activity'
+                            : (h.key === 'Activity' || h.key === 'Status')
                             ? '56px'
                             : h.key === 'Author'
                             ? '32px'
@@ -9645,10 +9789,14 @@ const AdminDashboard: React.FC = () => {
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', minWidth: 0 }}>
                             <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.price}</span>
-                            <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
-                            <span style={{ fontSize: '10px', color: getListingStatusColor(row.status), fontFamily: 'Bricolage Grotesque, sans-serif', whiteSpace: 'nowrap' }}>
-                              {row.status}
-                            </span>
+                            {listingsToggle === 'activities' && (row as any).status != null && (
+                              <>
+                                <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
+                                <span style={{ fontSize: '10px', color: getListingStatusColor((row as any).status), fontFamily: 'Bricolage Grotesque, sans-serif', whiteSpace: 'nowrap' }}>
+                                  {(row as any).status}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -9658,9 +9806,35 @@ const AdminDashboard: React.FC = () => {
                         {row.date}
                       </div>
 
-                      {/* Activity */}
-                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px', paddingLeft: '56px' }}>
-                        {row.activity}
+                      {/* Activity or Status */}
+                      <div style={{ paddingTop: '6px', paddingLeft: '56px' }}>
+                        {listingsToggle === 'list' ? (
+                          (() => {
+                            const status = (row as any).status as ListingListStatus | undefined;
+                            if (!status) return null;
+                            const badgeStyle = getListingListStatusBadgeStyle(status);
+                            return (
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '9px',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  backgroundColor: badgeStyle.backgroundColor,
+                                  color: badgeStyle.color
+                                }}
+                              >
+                                {badgeStyle.icon && <img src={badgeStyle.icon} alt="" style={{ width: '10px', height: '10px' }} />}
+                                {status}
+                              </span>
+                            );
+                          })()
+                        ) : (
+                          <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{(row as any).activity}</span>
+                        )}
                       </div>
 
                       {/* Author */}
