@@ -9478,7 +9478,15 @@ const AdminDashboard: React.FC = () => {
                       border: '1px solid #F1F1F1',
                       padding: '16px'
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      {/* Top Bar: Search + Export + Sort (same as User activity detail) */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          marginBottom: '12px'
+                        }}
+                      >
                         <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
                           <input
                             type="text"
@@ -9497,71 +9505,178 @@ const AdminDashboard: React.FC = () => {
                             }}
                           />
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
-                          <button style={{
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
+                        <div
+                          style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '6px',
-                            color: '#64B5F6',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            padding: 0
-                          }}>
+                            gap: '8px',
+                            marginLeft: 'auto',
+                            flexShrink: 0
+                          }}
+                        >
+                          <button
+                            style={{
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: '#64B5F6',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              padding: 0
+                            }}
+                          >
                             <span style={{ color: '#64B5F6' }}>Export data</span>
-                            <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)' }} />
+                            <img
+                              src={exportIcon}
+                              alt="Export"
+                              style={{
+                                width: '14px',
+                                height: '14px',
+                                filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                              }}
+                            />
                           </button>
-                          <select style={{
-                            padding: '4px 10px',
-                            paddingRight: '28px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            color: '#939393',
-                            backgroundColor: '#FFFFFF',
-                            cursor: 'pointer',
-                            appearance: 'none',
-                            WebkitAppearance: 'none',
-                            MozAppearance: 'none',
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'right 8px center',
-                            backgroundSize: '12px'
-                          }}>
+                          <select
+                            style={{
+                              padding: '4px 10px',
+                              paddingRight: '28px',
+                              borderRadius: '8px',
+                              border: 'none',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              color: '#939393',
+                              backgroundColor: '#FFFFFF',
+                              cursor: 'pointer',
+                              appearance: 'none',
+                              WebkitAppearance: 'none',
+                              MozAppearance: 'none',
+                              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                              backgroundRepeat: 'no-repeat',
+                              backgroundPosition: 'right 8px center',
+                              backgroundSize: '12px'
+                            }}
+                          >
                             <option>Sort by</option>
                           </select>
                         </div>
                       </div>
-                      <div style={{ color: '#939393', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginTop: '16px', marginBottom: '16px' }}>
-                        Mon, 21 Dec 2025
-                      </div>
+
+                      {/* Activity log by date (same structure as User activity detail) */}
                       {[
-                        { title: 'Listing created', desc: 'This listing was added to the platform.', time: '19 min ago' },
-                        { title: 'Listing updated', desc: 'Price and description were updated.', time: '2 hours ago' },
-                        { title: 'Status changed', desc: 'Listing set to Active.', time: '1 day ago' }
-                      ].map((entry, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: '12px', marginBottom: idx < 2 ? '16px' : 0 }}>
-                          <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '50%',
-                            backgroundColor: '#D5E9BD',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            overflow: 'hidden',
-                            flexShrink: 0
-                          }}>
-                            <img src={selectedListingForDetail.productImage} alt="" style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }} />
+                        {
+                          date: 'Mon, 21 Dec 2025',
+                          items: [
+                            { title: 'Listing created', description: 'This listing was added to the platform.', time: '19 min ago' },
+                            { title: 'Listing updated', description: 'Price and description were updated.', time: '2 hours ago' },
+                            { title: 'Status changed', description: 'Listing set to Active.', time: '1 day ago' }
+                          ]
+                        }
+                      ].map((group, groupIdx, groups) => (
+                        <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px', marginTop: groupIdx === 0 ? '20px' : '0' }}>
+                          <div style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginBottom: '10px' }}>
+                            {group.date}
                           </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>{entry.title}</span>
-                            <p style={{ fontSize: '11px', color: '#939393', fontFamily: 'Poppins, sans-serif', margin: '4px 0 0 0' }}>{entry.desc}</p>
-                            <span style={{ fontSize: '10px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>{entry.time}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {group.items.map((item, idx) => (
+                              <React.Fragment key={`${group.date}-${idx}`}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    gap: '12px',
+                                    padding: '10px 0',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                                    <div
+                                      style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#D5E9BD',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden',
+                                        border: '1px solid rgba(34, 197, 94, 0.3)'
+                                      }}
+                                    >
+                                      <img
+                                        src={selectedListingForDetail.productImage}
+                                        alt=""
+                                        style={{
+                                          width: '36px',
+                                          height: '36px',
+                                          borderRadius: '50%',
+                                          objectFit: 'cover'
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0px',
+                                        marginTop: '4px'
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          fontSize: '12px',
+                                          color: '#6A6A6A',
+                                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                                          fontWeight: 500
+                                        }}
+                                      >
+                                        {item.title}
+                                      </span>
+                                    </div>
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: '8px',
+                                        flexWrap: 'wrap'
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          fontSize: '11px',
+                                          color: '#939393',
+                                          fontFamily: 'Poppins, sans-serif'
+                                        }}
+                                      >
+                                        {item.description}
+                                      </span>
+                                      <span
+                                        style={{
+                                          fontSize: '10px',
+                                          color: '#B0B0B0',
+                                          fontFamily: 'Poppins, sans-serif'
+                                        }}
+                                      >
+                                        {item.time}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                {idx !== group.items.length - 1 && (
+                                  <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%' }} />
+                                )}
+                              </React.Fragment>
+                            ))}
                           </div>
+                          {groupIdx !== groups.length - 1 && (
+                            <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%', marginTop: '18px' }} />
+                          )}
                         </div>
                       ))}
                     </div>
