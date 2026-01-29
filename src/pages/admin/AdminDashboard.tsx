@@ -176,6 +176,8 @@ const AdminDashboard: React.FC = () => {
   const [removedListingIds, setRemovedListingIds] = useState<Set<number>>(new Set());
   const [isListingsSelectionMode, setIsListingsSelectionMode] = useState(false);
   const [selectedListingIds, setSelectedListingIds] = useState<Set<number>>(new Set());
+  const [hoveredListingRowKey, setHoveredListingRowKey] = useState<string | null>(null);
+  const [selectedListingRowKey, setSelectedListingRowKey] = useState<string | null>(null);
 
   // More options dropdown (portal)
   const [moreMenu, setMoreMenu] = useState<{
@@ -9109,9 +9111,9 @@ const AdminDashboard: React.FC = () => {
                         >
                           <button 
                             onClick={(e) => e.stopPropagation()}
-                            style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            style={{ width: '28px', height: '28px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                           >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                               <circle cx="12" cy="12" r="3" />
                             </svg>
@@ -9529,7 +9531,7 @@ const AdminDashboard: React.FC = () => {
                     { key: 'Date of creation', label: 'Date of creation' },
                     { key: 'Activity', label: 'Activity' },
                     { key: 'Author', label: 'Author' },
-                    ...(isListingsSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
+                    { key: 'Actions', label: 'Actions' }
                   ].map((h) => (
                     <div
                       key={h.key}
@@ -9569,16 +9571,27 @@ const AdminDashboard: React.FC = () => {
                 <div>
                   {pagedListingsRows.map((row, idx) => {
                     const rowId = (row as { id?: number }).id;
+                    const rowKey = rowId != null ? `listing-${rowId}-${idx}` : `${row.productName}-${idx}`;
+                    const isListingRowActive = hoveredListingRowKey === rowKey || selectedListingRowKey === rowKey;
                     return (
                     <div
                       key={rowId != null ? `listing-${rowId}` : `${row.productName}-${idx}`}
+                      onMouseEnter={() => setHoveredListingRowKey(rowKey)}
+                      onMouseLeave={() => setHoveredListingRowKey(null)}
+                      onClick={(e) => {
+                        const target = e.target as HTMLElement;
+                        if (target.closest('.listings-more-options-button') || target.closest('.checkbox-container') || isListingsSelectionMode) {
+                          return;
+                        }
+                        setSelectedListingRowKey(rowKey);
+                      }}
                       style={{
                         display: 'grid',
                         gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr',
                         gap: '10px',
                         padding: '14px 8px',
                         borderBottom: idx < pagedListingsRows.length - 1 ? '1px solid #F1F1F1' : 'none',
-                        backgroundColor: 'transparent',
+                        backgroundColor: isListingRowActive ? '#F6FBFF' : 'transparent',
                         borderRadius: 0
                       }}
                     >
@@ -9632,7 +9645,7 @@ const AdminDashboard: React.FC = () => {
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', minWidth: 0 }}>
                             <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.price}</span>
-                            <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
+                            <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
                             <span style={{ fontSize: '10px', color: getListingStatusColor(row.status), fontFamily: 'Bricolage Grotesque, sans-serif', whiteSpace: 'nowrap' }}>
                               {row.status}
                             </span>
@@ -9667,8 +9680,8 @@ const AdminDashboard: React.FC = () => {
                             )}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                            <span style={{ fontSize: '10px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.plan}</span>
-                            <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#B0B0B0', display: 'inline-block' }} />
+                            <span style={{ fontSize: '10px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.plan}</span>
+                            <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#B0B0B0', display: 'inline-block' }} />
                             <span style={{ fontSize: '10px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
                               {row.verified ? 'Verified' : 'Unverified'}
                             </span>
@@ -9690,9 +9703,9 @@ const AdminDashboard: React.FC = () => {
                         >
                           <button
                             type="button"
-                            style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            style={{ width: '28px', height: '28px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                           >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                               <circle cx="12" cy="12" r="3" />
                             </svg>
