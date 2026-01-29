@@ -64,11 +64,11 @@ import reviewIcon from '../../assets/images/admin/review.svg';
 import activeIcon from '../../assets/images/pre/active.svg';
 import inactiveIcon from '../../assets/images/pre/inactive.svg';
 
-// Fruit images for listing detail right sidebar (clear, nice fruit photos)
-const listingDetailFruitImages = [
+// Fruit images for listing detail right sidebar (clear, nice fruit photos – minimal/clean style)
+const listingDetailFruitImages: string[] = [
   'https://images.unsplash.com/photo-1547514701-42782101795e?w=400',
   'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400',
-  'https://images.unsplash.com/photo-1582053833986-ff4a2d4c6f85?w=400',
+  'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400',
   'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=400'
 ];
 
@@ -219,7 +219,7 @@ const AdminDashboard: React.FC = () => {
     inactiveListings?: number;
   } | null>(null);
   const [listingDetailActiveTab, setListingDetailActiveTab] = useState<'about' | 'reviews' | 'reported'>('about');
-  const [listingDetailSelectedImageIndex, setListingDetailSelectedImageIndex] = useState(0);
+  const [listingDetailSelectedImageIndex, setListingDetailSelectedImageIndex] = useState(2);
   const [isListingMetricsOpen, setIsListingMetricsOpen] = useState(true);
 
   // More options dropdown (portal)
@@ -1452,7 +1452,7 @@ const AdminDashboard: React.FC = () => {
               });
               setViewingListingDetail(true);
               setListingDetailActiveTab('about');
-              setListingDetailSelectedImageIndex(0);
+              setListingDetailSelectedImageIndex(2);
             }
             setListingsMoreMenu(null);
           }}
@@ -9788,23 +9788,23 @@ const AdminDashboard: React.FC = () => {
                   }}>
                     {/* Image gallery – reduced height, ProductDetail-style thumbnails, scroll, small more-options (screenshot 2–4), fruit images */}
                     <div style={{ marginBottom: '14px' }}>
-                      {/* Main image – reduced height (screenshot 4) */}
-                      <div style={{ position: 'relative', width: '100%', height: '220px', borderRadius: '14px', overflow: 'hidden', backgroundColor: '#FAFAFA', marginBottom: '10px' }}>
+                      {/* Main image – reduced height */}
+                      <div style={{ position: 'relative', width: '100%', height: '160px', borderRadius: '14px', overflow: 'hidden', backgroundColor: '#FAFAFA', marginBottom: '10px' }}>
                         <img
                           src={listingDetailFruitImages[listingDetailSelectedImageIndex]}
                           alt={selectedListingForDetail.productName}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
-                        {/* Carousel indicators (screenshot 3) – bottom center */}
-                        <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '999px', backgroundColor: 'rgba(33,33,33,0.6)' }}>
+                        {/* Carousel indicators – smaller scrollbar */}
+                        <div style={{ position: 'absolute', bottom: '8px', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '999px', backgroundColor: 'rgba(33,33,33,0.6)' }}>
                           {listingDetailFruitImages.map((_, index) => (
                             <button
                               key={index}
                               type="button"
                               onClick={() => setListingDetailSelectedImageIndex(index)}
                               style={{
-                                width: listingDetailSelectedImageIndex === index ? 16 : 6,
-                                height: 6,
+                                width: listingDetailSelectedImageIndex === index ? 12 : 4,
+                                height: 4,
                                 borderRadius: '999px',
                                 border: 'none',
                                 padding: 0,
@@ -9866,12 +9866,12 @@ const AdminDashboard: React.FC = () => {
                             </button>
                           ))}
                         </div>
-                        {/* More options – circular, light gray border, three dots, small (screenshot 2) */}
+                        {/* More options – circular, light gray border, three dots, smaller */}
                         <button
                           type="button"
                           style={{
-                            width: '28px',
-                            height: '28px',
+                            width: '22px',
+                            height: '22px',
                             borderRadius: '50%',
                             border: '1px solid #E0E0E0',
                             backgroundColor: '#FFFFFF',
@@ -9882,10 +9882,10 @@ const AdminDashboard: React.FC = () => {
                             flexShrink: 0
                           }}
                         >
-                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                            <circle cx="4" cy="8" r="1.25" fill="#9E9E9E" />
-                            <circle cx="8" cy="8" r="1.25" fill="#9E9E9E" />
-                            <circle cx="12" cy="8" r="1.25" fill="#9E9E9E" />
+                          <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                            <circle cx="4" cy="8" r="1" fill="#9E9E9E" />
+                            <circle cx="8" cy="8" r="1" fill="#9E9E9E" />
+                            <circle cx="12" cy="8" r="1" fill="#9E9E9E" />
                           </svg>
                         </button>
                       </div>
