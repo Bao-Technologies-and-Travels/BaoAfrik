@@ -10,9 +10,9 @@ pipeline {
         BRANCH = 'fonsah-staging'
         FRONTEND_DIR = '~/BaoAfrik/frontend'
         BACKEND_DIR = '~/BaoAfrik/backend'
-        APP_NAME_FRONTEND = 'prod-frontend'
-        APP_NAME_BACKEND = 'prod-backend'
-        DOMAIN = 'https://baoafrik.com'
+        APP_NAME_FRONTEND = 'frontend'
+        APP_NAME_BACKEND = 'backend'
+        DOMAIN = 'baoafrik.com'
         EMAIL = 'pageo.fonsah@baotechnologiesandtravels.com'
         BAOTECHNOLOGIES_DEV_TEAM = 'wendy.tembong@baotechnologiesandtravels.com,esther.eyere@baotechnologiesandtravels.com,toni.ebong@baotechnologiesandtravels.com,glory.tama@baotechnologiesandtravels.com,lionel.ngansop@baotechnologiesandtravels.com,arrey.johnson@baotechnologiesandtravels.com'
         DATABASE_URL = credentials('DATABASE_URL')
