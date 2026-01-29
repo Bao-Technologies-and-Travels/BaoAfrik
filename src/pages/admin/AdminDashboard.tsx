@@ -167,6 +167,15 @@ const AdminDashboard: React.FC = () => {
   const [listingsSortBy, setListingsSortBy] = useState('Sort by');
   const [listingsPage, setListingsPage] = useState(1);
   const [listingsGoTo, setListingsGoTo] = useState('');
+  const [listingsMoreMenu, setListingsMoreMenu] = useState<{
+    listingId: number;
+    anchorRect: DOMRect;
+  } | null>(null);
+  const listingsMoreMenuRef = useRef<HTMLDivElement | null>(null);
+  const listingsMoreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [removedListingIds, setRemovedListingIds] = useState<Set<number>>(new Set());
+  const [isListingsSelectionMode, setIsListingsSelectionMode] = useState(false);
+  const [selectedListingIds, setSelectedListingIds] = useState<Set<number>>(new Set());
 
   // More options dropdown (portal)
   const [moreMenu, setMoreMenu] = useState<{
@@ -325,6 +334,7 @@ const AdminDashboard: React.FC = () => {
   // Mock data for Listings Management table (activities)
   const listingsActivitiesRows = [
     {
+      id: 1,
       productName: 'Snails from South Africa',
       price: 'USD 45.90',
       status: 'Under review' as const,
@@ -340,6 +350,7 @@ const AdminDashboard: React.FC = () => {
       type: 'posted' as const
     },
     {
+      id: 2,
       productName: 'Coconut Oil',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -355,6 +366,7 @@ const AdminDashboard: React.FC = () => {
       type: 'posted' as const
     },
     {
+      id: 3,
       productName: 'African Wristband',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -370,6 +382,7 @@ const AdminDashboard: React.FC = () => {
       type: 'posted' as const
     },
     {
+      id: 4,
       productName: 'Bitter Cola',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -385,6 +398,7 @@ const AdminDashboard: React.FC = () => {
       type: 'posted' as const
     },
     {
+      id: 5,
       productName: 'Schrimps',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -400,6 +414,7 @@ const AdminDashboard: React.FC = () => {
       type: 'posted' as const
     },
     {
+      id: 6,
       productName: 'Coconut Oil',
       price: 'USD 45.90',
       status: 'Deleted' as const,
@@ -415,6 +430,7 @@ const AdminDashboard: React.FC = () => {
       type: 'reported' as const
     },
     {
+      id: 7,
       productName: 'Coconut Oil',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -430,6 +446,7 @@ const AdminDashboard: React.FC = () => {
       type: 'reviewed' as const
     },
     {
+      id: 8,
       productName: 'Coconut Oil',
       price: 'USD 45.90',
       status: 'Deleted' as const,
@@ -445,6 +462,7 @@ const AdminDashboard: React.FC = () => {
       type: 'reported' as const
     },
     {
+      id: 9,
       productName: 'Coconut Oil',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -460,6 +478,7 @@ const AdminDashboard: React.FC = () => {
       type: 'reviewed' as const
     },
     {
+      id: 10,
       productName: 'Coconut Oil',
       price: 'USD 45.90',
       status: 'Active' as const,
@@ -511,10 +530,10 @@ const AdminDashboard: React.FC = () => {
   const pagedUsersRows = (usersToggle === 'activities' ? filteredUsersActivitiesRows : filteredUsersListRows)
     .slice((usersPage - 1) * usersPageSize, usersPage * usersPageSize);
 
-  const filteredListingsActivitiesRows =
-    (listingsActivityTab === 'all'
-      ? listingsActivitiesRows
-      : listingsActivitiesRows.filter((r) => r.type === listingsActivityTab));
+  const filteredListingsActivitiesRows = (listingsActivityTab === 'all'
+    ? listingsActivitiesRows
+    : listingsActivitiesRows.filter((r) => r.type === listingsActivityTab))
+    .filter((r) => !removedListingIds.has((r as any).id));
 
   const listingsPageSize = 6;
   const listingsTotalPages = 48; // match screenshot pagination
@@ -668,13 +687,19 @@ const AdminDashboard: React.FC = () => {
       if (!reportedIssueMoreOptionsDropdown && !reportedIssueMoreButton && reportedIssueMoreMenu !== null) {
         setReportedIssueMoreMenu(null);
       }
+      // Don't close listings more menu if clicking on the button or dropdown itself
+      const listingsMoreOptionsDropdown = target.closest('.listings-more-options-dropdown');
+      const listingsMoreOptionsButton = target.closest('.listings-more-options-button');
+      if (!listingsMoreOptionsDropdown && !listingsMoreOptionsButton && listingsMoreMenu !== null) {
+        setListingsMoreMenu(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, filterDropdownOpen, reportedIssueMoreMenu]);
+  }, [isLanguageDropdownOpen, isNotificationOpen, isMenuDropdownOpen, isSearchFocused, searchValue, filterDropdownOpen, reportedIssueMoreMenu, listingsMoreMenu]);
 
   // Close activity card more menu on outside click / scroll / resize (portal-safe)
   useEffect(() => {
@@ -907,6 +932,12 @@ const AdminDashboard: React.FC = () => {
   const clearSelectionMode = () => {
     setSelectedUserEmails(new Set());
     setIsSelectionMode(false);
+  };
+
+  const clearListingsSelectionMode = () => {
+    setSelectedListingIds(new Set());
+    setIsListingsSelectionMode(false);
+    setListingsMoreMenu(null);
   };
 
   const renderMoreOptionsMenu = () => {
@@ -1205,6 +1236,149 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
+  const renderListingsMoreOptionsMenu = () => {
+    if (!listingsMoreMenu) return null;
+
+    const menuWidth = 200;
+    const margin = 8;
+    const left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, listingsMoreMenu.anchorRect.right - menuWidth));
+    const top = listingsMoreMenu.anchorRect.bottom + 8;
+
+    const primaryHoverOn = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+      e.currentTarget.style.backgroundColor = '#F0F8FE';
+      const icon = e.currentTarget.querySelector('img');
+      const text = e.currentTarget.querySelector('span');
+      if (icon) (icon as HTMLImageElement).style.filter =
+        'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)';
+      if (text) (text as HTMLElement).style.color = '#64B5F6';
+    };
+    const primaryHoverOff = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.currentTarget.style.cursor = 'pointer';
+      e.currentTarget.style.backgroundColor = 'transparent';
+      const icon = e.currentTarget.querySelector('img');
+      const text = e.currentTarget.querySelector('span');
+      if (icon) (icon as HTMLImageElement).style.filter =
+        'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)';
+      if (text) (text as HTMLElement).style.color = '#939393';
+    };
+
+    const baseItemStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px',
+      borderRadius: '8px',
+      cursor: `url(${mouseCursorIcon}), auto`,
+      transition: 'background-color 0.2s'
+    };
+
+    return createPortal(
+      <div
+        ref={listingsMoreMenuRef}
+        className="listings-more-options-dropdown"
+        style={{
+          position: 'fixed',
+          top,
+          left,
+          width: `${menuWidth}px`,
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          border: '1px solid #F1F1F1',
+          boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+          padding: '8px',
+          zIndex: 99999
+        }}
+      >
+        <div
+          onClick={() => {
+            setIsListingsSelectionMode(true);
+            setSelectedListingIds(new Set([listingsMoreMenu.listingId]));
+            setListingsMoreMenu(null);
+          }}
+          onMouseEnter={primaryHoverOn}
+          onMouseLeave={primaryHoverOff}
+          style={baseItemStyle}
+        >
+          <img
+            src={selectIcon}
+            alt="Select"
+            style={{
+              width: '16px',
+              height: '16px',
+              filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+            }}
+          />
+          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Select item</span>
+        </div>
+
+        <div
+          onClick={() => {
+            setListingsMoreMenu(null);
+          }}
+          onMouseEnter={primaryHoverOn}
+          onMouseLeave={primaryHoverOff}
+          style={baseItemStyle}
+        >
+          <img
+            src={viewIcon}
+            alt="View"
+            style={{
+              width: '16px',
+              height: '16px',
+              filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+            }}
+          />
+          <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View listing detail</span>
+        </div>
+
+        <div
+          onClick={() => {
+            setRemovedListingIds((prev) => new Set(prev).add(listingsMoreMenu.listingId));
+            setListingsMoreMenu(null);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.cursor = 'pointer';
+          }}
+          style={baseItemStyle}
+        >
+          <img src={trashIcon} alt="Delete" style={{ width: '16px', height: '16px' }} />
+          <span style={{ fontSize: '12px', color: '#FF5151', fontFamily: 'Poppins, sans-serif' }}>Delete the listing</span>
+        </div>
+
+        <div
+          onClick={() => setListingsMoreMenu(null)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.cursor = `url(${mouseCursorIcon}), auto`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.cursor = 'pointer';
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px',
+            borderRadius: '8px',
+            backgroundColor: '#FAFAFA',
+            cursor: `url(${mouseCursorIcon}), auto`,
+            transition: 'background-color 0.2s'
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span style={{ fontSize: '12px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>Close</span>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   const handleCategorySelect = (category: 'users' | 'listings' | 'requests') => {
     setSelectedCategory(category);
     const prefix = `@${category === 'users' ? 'User' : category === 'listings' ? 'Listing' : 'Request'}/`;
@@ -1320,6 +1494,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div style={{ backgroundColor: '#FAFAFA', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
       {renderMoreOptionsMenu()}
+      {renderListingsMoreOptionsMenu()}
       <style>
         {`
           @keyframes rotateGlobe {
@@ -8858,7 +9033,7 @@ const AdminDashboard: React.FC = () => {
                           <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover' }} />
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {row.name}
                             </span>
@@ -9162,99 +9337,221 @@ const AdminDashboard: React.FC = () => {
               <div style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '20px',
-                padding: '14px',
-                border: '1px solid #F1F1F1'
+                border: '1px solid #F1F1F1',
+                padding: '12px 14px'
               }}>
-                {/* Top bar: tabs + Export data + Sort by */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                    {[
-                      { key: 'all', label: 'All listings activities' },
-                      { key: 'posted', label: 'Posted' },
-                      { key: 'reviewed', label: 'Reviewed' },
-                      { key: 'reported', label: 'Reported' }
-                    ].map((t) => {
-                      const isActive = listingsActivityTab === (t.key as any);
-                      return (
-                        <div
-                          key={t.key}
-                          onClick={() => {
-                            setListingsActivityTab(t.key as any);
-                            setListingsPage(1);
-                          }}
-                          style={{
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            color: isActive ? '#64B5F6' : '#B0B0B0',
-                            cursor: 'pointer',
-                            paddingBottom: '8px',
-                            borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent',
-                            transition: 'all 0.2s'
-                          }}
-                        >
-                          {t.label}
-                        </div>
-                      );
-                    })}
-                  </div>
+                {/* Top bar: tabs + export + sort OR selection controls (match User Activities) */}
+                {!isListingsSelectionMode ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '26px', flexWrap: 'wrap' }}>
+                      {[
+                        { key: 'all', label: 'All listings activities' },
+                        { key: 'posted', label: 'Posted' },
+                        { key: 'reviewed', label: 'Reviewed' },
+                        { key: 'reported', label: 'Reported' },
+                      ].map((tab) => {
+                        const isActive = listingsActivityTab === (tab.key as any);
+                        return (
+                          <button
+                            key={tab.key}
+                            onClick={() => {
+                              setListingsActivityTab(tab.key as any);
+                              setListingsPage(1);
+                            }}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              padding: '0 0 10px 0',
+                              cursor: 'pointer',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              color: isActive ? '#64B5F6' : '#B0B0B0',
+                              fontWeight: 400,
+                              borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                            }}
+                          >
+                            {tab.label}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <button
-                      type="button"
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#64B5F6',
-                        fontSize: '11px',
-                        fontFamily: 'Poppins, sans-serif',
-                        padding: 0
-                      }}
-                    >
-                      <span>Export data</span>
-                      <img src={exportIcon} alt="Export" style={{ width: '14px', height: '14px' }} />
-                    </button>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>Sort by</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                       <button
                         type="button"
-                        onClick={() => setListingsSortBy((prev) => (prev === 'Sort by' ? 'Most recent' : 'Sort by'))}
                         style={{
-                          background: 'transparent',
                           border: 'none',
+                          background: 'transparent',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
-                          color: '#939393',
+                          color: '#64B5F6',
                           fontSize: '11px',
                           fontFamily: 'Poppins, sans-serif',
                           padding: 0
                         }}
                       >
-                        <span>{listingsSortBy}</span>
-                        <img src={arrowDownIcon} alt="Sort" style={{ width: '14px', height: '14px' }} />
+                        <span style={{ color: '#64B5F6' }}>Export data</span>
+                        <img
+                          src={exportIcon}
+                          alt="Export"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                          }}
+                        />
                       </button>
+
+                      <select
+                        value={listingsSortBy}
+                        onChange={(e) => setListingsSortBy(e.target.value)}
+                        style={{
+                          padding: '0 18px 0 0',
+                          borderRadius: '8px',
+                          border: 'none',
+                          fontSize: '11px',
+                          color: '#B0B0B0',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 4px center',
+                          backgroundSize: '12px'
+                        }}
+                      >
+                        <option>Sort by</option>
+                        <option>Date</option>
+                        <option>Activity</option>
+                      </select>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', padding: '8px 0' }}>
+                    <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''} selected
+                    </span>
+                    <button
+                      onClick={clearListingsSelectionMode}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                      Clear all selections
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <img
+                        src={exportIcon}
+                        alt="Export"
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                        }}
+                      />
+                      Export item data
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const idsToRemove = Array.from(selectedListingIds);
+                        if (idsToRemove.length === 0) return;
+                        setRemovedListingIds((prev) => {
+                          const next = new Set(prev);
+                          idsToRemove.forEach((id) => next.add(id));
+                          return next;
+                        });
+                        clearListingsSelectionMode();
+                      }}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: selectedListingIds.size ? 'pointer' : 'not-allowed',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#FF5151',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0,
+                        opacity: selectedListingIds.size ? 1 : 0.5
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                      Remove from activity list
+                    </button>
+                  </div>
+                )}
 
                 <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
 
                 {/* Column headers */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr', gap: '10px', padding: '14px 0 12px 0' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr', gap: '8px', padding: '14px 0 12px 0' }}>
                   {[
                     { key: 'Listings', label: 'Listings' },
                     { key: 'Date of creation', label: 'Date of creation' },
                     { key: 'Activity', label: 'Activity' },
                     { key: 'Author', label: 'Author' },
-                    { key: 'Actions', label: 'Actions' }
+                    ...(isListingsSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
                   ].map((h) => (
-                    <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div
+                      key={h.key}
+                      style={{
+                        fontSize: '10px',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        marginLeft:
+                          h.key === 'Date of creation'
+                            ? '40px'
+                            : h.key === 'Activity'
+                            ? '56px'
+                            : h.key === 'Author'
+                            ? '32px'
+                            : h.key === 'Actions'
+                            ? '64px'
+                            : 0
+                      }}
+                    >
                       {h.label}
                       {h.key !== 'Actions' && (
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -9270,12 +9567,14 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Rows */}
                 <div>
-                  {pagedListingsRows.map((row, idx) => (
+                  {pagedListingsRows.map((row, idx) => {
+                    const rowId = (row as { id?: number }).id;
+                    return (
                     <div
-                      key={`${row.productName}-${idx}`}
+                      key={rowId != null ? `listing-${rowId}` : `${row.productName}-${idx}`}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '2.2fr 1.2fr 1.6fr 1fr 0.8fr',
+                        gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr',
                         gap: '10px',
                         padding: '14px 8px',
                         borderBottom: idx < pagedListingsRows.length - 1 ? '1px solid #F1F1F1' : 'none',
@@ -9285,6 +9584,45 @@ const AdminDashboard: React.FC = () => {
                     >
                       {/* Listings column */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                        {isListingsSelectionMode && (
+                          <div
+                            className="checkbox-container"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              if (rowId == null) return;
+                              const newSelected = new Set(selectedListingIds);
+                              if (newSelected.has(rowId)) {
+                                newSelected.delete(rowId);
+                              } else {
+                                newSelected.add(rowId);
+                              }
+                              setSelectedListingIds(newSelected);
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              border: selectedListingIds.has(rowId!) ? '2px solid #64B5F6' : '2px solid #D9D9D9',
+                              borderRadius: '4px',
+                              backgroundColor: selectedListingIds.has(rowId!) ? '#64B5F6' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              flexShrink: 0
+                            }}
+                          >
+                            {selectedListingIds.has(rowId!) && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                        )}
                         <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
                           <img src={row.productImage} alt={row.productName} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
                         </div>
@@ -9303,13 +9641,17 @@ const AdminDashboard: React.FC = () => {
                       </div>
 
                       {/* Date of creation */}
-                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.date}</div>
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px', paddingLeft: '40px' }}>
+                        {row.date}
+                      </div>
 
                       {/* Activity */}
-                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.activity}</div>
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px', paddingLeft: '56px' }}>
+                        {row.activity}
+                      </div>
 
                       {/* Author */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, paddingLeft: '32px' }}>
                         <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: row.authorAvatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
                           <img src={row.authorAvatar} alt={row.authorName} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
                         </div>
@@ -9335,40 +9677,60 @@ const AdminDashboard: React.FC = () => {
                       </div>
 
                       {/* Actions */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}>
-                        <button
-                          type="button"
-                          style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          style={{
-                            width: '18px',
-                            height: '18px',
-                            borderRadius: '50%',
-                            border: '0.3px solid #B0B0B0',
-                            backgroundColor: '#FFFFFF',
-                            cursor: 'pointer',
-                            padding: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}
-                        >
-                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
-                            <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
-                            <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
-                          </svg>
-                        </button>
-                      </div>
+                      {!isListingsSelectionMode && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative', paddingLeft: '64px' }}>
+                          <button
+                            type="button"
+                            style={{ width: '24px', height: '24px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                          <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className="listings-more-options-button"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                                listingsMoreMenuButtonRef.current = e.currentTarget as HTMLButtonElement;
+                                const rId = (row as { id?: number }).id;
+                                setListingsMoreMenu((prev) => (prev?.listingId === rId ? null : { listingId: rId!, anchorRect: rect }));
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                              }}
+                              style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                border: listingsMoreMenu?.listingId === rowId ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer',
+                                padding: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1001,
+                                position: 'relative'
+                              }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="3" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="6" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="9" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Pagination (same as users) */}
