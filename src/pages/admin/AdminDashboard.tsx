@@ -61,6 +61,8 @@ import globeIcon from '../../assets/images/admin/globe.svg';
 import monitorIcon from '../../assets/images/admin/monitor.svg';
 import deleteIcon from '../../assets/images/admin/delete.svg';
 import reviewIcon from '../../assets/images/admin/review.svg';
+import activeIcon from '../../assets/images/pre/active.svg';
+import inactiveIcon from '../../assets/images/pre/inactive.svg';
 
 // Suggestion Option Component with hover state
 const SuggestionOption: React.FC<{
@@ -593,12 +595,12 @@ const AdminDashboard: React.FC = () => {
     return '#939393';
   };
 
-  const getListingListStatusBadgeStyle = (status: ListingListStatus): { backgroundColor: string; color: string; icon: string | null } => {
+  const getListingListStatusBadgeStyle = (status: ListingListStatus): { backgroundColor: string; color: string; icon: string | null; iconType?: 'clock' } => {
     const s = status.toLowerCase();
     if (s.includes('under review')) return { backgroundColor: '#F5EFFF', color: '#B78AF7', icon: reviewIcon };
-    if (s.includes('active')) return { backgroundColor: '#EDFBF0', color: '#22C55E', icon: null };
-    if (s.includes('inactive')) return { backgroundColor: '#FFE9E9', color: '#FF5151', icon: null };
-    if (s.includes('day left')) return { backgroundColor: '#FFF8E9', color: '#F9A825', icon: null };
+    if (s.includes('inactive')) return { backgroundColor: '#FFF5F5', color: '#FF5151', icon: inactiveIcon };
+    if (s.includes('active')) return { backgroundColor: '#EDFBF0', color: '#70E183', icon: activeIcon };
+    if (s.includes('day left')) return { backgroundColor: '#FEF6E9', color: '#FAB951', icon: null, iconType: 'clock' };
     return { backgroundColor: '#F4F4F4', color: '#939393', icon: null };
   };
 
@@ -9419,19 +9421,49 @@ const AdminDashboard: React.FC = () => {
                       <img src={activelistingsIcon} alt="Active listings" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
-                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                  {/* Inactive listings - same structure as User list Inactive accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '8px',
+                    border: '1px solid #F1F1F1'
+                  }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
-                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Inactive listings</p>
+                        <p style={{
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Inactive listings
+                        </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>204</p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#FFE9E9', padding: '1.5px 5px', borderRadius: '10px' }}>
-                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          <p style={{
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            204
+                          </p>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            backgroundColor: '#FFE9E9',
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
+                          }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                              <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
                             <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
                           </div>
                         </div>
                       </div>
-                      <img src={listingboxIcon} alt="Inactive listings" style={{ width: '24px', height: '24px' }} />
+                      <img src={peopleIcon} alt="Inactive listings" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
                   <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
@@ -9813,22 +9845,30 @@ const AdminDashboard: React.FC = () => {
                             const status = (row as any).status as ListingListStatus | undefined;
                             if (!status) return null;
                             const badgeStyle = getListingListStatusBadgeStyle(status);
+                            const isDayLeft = badgeStyle.iconType === 'clock';
                             return (
                               <span
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '4px',
-                                  padding: '3px 8px',
-                                  borderRadius: '6px',
-                                  fontSize: '9px',
+                                  padding: isDayLeft ? '2px 10px' : '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '10px',
                                   fontFamily: 'Poppins, sans-serif',
                                   backgroundColor: badgeStyle.backgroundColor,
                                   color: badgeStyle.color
                                 }}
                               >
-                                {badgeStyle.icon && <img src={badgeStyle.icon} alt="" style={{ width: '10px', height: '10px' }} />}
-                                {status}
+                                {badgeStyle.iconType === 'clock' ? (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" fill="#FAB951" />
+                                    <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                ) : badgeStyle.icon ? (
+                                  <img src={badgeStyle.icon} alt="" style={{ width: '12px', height: '12px' }} />
+                                ) : null}
+                                <span style={{ color: badgeStyle.color, fontFamily: 'Poppins, sans-serif' }}>{status}</span>
                               </span>
                             );
                           })()
