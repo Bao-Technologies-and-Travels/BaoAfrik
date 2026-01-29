@@ -8,8 +8,8 @@ pipeline {
         SSH_HOST = 'ashprincepageo@34.51.139.89'
         REPO_URL = 'https://github.com/Bao-Technologies-and-Travels/BaoAfrik.git'
         BRANCH = 'fonsah-staging'
-        FRONTEND_DIR = '~/prod/BaoAfrik/frontend'
-        BACKEND_DIR = '~/prod/BaoAfrik/backend'
+        FRONTEND_DIR = '~/BaoAfrik/frontend'
+        BACKEND_DIR = '~/BaoAfrik/backend'
         APP_NAME_FRONTEND = 'prod-frontend'
         APP_NAME_BACKEND = 'prod-backend'
         DOMAIN = 'https://baoafrik.com'
@@ -88,7 +88,6 @@ pipeline {
                 echo 'Cloning repository...'
                 sshagent([env.SSH_KEY_ID]) {
                     sh """
-                    cd /home/ashprincepageo/prod
 
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
