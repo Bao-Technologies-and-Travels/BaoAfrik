@@ -9564,14 +9564,12 @@ const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Activity log by date (same structure as User activity detail) */}
+                      {/* Activity log by date – single entry, exact replicate of User activity detail */}
                       {[
                         {
                           date: 'Mon, 21 Dec 2025',
                           items: [
-                            { title: 'Listing created', description: 'This listing was added to the platform.', time: '19 min ago' },
-                            { title: 'Listing updated', description: 'Price and description were updated.', time: '2 hours ago' },
-                            { title: 'Status changed', description: 'Listing set to Active.', time: '1 day ago' }
+                            { title: 'Listing created', description: 'This listing was added to the platform.', time: '19 min ago' }
                           ]
                         }
                       ].map((group, groupIdx, groups) => (
@@ -9591,6 +9589,7 @@ const AdminDashboard: React.FC = () => {
                                     cursor: 'pointer'
                                   }}
                                 >
+                                  {/* Avatar with Notification Bell (same as User activity detail) */}
                                   <div style={{ position: 'relative', flexShrink: 0 }}>
                                     <div
                                       style={{
@@ -9601,8 +9600,7 @@ const AdminDashboard: React.FC = () => {
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        overflow: 'hidden',
-                                        border: '1px solid rgba(34, 197, 94, 0.3)'
+                                        overflow: 'hidden'
                                       }}
                                     >
                                       <img
@@ -9616,7 +9614,34 @@ const AdminDashboard: React.FC = () => {
                                         }}
                                       />
                                     </div>
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        bottom: '-2px',
+                                        right: '-2px',
+                                        width: '16px',
+                                        height: '16px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#FFFFFF',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #F1F1F1',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                                      }}
+                                    >
+                                      <img
+                                        src={notifIcon}
+                                        alt="Notification"
+                                        style={{
+                                          width: '10px',
+                                          height: '10px',
+                                          filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                                        }}
+                                      />
+                                    </div>
                                   </div>
+                                  {/* Activity Content (same layout as User: title + more button, then description + View more + time) */}
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div
                                       style={{
@@ -9637,6 +9662,26 @@ const AdminDashboard: React.FC = () => {
                                       >
                                         {item.title}
                                       </span>
+                                      <button
+                                        type="button"
+                                        style={{
+                                          width: '24px',
+                                          height: '24px',
+                                          padding: 0,
+                                          border: 'none',
+                                          background: 'transparent',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                          <circle cx="4" cy="8" r="1.5" fill="#4D4D4D"/>
+                                          <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
+                                          <circle cx="12" cy="8" r="1.5" fill="#4D4D4D"/>
+                                        </svg>
+                                      </button>
                                     </div>
                                     <div
                                       style={{
@@ -9647,15 +9692,28 @@ const AdminDashboard: React.FC = () => {
                                         flexWrap: 'wrap'
                                       }}
                                     >
-                                      <span
-                                        style={{
-                                          fontSize: '11px',
-                                          color: '#939393',
-                                          fontFamily: 'Poppins, sans-serif'
-                                        }}
-                                      >
-                                        {item.description}
-                                      </span>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                                        <span
+                                          style={{
+                                            fontSize: '11px',
+                                            color: '#939393',
+                                            fontFamily: 'Poppins, sans-serif'
+                                          }}
+                                        >
+                                          {item.description}
+                                        </span>
+                                        <span
+                                          style={{
+                                            fontSize: '11px',
+                                            color: '#64B5F6',
+                                            fontFamily: 'Poppins, sans-serif',
+                                            cursor: 'pointer',
+                                            textDecoration: 'underline'
+                                          }}
+                                        >
+                                          View more
+                                        </span>
+                                      </div>
                                       <span
                                         style={{
                                           fontSize: '10px',
