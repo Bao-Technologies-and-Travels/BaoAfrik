@@ -91,15 +91,19 @@ pipeline {
 
                     ssh -o StrictHostKeyChecking=no ${SSH_HOST} '
                         set -e
-                        if [ ! -d ~/prod/BaoAfrik ]; then
-                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
-                        fi
 
-                        cd ${FRONTEND_DIR}
-                        git fetch origin ${BRANCH}
-                        git checkout ${BRANCH}
-                        git reset --hard origin/${BRANCH}
-                        echo "Repository cloned/updated successfully."
+                        # If the directory exists, pull the latest changes
+                        if [ -d ~/BaoAfrik ]; then
+                            cd ~/BaoAfrik
+                            git fetch origin ${BRANCH}
+                            git checkout ${BRANCH}
+                            git reset --hard origin/${BRANCH}
+                            echo "Repository updated successfully."
+                        else
+                            # Clone the repository if it doesn\'t exist
+                            git clone -b ${BRANCH} ${REPO_URL} ~/BaoAfrik
+                            echo "Repository cloned successfully."
+                        fi
                     '
                     """
                 }
