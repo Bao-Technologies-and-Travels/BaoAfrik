@@ -46,6 +46,9 @@ import CommunityGuidelines from './pages/CommunityGuidelines';
 import ContactSupport from './pages/ContactSupport';
 import SafetyTrust from './pages/SafetyTrust';
 import HelpCentre from './pages/HelpCentre';
+import PartnershipsPage from './pages/PartnershipsPage';
+import HowItWorks from './pages/HowItWorks';
+import OurStory from './pages/OurStory';
 import './App.css';
 
 function AppContent() {
@@ -151,6 +154,9 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/safety-trust" element={<SafetyTrust />} />
           <Route path="/help-centre" element={<HelpCentre />} />
+          <Route path="/partnerships" element={<PartnershipsPage />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/our-story" element={<OurStory />} />
         </Routes>
       </main>
       <Footer />
