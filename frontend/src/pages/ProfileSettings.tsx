@@ -2286,8 +2286,6 @@ const ProfileSettings: React.FC = () => {
       const handleMessage = async (event: MessageEvent) => {
         if (event.origin !== window.location.origin) return;
 
-        console.log('[OAuth] Received message:', event.data);
-
         if (event.data.type === 'SOCIAL_ACCOUNT_ERROR') {
           clearInterval(pollTimer);
           window.removeEventListener('message', handleMessage);

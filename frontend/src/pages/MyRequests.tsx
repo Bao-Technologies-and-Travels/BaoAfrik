@@ -4,6 +4,7 @@ import Header from '../components/layout/Header';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getProductCountry, countries } from '../utils/countryHelpers';
+import { useNotificationToast } from '../contexts/NotificationToastContext';
 
 import listIcon from '../assets/images/pre/list.svg';
 import gridIcon from '../assets/images/pre/grid.svg';
@@ -241,6 +242,7 @@ const badgeStyles = (filter: Exclude<StatusFilter, 'All Status'>) => {
 const MyRequests: React.FC = () => {
     const navigate = useNavigate();
     const { addToast } = useToast();
+    const { showNotification } = useNotificationToast();
     const { user } = useAuth();
     const [isMobile, setIsMobile] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -267,7 +269,7 @@ const MyRequests: React.FC = () => {
     const [mobileSearchSubmitted, setMobileSearchSubmitted] = useState(false);
     const [requests, setRequests] = useState<Request[]>([]);
     const [isLoadingRequests, setIsLoadingRequests] = useState(true);
-    
+
     // Request modal state
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [requestProductName, setRequestProductName] = useState('');
@@ -281,14 +283,14 @@ const MyRequests: React.FC = () => {
     const [isRequestProductOriginDropdownOpen, setIsRequestProductOriginDropdownOpen] = useState(false);
     const requestProductOriginDropdownRef = useRef<HTMLDivElement>(null);
     const locationDropdownRef = useRef<HTMLDivElement>(null);
-    
+
     // UK cities for location dropdown
     const ukCities = [
         'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds',
         'Sheffield', 'Edinburgh', 'Glasgow', 'Bristol', 'Cardiff',
         'Newcastle', 'Nottingham', 'Leicester', 'Southampton', 'Belfast'
     ];
-    
+
     // African countries for origin dropdown
     const africanCountries = countries
         .map(c => ({ name: c.name, code: c.code, flag: c.flag }))
@@ -297,17 +299,22 @@ const MyRequests: React.FC = () => {
     // Handle "Make a Request" button click - check authentication
     const handleMakeRequestClick = () => {
         if (!user) {
-            addToast({
-                type: 'info',
-                title: 'Login Required',
-                message: 'Please log in to make a request',
-                duration: 3000
+            // addToast({
+            //     type: 'info',
+            //     title: 'Login Required',
+            //     message: 'Please log in to make a request',
+            //     duration: 3000
+            // });
+            showNotification({
+                type: 'app',
+                mainText: 'Login Required',
+                subText: 'Please log in to make a request',
             });
             return;
         }
         setShowRequestModal(true);
     };
-    
+
     // Handle request form submission
     const handleRequestSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -775,12 +782,18 @@ const MyRequests: React.FC = () => {
             );
             setStatusModalOpenFor(null);
 
-            addToast({
-                type: 'success',
-                title: 'Status Updated',
-                message: 'Request status has been updated successfully',
-                duration: 2000
+            // addToast({
+            //     type: 'success',
+            //     title: 'Status Updated',
+            //     message: 'Request status has been updated successfully',
+            //     duration: 2000
+            // });
+            showNotification({
+                type: 'app',
+                mainText: 'Status Updated',
+                subText: 'Request status has been updated successfully',
             });
+
         } catch (error: any) {
             console.error('Error updating request status:', error);
             addToast({
@@ -788,6 +801,11 @@ const MyRequests: React.FC = () => {
                 title: 'Update Failed',
                 message: error.message || 'Failed to update request status. Please try again.',
                 duration: 3000
+            });
+            showNotification({
+                type: 'app',
+                mainText: 'Update Failed',
+                subText: error.message || 'Failed to update request status. Please try again.',
             });
         }
     };
@@ -871,7 +889,12 @@ const MyRequests: React.FC = () => {
                         borderRadius: '8px',
                         paddingTop: '4px',
                         paddingBottom: '6px',
-                        height: '24px'
+                        height: '24px',
+                        cursor: 'pointer'
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setStatusModalOpenFor(isModalOpen ? null : requestId);
                     }}
                 >
                     <span

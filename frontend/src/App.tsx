@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationToastProvider } from './contexts/NotificationToastContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { ContactSupportProvider } from './contexts/ContactSupportContext';
+import ContactSupportModal from './components/ContactSupportModal';
+
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -38,6 +41,13 @@ import Requests from './pages/Requests';
 import MyRequests from './pages/MyRequests';
 import ImageSearch from './pages/ImageSearch';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import TermsOfUse from './pages/TermsOfUse';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import CookiePolicy from './pages/CookiePolicy';
+import CommunityGuidelines from './pages/CommunityGuidelines';
+import ContactSupport from './pages/ContactSupport';
+import SafetyTrust from './pages/SafetyTrust';
+import HelpCentre from './pages/HelpCentre';
 import './App.css';
 
 import { ToastProvider } from './contexts/ToastContext';
@@ -140,6 +150,13 @@ function AppContent() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/requests/:id" element={<Requests />} />
+          <Route path="/terms" element={<TermsOfUse />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/cookie-policy" element={<CookiePolicy />} />
+          <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/contact-support" element={<ContactSupport />} />
+          <Route path="/safety-trust" element={<SafetyTrust />} />
+          <Route path="/help-center" element={<HelpCentre />} />
         </Routes>
       </main>
       <Footer />
@@ -153,9 +170,12 @@ function App() {
       <AuthProvider>
         <NotificationProvider>
           <NotificationToastProvider>
-            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AppContent />
-            </Router>
+            <ContactSupportProvider>
+              <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <AppContent />
+              </Router>
+              <ContactSupportModal />
+            </ContactSupportProvider>
           </NotificationToastProvider>
         </NotificationProvider>
       </AuthProvider>

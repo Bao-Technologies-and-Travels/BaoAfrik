@@ -599,18 +599,6 @@ const Notifications: React.FC = () => {
                     </span>
                   )}
 
-                  {/* Test Toast Button */}
-                  {/* <button
-                    onClick={() => showNotification({
-                      type: 'app',
-                      mainText: 'Your profile has been updated,',
-                      subText: 'you ...',
-                      subText2: 'Invoice 6 August 2025 Sequence: 2-7 ...'
-                    })}
-                    className="text-xs px-3 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
-                  >
-                    Test Toast
-                  </button> */}
                 </div>
 
                 {/* Pagination */}

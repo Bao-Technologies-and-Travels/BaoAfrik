@@ -1021,13 +1021,89 @@ const Requests: React.FC = () => {
     );
   };
 
+  /** Centralized empty state when no requests are found in any section */
+  const renderRequestsEmptyState = (options: {
+    title: string;
+    description: string;
+    showViewLink?: boolean;
+    wrapperClassName?: string;
+    wrapperStyle?: React.CSSProperties;
+  }) => {
+    const { title, description, showViewLink = false, wrapperClassName = '', wrapperStyle } = options;
+    const defaultStyle: React.CSSProperties = {
+      padding: isMobile ? '48px 16px' : '64px 16px',
+      marginTop: isMobile ? '32px' : '48px',
+      marginBottom: isMobile ? '48px' : '64px'
+    };
+    return (
+      <div
+        className={`text-center ${wrapperClassName}`.trim()}
+        style={{ ...defaultStyle, ...wrapperStyle }}
+      >
+        <img
+          src={emptyRequestIcon}
+          alt="No requests found"
+          className="mx-auto"
+          style={{
+            width: isMobile ? '40px' : '60px',
+            height: isMobile ? '40px' : '60px',
+            marginBottom: isMobile ? '12px' : '16px'
+          }}
+        />
+        <h3 style={{
+          fontSize: isMobile ? '16px' : '20px',
+          color: '#D9D9D9',
+          fontFamily: 'Bricolage Grotesque, sans-serif',
+          fontWeight: '500',
+          marginBottom: isMobile ? '8px' : '12px'
+        }}>
+          {title}
+        </h3>
+        <p style={{
+          fontSize: isMobile ? '12px' : '16px',
+          color: '#B0B0B0',
+          fontFamily: 'Poppins, sans-serif',
+          maxWidth: isMobile ? '280px' : '500px',
+          margin: '0 auto',
+          marginBottom: showViewLink ? (isMobile ? '16px' : '20px') : 0,
+          lineHeight: '1.5'
+        }}>
+          {description}
+        </p>
+        {showViewLink && (
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
+            style={{
+              color: '#64B5F6',
+              fontSize: isMobile ? '11px' : '13px',
+              textDecoration: 'none',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            <span>View available items</span>
+            <img
+              src={requestArrowIcon}
+              alt="Arrow"
+              style={{
+                width: isMobile ? '10px' : '12px',
+                height: isMobile ? '10px' : '12px',
+                filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
+              }}
+            />
+          </Link>
+        )}
+      </div>
+    );
+  };
+
   const renderRequestCard = (isPending: boolean = false, cardId: string = '', productData?: { title: string; country: string; flag: string; location: string; isPending?: boolean; description?: string; price?: number; request?: ProductRequest }) => {
     // Check if the current user is the owner of this request
     const isCurrentUserOwner = (req: ProductRequest | undefined) => {
       return user && req && req.userId === user.id;
     };
 
-    // Helper function to get status display text
+    // Helper function to get status display text (aligned with MyRequests: pending, completed, ongoing, expired)
     const getStatusDisplay = (status: string | undefined): string => {
       if (!status) return 'Pending';
       const statusUpper = status.toUpperCase();
@@ -1037,9 +1113,9 @@ const Requests: React.FC = () => {
         case 'ONGOING':
           return 'Ongoing';
         case 'FULFILLED':
-          return 'Fulfilled';
+          return 'Completed';
         case 'REJECTED':
-          return 'Rejected';
+          return 'Expired';
         case 'CANCELLED':
           return 'Cancelled';
         default:
@@ -2055,68 +2131,12 @@ const Requests: React.FC = () => {
 
         {/* Search Results or Empty State */}
         <div className="flex-1 overflow-y-auto px-4 pb-24">
-          {isNoResults && (
-            <div className="text-center" style={{ padding: '48px 16px', marginTop: '32px', marginBottom: '48px' }}>
-              {/* Empty Request Icon */}
-              <img
-                src={emptyRequestIcon}
-                alt="No requests found"
-                className="mx-auto"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  marginBottom: '12px'
-                }}
-              />
-
-              {/* Title */}
-              <h3 style={{
-                fontSize: '16px',
-                color: '#D9D9D9',
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
-                No results
-              </h3>
-
-              {/* Description */}
-              <p style={{
-                fontSize: '12px',
-                color: '#B0B0B0',
-                fontFamily: 'Poppins, sans-serif',
-                maxWidth: '280px',
-                margin: '0 auto',
-                marginBottom: '16px',
-                lineHeight: '1.5'
-              }}>
-                We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.
-              </p>
-
-              {/* View available items link */}
-              <Link
-                to="/"
-                className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                style={{
-                  color: '#64B5F6',
-                  fontSize: '11px',
-                  textDecoration: 'none',
-                  fontFamily: 'Poppins, sans-serif'
-                }}
-              >
-                <span>View available items</span>
-                <img
-                  src={requestArrowIcon}
-                  alt="Arrow"
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
-                  }}
-                />
-              </Link>
-            </div>
-          )}
+          {isNoResults && renderRequestsEmptyState({
+            title: 'No results',
+            description: 'We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.',
+            showViewLink: true,
+            wrapperStyle: { padding: '48px 16px', marginTop: '32px', marginBottom: '48px' }
+          })}
 
           {hasSearchResults && (
             <div className="grid grid-cols-1 gap-4">
@@ -2646,67 +2666,11 @@ const Requests: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  {/* Empty State */}
-                  <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px', marginTop: isMobile ? '32px' : '48px', marginBottom: isMobile ? '48px' : '64px' }}>
-                    {/* Empty Request Icon */}
-                    <img
-                      src={emptyRequestIcon}
-                      alt="No requests found"
-                      className="mx-auto"
-                      style={{
-                        width: isMobile ? '40px' : '60px',
-                        height: isMobile ? '40px' : '60px',
-                        marginBottom: isMobile ? '12px' : '16px'
-                      }}
-                    />
-
-                    {/* Title */}
-                    <h3 style={{
-                      fontSize: isMobile ? '16px' : '20px',
-                      color: '#D9D9D9',
-                      fontFamily: 'Bricolage Grotesque, sans-serif',
-                      fontWeight: '500',
-                      marginBottom: isMobile ? '8px' : '12px'
-                    }}>
-                      No results
-                    </h3>
-
-                    {/* Description */}
-                    <p style={{
-                      fontSize: isMobile ? '12px' : '16px',
-                      color: '#B0B0B0',
-                      fontFamily: 'Poppins, sans-serif',
-                      maxWidth: isMobile ? '280px' : '500px',
-                      margin: '0 auto',
-                      marginBottom: isMobile ? '16px' : '20px',
-                      lineHeight: '1.5'
-                    }}>
-                      We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.
-                    </p>
-
-                    {/* View available items link */}
-                    <Link
-                      to="/"
-                      className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                      style={{
-                        color: '#64B5F6',
-                        fontSize: isMobile ? '11px' : '13px',
-                        textDecoration: 'none',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
-                      <span>View available items</span>
-                      <img
-                        src={requestArrowIcon}
-                        alt="Arrow"
-                        style={{
-                          width: isMobile ? '10px' : '12px',
-                          height: isMobile ? '10px' : '12px',
-                          filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
-                        }}
-                      />
-                    </Link>
-                  </div>
+                  {renderRequestsEmptyState({
+                    title: 'No results',
+                    description: 'We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.',
+                    showViewLink: true
+                  })}
 
                   {/* Requests near you Section */}
                   <div className="mb-12">
@@ -2802,37 +2766,10 @@ const Requests: React.FC = () => {
                         })}
                       </div>
                     ) : (
-                      <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px' }}>
-                        <img
-                          src={emptyRequestIcon}
-                          alt="No requests found"
-                          className="mx-auto"
-                          style={{
-                            width: isMobile ? '40px' : '60px',
-                            height: isMobile ? '40px' : '60px',
-                            marginBottom: isMobile ? '12px' : '16px'
-                          }}
-                        />
-                        <h3 style={{
-                          fontSize: isMobile ? '16px' : '20px',
-                          color: '#D9D9D9',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontWeight: '500',
-                          marginBottom: isMobile ? '8px' : '12px'
-                        }}>
-                          No requests around you
-                        </h3>
-                        <p style={{
-                          fontSize: isMobile ? '12px' : '16px',
-                          color: '#B0B0B0',
-                          fontFamily: 'Poppins, sans-serif',
-                          maxWidth: isMobile ? '280px' : '500px',
-                          margin: '0 auto',
-                          lineHeight: '1.5'
-                        }}>
-                          Explore other requests from different locations
-                        </p>
-                      </div>
+                      renderRequestsEmptyState({
+                        title: 'No requests around you',
+                        description: 'Explore other requests from different locations'
+                      })
                     )}
                   </div>
                 </>
@@ -2952,67 +2889,11 @@ const Requests: React.FC = () => {
               {/* Check if no results */}
               {getFilteredCount() === 0 && (selectedCountry || selectedPrice) ? (
                 <>
-                  {/* Empty State */}
-                  <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px', marginTop: isMobile ? '32px' : '48px', marginBottom: isMobile ? '48px' : '64px' }}>
-                    {/* Empty Request Icon */}
-                    <img
-                      src={emptyRequestIcon}
-                      alt="No requests found"
-                      className="mx-auto"
-                      style={{
-                        width: isMobile ? '40px' : '60px',
-                        height: isMobile ? '40px' : '60px',
-                        marginBottom: isMobile ? '12px' : '16px'
-                      }}
-                    />
-
-                    {/* Title */}
-                    <h3 style={{
-                      fontSize: isMobile ? '16px' : '20px',
-                      color: '#D9D9D9',
-                      fontFamily: 'Bricolage Grotesque, sans-serif',
-                      fontWeight: '500',
-                      marginBottom: isMobile ? '8px' : '12px'
-                    }}>
-                      No results
-                    </h3>
-
-                    {/* Description */}
-                    <p style={{
-                      fontSize: isMobile ? '12px' : '16px',
-                      color: '#B0B0B0',
-                      fontFamily: 'Poppins, sans-serif',
-                      maxWidth: isMobile ? '280px' : '500px',
-                      margin: '0 auto',
-                      marginBottom: isMobile ? '16px' : '20px',
-                      lineHeight: '1.5'
-                    }}>
-                      We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.
-                    </p>
-
-                    {/* View available items link */}
-                    <Link
-                      to="/"
-                      className="inline-flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                      style={{
-                        color: '#64B5F6',
-                        fontSize: isMobile ? '11px' : '13px',
-                        textDecoration: 'none',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
-                      <span>View available items</span>
-                      <img
-                        src={requestArrowIcon}
-                        alt="Arrow"
-                        style={{
-                          width: isMobile ? '10px' : '12px',
-                          height: isMobile ? '10px' : '12px',
-                          filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)'
-                        }}
-                      />
-                    </Link>
-                  </div>
+                  {renderRequestsEmptyState({
+                    title: 'No results',
+                    description: 'We found nothing for your search, sorry. Please continue browsing the platform to discover more wonders.',
+                    showViewLink: true
+                  })}
 
                   {/* Requests near you Section */}
                   <div className="mb-12">
@@ -3094,7 +2975,7 @@ const Requests: React.FC = () => {
                         />
                       )}
                       <div
-                        className={isMobile ? "flex gap-6 mb-2 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
+                        className={isMobile ? "flex gap-6 mb-2 overflow-x-auto scrollbar-hide" : "col-span-full"}
                         style={isMobile ? {
                           padding: '12px 0 8px 0',
                           scrollbarWidth: 'none',
@@ -3121,37 +3002,12 @@ const Requests: React.FC = () => {
                             );
                           })
                         ) : (
-                          <div className="text-center col-span-full" style={{ padding: isMobile ? '48px 16px' : '64px 16px' }}>
-                            <img
-                              src={emptyRequestIcon}
-                              alt="No requests found"
-                              className="mx-auto"
-                              style={{
-                                width: isMobile ? '40px' : '60px',
-                                height: isMobile ? '40px' : '60px',
-                                marginBottom: isMobile ? '12px' : '16px'
-                              }}
-                            />
-                            <h3 style={{
-                              fontSize: isMobile ? '16px' : '20px',
-                              color: '#D9D9D9',
-                              fontFamily: 'Bricolage Grotesque, sans-serif',
-                              fontWeight: '500',
-                              marginBottom: isMobile ? '8px' : '12px'
-                            }}>
-                              No requests around you
-                            </h3>
-                            <p style={{
-                              fontSize: isMobile ? '12px' : '16px',
-                              color: '#B0B0B0',
-                              fontFamily: 'Poppins, sans-serif',
-                              maxWidth: isMobile ? '280px' : '500px',
-                              margin: '0 auto',
-                              lineHeight: '1.5'
-                            }}>
-                              Explore other requests from different locations
-                            </p>
-                          </div>
+                          renderRequestsEmptyState({
+                            title: 'No requests around you',
+                            description: 'Explore other requests from different locations',
+                            wrapperClassName: 'col-span-full',
+                            wrapperStyle: { padding: isMobile ? '48px 16px' : '64px 16px' }
+                          })
                         )}
                       </div>
                     </div>
@@ -3301,37 +3157,12 @@ const Requests: React.FC = () => {
                         );
                       })
                     ) : (
-                      <div className="text-center col-span-full" style={{ padding: isMobile ? '48px 16px' : '64px 16px' }}>
-                        <img
-                          src={emptyRequestIcon}
-                          alt="No requests found"
-                          className="mx-auto"
-                          style={{
-                            width: isMobile ? '40px' : '60px',
-                            height: isMobile ? '40px' : '60px',
-                            marginBottom: isMobile ? '12px' : '16px'
-                          }}
-                        />
-                        <h3 style={{
-                          fontSize: isMobile ? '16px' : '20px',
-                          color: '#D9D9D9',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontWeight: '500',
-                          marginBottom: isMobile ? '8px' : '12px'
-                        }}>
-                          No requests around you
-                        </h3>
-                        <p style={{
-                          fontSize: isMobile ? '12px' : '16px',
-                          color: '#B0B0B0',
-                          fontFamily: 'Poppins, sans-serif',
-                          maxWidth: isMobile ? '280px' : '500px',
-                          margin: '0 auto',
-                          lineHeight: '1.5'
-                        }}>
-                          Explore other requests from different locations
-                        </p>
-                      </div>
+                      renderRequestsEmptyState({
+                        title: 'No requests around you',
+                        description: 'Explore other requests from different locations',
+                        wrapperClassName: 'col-span-full',
+                        wrapperStyle: { padding: isMobile ? '48px 16px' : '64px 16px' }
+                      })
                     )}
                   </div>
                 </div>
@@ -3435,37 +3266,12 @@ const Requests: React.FC = () => {
                         );
                       })
                     ) : (
-                      <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px' }}>
-                        <img
-                          src={emptyRequestIcon}
-                          alt="No requests found"
-                          className="mx-auto"
-                          style={{
-                            width: isMobile ? '40px' : '60px',
-                            height: isMobile ? '40px' : '60px',
-                            marginBottom: isMobile ? '12px' : '16px'
-                          }}
-                        />
-                        <h3 style={{
-                          fontSize: isMobile ? '16px' : '20px',
-                          color: '#D9D9D9',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontWeight: '500',
-                          marginBottom: isMobile ? '8px' : '12px'
-                        }}>
-                          No pending requests
-                        </h3>
-                        <p style={{
-                          fontSize: isMobile ? '12px' : '16px',
-                          color: '#B0B0B0',
-                          fontFamily: 'Poppins, sans-serif',
-                          maxWidth: isMobile ? '280px' : '500px',
-                          margin: '0 auto',
-                          lineHeight: '1.5'
-                        }}>
-                          All requests have been processed
-                        </p>
-                      </div>
+                      renderRequestsEmptyState({
+                        title: 'No pending requests',
+                        description: 'All requests have been processed',
+                        wrapperClassName: 'col-span-full',
+                        wrapperStyle: { padding: isMobile ? '48px 16px' : '64px 16px' }
+                      })
                     )}
                   </div>
                 </div>
@@ -3570,37 +3376,11 @@ const Requests: React.FC = () => {
                         );
                       })
                     ) : (
-                      <div className="text-center" style={{ padding: isMobile ? '48px 16px' : '64px 16px' }}>
-                        <img
-                          src={emptyRequestIcon}
-                          alt="No requests found"
-                          className="mx-auto"
-                          style={{
-                            width: isMobile ? '40px' : '60px',
-                            height: isMobile ? '40px' : '60px',
-                            marginBottom: isMobile ? '12px' : '16px'
-                          }}
-                        />
-                        <h3 style={{
-                          fontSize: isMobile ? '16px' : '20px',
-                          color: '#D9D9D9',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontWeight: '500',
-                          marginBottom: isMobile ? '8px' : '12px'
-                        }}>
-                          No requests found
-                        </h3>
-                        <p style={{
-                          fontSize: isMobile ? '12px' : '16px',
-                          color: '#B0B0B0',
-                          fontFamily: 'Poppins, sans-serif',
-                          maxWidth: isMobile ? '280px' : '500px',
-                          margin: '0 auto',
-                          lineHeight: '1.5'
-                        }}>
-                          Be the first to create a request
-                        </p>
-                      </div>
+                      renderRequestsEmptyState({
+                        title: 'No requests found',
+                        description: 'Be the first to create a request',
+                        wrapperStyle: { padding: isMobile ? '48px 16px' : '64px 16px' }
+                      })
                     )}
                   </div>
                 </div>

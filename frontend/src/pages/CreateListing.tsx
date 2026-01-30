@@ -59,8 +59,9 @@ const CreateListing: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState('GBP');
-  const [quantity, setQuantity] = useState(1);
+  const [currency, setCurrency] = useState('£');
+  const [quantity, setQuantity] = useState(0);
+  const [quantityDisplayStr, setQuantityDisplayStr] = useState('0');
   const [category, setCategory] = useState('');
   const [origin, setOrigin] = useState('');
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
@@ -168,6 +169,11 @@ const CreateListing: React.FC = () => {
     category !== '' &&
     origin !== '' &&
     (isEditMode || imageUrls.length > 0);
+
+  // Keep quantity display string in sync when quantity changes from +/- or reset/prefill
+  useEffect(() => {
+    setQuantityDisplayStr(String(quantity));
+  }, [quantity]);
 
   // auto-fill product data for editing
   useEffect(() => {
@@ -521,7 +527,7 @@ const CreateListing: React.FC = () => {
         setDescription(product.description || '');
         setPrice(product.price?.toString() || '');
         setCurrency(product.currency || 'GCP');
-        setQuantity(product.quantity || 1);
+        setQuantity(product.quantity ?? 0);
         setCategory(product.category || '');
         setOrigin(product.origin || '');
         // setSaleType(product.saleType || 'Default');
@@ -558,10 +564,10 @@ const CreateListing: React.FC = () => {
   ];
 
   const currencies = [
-    // { value: 'USD', label: 'US Dollar', flagCode: 'us' },
-    // { value: 'CAD', label: 'Canadian Dollar', flagCode: 'ca' },
-    { value: 'GBP', label: 'Pound Sterling', flagCode: 'gb' },
-    // { value: 'EUR', label: 'Euro', flagCode: 'eu' }
+    // { value: '$', label: 'US Dollar', flagCode: 'us' },
+    // { value: 'C$', label: 'Canadian Dollar', flagCode: 'ca' },
+    { value: '£', label: 'Pound Sterling', flagCode: 'gb' },
+    // { value: '€', label: 'Euro', flagCode: 'eu' }
   ];
 
   const countries = [
@@ -664,7 +670,7 @@ const CreateListing: React.FC = () => {
     if (prefill.description) setDescription(prefill.description);
     if (prefill.price) setPrice(prefill.price.toString());
     if (prefill.currency) setCurrency(prefill.currency);
-    if (prefill.quantity) setQuantity(Number(prefill.quantity) || 1);
+    if (prefill.quantity != null && prefill.quantity !== '') setQuantity(Math.max(0, Number(prefill.quantity) || 0));
     if (prefill.category) setCategory(prefill.category);
     if (prefill.location) setLocation(prefill.location);
     if (typeof prefill.deliveryAvailable === 'boolean') setDeliveryAvailable(prefill.deliveryAvailable);
@@ -1444,7 +1450,7 @@ const CreateListing: React.FC = () => {
     setDescription('');
     setPrice('');
     setCurrency('GCP');
-    setQuantity(1);
+    setQuantity(0);
     setCategory('');
     setOrigin('');
     setDeliveryAvailable(false);
@@ -3328,23 +3334,28 @@ const CreateListing: React.FC = () => {
                     </label>
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        onClick={() => setQuantity(Math.max(0, quantity - 1))}
                         className="w-10 h-10 rounded-lg font-medium text-base flex-shrink-0"
                         style={{ backgroundColor: '#E3F2FD', color: '#64B5F6' }}
                       >
                         −
                       </button>
                       <input
-                        type="number"
-                        value={quantity}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        autoComplete="off"
+                        value={quantityDisplayStr}
+                        onFocus={(e) => {
+                          const el = e.target as HTMLInputElement;
+                          requestAnimationFrame(() => el.select());
+                        }}
+                        onTouchEnd={(e) => (e.target as HTMLInputElement).select()}
                         onChange={(e) => {
-                          const value = e.target.value;
-                          // Clear leading zeros when user types
-                          if (value && value.startsWith('0') && value.length > 1) {
-                            setQuantity(parseInt(value.replace(/^0+/, '')) || 1);
-                          } else {
-                            setQuantity(parseInt(value) || 1);
-                          }
+                          const raw = e.target.value.replace(/\D/g, '');
+                          const normalized = raw.replace(/^0+/, '') || '0';
+                          setQuantityDisplayStr(normalized);
+                          setQuantity(Math.max(0, parseInt(normalized, 10) || 0));
                         }}
                         className="px-2.5 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ width: '100%', fontSize: '0.75rem' }}
@@ -4403,16 +4414,21 @@ const CreateListing: React.FC = () => {
                           −
                         </button>
                         <input
-                          type="number"
-                          value={quantity}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          autoComplete="off"
+                          value={quantityDisplayStr}
+                          onFocus={(e) => {
+                            const el = e.target as HTMLInputElement;
+                            requestAnimationFrame(() => el.select());
+                          }}
+                          onTouchEnd={(e) => (e.target as HTMLInputElement).select()}
                           onChange={(e) => {
-                            const value = e.target.value;
-                            // Clear leading zeros when user types
-                            if (value && value.startsWith('0') && value.length > 1) {
-                              setQuantity(parseInt(value.replace(/^0+/, '')) || 0);
-                            } else {
-                              setQuantity(parseInt(value) || 0);
-                            }
+                            const raw = e.target.value.replace(/\D/g, '');
+                            const normalized = raw.replace(/^0+/, '') || '0';
+                            setQuantityDisplayStr(normalized);
+                            setQuantity(Math.max(0, parseInt(normalized, 10) || 0));
                           }}
                           className="px-4 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           style={{ width: '140px' }}
@@ -4788,7 +4804,7 @@ const CreateListing: React.FC = () => {
                           Delivery available
                         </label>
                         <p className="text-xs text-gray-400 mt-1">
-                          Lorem ipsum dolor sit amet consectutor
+                          Possibility to deliver the product to the seller's location?
                         </p>
                       </div>
                       <button
@@ -5000,7 +5016,7 @@ const CreateListing: React.FC = () => {
                   lineHeight: '1.5'
                 }}
               >
-                Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing.
+                Your product will soon be available on the platform after it is reviewed.
               </p>
 
               {/* Buttons */}

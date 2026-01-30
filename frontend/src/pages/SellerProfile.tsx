@@ -1072,7 +1072,7 @@ const SellerProfile: React.FC = () => {
               </p>
 
               {/* Social Media Icons */}
-              <div className="flex items-center space-x-8 mt-6">
+              {/* <div className="flex items-center space-x-8 mt-6">
                 <a href="#" className="hover:opacity-80 transition-opacity">
                   <img src={whatsappIcon} alt="WhatsApp" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
                 </a>
@@ -1082,7 +1082,7 @@ const SellerProfile: React.FC = () => {
                 <a href="#" className="hover:opacity-80 transition-opacity">
                   <img src={facebookIcon} alt="Facebook" className="w-6 h-6" style={{ filter: 'brightness(0) saturate(100%) invert(61%) sepia(45%) saturate(820%) hue-rotate(175deg) brightness(92%) contrast(92%)' }} />
                 </a>
-              </div>
+              </div> */}
             </div>
 
             {/* Info Section - Location and Membership */}

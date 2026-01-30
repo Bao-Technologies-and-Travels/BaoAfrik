@@ -285,7 +285,6 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
-  const [conversations, setConversations] = useState<any[]>([]);
   const [productConversations, setProductConversations] = useState<any[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [locationFilter, setLocationFilter] = useState('');
@@ -305,35 +304,35 @@ const ProductDetail: React.FC = () => {
   const repostModalRef = useRef<HTMLDivElement>(null);
   const ownerViewState = routerLocation.state as OwnerListingState | null;
   const ownerListingFromState = ownerViewState?.listing;
-  
+
   // Determine if current user is the owner of this product
   const isProductOwner = user && product?.seller?.id === user.id;
-  
+
   // Use owner view if navigating from MyListings OR if user owns the product
   const isOwnerView = Boolean(ownerViewState?.fromMyListings && ownerListingFromState) || Boolean(isProductOwner);
-  
+
   // Compute the current listing status - use localListingStatus if set, otherwise derive from product/navigation state
-  const currentListingStatus: 'active' | 'inactive' = localListingStatus || 
-    ownerListingFromState?.status || 
+  const currentListingStatus: 'active' | 'inactive' = localListingStatus ||
+    ownerListingFromState?.status ||
     (product?.status === 'PUBLISHED' ? 'active' : 'inactive');
 
   // Build ownerListing - merge navigation state with local updates
   const computedDaysLeft = (() => {
     // If local status was just updated to active (reposted), daysLeft should be undefined (7 days left > 3)
     if (localListingStatus === 'active') return undefined;
-    
+
     // Use ownerListingFromState.daysLeft if available
     if (ownerListingFromState?.daysLeft !== undefined) {
       return ownerListingFromState.daysLeft <= 3 ? ownerListingFromState.daysLeft : undefined;
     }
-    
+
     // Calculate from product.expiresAt
     if (product?.expiresAt) {
       const daysLeft = Math.ceil((new Date(product.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
       // Only show daysLeft if 3 days or less
       return daysLeft <= 3 && daysLeft > 0 ? daysLeft : undefined;
     }
-    
+
     return undefined;
   })();
 
@@ -341,7 +340,7 @@ const ProductDetail: React.FC = () => {
     id: ownerListingFromState?.id || product?.id || '',
     title: ownerListingFromState?.title || product?.title || '',
     price: ownerListingFromState?.price || product?.price?.toString() || '0',
-    currency: ownerListingFromState?.currency || product?.currency || 'GCP',
+    currency: ownerListingFromState?.currency || product?.currency || '£',
     status: currentListingStatus,
     daysLeft: computedDaysLeft,
     createdAt: ownerListingFromState?.createdAt || (product?.createdAt ? new Date(product.createdAt).getTime() : Date.now()),
@@ -434,9 +433,9 @@ const ProductDetail: React.FC = () => {
       const token = localStorage.getItem('accessToken');
       const res = await fetch(`${API_BASE}/products/${product.id}/status`, {
         method: 'PATCH',
-        headers: { 
-          Authorization: `Bearer ${token}`, 
-          'Content-Type': 'application/json' 
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ status: 'PUBLISHED' })
       });
@@ -448,11 +447,11 @@ const ProductDetail: React.FC = () => {
 
       // Update local status to active
       setLocalListingStatus('active');
-      
+
       // Update the published date to current time (backend sets this too)
       const newPublishedAt = new Date().toISOString();
       setLocalPublishedAt(newPublishedAt);
-      
+
       // Update product status and publishedAt in state
       setProduct(prev => prev ? { ...prev, status: 'PUBLISHED', publishedAt: newPublishedAt } : prev);
 
@@ -469,14 +468,14 @@ const ProductDetail: React.FC = () => {
   // Handle edit and repost - navigate to create listing with all product details
   const handleEditAndRepost = () => {
     if (!product) return;
-    
+
     // Build the prefill data with all product details
     const prefillData = {
       id: product.id,
       title: product.title,
       description: product.description,
       price: product.price?.toString() || '',
-      currency: product.currency || 'GCP',
+      currency: product.currency || '£',
       quantity: product.quantity?.toString() || '1',
       category: product.category || '',
       origin: product.origin || '',
@@ -484,12 +483,12 @@ const ProductDetail: React.FC = () => {
       location: product.location || '',
       saleType: product.saleType || 'DEFAULT',
       deliveryAvailable: product.deliveryAvailable || false,
-      images: Array.isArray(product.images) 
+      images: Array.isArray(product.images)
         ? product.images.map((img: any) => typeof img === 'string' ? img : img.url)
         : (product.imageUrls || []),
       isRepost: true // Flag to indicate this is a repost/edit
     };
-    
+
     navigate('/create-listing', { state: { draft: prefillData } });
     setShowRepostModal(false);
   };
@@ -577,7 +576,7 @@ const ProductDetail: React.FC = () => {
   // Fetch conversations for product (owner view only)
   useEffect(() => {
     const productId = product?.id;
-    
+
     // Prevent duplicate calls for the same product
     if (!isOwnerView || !productId || !user || fetchingConversationsRef.current || lastFetchedProductIdRef.current === productId) {
       return;
@@ -897,6 +896,32 @@ const ProductDetail: React.FC = () => {
     );
   };
 
+  // Get first image URL from a related product (handles multiple API response shapes)
+  const getRelatedProductFirstImage = (p: { images?: any; imageUrls?: string[] } | null): string => {
+    if (!p) return pre1;
+    const imgs = p.images;
+    const urls = p.imageUrls;
+    if (Array.isArray(urls) && urls.length > 0 && typeof urls[0] === 'string') return urls[0];
+    if (typeof imgs === 'string') {
+      try {
+        const parsed = JSON.parse(imgs);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const first = parsed[0];
+          return (first && (first.url ?? first.link ?? (typeof first === 'string' ? first : null))) || pre1;
+        }
+        return imgs.startsWith('http') ? imgs : pre1;
+      } catch {
+        return imgs.startsWith('http') ? imgs : pre1;
+      }
+    }
+    if (Array.isArray(imgs) && imgs.length > 0) {
+      const first = imgs[0];
+      if (typeof first === 'string') return first;
+      if (first && typeof first === 'object') return (first as any).url ?? (first as any).link ?? pre1;
+    }
+    return pre1;
+  };
+
   // Get product images
   const getProductImages = (product: Product | null) => {
     const defaultImages = [mainImage, thumbnailImage1, thumbnailImage2, thumbnailImage3];
@@ -1123,7 +1148,7 @@ const ProductDetail: React.FC = () => {
 
     return `${formattedDate} (${relativeTime})`;
   };
-  
+
   // Get the display date - prefer localPublishedAt (after repost), then product.publishedAt, then product.createdAt
   const getDisplayPublishedDate = (): string => {
     const dateToUse = localPublishedAt || product?.publishedAt || product?.createdAt;
@@ -1332,7 +1357,7 @@ const ProductDetail: React.FC = () => {
             name: product.title,
             title: product.title,
             price: product.price,
-            currency: product.currency || 'GCP',
+            currency: product.currency || '£',
             description: product.description || '',
             image: primaryImage, // Primary image URL
             images: imageUrls, // All image URLs array
@@ -1410,63 +1435,6 @@ const ProductDetail: React.FC = () => {
       : (product?.price != null ? `${product.price}` : ''));
   const defaultDateLabel = product?.createdAt ?? 'Mon, 21 Dec 2024';
   const displayDateLabel = ownerListing?.createdAt ? formatOwnerDate(ownerListing.createdAt) : defaultDateLabel;
-
-  const reviewDiscussionData: { [key: string]: Array<{ id: string; author: string; role?: string; date: string; text: string; isOwner?: boolean; avatar?: string }> } = {
-    review1: [
-      {
-        id: 'review1-comment1',
-        author: `${product?.seller.firstName} ${product?.seller.lastName}`,
-        role: 'Product Owner',
-        date: '2 Jan 2025',
-        text: 'I am glad the flavor worked well for your dishes, Samine. Each batch is sourced carefully so you can count on the same aroma every time.',
-        isOwner: true,
-        avatar: product?.seller.profileImage || sellerAvatar
-      }
-    ],
-    review2: [
-      {
-        id: 'review2-comment1',
-        author: 'Ibrahim Kalu',
-        date: '13 Dec 2024',
-        text: 'Thanks for the detailed feedback, Kael! I also noticed the aroma lingers nicely when simmered slowly.',
-        avatar: sellerAvatar
-      },
-      {
-        id: 'review2-comment2',
-        author: `${product?.seller.firstName} ${product?.seller.lastName}`,
-        role: 'Product Owner',
-        date: '13 Dec 2024',
-        text: 'Happy you enjoyed it, Kael. Feel free to reach out if you ever need larger quantities for your kitchen.',
-        isOwner: true,
-        avatar: product?.seller.profileImage || sellerAvatar
-      },
-      {
-        id: 'review2-comment3',
-        author: 'Ada Ifeoma',
-        date: '14 Dec 2024',
-        text: 'Totally agree—shipping was quick for me too. Perfect for soups!',
-        avatar: sellerAvatar
-      }
-    ],
-    review3: [
-      {
-        id: 'review3-comment1',
-        author: `${product?.seller.firstName} ${product?.seller.lastName}`,
-        role: 'Product Owner',
-        date: '9 Nov 2024',
-        text: 'Thanks for sharing, Alex. I can offer a bolder batch next time—send me a message and I will make it right.',
-        isOwner: true,
-        avatar: product?.seller.profileImage || sellerAvatar
-      },
-      {
-        id: 'review3-comment2',
-        author: 'Chinedu Bassey',
-        date: '10 Nov 2024',
-        text: 'I had a stronger flavor experience, maybe try it freshly ground. It made a difference for me.',
-        avatar: sellerAvatar
-      }
-    ]
-  };
 
   // Seller rating derived from backend user data
   const sellerRatingValue = getSellerRating(product?.seller);
@@ -1896,9 +1864,9 @@ const ProductDetail: React.FC = () => {
                   className="w-full h-full object-cover"
                   loading="eager"
                 />
-                
+
                 {/* Smoky fade effect at the top */}
-                <div 
+                <div
                   className="absolute top-0 left-0 right-0 h-32 pointer-events-none"
                   style={{
                     background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 30%, transparent 100%)'
@@ -2652,7 +2620,7 @@ const ProductDetail: React.FC = () => {
             <div className="flex-1">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-normal capitalize" style={{ fontSize: '16px', color: '#939393' }}>
-                  {isOwnerView ? product.title : 'poivre blanc'}
+                  {product.title}
                 </p>
                 {isMobile && isOwnerView && !currentReviewStatus && (
                   <div className="flex-shrink-0">
@@ -2666,7 +2634,7 @@ const ProductDetail: React.FC = () => {
                 )}
               </div>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {isOwnerView ? displayPrice : `GCP ${product.price}`}
+                {isOwnerView ? displayPrice : `£ ${product.price}`}
               </div>
             </div>
             {!isOwnerView && (
@@ -4217,11 +4185,7 @@ const ProductDetail: React.FC = () => {
                 ) : relatedProducts.length > 0 ? (
                   // Show related products
                   relatedProducts.map((relatedProduct) => {
-                    const productImage = Array.isArray(relatedProduct.images) && relatedProduct.images.length > 0
-                      ? relatedProduct.images[0].url
-                      : typeof relatedProduct.images === 'string'
-                        ? relatedProduct.images
-                        : pre1;
+                    const productImage = getRelatedProductFirstImage(relatedProduct);
 
                     return (
                       <Link
@@ -4310,7 +4274,7 @@ const ProductDetail: React.FC = () => {
                             </div>
                           </div>
                           <div className="text-sm font-semibold text-gray-900 mb-1">
-                            {relatedProduct.currency || '$'}{relatedProduct.price.toLocaleString()}
+                            {relatedProduct.currency || '£'}{relatedProduct.price.toLocaleString()}
                           </div>
                           <div className="flex items-center text-xs text-gray-500">
                             <img
@@ -4405,7 +4369,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
+                          £ 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4504,7 +4468,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
+                          £ 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4603,7 +4567,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
+                          £ 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4702,7 +4666,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
+                          £ 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4801,7 +4765,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
+                          £ 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4900,7 +4864,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
+                        £ 31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4971,207 +4935,110 @@ const ProductDetail: React.FC = () => {
                   You may also like
                 </h2>
 
-                {/* Product Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5 md:gap-6">
-                  {/* Recommended Product 1 */}
-                  <Link to={`/product/7`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                    <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                      <img
-                        src={pre1}
-                        alt="White Pepper"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                        style={{ borderRadius: '12px' }}
-                      />
-                      <div className="absolute bg-white rounded-md shadow-sm" style={{
-                        display: 'flex',
-                        padding: '2px 6px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '4px',
-                        top: '8px',
-                        left: '8px'
-                      }}>
-                        <img
-                          src={getProductCountry('1').flag}
-                          alt={getProductCountry('1').name}
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            objectFit: 'cover',
-                            borderRadius: '50%'
-                          }}
-                        />
-                        <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                          {getProductCountry('1').abbreviation}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
-                        <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          GCP 31.7
-                        </div>
-                        <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                          display: 'flex',
-                          padding: '1px 3px',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: '1px',
-                          fontSize: '8px'
-                        }}>
-                          <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                          <span>Verified seller</span>
+                  {isLoadingRelated ? (
+                    Array(6).fill(0).map((_, i) => (
+                      <div key={i} className="bg-white rounded-lg overflow-hidden">
+                        <div className="aspect-square bg-gray-200 animate-pulse rounded-lg mb-2" />
+                        <div className="p-2 sm:p-3">
+                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                          <div className="h-4 bg-gray-200 rounded w-1/2" />
                         </div>
                       </div>
-                      <h3 className="line-clamp-2 font-medium" style={{
-                        fontSize: '12px',
-                        color: '#212121',
-                        marginBottom: '3px',
-                        lineHeight: '1.3'
-                      }}>White Pepper</h3>
-                      <div className="flex items-center justify-between gap-1">
-                        <div className="flex items-center text-gray-500 flex-1 min-w-0">
-                          <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                            width: '9px',
-                            height: '9px',
-                            marginRight: '3px'
-                          }} />
-                          <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
-                        </div>
-                        <div className="flex-shrink-0" style={{ marginLeft: '4px' }}>
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const newSet = new Set(wishlistProducts);
-                              if (newSet.has('recommended-1')) {
-                                newSet.delete('recommended-1');
-                              } else {
-                                newSet.add('recommended-1');
-                              }
-                              setWishlistProducts(newSet);
-                            }}
-                            className="transition-colors touch-manipulation"
-                            style={{
-                              width: window.innerWidth < 1024 ? '18px' : '20px',
-                              height: window.innerWidth < 1024 ? '18px' : '20px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: '2px'
-                            }}
-                          >
-                            <img src={bookmarkIcon} alt="Bookmark" style={{
-                              width: window.innerWidth < 1024 ? '16px' : '20px',
-                              height: window.innerWidth < 1024 ? '16px' : '20px',
-                              filter: wishlistProducts.has('recommended-1') ? 'none' : 'grayscale(100%) opacity(0.6)'
-                            }} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                    ))
+                  ) : relatedProducts.length > 0 ? (
+                    relatedProducts.map((relatedProduct) => {
+                      const productImage = getRelatedProductFirstImage(relatedProduct);
 
-                  {/* Recommended Products 2-12 - Similar structure */}
-                  {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => (
-                    <Link key={num} to={`/product/${num + 7}`} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group">
-                      <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
-                        <img
-                          src={[pre2, pre3, pre4, pre5, pre6, pre1, pre2, pre3, pre4, pre5, pre6][(num - 2) % 11]}
-                          alt={`Product ${num}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          style={{ borderRadius: '12px' }}
-                        />
-                        <div className="absolute bg-white rounded-md shadow-sm" style={{
-                          display: 'flex',
-                          padding: '2px 6px',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: '4px',
-                          top: '8px',
-                          left: '8px'
-                        }}>
-                          <img
-                            src={getProductCountry(String(num)).flag}
-                            alt={getProductCountry(String(num)).name}
-                            style={{
-                              width: '14px',
-                              height: '14px',
-                              objectFit: 'cover',
-                              borderRadius: '50%'
-                            }}
-                          />
-                          <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
-                            {getProductCountry(String(num)).abbreviation}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
-                        <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
-                          <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                            GCP 31.7
-                          </div>
-                          <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
-                            display: 'flex',
-                            padding: '1px 3px',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '1px',
-                            fontSize: '8px'
-                          }}>
-                            <img src={verifyIcon} alt="Verified" style={{ width: '7px', height: '7px' }} />
-                            <span>Verified seller</span>
-                          </div>
-                        </div>
-                        <h3 className="line-clamp-2 font-medium" style={{
-                          fontSize: '12px',
-                          color: '#212121',
-                          marginBottom: '3px',
-                          lineHeight: '1.3'
-                        }}>Product Name</h3>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center text-gray-500 flex-1 min-w-0">
-                            <img src={locationIcon} alt="Location" className="flex-shrink-0" style={{
-                              width: '9px',
-                              height: '9px',
-                              marginRight: '3px'
-                            }} />
-                            <span className="truncate font-normal" style={{ fontSize: '9px' }}>London | United Kingdom</span>
-                          </div>
-                          <div style={{ marginLeft: '4px' }}>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const newSet = new Set(wishlistProducts);
-                                if (newSet.has(`recommended-${num}`)) {
-                                  newSet.delete(`recommended-${num}`);
-                                } else {
-                                  newSet.add(`recommended-${num}`);
-                                }
-                                setWishlistProducts(newSet);
+                      return (
+                        <Link
+                          key={relatedProduct.id}
+                          to={`/product/${relatedProduct.id}`}
+                          className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
+                        >
+                          <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
+                            <img
+                              src={productImage}
+                              alt={relatedProduct.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              style={{ borderRadius: '12px' }}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = pre1;
                               }}
-                              className="transition-colors touch-manipulation"
-                              style={{
-                                width: window.innerWidth < 1024 ? '18px' : '20px',
-                                height: window.innerWidth < 1024 ? '18px' : '20px',
+                            />
+                            {relatedProduct.origin && (
+                              <div className="absolute bg-white rounded-md shadow-sm" style={{
                                 display: 'flex',
-                                alignItems: 'center',
+                                padding: '2px 6px',
                                 justifyContent: 'center',
-                                padding: '2px'
-                              }}
-                            >
-                              <img src={bookmarkIcon} alt="Bookmark" style={{
-                                width: window.innerWidth < 1024 ? '16px' : '20px',
-                                height: window.innerWidth < 1024 ? '16px' : '20px',
-                                filter: wishlistProducts.has(`recommended-${num}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
-                              }} />
-                            </button>
+                                alignItems: 'center',
+                                gap: '4px',
+                                top: '8px',
+                                left: '8px'
+                              }}>
+                                <img
+                                  src={getProductCountry(relatedProduct.origin, relatedProduct.originCode).flag}
+                                  alt={getProductCountry(relatedProduct.origin, relatedProduct.originCode).name}
+                                  style={{ width: '14px', height: '14px', objectFit: 'cover', borderRadius: '50%' }}
+                                />
+                                <span className="font-medium text-gray-800" style={{ fontSize: '12px' }}>
+                                  {getProductCountry(relatedProduct.origin, relatedProduct.originCode).abbreviation}
+                                </span>
+                              </div>
+                            )}
+                            <div className="absolute top-0 right-0 p-2">
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const newSet = new Set(wishlistProducts);
+                                  if (newSet.has(`recommended-${relatedProduct.id}`)) {
+                                    newSet.delete(`recommended-${relatedProduct.id}`);
+                                  } else {
+                                    newSet.add(`recommended-${relatedProduct.id}`);
+                                  }
+                                  setWishlistProducts(newSet);
+                                }}
+                                className="transition-colors touch-manipulation"
+                                style={{
+                                  width: window.innerWidth < 1024 ? '18px' : '20px',
+                                  height: window.innerWidth < 1024 ? '18px' : '20px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  padding: '2px'
+                                }}
+                              >
+                                <img
+                                  src={bookmarkIcon}
+                                  alt="Bookmark"
+                                  style={{
+                                    width: window.innerWidth < 1024 ? '16px' : '20px',
+                                    height: window.innerWidth < 1024 ? '16px' : '20px',
+                                    filter: wishlistProducts.has(`recommended-${relatedProduct.id}`) ? 'none' : 'grayscale(100%) opacity(0.6)'
+                                  }}
+                                />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                          <div className="p-2 sm:p-3">
+                            <div className="flex justify-between items-start mb-1">
+                              <div
+                                className="font-medium text-gray-900 text-sm sm:text-base line-clamp-2"
+                                style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              >
+                                {relatedProduct.title}
+                              </div>
+                            </div>
+                            <div className="text-sm font-semibold text-gray-900 mb-1">
+                              {relatedProduct.currency || '£'}{relatedProduct.price?.toLocaleString() ?? ''}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })
+                  ) : null}
                 </div>
               </div>
             </>

@@ -40,11 +40,12 @@ const isPublicEndpoint = (url: string, method: string = 'GET'): boolean => {
       if (path === '/api/products' || path.startsWith('/api/products?')) {
         return true;
       }
-      // Allow GET /api/products/:id (view product details) - public
+      // Allow GET /api/products/:id or /products/:id (view product details) - public
       // But exclude authenticated endpoints like /save, /saved, /view (POST)
-      if (path.match(/^\/api\/products\/[^/]+$/) && 
-          !path.includes('/save') && 
-          !path.includes('/saved') && 
+      const productDetailPath = path.match(/^\/api\/products\/[^/]+$/) || path.match(/^\/products\/[^/]+$/);
+      if (productDetailPath &&
+          !path.includes('/save') &&
+          !path.includes('/saved') &&
           !path.includes('/view') &&
           !path.includes('/my-products')) {
         return true;
@@ -130,16 +131,19 @@ if (!window.__originalFetch) {
       return window.__originalFetch!.call(window, input, init);
     }
 
-    // Check if we're on the homepage - allow public access without redirecting
-    const isHomePage = window.location.pathname === '/' || window.location.pathname === '/home';
-    
+    // Check if we're on a public page where unauthenticated access is allowed
+    const pathname = window.location.pathname;
+    const isHomePage = pathname === '/' || pathname === '/home';
+    const isProductDetailPage = /^\/product\/[^/]+$/.test(pathname);
+    const isPublicPage = isHomePage || isProductDetailPage;
+
     // Check token
     const token = TokenManager.getAccessToken();
     const isExpired = token ? TokenManager.isTokenExpired(token) : true;
 
-    // If on homepage and no token, allow the request without auth header (don't redirect)
-    // This allows users to browse the homepage without logging in
-    if (isHomePage && (!token || isExpired)) {
+    // If on homepage or product detail and no token, allow the request without auth header (don't redirect)
+    // This allows users to browse the homepage and view product details without logging in
+    if (isPublicPage && (!token || isExpired)) {
       return window.__originalFetch!.call(window, input, init);
     }
 
@@ -160,16 +164,16 @@ if (!window.__originalFetch) {
         credentials: 'include'
       });
 
-      // Handle 401 responses - only redirect if not on homepage
+      // Handle 401 responses - don't redirect on public pages (home, product detail)
       if (response.status === 401) {
         const currentPath = window.location.pathname;
-        const isHomePage = currentPath === '/' || currentPath === '/home';
-        if (!isHomePage) {
+        const isHome = currentPath === '/' || currentPath === '/home';
+        const isProductDetail = /^\/product\/[^/]+$/.test(currentPath);
+        if (!isHome && !isProductDetail) {
           console.log('Received 401, redirecting to login');
           return redirectToLogin();
         }
-        // On homepage, just return the 401 response without redirecting
-        // This allows the page to handle the error gracefully (e.g., show products without bookmarks)
+        // On homepage or product detail, return 401 without redirecting so the page can handle it
       }
 
       return response;
@@ -177,12 +181,13 @@ if (!window.__originalFetch) {
       console.error('Fetch error:', error);
       if (error instanceof Error &&
         (error.message.includes('401') || error.message.includes('Unauthorized'))) {
-        // Only redirect if not on homepage
-        const isHomePage = window.location.pathname === '/' || window.location.pathname === '/home';
-        if (!isHomePage) {
+        const currentPath = window.location.pathname;
+        const isHome = currentPath === '/' || currentPath === '/home';
+        const isProductDetail = /^\/product\/[^/]+$/.test(currentPath);
+        if (!isHome && !isProductDetail) {
           return redirectToLogin();
         }
-        // On homepage, re-throw the error so the component can handle it
+        // On homepage or product detail, re-throw so the component can handle it
       }
       throw error;
     }

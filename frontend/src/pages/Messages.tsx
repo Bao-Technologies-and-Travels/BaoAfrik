@@ -859,7 +859,6 @@ const Messages: React.FC = (): JSX.Element => {
       : (msg?.senderId && currentUserId ? msg.senderId !== currentUserId : false);
     // Ensure reaction, metadata fields, and replyTo are preserved
     // Load reactions from backend - backend returns all reactions in reactions array
-    // The reaction field is the user's own reaction (if any), reactions array has all reactions
     const reactions = msg?.reactions || [];
     // Get the most recent reaction for display (or user's reaction if available)
     const reaction = msg?.reaction || (reactions.length > 0 ? reactions[reactions.length - 1]?.reaction : null);

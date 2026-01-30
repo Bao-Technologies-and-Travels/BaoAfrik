@@ -53,9 +53,9 @@ const Footer: React.FC = () => {
           <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Support</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-              <li><Link to="/help" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Help center</Link></li>
-              <li><Link to="/safety" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Safety & Trust</Link></li>
-              <li><Link to="/contact" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact</Link></li>
+              <li><Link to="/help-center" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Help center</Link></li>
+              <li><Link to="/safety-trust" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Safety & Trust</Link></li>
+              <li><Link to="/contact-support" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Contact</Link></li>
             </ul>
           </div>
 
@@ -63,8 +63,8 @@ const Footer: React.FC = () => {
           <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4" style={{ color: '#212121' }}>Legal</h3>
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
-            <li><Link to="/terms-of-use" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms Of Use</Link></li>
-              <li><Link to="/privacy-policy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms Of Use</Link></li>
+              <li><Link to="/privacy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link></li>
               <li><Link to="/cookie-policy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Cookie Policy</Link></li>
               <li><Link to="/community-guidelines" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Community Guidelines</Link></li>
             </ul>

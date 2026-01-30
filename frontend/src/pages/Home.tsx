@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { getProductCountry, countries } from '../utils/countryHelpers';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -231,6 +232,11 @@ const Home: React.FC = () => {
   const [showSellerLocationSuggestions, setShowSellerLocationSuggestions] = useState(false);
   const [isRequestProductOriginDropdownOpen, setIsRequestProductOriginDropdownOpen] = useState(false);
   const requestProductOriginDropdownRef = React.useRef<HTMLDivElement>(null);
+  const [mobileCountryPickerOpen, setMobileCountryPickerOpen] = useState(false);
+  const [mobileCountryPickerPosition, setMobileCountryPickerPosition] = useState<{ top: number; left: number; width: number } | null>(null);
+  const mobileCountryPickerRef = React.useRef<HTMLDivElement>(null);
+  const homeCountryPickerRef = React.useRef<HTMLDivElement>(null);
+  const mobileCountryPickerPortalRef = React.useRef<HTMLDivElement>(null);
   const [hoveredCategoryOption, setHoveredCategoryOption] = useState<string | null>(null);
   const [hoveredOriginOption, setHoveredOriginOption] = useState<string | null>(null);
 
@@ -429,33 +435,65 @@ const Home: React.FC = () => {
     }
   }, [navigationLocation.search]);
 
+  const requestsScrollRef = useRef<HTMLDivElement>(null);
   // Ref to prevent duplicate requests fetch within the same render cycle
   const fetchingRequestsRef = useRef(false);
   const lastRequestFiltersRef = useRef<string | null>(null);
-  const hasFetchedRef = useRef(false);
-  const isInitialMountRef = useRef(true);
+  const requestsMountFetchDoneRef = useRef(false);
 
-  // useEffect for fetching requests from API
+  // Fetch requests on mount (same pattern as products) so cards show immediately
   useEffect(() => {
-    // Create a key from current filters to detect filter changes
+    if (fetchingRequestsRef.current) return;
+    const controller = new AbortController();
+    const doFetch = async () => {
+      fetchingRequestsRef.current = true;
+      try {
+        setIsLoadingRequests(true);
+        setRequestsError(null);
+        const token = localStorage.getItem('accessToken');
+        const queryParams = new URLSearchParams({ limit: '3', page: '1' });
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/requests?${queryParams.toString()}`, {
+          method: 'GET',
+          headers,
+          signal: controller.signal
+        });
+        if (!response.ok) throw new Error('Failed to fetch requests');
+        const result = await response.json();
+        let requestsArray: any[] = [];
+        if (result.success && result.data) {
+          if (Array.isArray(result.data)) requestsArray = result.data;
+          else if (result.data.requests && Array.isArray(result.data.requests)) requestsArray = result.data.requests;
+          else if (result.data.data && Array.isArray(result.data.data)) requestsArray = result.data.data;
+        } else if (Array.isArray(result)) requestsArray = result;
+        else if (result.data && Array.isArray(result.data)) requestsArray = result.data;
+        setRequests(requestsArray);
+        lastRequestFiltersRef.current = '--';
+        requestsMountFetchDoneRef.current = true;
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          setRequestsError('Failed to load requests. Please try again later.');
+        }
+      } finally {
+        setIsLoadingRequests(false);
+        fetchingRequestsRef.current = false;
+      }
+    };
+    doFetch();
+    return () => {
+      controller.abort();
+      fetchingRequestsRef.current = false;
+    };
+  }, []);
+
+  // Refetch requests when filters change
+  useEffect(() => {
     const filterKey = `${requestBuyerLocation}-${requestFilterCountry}-${requestFilterPrice}`;
-
-    // Only prevent if currently fetching
-    if (fetchingRequestsRef.current) {
-      return;
-    }
-
-    // Always allow the initial fetch on mount
-    const isInitialMount = isInitialMountRef.current;
-    if (isInitialMount) {
-      isInitialMountRef.current = false;
-    }
-
-    // If we've fetched before AND filters haven't changed, skip
-    // But always allow the initial fetch
-    if (!isInitialMount && hasFetchedRef.current && lastRequestFiltersRef.current !== null && lastRequestFiltersRef.current === filterKey) {
-      return;
-    }
+    if (fetchingRequestsRef.current) return;
+    // Skip initial run with no filters (mount effect already fetched)
+    if (!requestsMountFetchDoneRef.current && filterKey === '--') return;
+    if (lastRequestFiltersRef.current === filterKey) return;
 
     const controller = new AbortController();
     const fetchRequests = async () => {
@@ -544,19 +582,16 @@ const Home: React.FC = () => {
         }
 
         setRequests(requestsArray);
-        hasFetchedRef.current = true;
-        lastRequestFiltersRef.current = filterKey; // Only set after successful fetch
+        lastRequestFiltersRef.current = filterKey;
+        requestsMountFetchDoneRef.current = true;
 
       } catch (error: any) {
         if (error?.name === 'AbortError') {
           fetchingRequestsRef.current = false;
-          // Don't reset refs on abort - keep them to prevent immediate retry
           return;
         }
         setRequestsError('Failed to load requests. Please try again later.');
-        // Reset on error to allow retry with same filters
         lastRequestFiltersRef.current = null;
-        hasFetchedRef.current = false;
       } finally {
         setIsLoadingRequests(false);
         fetchingRequestsRef.current = false;
@@ -1016,16 +1051,13 @@ const Home: React.FC = () => {
     }
   };
 
-  // Check if cookies modal should be shown (first visit after login/signup)
+  // Check if cookies modal should be shown on first visit (logged in or not)
   useEffect(() => {
-    // Only show if user is logged in (not visitor) and hasn't seen the modal
-    if (user) {
-      const cookiesModalSeen = localStorage.getItem('cookiesModalSeen');
-      if (!cookiesModalSeen) {
-        setShowCookiesModal(true);
-      }
+    const cookiesModalSeen = localStorage.getItem('cookiesModalSeen');
+    if (!cookiesModalSeen) {
+      setShowCookiesModal(true);
     }
-  }, [user]);
+  }, []);
 
   // Re-run search when country filter changes and search is active
   useEffect(() => {
@@ -1107,6 +1139,13 @@ const Home: React.FC = () => {
       }
       if (requestProductOriginDropdownRef.current && !requestProductOriginDropdownRef.current.contains(target)) {
         setIsRequestProductOriginDropdownOpen(false);
+      }
+      if (mobileCountryPickerOpen &&
+          (!mobileCountryPickerPortalRef.current || !mobileCountryPickerPortalRef.current.contains(target)) &&
+          (mobileCountryPickerRef.current ? !mobileCountryPickerRef.current.contains(target) : true) &&
+          (homeCountryPickerRef.current ? !homeCountryPickerRef.current.contains(target) : true)) {
+        setMobileCountryPickerOpen(false);
+        setMobileCountryPickerPosition(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -2861,25 +2900,35 @@ const Home: React.FC = () => {
       {/* Mobile Filter Buttons - Horizontal Scroll */}
       <section className="bg-white md:hidden" style={{ marginTop: '-8px', marginBottom: '-8px' }}>
         <div className="px-2">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {/* More Options Button */}
-            <button
-              className="flex-shrink-0 flex items-center justify-center"
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                border: '1px solid #E9E9E9',
-                backgroundColor: '#FFF'
-              }}
-              aria-label="More options"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A" />
-                <circle cx="7" cy="7" r="1.25" fill="#6A6A6A" />
-                <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A" />
-              </svg>
-            </button>
+          <div ref={homeCountryPickerRef} className="relative">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {/* More Options Button - opens scrollable country picker modal */}
+              {/* <button
+                type="button"
+                onClick={() => {
+                  const rect = homeCountryPickerRef.current?.getBoundingClientRect();
+                  if (rect) {
+                    setMobileCountryPickerPosition({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+                    setMobileCountryPickerOpen(true);
+                  }
+                }}
+                className="flex-shrink-0 flex items-center justify-center"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  border: '1px solid #E9E9E9',
+                  backgroundColor: mobileCountryPickerOpen ? '#F0F8FE' : '#FFF'
+                }}
+                aria-label="More options - filter by country of origin"
+                aria-expanded={mobileCountryPickerOpen}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A" />
+                  <circle cx="7" cy="7" r="1.25" fill="#6A6A6A" />
+                  <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A" />
+                </svg>
+              </button> */}
 
             {/* Africa Button */}
             <button
@@ -2910,7 +2959,7 @@ const Home: React.FC = () => {
             </button>
 
             {/* Country Buttons */}
-            {africanCountries.slice(0, 10).map((country) => (
+            {africanCountries.map((country) => (
               <button
                 key={country.name}
                 onClick={() => setSelectedCountry(country.name)}
@@ -2934,6 +2983,7 @@ const Home: React.FC = () => {
                 </span>
               </button>
             ))}
+            </div>
           </div>
         </div>
       </section>
@@ -4295,6 +4345,7 @@ const Home: React.FC = () => {
               />
             )}
             <div
+              ref={requestsScrollRef}
               className={isMobile ? "flex gap-4 mb-6 overflow-x-auto scrollbar-hide" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6"}
               style={isMobile ? {
                 scrollbarWidth: 'none',
@@ -4315,7 +4366,7 @@ const Home: React.FC = () => {
                   No requests found
                 </div>
               ) : (
-                requests.slice(0, 3).map((request) => (
+                requests.map((request) => (
                   <div
                     key={request.id}
                     className="bg-white hover:shadow-md transition-shadow cursor-pointer"
@@ -4742,56 +4793,70 @@ const Home: React.FC = () => {
               )}
             </div>
 
-            {/* Navigation Arrows */}
-            <div className="flex items-center justify-between gap-3 mt-6">
-              {/* See all requests link */}
-              <Link
-                to="/requests"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                style={{
-                  color: '#64B5F6',
-                  fontSize: window.innerWidth < 640 ? '12px' : '16px',
-                  textDecoration: 'none',
-                  marginLeft: '8px'
-                }}
-              >
-                <span>See all requests</span>
-                <img
-                  src={requestArrowIcon}
-                  alt="Arrow"
+            {/* Navigation Arrows - only show when there are requests */}
+            {requests.length > 0 && (
+              <div className="flex items-center justify-between gap-3 mt-6">
+                {/* See all requests link */}
+                <Link
+                  to="/requests"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
                   style={{
-                    width: window.innerWidth < 640 ? '12px' : '16px',
-                    height: window.innerWidth < 640 ? '12px' : '16px',
-                    filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)',
-                    transform: 'scaleX(1.3)',
-                    transformOrigin: 'center'
+                    color: '#64B5F6',
+                    fontSize: window.innerWidth < 640 ? '12px' : '16px',
+                    textDecoration: 'none',
+                    marginLeft: '8px'
                   }}
-                />
-              </Link>
-              <div className="flex items-center gap-3">
-                <button
-                  className="rounded-full flex items-center justify-center transition-all duration-200"
-                  style={{
-                    width: window.innerWidth < 640 ? '20px' : '24px',
-                    height: window.innerWidth < 640 ? '20px' : '24px'
-                  }}
-                  aria-label="Previous"
                 >
-                  <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
-                </button>
-                <button
-                  className="rounded-full flex items-center justify-center transition-all duration-200"
-                  style={{
-                    width: window.innerWidth < 640 ? '20px' : '24px',
-                    height: window.innerWidth < 640 ? '20px' : '24px'
-                  }}
-                  aria-label="Next"
-                >
-                  <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
-                </button>
+                  <span>See all requests</span>
+                  <img
+                    src={requestArrowIcon}
+                    alt="Arrow"
+                    style={{
+                      width: window.innerWidth < 640 ? '12px' : '16px',
+                      height: window.innerWidth < 640 ? '12px' : '16px',
+                      filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)',
+                      transform: 'scaleX(1.3)',
+                      transformOrigin: 'center'
+                    }}
+                  />
+                </Link>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => requestsScrollRef.current?.scrollBy({ left: -276, behavior: 'smooth' })}
+                    disabled={requests.length <= 3}
+                    className="rounded-full flex items-center justify-center transition-all duration-200"
+                    style={{
+                      width: window.innerWidth < 640 ? '20px' : '24px',
+                      height: window.innerWidth < 640 ? '20px' : '24px',
+                      opacity: requests.length <= 3 ? 0.4 : 1,
+                      cursor: requests.length <= 3 ? 'not-allowed' : 'pointer',
+                      pointerEvents: requests.length <= 3 ? 'none' : 'auto'
+                    }}
+                    aria-label="Previous"
+                  >
+                    <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => requestsScrollRef.current?.scrollBy({ left: 276, behavior: 'smooth' })}
+                    disabled={requests.length <= 3}
+                    className="rounded-full flex items-center justify-center transition-all duration-200"
+                    style={{
+                      width: window.innerWidth < 640 ? '20px' : '24px',
+                      height: window.innerWidth < 640 ? '20px' : '24px',
+                      opacity: requests.length <= 3 ? 0.4 : 1,
+                      cursor: requests.length <= 3 ? 'not-allowed' : 'pointer',
+                      pointerEvents: requests.length <= 3 ? 'none' : 'auto'
+                    }}
+                    aria-label="Next"
+                  >
+                    <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -6585,36 +6650,52 @@ const Home: React.FC = () => {
             return filteredProducts.length > 0;
           })() && (
               <div className="px-4 pb-3">
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                  {/* More Options Button */}
-                  <button
-                    className="flex-shrink-0 flex items-center justify-center"
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      border: '1px solid #E9E9E9',
-                      backgroundColor: '#FFF'
-                    }}
-                    aria-label="More options"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A" />
-                      <circle cx="7" cy="7" r="1.25" fill="#6A6A6A" />
-                      <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A" />
-                    </svg>
-                  </button>
+                <div ref={mobileCountryPickerRef} className="relative">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                    {/* More Options Button - opens full country list */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!mobileCountryPickerOpen) {
+                          const rect = mobileCountryPickerRef.current?.getBoundingClientRect();
+                          if (rect) {
+                            setMobileCountryPickerPosition({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+                            setMobileCountryPickerOpen(true);
+                          }
+                        } else {
+                          setMobileCountryPickerOpen(false);
+                          setMobileCountryPickerPosition(null);
+                        }
+                      }}
+                      className="flex-shrink-0 flex items-center justify-center"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        border: '1px solid #E9E9E9',
+                        backgroundColor: mobileCountryPickerOpen ? '#F0F8FE' : '#FFF'
+                      }}
+                      aria-label="More options - filter by country of origin"
+                      aria-expanded={mobileCountryPickerOpen}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A" />
+                        <circle cx="7" cy="7" r="1.25" fill="#6A6A6A" />
+                        <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A" />
+                      </svg>
+                    </button>
 
-                  {/* Africa Button */}
-                  <button
-                    onClick={() => setSelectedCountry('')}
-                    className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
-                    style={{
-                      backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
-                      border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  >
+                    {/* Africa Button */}
+                    <button
+                      onClick={() => setSelectedCountry('')}
+                      className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                      style={{
+                        backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
+                        border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
                     <img
                       src={globyIcon}
                       alt="Globe"
@@ -6662,6 +6743,7 @@ const Home: React.FC = () => {
                   ))}
                 </div>
               </div>
+            </div>
             )}
 
           {/* Category and Country Filters - Show when no filters applied and search is submitted, but hide when no results */}
@@ -6738,29 +6820,45 @@ const Home: React.FC = () => {
                 </div>
 
                 {/* Country Filter - Match Home Page Mobile Horizontal Scroll */}
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                  {/* More Options Button */}
-                  <button
-                    className="flex-shrink-0 flex items-center justify-center"
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      border: '1px solid #E9E9E9',
-                      backgroundColor: '#FFF'
-                    }}
-                    aria-label="More options"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A" />
-                      <circle cx="7" cy="7" r="1.25" fill="#6A6A6A" />
-                      <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A" />
-                    </svg>
-                  </button>
+                <div ref={mobileCountryPickerRef} className="relative">
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                    {/* More Options Button - opens full country list */}
+                    {/* <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!mobileCountryPickerOpen) {
+                          const rect = mobileCountryPickerRef.current?.getBoundingClientRect();
+                          if (rect) {
+                            setMobileCountryPickerPosition({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+                            setMobileCountryPickerOpen(true);
+                          }
+                        } else {
+                          setMobileCountryPickerOpen(false);
+                          setMobileCountryPickerPosition(null);
+                        }
+                      }}
+                      className="flex-shrink-0 flex items-center justify-center"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        border: '1px solid #E9E9E9',
+                        backgroundColor: mobileCountryPickerOpen ? '#F0F8FE' : '#FFF'
+                      }}
+                      aria-label="More options - filter by country of origin"
+                      aria-expanded={mobileCountryPickerOpen}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="3.5" cy="7" r="1.25" fill="#6A6A6A" />
+                        <circle cx="7" cy="7" r="1.25" fill="#6A6A6A" />
+                        <circle cx="10.5" cy="7" r="1.25" fill="#6A6A6A" />
+                      </svg>
+                    </button> */}
 
-                  {/* Africa Button */}
-                  <button
-                    onClick={() => setSelectedCountry('')}
+                    {/* Africa Button */}
+                    <button
+                      onClick={() => setSelectedCountry('')}
                     className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
                     style={{
                       backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
@@ -6786,13 +6884,13 @@ const Home: React.FC = () => {
                     </span>
                   </button>
 
-                  {/* Country Buttons */}
-                  {africanCountries.slice(0, 10).map((country) => (
-                    <button
-                      key={country.name}
-                      onClick={() => setSelectedCountry(country.name)}
-                      className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
-                      style={{
+                    {/* Country Buttons */}
+                    {africanCountries.map((country) => (
+                      <button
+                        key={country.name}
+                        onClick={() => setSelectedCountry(country.name)}
+                        className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                        style={{
                         backgroundColor: '#FAFAFA',
                         border: 'none',
                         fontFamily: 'Poppins, sans-serif'
@@ -6813,6 +6911,7 @@ const Home: React.FC = () => {
                       </span>
                     </button>
                   ))}
+                </div>
                 </div>
               </div>
             )}
@@ -7446,6 +7545,65 @@ const Home: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Mobile country picker dropdown - rendered in portal so it's always visible on top */}
+      {mobileCountryPickerOpen && mobileCountryPickerPosition && createPortal(
+        <>
+          <style>{`
+            .country-picker-modal::-webkit-scrollbar { display: none; }
+            .country-picker-modal { -ms-overflow-style: none; scrollbar-width: none; }
+          `}</style>
+          {/* Backdrop - clicking outside closes the modal */}
+          <div
+            role="presentation"
+            aria-hidden
+            style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+            onClick={() => { setMobileCountryPickerOpen(false); setMobileCountryPickerPosition(null); }}
+            onTouchEnd={() => { setMobileCountryPickerOpen(false); setMobileCountryPickerPosition(null); }}
+          />
+          <div
+            ref={mobileCountryPickerPortalRef}
+            className="country-picker-modal bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+            style={{
+              position: 'fixed',
+              top: mobileCountryPickerPosition.top,
+              left: mobileCountryPickerPosition.left,
+              width: mobileCountryPickerPosition.width,
+              maxHeight: '240px',
+              overflowY: 'auto',
+              zIndex: 9999
+            }}
+          >
+            {africanCountries.map((country) => (
+              <button
+                key={country.name}
+                type="button"
+                onClick={() => {
+                  setSelectedCountry(country.name);
+                  setMobileCountryPickerOpen(false);
+                  setMobileCountryPickerPosition(null);
+                }}
+                className="w-full text-left px-3 py-2.5 flex items-center gap-2 transition-colors"
+                style={{
+                  color: '#6A6A6A',
+                  fontSize: '12px',
+                  fontFamily: 'Poppins, sans-serif',
+                  backgroundColor: selectedCountry === country.name ? '#F0F8FE' : '#FFF',
+                  borderBottom: '1px solid #F5F5F5'
+                }}
+              >
+                <img
+                  src={country.flag}
+                  alt=""
+                  className="w-4 h-3 object-cover rounded"
+                />
+                <span>{country.name}</span>
+              </button>
+            ))}
+          </div>
+        </>,
+        document.body
       )}
     </div>
   );

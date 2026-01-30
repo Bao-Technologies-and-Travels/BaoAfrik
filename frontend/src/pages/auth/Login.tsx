@@ -20,7 +20,7 @@ const Login: React.FC = () => {
     "success"
   );
   const { addToast } = useToast();
-  
+
   // 2FA Modal State
   const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
   const [twoFactorMethod, setTwoFactorMethod] = useState<'phone' | 'email'>('phone');
@@ -341,17 +341,17 @@ const Login: React.FC = () => {
     setIsVerifyingOTP(true);
     try {
       const response = await authService.verifyLoginOTP(email.toLowerCase(), code);
-      
+
       if (response.success && response.data) {
         const { user, accessToken, refreshToken } = response.data;
-        
+
         // Store tokens and user data
         localStorage.setItem('accessToken', accessToken);
         if (refreshToken) {
           localStorage.setItem('refreshToken', refreshToken);
         }
         localStorage.setItem('user', JSON.stringify(user));
-        
+
         // Update auth context
         login(
           {
@@ -364,14 +364,14 @@ const Login: React.FC = () => {
           accessToken,
           refreshToken
         );
-        
+
         // Close modal
         setShowTwoFactorModal(false);
         setVerificationCode(['', '', '', '', '', '']);
-        
+
         // Check if profile is incomplete
         const profileIncomplete = !user.firstName || !user.lastName;
-        
+
         if (profileIncomplete) {
           navigate('/profile-setup');
           addToast({
@@ -415,7 +415,7 @@ const Login: React.FC = () => {
   // Handle resend 2FA code
   const handleResendTwoFactorCode = async () => {
     if (!canResendTwoFactor) return;
-    
+
     try {
       // Re-login to trigger new OTP
       setIsLoading(true);
@@ -424,7 +424,7 @@ const Login: React.FC = () => {
         password,
         rememberMe,
       });
-      
+
       if (response.success) {
         const responseData = response.data as any;
         if (responseData?.requires2FA) {
@@ -457,11 +457,11 @@ const Login: React.FC = () => {
         // Don't close on outside click - user must verify
       }
     };
-    
+
     if (showTwoFactorModal) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -717,7 +717,8 @@ const Login: React.FC = () => {
               </button>
             </div>
 
-            <div className="relative">
+            {/* social login */}
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
               </div>
@@ -728,7 +729,6 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* Social Login Buttons */}
             <div className="flex justify-center space-x-4">
               <button
                 type="button"
@@ -785,7 +785,7 @@ const Login: React.FC = () => {
                   <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
                 </svg>
               </button>
-            </div>
+            </div> */}
 
             <div className="text-center">
               <span className="text-gray-500 text-sm">
