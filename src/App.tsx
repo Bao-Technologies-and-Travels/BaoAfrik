@@ -45,6 +45,7 @@ import CookiePolicy from './pages/CookiePolicy';
 import CommunityGuidelines from './pages/CommunityGuidelines';
 import ContactSupport from './pages/ContactSupport';
 import SafetyTrust from './pages/SafetyTrust';
+import HelpCentre from './pages/HelpCentre';
 import './App.css';
 
 function AppContent() {
@@ -149,6 +150,7 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/safety-trust" element={<SafetyTrust />} />
+          <Route path="/help-centre" element={<HelpCentre />} />
         </Routes>
       </main>
       <Footer />
