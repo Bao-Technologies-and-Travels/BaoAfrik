@@ -55,6 +55,40 @@
     animation-delay: 0.1s;
   }
   
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+  
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+  
+  /* Brand gradient (#E55325 → #F9A825) */
+  .gradient-brand {
+    background: linear-gradient(135deg, #E55325 0%, #F9A825 100%);
+  }
+  
+  .gradient-brand-text {
+    background: linear-gradient(135deg, #E55325 0%, #F9A825 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  @keyframes gradientShift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease infinite;
+  }
+  
   /* Mobile responsive utilities */
   .line-clamp-2 {
     display: -webkit-box;

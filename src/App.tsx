@@ -37,6 +37,10 @@ import MyRequests from './pages/MyRequests';
 import Requests from './pages/Requests';
 import ImageSearch from './pages/ImageSearch';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import TermsOfUse from './pages/TermsOfUse';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import CookiePolicy from './pages/CookiePolicy';
+import CommunityGuidelines from './pages/CommunityGuidelines';
 import './App.css';
 
 function AppContent() {
@@ -135,6 +139,10 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
           <Route path="/listings" element={<Listings />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/requests" element={<Requests />} />
+          <Route path="/terms" element={<TermsOfUse />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/cookie-policy" element={<CookiePolicy />} />
+          <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         </Routes>
       </main>
       <Footer />
