@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import tickIcon from '../assets/images/pre/tick.svg';
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80';
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=1920&q=80';
 
 const CommunityGuidelines: React.FC = () => {
   useEffect(() => {
@@ -72,7 +73,7 @@ const CommunityGuidelines: React.FC = () => {
             {guidelines.map((item, index) => (
               <li
                 key={index}
-                className={`flex gap-4 p-5 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up opacity-0`}
+                className={`flex gap-4 p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up opacity-0`}
                 style={{ animationDelay: `${0.35 + index * 0.1}s`, animationFillMode: 'forwards' }}
               >
                 <img src={tickIcon} alt="" className="mt-1 shrink-0 w-6 h-6 opacity-90" aria-hidden style={{ minWidth: 24, minHeight: 24 }} />
@@ -90,6 +91,13 @@ const CommunityGuidelines: React.FC = () => {
             </p>
             <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '0.9375rem', lineHeight: 1.6 }}>
               Violation of these guidelines may result in content removal, account suspension, or account deactivation. We may also report serious or repeated breaches to the relevant authorities. By using BaoAfrik, you agree to follow these guidelines and our Terms of Use.
+            </p>
+            <p className="mt-3" style={{ fontFamily: "'Poppins', sans-serif", fontSize: '0.9375rem' }}>
+              For any questions, visit our{' '}
+              <Link to="/help-centre" className="underline hover:opacity-90 transition-opacity" style={{ color: '#64B5F6' }}>
+                Help Centre
+              </Link>
+              .
             </p>
           </div>
         </div>

@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useContactSupport } from '../contexts/ContactSupportContext';
 
 const TermsOfUse: React.FC = () => {
+  const { openContactSupport } = useContactSupport();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -48,7 +51,7 @@ const TermsOfUse: React.FC = () => {
               </p>
 
               <p className="text-sm mt-8" style={{ color: '#BABABA' }}>
-                Last updated: January 2026. For questions about these terms, please contact us through our Help Centre or Contact Support.
+                Last updated: January 2026. For questions about these terms, please contact us through our <Link to="/help-centre" className="underline hover:opacity-90" style={{ color: '#64B5F6' }}>Help Centre</Link> or <button type="button" onClick={openContactSupport} className="underline hover:opacity-90 bg-transparent border-none p-0 cursor-pointer font-inherit text-inherit" style={{ color: '#64B5F6' }}>Contact Support</button>.
               </p>
             </div>
           </div>

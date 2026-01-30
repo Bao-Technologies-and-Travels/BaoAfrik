@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationToastProvider } from './contexts/NotificationToastContext';
+import { ContactSupportProvider } from './contexts/ContactSupportContext';
+import ContactSupportModal from './components/ContactSupportModal';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -154,9 +156,12 @@ function App() {
   return (
     <AuthProvider>
       <NotificationToastProvider>
-        <Router>
-          <AppContent />
-        </Router>
+        <ContactSupportProvider>
+          <Router>
+            <AppContent />
+          </Router>
+          <ContactSupportModal />
+        </ContactSupportProvider>
       </NotificationToastProvider>
     </AuthProvider>
   );
