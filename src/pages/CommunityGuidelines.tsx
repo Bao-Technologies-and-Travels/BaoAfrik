@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import tickIcon from '../assets/images/pre/tick.svg';
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=1920&q=80';
-
 const CommunityGuidelines: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,30 +28,27 @@ const CommunityGuidelines: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Full-width hero with HD background image */}
-      <section className="w-full relative overflow-hidden bg-[#212121] min-h-[320px] sm:min-h-[380px] flex items-center">
-        <div className="absolute inset-0">
-          <img
-            src={HERO_IMAGE}
-            alt=""
-            className="w-full h-full object-cover"
-            aria-hidden
-          />
-          <div
-            className="absolute inset-0 bg-black/80"
-            style={{ pointerEvents: 'none' }}
-            aria-hidden
-          />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
+      {/* Hero - same style as Contact Support */}
+      <section
+        className="relative overflow-hidden py-8 sm:py-10 lg:py-12"
+        style={{
+          background: 'linear-gradient(135deg, #E55325 0%, #F9A825 100%)',
+          boxShadow: '0 4px 20px rgba(229, 83, 37, 0.2)',
+        }}
+      >
+        <div className="absolute inset-0 opacity-10" style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}
+        />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white animate-fade-in-up"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight animate-fade-in-up animation-delay-100"
             style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
           >
-            Community <span className="gradient-brand-text" style={{ background: 'linear-gradient(135deg, #F9A825 0%, #E55325 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Guidelines</span>
+            Community Guidelines
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-gray-200 animate-fade-in-up animation-delay-100" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            BaoAfrik is a community-driven platform where buyers and sellers connect. These guidelines help keep our marketplace <span className="font-medium" style={{ background: 'linear-gradient(135deg, #F9A825 0%, #E55325 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>safe, fair, and welcoming</span> for everyone.
+          <p className="mt-3 text-white/95 text-lg max-w-4xl mx-auto animate-fade-in-up animation-delay-200" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            BaoAfrik is a community-driven platform where buyers and sellers connect.
+            <br />
+            These guidelines help keep our marketplace safe, fair, and welcoming for everyone.
           </p>
         </div>
       </section>

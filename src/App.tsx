@@ -43,6 +43,8 @@ import TermsOfUse from './pages/TermsOfUse';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import CookiePolicy from './pages/CookiePolicy';
 import CommunityGuidelines from './pages/CommunityGuidelines';
+import ContactSupport from './pages/ContactSupport';
+import SafetyTrust from './pages/SafetyTrust';
 import './App.css';
 
 function AppContent() {
@@ -145,6 +147,8 @@ const customLayoutPages = ['/messages', '/create-listing', '/notifications', '/n
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/cookie-policy" element={<CookiePolicy />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/contact-support" element={<ContactSupport />} />
+          <Route path="/safety-trust" element={<SafetyTrust />} />
         </Routes>
       </main>
       <Footer />
