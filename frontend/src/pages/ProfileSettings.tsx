@@ -2193,10 +2193,10 @@ const ProfileSettings: React.FC = () => {
       // The redirect URI should point to the backend callback endpoint, not the frontend
       // The backend will handle the OAuth callback and then redirect to frontend
       const backendCallbackUri = `${process.env.REACT_APP_API_URL}/auth/callback?provider=${provider}`;
-      
+
       console.log(`[OAuth] Initiating ${provider} OAuth flow`);
       console.log(`[OAuth] Backend callback URI: ${backendCallbackUri}`);
-      
+
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/auth/${provider}/connect?redirect_uri=${encodeURIComponent(backendCallbackUri)}`,
         {
@@ -2221,7 +2221,7 @@ const ProfileSettings: React.FC = () => {
         console.error(`[OAuth] No auth URL in response:`, data);
         throw new Error('OAuth URL not received from server');
       }
-      
+
       console.log(`[OAuth] Opening OAuth URL for ${provider}`);
 
       // Open in popup window
@@ -3347,59 +3347,59 @@ const ProfileSettings: React.FC = () => {
                                             <div className="flex-1 min-w-0">
                                               <div className="flex items-start justify-between">
                                                 <div className="flex-1 min-w-0">
-                                              {/* Message notifications */}
-                                              {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
-                                                <>
-                                                  <p style={{ fontSize: '14px' }}>
-                                                    {(() => {
-                                                      const isReaction =
+                                                  {/* Message notifications */}
+                                                  {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
+                                                    <>
+                                                      <p style={{ fontSize: '14px' }}>
+                                                        {(() => {
+                                                          const isReaction =
+                                                            notif.meta?.messageType === 'REACTION' ||
+                                                            notif.meta?.type === 'reaction' ||
+                                                            Boolean(notif.meta?.reaction);
+                                                          const senderName = getNotificationSenderName(notif);
+                                                          const reactionValue = notif.meta?.reaction;
+
+                                                          if (isReaction && reactionValue) {
+                                                            return (
+                                                              <>
+                                                                <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                                  {senderName}
+                                                                </span>
+                                                                <span style={{ color: '#939393' }}> reacted "{reactionValue}" to a message</span>
+                                                              </>
+                                                            );
+                                                          }
+
+                                                          return (
+                                                            <>
+                                                              <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                                {senderName}
+                                                              </span>
+                                                              <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                            </>
+                                                          );
+                                                        })()}
+                                                      </p>
+                                                      {notif.meta?.preview && !(
                                                         notif.meta?.messageType === 'REACTION' ||
                                                         notif.meta?.type === 'reaction' ||
-                                                        Boolean(notif.meta?.reaction);
-                                                      const senderName = getNotificationSenderName(notif);
-                                                      const reactionValue = notif.meta?.reaction;
-
-                                                      if (isReaction && reactionValue) {
-                                                        return (
-                                                          <>
-                                                            <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                              {senderName}
-                                                            </span>
-                                                            <span style={{ color: '#939393' }}> reacted "{reactionValue}" to a message</span>
-                                                          </>
-                                                        );
-                                                      }
-
-                                                      return (
-                                                        <>
-                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                            {senderName}
-                                                          </span>
-                                                          <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
-                                                        </>
-                                                      );
-                                                    })()}
-                                                  </p>
-                                                  {notif.meta?.preview && !(
-                                                    notif.meta?.messageType === 'REACTION' ||
-                                                    notif.meta?.type === 'reaction' ||
-                                                    Boolean(notif.meta?.reaction)
-                                                  ) && (
-                                                        <p
-                                                          className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-                                                          style={{
-                                                            color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
-                                                            fontSize: '13px',
-                                                            textDecoration: 'underline'
-                                                          }}
-                                                          onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleNotificationClick(notif);
-                                                          }}
-                                                        >
-                                                          Click to view
-                                                        </p>
-                                                      )}
+                                                        Boolean(notif.meta?.reaction)
+                                                      ) && (
+                                                          <p
+                                                            className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                                                            style={{
+                                                              color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
+                                                              fontSize: '13px',
+                                                              textDecoration: 'underline'
+                                                            }}
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              handleNotificationClick(notif);
+                                                            }}
+                                                          >
+                                                            Click to view
+                                                          </p>
+                                                        )}
                                                     </>
                                                   ) : (
                                                     /* App notifications (product, etc.) */
@@ -3634,7 +3634,7 @@ const ProfileSettings: React.FC = () => {
                                 </div>
                               </Link>
 
-                              {/* Help Center */}
+                              {/* Help Centre */}
                               <Link
                                 to="/help"
                                 className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
@@ -3643,7 +3643,7 @@ const ProfileSettings: React.FC = () => {
                                 <div className="flex items-center space-x-2">
                                   <img src={podsIcon} alt="Pods" className="w-4 h-4" style={{ color: '#64B5F6' }} />
                                   <div>
-                                    <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Center</div>
+                                    <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Centre</div>
                                   </div>
                                 </div>
                               </Link>

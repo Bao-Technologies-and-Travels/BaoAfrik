@@ -131,11 +131,11 @@ const Requests: React.FC = () => {
 
   const priceOptions = [
     { label: 'All', value: '' },
-    { label: 'Less than 10 GBP', value: 'less-than-10' },
-    { label: '10 ~ 50 GBP', value: '10-50' },
-    { label: '50 ~ 100 GBP', value: '50-100' },
-    { label: '100 ~ 200 GBP', value: '100-200' },
-    { label: 'More than 200 GBP', value: 'more-than-200' }
+    { label: 'Less than 10', value: 'less-than-10' },
+    { label: '10 ~ 50', value: '10-50' },
+    { label: '50 ~ 100', value: '50-100' },
+    { label: '100 ~ 200', value: '100-200' },
+    { label: 'More than 200', value: 'more-than-200' }
   ];
 
   // Use all African countries from countryHelpers
@@ -293,7 +293,7 @@ const Requests: React.FC = () => {
         origin: request.origin,
         sellerLocation: request.sellerLocation,
         price: request.minPrice || 0,
-        currency: request.currency || 'GBP',
+        currency: request.currency || '£',
         isRequest: true,
         requestData: {
           minPrice: request.minPrice,
@@ -406,7 +406,7 @@ const Requests: React.FC = () => {
   const formatPriceRange = (minPrice: number | null | undefined, maxPrice: number | null | undefined, currency: string | null | undefined): string => {
     const min = minPrice ?? 0;
     const max = maxPrice ?? 1000;
-    const curr = (currency || 'GBP').toUpperCase();
+    const curr = (currency || '£').toUpperCase();
 
     // Currency symbol mapping
     const currencySymbols: Record<string, string> = {
@@ -1711,7 +1711,7 @@ const Requests: React.FC = () => {
                     style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                   />
                   <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
-                    {req ? formatPriceRange(req.minPrice, req.maxPrice, req.currency) : (productData && productData.price !== undefined ? `${productData.price} GBP` : '')}
+                    {req ? formatPriceRange(req.minPrice, req.maxPrice, req.currency) : (productData && productData.price !== undefined ? `${productData.price}` : '')}
                   </span>
                 </div>
 
@@ -1818,7 +1818,7 @@ const Requests: React.FC = () => {
                   }}
                 />
                 <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
-                  {req ? formatPriceRange(req.minPrice, req.maxPrice, req.currency) : (productData && productData.price !== undefined ? `${productData.price} GBP` : '')}
+                  {req ? formatPriceRange(req.minPrice, req.maxPrice, req.currency) : (productData && productData.price !== undefined ? `${productData.price}` : '')}
                 </span>
               </div>
 

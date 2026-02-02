@@ -674,7 +674,7 @@ const CreateListing: React.FC = () => {
     if (prefill.category) setCategory(prefill.category);
     if (prefill.location) setLocation(prefill.location);
     if (typeof prefill.deliveryAvailable === 'boolean') setDeliveryAvailable(prefill.deliveryAvailable);
-    
+
     // Handle country/origin
     if (prefill.country) {
       const originOption = countries.find(
@@ -685,11 +685,11 @@ const CreateListing: React.FC = () => {
     if (prefill.origin) {
       const originOption = countries.find(
         (country) => country.label.toLowerCase() === prefill.origin.toLowerCase() ||
-                     country.value.toLowerCase() === prefill.origin.toLowerCase()
+          country.value.toLowerCase() === prefill.origin.toLowerCase()
       );
       if (originOption) setOrigin(originOption.value);
     }
-    
+
     // Handle images
     if (prefill.image) {
       setImageUrls([prefill.image]);
@@ -701,7 +701,7 @@ const CreateListing: React.FC = () => {
       setImages([]);
       setPrimaryImageIndex(0);
     }
-    
+
     // Set editing draft ID if this is an edit/repost
     if (prefill.id) {
       setEditingDraftId(prefill.id);
@@ -1366,14 +1366,14 @@ const CreateListing: React.FC = () => {
         const reviewTimeout = setTimeout(() => {
           // Hide the "under review" banner
           setShowNotification(false);
-          
+
           // Update product data to active status (product is now available on marketplace)
           setCreatedProductData(prev => prev ? {
             ...prev,
             status: 'active' as const,
             reviewStatus: 'success' as const
           } : null);
-          
+
           // Show notification that listing is now available
           showNotificationToast({
             type: 'app',
@@ -1383,7 +1383,7 @@ const CreateListing: React.FC = () => {
             duration: 8000
           });
         }, 30000);
-        
+
         // Store timeout ID for cleanup if component unmounts
         (window as any).__reviewTimeout = reviewTimeout;
 
@@ -2402,7 +2402,7 @@ const CreateListing: React.FC = () => {
                         </div>
                       </Link>
 
-                      {/* Help Center */}
+                      {/* Help Centre */}
                       <Link
                         to="/help"
                         className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
@@ -2411,7 +2411,7 @@ const CreateListing: React.FC = () => {
                         <div className="flex items-center space-x-2">
                           <img src={podsIcon} alt="Pods" className="w-4 h-4" style={{ color: '#64B5F6' }} />
                           <div>
-                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Center</div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Centre</div>
                           </div>
                         </div>
                       </Link>

@@ -8,7 +8,7 @@ const faqs = [
     answer: (
       <>
         <p className="mb-3">
-          To use BaoAfrik, create an account by signing up with your email or through a social login. You’ll be asked to verify your email before you can list items or message other users. You can add a profile photo, bio, and location in your profile so buyers and sellers know who they’re dealing with.
+          To use BaoAfrik, create an account by signing up with your email. You’ll be asked to verify your email before you can list items or message other users. You can add a profile photo, bio, and location in your profile so buyers and sellers know who they’re dealing with.
         </p>
         <p className="mb-3">
           To manage your account, go to your profile or account settings. From there you can update your details, change your password, and turn on two-factor authentication for extra security. Keep your login details private and tell us straight away if you think someone else has used your account.
@@ -53,7 +53,7 @@ const faqs = [
           You can message a seller by opening a listing and choosing “Contact seller” or “Message”. For requests, you can message buyers who have posted requests you can fulfil. All messages go through BaoAfrik’s messaging system so you have a record of your conversations.
         </p>
         <p className="mb-3">
-          Use messaging to agree on price, delivery, and payment. Be clear and respectful. We don’t read your private messages, but we may act on reports of abuse, fraud, or rule-breaking. Don’t share personal payment details outside the platform before you’re sure the other party is trustworthy.
+          Use messaging to agree on price, delivery, and how payment will be handled between you and the other user. Be clear and respectful. We don’t read your private messages, but we may act on reports of abuse, fraud, or rule-breaking. Don’t share personal payment details outside the platform before you’re sure the other party is trustworthy.
         </p>
       </>
     ),
@@ -67,7 +67,7 @@ const faqs = [
           As a user of BaoAfrik, you’re responsible for giving accurate information in your profile and listings, dealing fairly with other users, and only listing items that are allowed. You must not harass others, mislead buyers or sellers, or use the platform for anything illegal.
         </p>
         <p className="mb-3">
-          BaoAfrik is a peer-to-peer marketplace: we connect buyers and sellers but don’t verify users or guarantee transactions. You’re responsible for your own deals, including payment and delivery. For full details, see our{' '}
+          BaoAfrik is a peer-to-peer marketplace: we connect buyers and sellers but don’t verify users or guarantee transactions. You’re responsible for your own deals, including payment and delivery. BaoAfrik does not verify listings, so sellers are responsible for compliance. For full details, see our{' '}
           <Link to="/community-guidelines" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Community Guidelines</Link>,{' '}
           <Link to="/terms" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Terms of Use</Link>, and{' '}
           <Link to="/safety-trust" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Safety & Trust</Link> pages.

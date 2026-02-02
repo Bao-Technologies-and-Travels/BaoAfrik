@@ -7481,7 +7481,7 @@ const AdminDashboard: React.FC = () => {
                                 fontWeight: 600,
                                 margin: '0 0 6px 0'
                               }}>
-                                Inappropriate content or behavior
+                                Inappropriate content or behaviour
                               </h3>
                               <p style={{
                                 fontSize: '11px',
@@ -7490,7 +7490,7 @@ const AdminDashboard: React.FC = () => {
                                 margin: '0 0 12px 0',
                                 lineHeight: '1.5'
                               }}>
-                                The user has been posting inappropriate comments and engaging in harassing behavior towards other users.
+                                The user has been posting inappropriate comments and engaging in harassing behaviour towards other users.
                               </p>
                               <div style={{
                                 display: 'flex',
@@ -7727,7 +7727,7 @@ const AdminDashboard: React.FC = () => {
                               const reportData = reportedIssueMoreMenu.reportId === 'report-1'
                                 ? { reportId: 'report-1', reportTitle: 'Fake reviews or suspicious ratings', reporterName: 'Kevin Mobinnid' }
                                 : reportedIssueMoreMenu.reportId === 'report-2'
-                                  ? { reportId: 'report-2', reportTitle: 'Inappropriate content or behavior', reporterName: 'Esther Howard' }
+                                  ? { reportId: 'report-2', reportTitle: 'Inappropriate content or behaviour', reporterName: 'Esther Howard' }
                                   : { reportId: 'report-3', reportTitle: 'Spam or misleading information', reporterName: 'Esther Howard' };
                               setReportToDelete(reportData);
                               setIsDeleteReportSuccess(false);
@@ -10082,7 +10082,7 @@ const AdminDashboard: React.FC = () => {
                           margin: 0,
                           fontFamily: 'Poppins, sans-serif'
                         }}>
-                          {listingsToggle === 'activities' ? 'Stay informed about listing trends, behavior and have a comprehensive activity tracking.' : 'Explore, manage, and monitor all listed listing in BAO Afrik platform with ease.'}
+                          {listingsToggle === 'activities' ? 'Stay informed about listing trends, behaviour and have a comprehensive activity tracking.' : 'Explore, manage, and monitor all listed listing in BAO Afrik platform with ease.'}
                         </p>
 
                         {/* Toggle (aligned with description) */}

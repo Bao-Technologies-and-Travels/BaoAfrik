@@ -177,13 +177,13 @@ const Home: React.FC = () => {
   const [focusedSearchSection, setFocusedSearchSection] = useState<string | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
 
-  // Handle "Make a Request" button click - check authentication
+  // Handle "Post a Request" button click - check authentication
   const handleMakeRequestClick = () => {
     if (!user) {
       addToast({
         type: 'info',
         title: 'Login Required',
-        message: 'Please log in to make a request',
+        message: 'Please log in to post a request',
         duration: 3000
       });
       return;
@@ -2307,7 +2307,7 @@ const Home: React.FC = () => {
             </div>
 
             {/* Scan Icon or Clear Image Button */}
-            {selectedImage ? (
+            {/* {selectedImage ? (
               <button
                 onClick={() => {
                   setSelectedImage(null);
@@ -2349,7 +2349,7 @@ const Home: React.FC = () => {
                   style={{ width: '20px', height: '20px' }}
                 />
               </button>
-            )}
+            )} */}
 
             {/* Search Button */}
             <button
@@ -2645,7 +2645,7 @@ const Home: React.FC = () => {
                     font-size: 12px;
                   }
                 `}</style>
-                {selectedImage ? (
+                {/* {selectedImage ? (
                   <button
                     onClick={() => {
                       setSelectedImage(null);
@@ -2688,7 +2688,7 @@ const Home: React.FC = () => {
                       style={{ opacity: 0.6 }}
                     />
                   </button>
-                )}
+                )} */}
               </div>
             </div>
 
@@ -3126,7 +3126,7 @@ const Home: React.FC = () => {
                         Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
                       </p>
 
-                      {/* Make a Request Button */}
+                      {/* Post a Request Button */}
                       <button
                         onClick={handleMakeRequestClick}
                         className="inline-flex items-center mx-auto"
@@ -3146,7 +3146,7 @@ const Home: React.FC = () => {
                         }}
                       >
                         <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
-                        Make a request
+                        Post a request
                       </button>
                     </div>
 
@@ -3750,7 +3750,7 @@ const Home: React.FC = () => {
                           Can't find what you're looking for? don't worry, just ask for it and we will bring it for you.
                         </p>
 
-                        {/* Make a Request Button */}
+                        {/* Post a Request Button */}
                         <button
                           onClick={handleMakeRequestClick}
                           className="inline-flex items-center mx-auto"
@@ -3770,7 +3770,7 @@ const Home: React.FC = () => {
                           }}
                         >
                           <img src={draftsIcon} alt="Request" style={{ width: window.innerWidth < 640 ? '14px' : '20px', height: window.innerWidth < 640 ? '14px' : '20px' }} />
-                          Make a request
+                          Post a request
                         </button>
                       </div>
 
@@ -4226,7 +4226,7 @@ const Home: React.FC = () => {
         </section>
       )}
 
-      {/* Make a Request Card - Always Visible */}
+      {/* Post a Request Card - Always Visible */}
       <section className="py-8 px-6 sm:px-8 lg:px-12" style={{ fontFamily: 'Poppins, sans-serif' }}>
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-2xl p-6 sm:p-8">
@@ -4235,7 +4235,7 @@ const Home: React.FC = () => {
                 Can't find what you're looking for?
               </h3>
               <p className="text-sm sm:text-base text-gray-600 mb-6 max-w-2xl">
-                Don't worry, just ask for it and we will bring it to you.
+              Post a request and local sellers can message you if they have it.
               </p>
               <button
                 onClick={handleMakeRequestClick}
@@ -4245,7 +4245,7 @@ const Home: React.FC = () => {
                   minWidth: '200px'
                 }}
               >
-                Make a Request
+                Post a Request
               </button>
             </div>
           </div>
@@ -7030,7 +7030,7 @@ const Home: React.FC = () => {
                             }}
                           >
                             <img src={draftsIcon} alt="Request" style={{ width: '14px', height: '14px' }} />
-                            <span>Make a request</span>
+                            <span>Post a request</span>
                           </button>
                         </div>
 

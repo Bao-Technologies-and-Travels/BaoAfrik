@@ -86,7 +86,7 @@ const ContactSupport: React.FC = () => {
               {[
                 'Account-related issues — login, email verification, two-factor authentication, profile updates, and account settings.',
                 'Reported content or safety concerns — listings, messages, or behaviour that may violate our Community Guidelines or Terms of Use.',
-                'General platform enquiries — how to list items, how to buy or request products, payments and delivery, and how to get the most out of BaoAfrik.',
+                'General platform enquiries — how to list items, how to buy or request products, how payments and deliveries are agreed between buyers and sellers, and how to get the most out of BaoAfrik.',
               ].map((text, i) => (
                 <li key={i} className="flex gap-3 items-start">
                   <span

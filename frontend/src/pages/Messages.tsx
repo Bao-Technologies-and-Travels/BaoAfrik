@@ -244,7 +244,7 @@ const Messages: React.FC = (): JSX.Element => {
           const created = n.createdAt ? new Date(n.createdAt) : new Date();
           const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
           const getDayLabel = (date: Date) => {
-            const d = new Date(date); 
+            const d = new Date(date);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const yesterday = new Date(today);
@@ -254,7 +254,7 @@ const Messages: React.FC = (): JSX.Element => {
             if (d.getTime() === yesterday.getTime()) return 'Yesterday';
             return d.toLocaleDateString();
           };
-          
+
           // Parse meta if it's a string
           let meta = n.meta;
           if (typeof meta === 'string') {
@@ -264,11 +264,11 @@ const Messages: React.FC = (): JSX.Element => {
               meta = null;
             }
           }
-          
-          return { 
-            ...n, 
+
+          return {
+            ...n,
             meta,
-            day: getDayLabel(created), 
+            day: getDayLabel(created),
             time: n.time || formatTime(created),
             type: n.type || 'message'
           };
@@ -446,7 +446,7 @@ const Messages: React.FC = (): JSX.Element => {
 
     const onNotification = (payload: any) => {
       const created = payload.createdAt ? new Date(payload.createdAt) : new Date();
-      
+
       // Parse meta if it's a string
       let meta = payload.meta;
       if (typeof meta === 'string') {
@@ -456,7 +456,7 @@ const Messages: React.FC = (): JSX.Element => {
           meta = null;
         }
       }
-      
+
       const normalized = {
         ...payload,
         meta,
@@ -484,7 +484,7 @@ const Messages: React.FC = (): JSX.Element => {
       const created = new Date();
       // Check if this is a reaction notification
       const isReaction = payload.type === 'reaction' || payload.meta?.messageType === 'REACTION' || payload.meta?.type === 'reaction';
-      
+
       // Build actor object if available
       const actor = payload.actor ?? payload._actor ?? (payload.senderImage ? {
         id: payload.senderId || payload.userId,
@@ -499,8 +499,8 @@ const Messages: React.FC = (): JSX.Element => {
         time: payload.time || formatTime(created),
         title: payload.senderName || payload.title || 'Someone',
         body: isReaction ? undefined : (payload.preview || payload.body || ''),
-        meta: { 
-          conversationId: payload.conversationId, 
+        meta: {
+          conversationId: payload.conversationId,
           messageId: payload.messageId,
           messageType: isReaction ? 'REACTION' : undefined,
           type: isReaction ? 'reaction' : undefined,
@@ -601,7 +601,7 @@ const Messages: React.FC = (): JSX.Element => {
 
       const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
       const getDayLabel = (date: Date) => {
-        const d = new Date(date); 
+        const d = new Date(date);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const yesterday = new Date(today);
@@ -614,7 +614,7 @@ const Messages: React.FC = (): JSX.Element => {
 
       const items = (json.data.items || []).map((n: any) => {
         const created = n.createdAt ? new Date(n.createdAt) : new Date();
-        
+
         // Parse meta if it's a string
         let meta = n.meta;
         if (typeof meta === 'string') {
@@ -624,16 +624,16 @@ const Messages: React.FC = (): JSX.Element => {
             meta = null;
           }
         }
-        
-        return { 
-          ...n, 
+
+        return {
+          ...n,
           meta,
-          day: getDayLabel(created), 
+          day: getDayLabel(created),
           time: n.time || formatTime(created),
           type: n.type || 'message'
         };
       });
-      
+
       setNotifications(items);
       if (json.data.unreadCount !== undefined) setNotificationCount(json.data.unreadCount);
     } catch (e) {
@@ -666,10 +666,10 @@ const Messages: React.FC = (): JSX.Element => {
   const handleNotificationClick = async (notif: any) => {
     // Check if notification was already read
     const wasAlreadyRead = notifications.find(n => n.id === notif.id)?.isRead;
-    
+
     // Update local state optimistically
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
-    
+
     // Update count only if it wasn't already read
     if (!wasAlreadyRead) {
       setNotificationCount(prev => Math.max(0, prev - 1));
@@ -1419,11 +1419,11 @@ const Messages: React.FC = (): JSX.Element => {
                   status: normalizedStatus.toUpperCase(),
                   updatedAt: new Date().toISOString()
                 };
-                
+
                 const finalStatuses = statusIndex >= 0
                   ? updatedStatuses.map((s: any, idx: number) => idx === statusIndex ? newStatus : s)
                   : [...updatedStatuses, newStatus];
-                
+
                 return {
                   ...conv,
                   lastMessage: {
@@ -1666,11 +1666,11 @@ const Messages: React.FC = (): JSX.Element => {
           if (String(conv.id) === String(conversationId)) {
             // When metadata is explicitly updated (e.g., unarchive), respect the update
             // This allows explicit unarchive to work
-            return { 
-              ...conv, 
+            return {
+              ...conv,
               ...metadata,
               // Ensure isArchived is properly set from metadata if provided
-              isArchived: metadata.isArchived !== undefined 
+              isArchived: metadata.isArchived !== undefined
                 ? Boolean(metadata.isArchived === true || metadata.isArchived === 'true')
                 : conv.isArchived
             };
@@ -2542,7 +2542,7 @@ const Messages: React.FC = (): JSX.Element => {
   const renderSidebarStatus = (messageId: string | number, message?: any) => {
     // Get status from messageStatuses state (real-time updates) or from message.statuses array (backend)
     let status: MessageStatus = 'sent';
-    
+
     // First check real-time state (for dynamic updates)
     const stateStatus = messageStatuses[String(messageId)];
     if (stateStatus) {
@@ -5893,7 +5893,7 @@ const Messages: React.FC = (): JSX.Element => {
                 )}
 
                 {/* Chat Entries */}
-                <div 
+                <div
                   className="flex-1 overflow-y-auto p-1 min-h-0"
                   style={{
                     scrollBehavior: 'smooth',
@@ -6090,7 +6090,7 @@ const Messages: React.FC = (): JSX.Element => {
                                       // Get status from lastMessage.statuses array (from backend) or messageStatuses state
                                       // Always show status for sent messages
                                       let status: MessageStatus = 'sent';
-                                      
+
                                       // First check backend statuses array
                                       if (lastMessage.statuses && Array.isArray(lastMessage.statuses) && lastMessage.statuses.length > 0) {
                                         // Find status for current user (sender)
@@ -6102,13 +6102,13 @@ const Messages: React.FC = (): JSX.Element => {
                                           else if (s === 'sent' || s === 'sending') status = s as MessageStatus;
                                         }
                                       }
-                                      
+
                                       // Override with real-time state updates (for dynamic updates)
                                       const stateStatus = messageStatuses[String(lastMessage.id)];
                                       if (stateStatus) {
                                         status = stateStatus;
                                       }
-                                      
+
                                       // Always render status indicator for sent messages
                                       return renderSidebarStatus(lastMessage.id, lastMessage);
                                     })()
@@ -6512,308 +6512,308 @@ const Messages: React.FC = (): JSX.Element => {
                       title="Notifications"
                       aria-label="View notifications"
                     >
-                    <img
-                      src={notificationIcon}
-                      alt="Notifications"
-                      className="w-5 h-5"
-                      style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
-                    />
-                    {notificationCount > 0 && (
-                      <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        {notificationCount}
-                      </span>
-                    )}
-                  </button>
+                      <img
+                        src={notificationIcon}
+                        alt="Notifications"
+                        className="w-5 h-5"
+                        style={{ filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)' }}
+                      />
+                      {notificationCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {notificationCount}
+                        </span>
+                      )}
+                    </button>
 
-                  {/* Notification Dropdown */}
-                  {isNotificationOpen && (
-                    <div
-                      className="fixed right-8 top-20 w-96 bg-white shadow-lg border border-gray-200 z-50 notification-dropdown"
-                      style={{
-                        borderRadius: '20px',
-                        maxHeight: '600px',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
-                    >
-                      {/* Header */}
-                      <div className="px-6 pt-5 pb-3">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-semibold" style={{ color: '#212121' }}>Notifications</h3>
-                          <button
-                            onClick={() => setIsNotificationOpen(false)}
-                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Tabs */}
-                        <div className="flex items-center space-x-6 border-b border-gray-200 relative">
-                          <button
-                            onClick={() => setNotificationTab('all')}
-                            className="pb-2 font-normal transition-colors relative"
-                            style={{
-                              color: notificationTab === 'all' ? '#64B5F6' : '#BABABA',
-                              fontSize: '12px'
-                            }}
-                          >
-                            All
-                            {notificationTab === 'all' && (
-                              <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => setNotificationTab('unread')}
-                            className="pb-2 font-normal transition-colors relative"
-                            style={{
-                              color: notificationTab === 'unread' ? '#64B5F6' : '#BABABA',
-                              fontSize: '12px'
-                            }}
-                          >
-                            Unreads
-                            {notificationTab === 'unread' && (
-                              <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => setNotificationTab('messages')}
-                            className="pb-2 font-normal transition-colors relative"
-                            style={{
-                              color: notificationTab === 'messages' ? '#64B5F6' : '#BABABA',
-                              fontSize: '12px'
-                            }}
-                          >
-                            Messages
-                            {notificationTab === 'messages' && (
-                              <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Notification List */}
+                    {/* Notification Dropdown */}
+                    {isNotificationOpen && (
                       <div
-                        className="flex-1"
+                        className="fixed right-8 top-20 w-96 bg-white shadow-lg border border-gray-200 z-50 notification-dropdown"
                         style={{
-                          overflowY: 'auto',
-                          scrollbarWidth: 'none',
-                          msOverflowStyle: 'none'
+                          borderRadius: '20px',
+                          maxHeight: '600px',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column'
                         }}
                       >
-                        <style>
-                          {`
+                        {/* Header */}
+                        <div className="px-6 pt-5 pb-3">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold" style={{ color: '#212121' }}>Notifications</h3>
+                            <button
+                              onClick={() => setIsNotificationOpen(false)}
+                              className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+
+                          {/* Tabs */}
+                          <div className="flex items-center space-x-6 border-b border-gray-200 relative">
+                            <button
+                              onClick={() => setNotificationTab('all')}
+                              className="pb-2 font-normal transition-colors relative"
+                              style={{
+                                color: notificationTab === 'all' ? '#64B5F6' : '#BABABA',
+                                fontSize: '12px'
+                              }}
+                            >
+                              All
+                              {notificationTab === 'all' && (
+                                <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => setNotificationTab('unread')}
+                              className="pb-2 font-normal transition-colors relative"
+                              style={{
+                                color: notificationTab === 'unread' ? '#64B5F6' : '#BABABA',
+                                fontSize: '12px'
+                              }}
+                            >
+                              Unreads
+                              {notificationTab === 'unread' && (
+                                <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => setNotificationTab('messages')}
+                              className="pb-2 font-normal transition-colors relative"
+                              style={{
+                                color: notificationTab === 'messages' ? '#64B5F6' : '#BABABA',
+                                fontSize: '12px'
+                              }}
+                            >
+                              Messages
+                              {notificationTab === 'messages' && (
+                                <div className="absolute bottom-0 h-0.5" style={{ backgroundColor: '#64B5F6', left: '-4px', right: '-4px' }} />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Notification List */}
+                        <div
+                          className="flex-1"
+                          style={{
+                            overflowY: 'auto',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none'
+                          }}
+                        >
+                          <style>
+                            {`
                                       .notification-dropdown::-webkit-scrollbar {
                                         display: none;
                                       }
                                     `}
-                        </style>
-                        {/* Render notifications grouped by day */}
-                        {(() => {
-                          // Get unique days from notifications
-                          const days = Array.from(new Set(filteredNotifications.map(n => n.day || 'Other').filter(Boolean)));
-                          return days.map(day => {
-                            const dayNotifs = filteredNotifications.filter(n => (n.day || 'Other') === day);
-                            if (dayNotifs.length === 0) return null;
+                          </style>
+                          {/* Render notifications grouped by day */}
+                          {(() => {
+                            // Get unique days from notifications
+                            const days = Array.from(new Set(filteredNotifications.map(n => n.day || 'Other').filter(Boolean)));
+                            return days.map(day => {
+                              const dayNotifs = filteredNotifications.filter(n => (n.day || 'Other') === day);
+                              if (dayNotifs.length === 0) return null;
 
-                            return (
-                              <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
-                                <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
-                                {dayNotifs.map((notif, idx) => {
-                                  // Check if this is a reaction notification
-                                  const isReaction = notif.meta?.messageType === 'REACTION' || notif.type === 'reaction' || notif.meta?.type === 'reaction';
-                                  const senderName = getNotificationSenderName(notif);
-                                  
-                                  return (
-                                    <div
-                                      key={notif.id || idx}
-                                      className="transition-colors cursor-pointer"
-                                      style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
-                                      onClick={() => handleNotificationClick(notif)}
-                                    >
-                                      <div className="flex items-start space-x-4 py-3 px-6">
-                                        <div className="relative flex-shrink-0">
-                                          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
-                                            backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
-                                            border: '2px solid white'
-                                          }}>
-                                            {(() => {
-                                              const avatarUrl = getNotificationAvatar(notif);
-                                              const isMessage = notif.type === 'message' || notif.type === 'NEW_MESSAGE';
+                              return (
+                                <div key={day} className={day === 'Today' ? 'pt-3 pb-1' : 'pt-2 pb-2'}>
+                                  <p className="text-xs font-medium mb-2 px-6" style={{ color: '#B0B0B0' }}>{day}</p>
+                                  {dayNotifs.map((notif, idx) => {
+                                    // Check if this is a reaction notification
+                                    const isReaction = notif.meta?.messageType === 'REACTION' || notif.type === 'reaction' || notif.meta?.type === 'reaction';
+                                    const senderName = getNotificationSenderName(notif);
 
-                                              // For messages, always try to show sender's image
-                                              if (isMessage && avatarUrl) {
+                                    return (
+                                      <div
+                                        key={notif.id || idx}
+                                        className="transition-colors cursor-pointer"
+                                        style={{ backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF' }}
+                                        onClick={() => handleNotificationClick(notif)}
+                                      >
+                                        <div className="flex items-start space-x-4 py-3 px-6">
+                                          <div className="relative flex-shrink-0">
+                                            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{
+                                              backgroundColor: (notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? '#E3F2FD' : '#F9A825',
+                                              border: '2px solid white'
+                                            }}>
+                                              {(() => {
+                                                const avatarUrl = getNotificationAvatar(notif);
+                                                const isMessage = notif.type === 'message' || notif.type === 'NEW_MESSAGE';
+
+                                                // For messages, always try to show sender's image
+                                                if (isMessage && avatarUrl) {
+                                                  return (
+                                                    <img
+                                                      src={avatarUrl}
+                                                      alt="Avatar"
+                                                      className="w-9 h-9 rounded-full object-cover"
+                                                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
+                                                    />
+                                                  );
+                                                }
+
+                                                // For product notifications, show seller image if available
+                                                if (notif.type === 'product' && avatarUrl) {
+                                                  return (
+                                                    <img
+                                                      src={avatarUrl}
+                                                      alt="Seller"
+                                                      className="w-9 h-9 rounded-full object-cover"
+                                                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
+                                                    />
+                                                  );
+                                                }
+
+                                                // For all other cases, show logo
                                                 return (
                                                   <img
-                                                    src={avatarUrl}
-                                                    alt="Avatar"
-                                                    className="w-9 h-9 rounded-full object-cover"
-                                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = avatar; }}
+                                                    src={logoIcon}
+                                                    alt="Logo"
+                                                    className="w-7 h-7"
+                                                    style={{ filter: 'brightness(0) invert(1)' }}
                                                   />
                                                 );
-                                              }
-
-                                              // For product notifications, show seller image if available
-                                              if (notif.type === 'product' && avatarUrl) {
-                                                return (
-                                                  <img
-                                                    src={avatarUrl}
-                                                    alt="Seller"
-                                                    className="w-9 h-9 rounded-full object-cover"
-                                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = logoIcon; }}
-                                                  />
-                                                );
-                                              }
-
-                                              // For all other cases, show logo
-                                              return (
-                                                <img
-                                                  src={logoIcon}
-                                                  alt="Logo"
-                                                  className="w-7 h-7"
-                                                  style={{ filter: 'brightness(0) invert(1)' }}
-                                                />
-                                              );
-                                            })()}
-                                          </div>
-                                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
-                                            <img src={(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
-                                          </div>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <div className="flex items-start justify-between">
-                                            <div className="flex-1 min-w-0">
-                                              {/* Message notifications */}
-                                              {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
-                                                <>
-                                                  <p style={{ fontSize: '14px' }}>
-                                                    {isReaction ? (
-                                                      <>
-                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                          sender
-                                                        </span>
-                                                        <span style={{ color: '#939393' }}> ({senderName}) reacted to a message</span>
-                                                      </>
-                                                    ) : (
-                                                      <>
-                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                          {senderName}
-                                                        </span>
-                                                        <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
-                                                      </>
-                                                    )}
-                                                  </p>
-                                                  {notif.meta?.preview && !isReaction && (
-                                                    <p
-                                                      className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-                                                      style={{
-                                                        color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
-                                                        fontSize: '13px',
-                                                        textDecoration: 'underline'
-                                                      }}
-                                                      onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleNotificationClick(notif);
-                                                      }}
-                                                    >
-                                                      Click to view
-                                                    </p>
-                                                  )}
-                                                </>
-                                              ) : (
-                                                /* App notifications (product, etc.) */
-                                                <>
-                                                  <p style={{ fontSize: '14px' }}>
-                                                    {(notif.text || notif.meta?.text || notif.title) ? (
-                                                      <>
-                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                          {notif.text || notif.meta?.text || notif.title || getNotificationSenderName(notif)}
-                                                        </span>
-                                                        {(notif.additionalText || notif.meta?.additionalText) && (
-                                                          <span style={{ color: '#939393' }}> {notif.additionalText || notif.meta.additionalText}</span>
-                                                        )}
-                                                        {!notif.additionalText && !notif.meta?.additionalText && notif.body && (
-                                                          <span style={{ color: '#939393' }}> {notif.body}</span>
-                                                        )}
-                                                      </>
-                                                    ) : (
-                                                      <>
-                                                        <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
-                                                          {notif.title || getNotificationSenderName(notif)}
-                                                        </span>
-                                                        {notif.body && <span style={{ color: '#939393' }}> {notif.body}</span>}
-                                                      </>
-                                                    )}
-                                                  </p>
-                                                  {(notif.subText || notif.meta?.subText) && (
-                                                    <p className="mt-1.5" style={{ color: '#9E9E9E', fontSize: '13px' }}>
-                                                      {notif.subText || notif.meta?.subText}
-                                                    </p>
-                                                  )}
-                                                </>
-                                              )}
+                                              })()}
                                             </div>
-                                            <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
-                                              {notif.time && (
-                                                <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
-                                              )}
-                                              {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
+                                            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF' }}>
+                                              <img src={(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? messageAvatarIcon : appNotificationIcon} alt="Icon" className="w-3 h-3" />
+                                            </div>
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between">
+                                              <div className="flex-1 min-w-0">
+                                                {/* Message notifications */}
+                                                {(notif.type === 'message' || notif.type === 'NEW_MESSAGE') ? (
+                                                  <>
+                                                    <p style={{ fontSize: '14px' }}>
+                                                      {isReaction ? (
+                                                        <>
+                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                            sender
+                                                          </span>
+                                                          <span style={{ color: '#939393' }}> ({senderName}) reacted to a message</span>
+                                                        </>
+                                                      ) : (
+                                                        <>
+                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                            {senderName}
+                                                          </span>
+                                                          <span style={{ color: '#939393' }}> {notif.body || notif.text || 'sent you a message'}</span>
+                                                        </>
+                                                      )}
+                                                    </p>
+                                                    {notif.meta?.preview && !isReaction && (
+                                                      <p
+                                                        className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                                                        style={{
+                                                          color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
+                                                          fontSize: '13px',
+                                                          textDecoration: 'underline'
+                                                        }}
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleNotificationClick(notif);
+                                                        }}
+                                                      >
+                                                        Click to view
+                                                      </p>
+                                                    )}
+                                                  </>
+                                                ) : (
+                                                  /* App notifications (product, etc.) */
+                                                  <>
+                                                    <p style={{ fontSize: '14px' }}>
+                                                      {(notif.text || notif.meta?.text || notif.title) ? (
+                                                        <>
+                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                            {notif.text || notif.meta?.text || notif.title || getNotificationSenderName(notif)}
+                                                          </span>
+                                                          {(notif.additionalText || notif.meta?.additionalText) && (
+                                                            <span style={{ color: '#939393' }}> {notif.additionalText || notif.meta.additionalText}</span>
+                                                          )}
+                                                          {!notif.additionalText && !notif.meta?.additionalText && notif.body && (
+                                                            <span style={{ color: '#939393' }}> {notif.body}</span>
+                                                          )}
+                                                        </>
+                                                      ) : (
+                                                        <>
+                                                          <span className="font-medium" style={{ color: notif.isRead ? '#939393' : '#616161' }}>
+                                                            {notif.title || getNotificationSenderName(notif)}
+                                                          </span>
+                                                          {notif.body && <span style={{ color: '#939393' }}> {notif.body}</span>}
+                                                        </>
+                                                      )}
+                                                    </p>
+                                                    {(notif.subText || notif.meta?.subText) && (
+                                                      <p className="mt-1.5" style={{ color: '#9E9E9E', fontSize: '13px' }}>
+                                                        {notif.subText || notif.meta?.subText}
+                                                      </p>
+                                                    )}
+                                                  </>
+                                                )}
+                                              </div>
+                                              <div className="flex flex-col items-end ml-4 flex-shrink-0" style={{ gap: notif.isRead ? '4px' : '8px' }}>
+                                                {notif.time && (
+                                                  <span style={{ color: '#9E9E9E', fontSize: '12px' }}>{notif.time}</span>
+                                                )}
+                                                {!notif.isRead && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#64B5F6' }} />}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
+                                        <div className="border-b border-gray-100" />
                                       </div>
-                                      <div className="border-b border-gray-100" />
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          });
-                        })()}
-                      </div>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
 
-                      {/* Footer */}
-                      <div className="px-6 pt-5 pb-3 flex items-center justify-between">
-                        <button onClick={markAllAsRead} className="text-xs hover:opacity-70 transition-opacity" style={{ color: '#939393' }}>
-                          Mark all as read
-                        </button>
-                        <button
-                          onClick={() => {
-                            navigate('/notifications');
-                            setIsNotificationOpen(false);
-                          }}
-                          className="text-xs flex items-center space-x-1 hover:opacity-70 transition-opacity"
-                          style={{ color: '#64B5F6' }}
-                        >
-                          <span>See all notifications</span>
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
+                        {/* Footer */}
+                        <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+                          <button onClick={markAllAsRead} className="text-xs hover:opacity-70 transition-opacity" style={{ color: '#939393' }}>
+                            Mark all as read
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/notifications');
+                              setIsNotificationOpen(false);
+                            }}
+                            className="text-xs flex items-center space-x-1 hover:opacity-70 transition-opacity"
+                            style={{ color: '#64B5F6' }}
+                          >
+                            <span>See all notifications</span>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   </div>
 
                   {/* Profile Picture */}
                   <div className="w-10 h-10 rounded-full overflow-hidden">
-                  <Link
-                    to="/account"
-                    className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full hover:ring-1 hover:ring-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
-                    title="Profile"
-                    aria-label="Go to profile page"
-                  >
-                    <img
-                      src={user?.profileImage || avatarIcon}
-                      alt="User Icon"
-                      className="w-8 h-8 rounded-full object-cover"
-                      width="32"
-                      height="32"
-                    />
-                  </Link>
+                    <Link
+                      to="/account"
+                      className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full hover:ring-1 hover:ring-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                      title="Profile"
+                      aria-label="Go to profile page"
+                    >
+                      <img
+                        src={user?.profileImage || avatarIcon}
+                        alt="User Icon"
+                        className="w-8 h-8 rounded-full object-cover"
+                        width="32"
+                        height="32"
+                      />
+                    </Link>
                   </div>
 
                   {/* Menu Button */}
@@ -6984,7 +6984,7 @@ const Messages: React.FC = (): JSX.Element => {
                             </div>
                           </Link>
 
-                          {/* Help Center */}
+                          {/* Help Centre */}
                           <Link
                             to="/help"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
@@ -6993,7 +6993,7 @@ const Messages: React.FC = (): JSX.Element => {
                             <div className="flex items-center space-x-2">
                               <img src={podsIcon} alt="Pods" className="w-4 h-4" style={{ color: '#64B5F6' }} />
                               <div>
-                                <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Center</div>
+                                <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Centre</div>
                               </div>
                             </div>
                           </Link>

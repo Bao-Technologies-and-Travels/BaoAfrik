@@ -18,7 +18,7 @@ const CommunityGuidelines: React.FC = () => {
     },
     {
       title: 'Avoid posting illegal or prohibited items',
-      description: 'Only list items that are allowed in your region and that comply with our policies. Prohibited or restricted goods will be removed.',
+      description: 'Only list items that are allowed in your region and that comply with local laws and our platform policies. Prohibited or restricted goods will be removed.',
     },
     {
       title: 'Use the platform responsibly',
@@ -48,7 +48,7 @@ const CommunityGuidelines: React.FC = () => {
           <p className="mt-3 text-white/95 text-lg max-w-4xl mx-auto animate-fade-in-up animation-delay-200" style={{ fontFamily: "'Poppins', sans-serif" }}>
             BaoAfrik is a community-driven platform where buyers and sellers connect.
             <br />
-            These guidelines help keep our marketplace safe, fair, and welcoming for everyone.
+            These guidelines help keep our peer-to-peer marketplace safe, fair, and welcoming for everyone.
           </p>
         </div>
       </section>

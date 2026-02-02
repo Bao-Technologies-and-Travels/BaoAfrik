@@ -38,7 +38,7 @@ const TermsOfUse: React.FC = () => {
                 <li>Use the platform only for lawful purposes and in accordance with these terms.</li>
                 <li>Respect other users and refrain from harassment, fraud, or misleading conduct.</li>
                 <li>Not list prohibited items or content that violates applicable laws or our Community Guidelines.</li>
-                <li>Honour commitments made in transactions (e.g. payment and delivery within agreed terms).</li>
+                <li>Honour commitments made in transactions directly with other users (e.g. payment and delivery arrangements within agreed terms).</li>
                 <li>Keep your account credentials secure and notify us of any unauthorised use.</li>
               </ul>
 
@@ -47,7 +47,7 @@ const TermsOfUse: React.FC = () => {
               </p>
 
               <p>
-                These Terms of Use are governed by the laws of the jurisdiction in which BaoAfrik operates. Any disputes arising from your use of the platform shall be resolved in accordance with those laws and our dispute resolution process.
+                These Terms of Use are governed by the laws of the jurisdiction in which BaoAfrik is registered and operates. Any disputes arising from your use of the platform shall be resolved in accordance with those laws and our dispute resolution process.
               </p>
 
               <p className="text-sm mt-8" style={{ color: '#BABABA' }}>

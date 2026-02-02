@@ -158,7 +158,7 @@ function AppContent() {
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/safety-trust" element={<SafetyTrust />} />
-          <Route path="/help-center" element={<HelpCentre />} />
+          <Route path="/help-centre" element={<HelpCentre />} />
           <Route path="/partnerships" element={<PartnershipsPage />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/our-story" element={<OurStory />} />

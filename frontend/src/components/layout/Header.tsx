@@ -709,21 +709,21 @@ const Header: React.FC<HeaderProps> = ({
                                                     notif.meta!.type === 'reaction' ||
                                                     Boolean(notif.meta?.reaction)
                                                   ) && (
-                                                    <p
-                                                      className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-                                                      style={{
-                                                        color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
-                                                        fontSize: '13px',
-                                                        textDecoration: 'underline'
-                                                      }}
-                                                      onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleNotificationClick(notif);
-                                                      }}
-                                                    >
-                                                      Click to view
-                                                    </p>
-                                                  )}
+                                                      <p
+                                                        className="mt-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                                                        style={{
+                                                          color: !notif.isRead ? '#64B5F6' : '#9E9E9E',
+                                                          fontSize: '13px',
+                                                          textDecoration: 'underline'
+                                                        }}
+                                                        onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleNotificationClick(notif);
+                                                        }}
+                                                      >
+                                                        Click to view
+                                                      </p>
+                                                    )}
                                                 </>
                                               ) : (
                                                 /* App notifications (product, etc.) */
@@ -1077,7 +1077,7 @@ const Header: React.FC<HeaderProps> = ({
                             </div>
                           </Link>
 
-                          {/* Help Center */}
+                          {/* Help Centre */}
                           <Link
                             to="/help"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
@@ -1095,7 +1095,7 @@ const Header: React.FC<HeaderProps> = ({
                                   className="font-medium text-sm"
                                   style={{ color: "#6A6A6A" }}
                                 >
-                                  Help Center
+                                  Help Centre
                                 </div>
                               </div>
                             </div>
@@ -1747,7 +1747,7 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </Link>
 
-                      {/* Help Center */}
+                      {/* Help Centre */}
                       <Link
                         to="/help"
                         className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
@@ -1756,7 +1756,7 @@ const Header: React.FC<HeaderProps> = ({
                         <div className="flex items-center space-x-2">
                           <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{ color: '#64B5F6' }} />
                           <div>
-                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Center</div>
+                            <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Help Centre</div>
                           </div>
                         </div>
                       </Link>
@@ -1923,7 +1923,7 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </Link> */}
 
-                      {/* Help Center */}
+                      {/* Help Centre */}
                       <Link
                         to="/help"
                         className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
@@ -1932,7 +1932,7 @@ const Header: React.FC<HeaderProps> = ({
                         <div className="flex items-center space-x-3">
                           <img src={podsIcon} alt="Pods" className="w-5 h-5" style={{ color: '#64B5F6' }} />
                           <div>
-                            <div className="font-medium text-gray-900">Help Center</div>
+                            <div className="font-medium text-gray-900">Help Centre</div>
                             <div className="text-sm text-gray-500">Need to talk ? We're listening</div>
                           </div>
                         </div>

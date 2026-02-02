@@ -10,15 +10,15 @@ const SafetyTrust: React.FC = () => {
   const practices = [
     {
       title: 'Communicate clearly and respectfully',
-      description: 'Use our messaging system to discuss items, prices, and delivery. Be honest and courteous so both parties have a smooth, trustworthy experience.',
+      description: 'Use our messaging system to discuss items, prices, and delivery arrangements directly with the other user. Be honest and courteous so both parties have a smooth, trustworthy experience.',
     },
     {
       title: 'Verify product details before agreeing to a transaction',
-      description: 'Ask for clear photos, descriptions, and condition details. Confirm price, quantity, and any other terms before you commit to a deal.',
+      description: 'Ask for clear photos, descriptions, and condition details. Confirm price, quantity, and any other terms before you commit to a deal. Note that BaoAfrik does not verify listings, so sellers are responsible for compliance.',
     },
     {
       title: 'Arrange exchanges safely',
-      description: 'Agree on payment and delivery methods in advance. Meet in safe, public places when possible, and keep records of your arrangements.',
+      description: 'Agree on how payment and delivery will be handled between you and the other user in advance. Meet in safe, public places when possible, and keep records of your arrangements. BaoAfrik does not handle the money or the shipping.',
     },
     {
       title: 'Report suspicious or inappropriate behaviour',
@@ -104,7 +104,7 @@ const SafetyTrust: React.FC = () => {
                 Important notice
               </h2>
               <p className="text-[#6A6A6A] text-sm leading-snug mb-2 relative">
-                BaoAfrik does not verify users and does not guarantee transactions. We are a peer-to-peer marketplace that connects buyers and sellers; we are not responsible for product quality, delivery, or payments between users.
+                BaoAfrik does not verify users and does not guarantee transactions. We are a peer-to-peer marketplace that connects buyers and sellers; we are not responsible for product quality, delivery arrangements or payments agreed between users.
               </p>
               <p className="text-[#6A6A6A] text-sm leading-snug relative">
                 By using BaoAfrik, you agree to take responsibility for your own transactions and to follow our{' '}
