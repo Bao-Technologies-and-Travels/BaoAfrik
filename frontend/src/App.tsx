@@ -4,6 +4,8 @@ import { NotificationToastProvider } from './contexts/NotificationToastContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ContactSupportProvider } from './contexts/ContactSupportContext';
 import ContactSupportModal from './components/ContactSupportModal';
+import './App.css';
+import { ToastProvider } from './contexts/ToastContext';
 
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -48,9 +50,9 @@ import CommunityGuidelines from './pages/CommunityGuidelines';
 import ContactSupport from './pages/ContactSupport';
 import SafetyTrust from './pages/SafetyTrust';
 import HelpCentre from './pages/HelpCentre';
-import './App.css';
-
-import { ToastProvider } from './contexts/ToastContext';
+import OurStory from './pages/OurStory';
+import PartnershipsPage from './pages/PartnershipsPage';
+import HowItWorks from './pages/HowItWorks';
 
 function AppContent() {
   const location = useLocation();
@@ -157,6 +159,9 @@ function AppContent() {
           <Route path="/contact-support" element={<ContactSupport />} />
           <Route path="/safety-trust" element={<SafetyTrust />} />
           <Route path="/help-center" element={<HelpCentre />} />
+          <Route path="/partnerships" element={<PartnershipsPage />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/our-story" element={<OurStory />} />
         </Routes>
       </main>
       <Footer />

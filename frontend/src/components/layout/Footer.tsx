@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-3 text-sm" style={{ color: '#BABABA' }}>
               <li><Link to="/our-story" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Our Story</Link></li>
               <li><Link to="/how-it-works" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">How It Works</Link></li>
-              <li><Link to="/partnership" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnerships</Link></li>
+              <li><Link to="/partnerships" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Partnerships</Link></li>
             </ul>
           </div>
 
@@ -72,10 +72,6 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-center items-center text-center md:text-left">
-          {/* <div className="text-sm mb-4 md:mb-0 flex flex-col md:flex-row md:space-x-6 space-y-2 md:space-y-0" style={{ color: '#BABABA' }}>
-            <Link to="/terms" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Terms of Use</Link>
-            <Link to="/privacy" className="hover:text-gray-900 focus:outline-none focus:text-orange-600 focus:underline transition-colors">Privacy Policy</Link>
-          </div> */}
           <div className="text-sm" style={{ color: '#BABABA' }}>
             © {new Date().getFullYear()} BaoAfrik. All rights reserved.
           </div>
