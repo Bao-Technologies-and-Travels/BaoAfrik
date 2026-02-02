@@ -46,13 +46,18 @@ export class ProductController {
         title,
         description,
         price,
-        currency = 'GBP',
+        currency: rawCurrency = 'GBP',
         quantity,
         category,
         origin,
         location,
         deliveryAvailable = false
       } = req.body;
+
+      // Normalize currency: display symbol £ or 'gbp' -> store as 'GBP'
+      const currency = (rawCurrency === '£' || String(rawCurrency).toUpperCase() === 'GBP')
+        ? 'GBP'
+        : String(rawCurrency).toUpperCase();
 
       const userId = (req as any).user?.id;
 
@@ -199,6 +204,11 @@ export class ProductController {
     try {
       const { id } = req.params;
       const updateData = req.body;
+      if (updateData.currency !== undefined) {
+        updateData.currency = (updateData.currency === '£' || String(updateData.currency).toUpperCase() === 'GBP')
+          ? 'GBP'
+          : String(updateData.currency).toUpperCase();
+      }
       const userId = (req as any).user?.id;
 
       if (!id) {

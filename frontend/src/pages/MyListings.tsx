@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getProductCountry } from '../utils/countryHelpers';
+import { formatPriceDisplay } from '../utils/currency';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import ErrorBoundary from './ErrorBoundary';
@@ -514,7 +515,7 @@ const MyListings: React.FC = () => {
                     id: product.id,
                     title: product.title || 'Undefined',
                     price: product.price?.toString() || 'N/A',
-                    currency: product.currency || 'GCP',
+                    currency: product.currency || 'GBP',
                     image: product.images?.[0]?.url || a1,
                     description: product.description || '',
                     country: product.origin || 'Cameroon',
@@ -627,7 +628,7 @@ const MyListings: React.FC = () => {
                                 id: product.id,
                                 title: product.title || 'Undefined',
                                 price: product.price?.toString() || 'N/A',
-                                currency: product.currency || 'GCP',
+                                currency: product.currency || 'GBP',
                                 image: product.images?.[0]?.url || a1,
                                 description: product.description || '',
                                 country: product.origin || 'Cameroon',
@@ -660,7 +661,7 @@ const MyListings: React.FC = () => {
             rating: product.averageRating || 0,
             reviews: product.reviewCount || 0,
             price: product.price?.toString() || '0',
-            currency: product.currency || 'GCP',
+            currency: product.currency || 'GBP',
             createdAt: new Date(product.createdAt).getTime(),
             priceValue: product.price || 0,
             messages: 0,
@@ -1173,7 +1174,7 @@ const MyListings: React.FC = () => {
                         <span className="truncate">{draft.title}</span>
                         <span style={{ color: '#B0B0B0', flexShrink: 0 }}>·</span>
                         <span style={{ color: '#B0B0B0', flexShrink: 0 }}>
-                            {draft.currency} {draft.price}
+                            {formatPriceDisplay(draft.currency, draft.price)}
                         </span>
                     </div>
                     <div className="flex items-center gap-2 flexShrink: 0">
@@ -1518,7 +1519,7 @@ const MyListings: React.FC = () => {
                         {/* Column 3: Price */}
                         <div>
                             <span style={{ color: '#939393', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                {listing.price} {listing.currency}
+                                {formatPriceDisplay(listing.currency, listing.price)}
                             </span>
                         </div>
 
@@ -1963,7 +1964,7 @@ const MyListings: React.FC = () => {
                             fontFamily: 'Bricolage Grotesque, sans-serif'
                         }}
                     >
-                        {listing.price} {listing.currency}
+                        {formatPriceDisplay(listing.currency, listing.price)}
                     </span>
                     <button
                         className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded"
@@ -2542,7 +2543,7 @@ const MyListings: React.FC = () => {
                                                     fontFamily: 'Bricolage Grotesque, sans-serif'
                                                 }}
                                             >
-                                                {listing.currency} {listing.price}
+                                                {formatPriceDisplay(listing.currency, listing.price)}
                                             </span>
                                             <button
                                                 type="button"
@@ -2674,7 +2675,7 @@ const MyListings: React.FC = () => {
                                     </span>
                                     <span style={{ color: '#B0B0B0', fontSize: '14px' }}>·</span>
                                     <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                        {draft.currency} {draft.price}
+                                        {formatPriceDisplay(draft.currency, draft.price)}
                                     </span>
                                 </div>
 

@@ -8,7 +8,7 @@ const faqs = [
     answer: (
       <>
         <p className="mb-3">
-          To use BaoAfrik, create an account by signing up with your email. You’ll be asked to verify your email before you can list items or message other users. You can add a profile photo, bio, and location in your profile so buyers and sellers know who they’re dealing with.
+          To use BaoAfrik, create an account by <a href="/register" style={{ color: '#64B5F6' }}>signing up</a> with your email. You’ll be asked to verify your email before you can list items or message other users. You can add a profile photo, bio, and location in your profile so buyers and sellers know who they’re dealing with.
         </p>
         <p className="mb-3">
           To manage your account, go to your profile or account settings. From there you can update your details, change your password, and turn on two-factor authentication for extra security. Keep your login details private and tell us straight away if you think someone else has used your account.
@@ -22,7 +22,7 @@ const faqs = [
     answer: (
       <>
         <p className="mb-3">
-          To list a product on BaoAfrik, go to Create listing and add a clear title, description, and photos. Choose the right category (e.g. Food & Spices, Fashion & Textiles) and set your price. Use honest descriptions and good-quality photos so buyers know exactly what they’re getting.
+          To list a product on BaoAfrik, go to <a href="/create-listing" style={{ color: '#64B5F6' }}>Create listing</a> and add a clear title, description, and photos. Choose the right category (e.g. Food & Spices, Fashion & Textiles) and set your price. Use honest descriptions and good-quality photos so buyers know exactly what they’re getting.
         </p>
         <p className="mb-3">
           You can edit or remove your listings at any time from My Listings. Only list items that you’re allowed to sell in your area and that follow our Community Guidelines. Prohibited or restricted items will be removed.
@@ -50,10 +50,19 @@ const faqs = [
     answer: (
       <>
         <p className="mb-3">
-          You can message a seller by opening a listing and choosing “Contact seller” or “Message”. For requests, you can message buyers who have posted requests you can fulfil. All messages go through BaoAfrik’s messaging system so you have a record of your conversations.
+          <ul>
+            <li>You can message a seller by opening a listing and choosing “Contact seller” or “Message”.</li>
+            <li>For requests, you can message buyers who have posted requests you can fulfil.</li>
+            <li>All messages go through BaoAfrik’s messaging system so you have a record of your conversations.</li>
+          </ul>
         </p>
         <p className="mb-3">
-          Use messaging to agree on price, delivery, and how payment will be handled between you and the other user. Be clear and respectful. We don’t read your private messages, but we may act on reports of abuse, fraud, or rule-breaking. Don’t share personal payment details outside the platform before you’re sure the other party is trustworthy.
+          <ul>
+            <li>Use messaging to agree on price, delivery, and how payment will be handled between you and the other user.</li>
+            <li>Be clear and respectful.</li>
+            <li>We don’t read your private messages, but we may act on reports of abuse, fraud, or rule-breaking.</li>
+            <li>Don’t share personal payment details outside the platform before you’re sure the other party is trustworthy.</li>
+          </ul>
         </p>
       </>
     ),

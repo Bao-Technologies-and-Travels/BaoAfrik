@@ -32,6 +32,7 @@ import zapIcon from '../assets/images/pre/zap1.svg';
 
 import { apiClient } from '../services';
 import { getProductCountry, countries as africanCountriesList } from '../utils/countryHelpers';
+import { getCurrencyDisplaySymbol } from '../utils/currency';
 import { format } from 'date-fns';
 
 interface ProductRequest {
@@ -293,7 +294,7 @@ const Requests: React.FC = () => {
         origin: request.origin,
         sellerLocation: request.sellerLocation,
         price: request.minPrice || 0,
-        currency: request.currency || '£',
+        currency: request.currency || 'GBP',
         isRequest: true,
         requestData: {
           minPrice: request.minPrice,
@@ -402,31 +403,20 @@ const Requests: React.FC = () => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
 
-  // Format price range for requests (matching the modal logic)
+  // Format price range for requests (display as £50, not GBP)
   const formatPriceRange = (minPrice: number | null | undefined, maxPrice: number | null | undefined, currency: string | null | undefined): string => {
     const min = minPrice ?? 0;
     const max = maxPrice ?? 1000;
-    const curr = (currency || '£').toUpperCase();
+    const symbol = getCurrencyDisplaySymbol(currency);
 
-    // Currency symbol mapping
-    const currencySymbols: Record<string, string> = {
-      'USD': '$',
-      'GBP': '£',
-      'CAD': 'C$',
-      'EUR': '€',
-    };
-
-    const symbol = currencySymbols[curr] || curr;
-
-    // Handle different range types
     if (min === 0 && max >= 1000000) {
-      return `Any price ${curr}`;
+      return `Any price ${symbol}`;
     } else if (min === 0) {
       return `Less than ${symbol}${max}`;
     } else if (max >= 1000000) {
       return `More than ${symbol}${min}`;
     } else {
-      return `${symbol}${min} - ${symbol}${max} ${curr}`;
+      return `${symbol}${min} - ${symbol}${max}`;
     }
   };
 

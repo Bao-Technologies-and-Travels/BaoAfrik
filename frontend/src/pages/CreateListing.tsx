@@ -38,6 +38,7 @@ import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
 
 import { Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
+import { getCurrencyDisplaySymbol, formatPriceDisplay, toApiCurrency } from '../utils/currency';
 import { useToast } from '../contexts/ToastContext';
 import { useNotificationToast } from '../contexts/NotificationToastContext';
 
@@ -59,7 +60,7 @@ const CreateListing: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState('£');
+  const [currency, setCurrency] = useState('GBP');
   const [quantity, setQuantity] = useState(0);
   const [quantityDisplayStr, setQuantityDisplayStr] = useState('0');
   const [category, setCategory] = useState('');
@@ -466,7 +467,7 @@ const CreateListing: React.FC = () => {
           id: product.id,
           title: product.title || 'Undefined',
           price: product.price?.toString() || 'N/A',
-          currency: product.currency || 'GCP',
+          currency: product.currency || 'GBP',
           image: product.images?.[0]?.url || a1,
           description: product.description || '',
           country: product.origin || 'Cameroon',
@@ -526,7 +527,7 @@ const CreateListing: React.FC = () => {
         setTitle(product.title || '');
         setDescription(product.description || '');
         setPrice(product.price?.toString() || '');
-        setCurrency(product.currency || 'GCP');
+        setCurrency(product.currency || 'GBP');
         setQuantity(product.quantity ?? 0);
         setCategory(product.category || '');
         setOrigin(product.origin || '');
@@ -1042,7 +1043,7 @@ const CreateListing: React.FC = () => {
         title: title?.trim() || '',
         description: description?.trim() || '',
         price: priceNum,
-        currency,
+        currency: toApiCurrency(currency),
         quantity: qty,
         category: category || '',
         origin: origin || '',
@@ -1118,7 +1119,7 @@ const CreateListing: React.FC = () => {
                   id: product.id,
                   title: product.title || 'Undefined',
                   price: product.price?.toString() || 'N/A',
-                  currency: product.currency || 'GCP',
+                  currency: product.currency || 'GBP',
                   image: product.images?.[0]?.url || a1,
                   description: product.description || '',
                   country: product.origin || 'Cameroon',
@@ -1225,7 +1226,7 @@ const CreateListing: React.FC = () => {
         title: title?.trim() || '',
         description: description?.trim() || '',
         price: priceNum,
-        currency,
+        currency: toApiCurrency(currency),
         quantity: qty,
         category,
         origin: origin || undefined,
@@ -1316,7 +1317,7 @@ const CreateListing: React.FC = () => {
                   id: product.id,
                   title: product.title || 'Undefined',
                   price: product.price?.toString() || 'N/A',
-                  currency: product.currency || 'GCP',
+                  currency: product.currency || 'GBP',
                   image: product.images?.[0]?.url || a1,
                   description: product.description || '',
                   country: product.origin || 'Cameroon',
@@ -1563,7 +1564,7 @@ const CreateListing: React.FC = () => {
             <span>{draft.title}</span>
             <span style={{ color: '#B0B0B0', flexShrink: 0 }}>·</span>
             <span style={{ color: '#B0B0B0', flexShrink: 0 }}>
-              {draft.currency} {draft.price}
+              {formatPriceDisplay(draft.currency, draft.price)}
             </span>
           </div>
           <div className="flex items-center gap-2 flexShrink: 0">
@@ -1709,7 +1710,7 @@ const CreateListing: React.FC = () => {
                   </span>
                   <span style={{ color: '#B0B0B0', fontSize: '14px' }}>·</span>
                   <span style={{ color: '#B0B0B0', fontSize: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    {draft.currency} {draft.price}
+                    {formatPriceDisplay(draft.currency, draft.price)}
                   </span>
                 </div>
 
@@ -3236,7 +3237,7 @@ const CreateListing: React.FC = () => {
                             className="pl-2 pr-1 py-2 border-none focus:outline-none bg-white flex items-center"
                             style={{ color: '#E4E4E4', fontSize: '0.7rem', cursor: 'pointer' }}
                           >
-                            <span>{currency}</span>
+                            <span>{getCurrencyDisplaySymbol(currency)}</span>
                             {/* <svg
                               className="w-2.5 h-2.5 ml-0.5"
                               fill="none"
@@ -3267,7 +3268,7 @@ const CreateListing: React.FC = () => {
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      setCurrency(curr.value);
+                                      setCurrency(curr.value === '£' ? 'GBP' : curr.value);
                                       setIsCurrencyDropdownOpen(false);
                                     }}
                                     className="w-full text-left transition-colors relative flex items-center"
@@ -3279,7 +3280,7 @@ const CreateListing: React.FC = () => {
                                       fontWeight: 500
                                     }}
                                   >
-                                    {currency === curr.value && (
+                                    {(currency === curr.value || (currency === 'GBP' && curr.value === '£')) && (
                                       <div
                                         style={{
                                           position: 'absolute',
@@ -4309,7 +4310,7 @@ const CreateListing: React.FC = () => {
                               className="pl-4 pr-1 py-3 border-none focus:outline-none bg-white flex items-center"
                               style={{ color: '#E4E4E4', fontSize: '0.85rem', cursor: 'pointer' }}
                             >
-                              <span className="font-bold">{currency}</span>
+                              <span className="font-bold">{getCurrencyDisplaySymbol(currency)}</span>
                               {/* <svg
                                 className="w-4 h-4 ml-1"
                                 fill="none"
@@ -4352,7 +4353,7 @@ const CreateListing: React.FC = () => {
                                         fontWeight: 500
                                       }}
                                     >
-                                      {currency === curr.value && (
+                                      {(currency === curr.value || (currency === 'GBP' && curr.value === '£')) && (
                                         <div
                                           style={{
                                             position: 'absolute',

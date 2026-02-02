@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { formatPriceDisplay } from "../utils/currency";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import axios from "axios";
 
@@ -340,7 +341,7 @@ const ProductDetail: React.FC = () => {
     id: ownerListingFromState?.id || product?.id || '',
     title: ownerListingFromState?.title || product?.title || '',
     price: ownerListingFromState?.price || product?.price?.toString() || '0',
-    currency: ownerListingFromState?.currency || product?.currency || '£',
+    currency: ownerListingFromState?.currency || product?.currency || 'GBP',
     status: currentListingStatus,
     daysLeft: computedDaysLeft,
     createdAt: ownerListingFromState?.createdAt || (product?.createdAt ? new Date(product.createdAt).getTime() : Date.now()),
@@ -475,7 +476,7 @@ const ProductDetail: React.FC = () => {
       title: product.title,
       description: product.description,
       price: product.price?.toString() || '',
-      currency: product.currency || '£',
+      currency: product.currency || 'GBP',
       quantity: product.quantity?.toString() || '1',
       category: product.category || '',
       origin: product.origin || '',
@@ -1357,7 +1358,7 @@ const ProductDetail: React.FC = () => {
             name: product.title,
             title: product.title,
             price: product.price,
-            currency: product.currency || '£',
+            currency: product.currency || 'GBP',
             description: product.description || '',
             image: primaryImage, // Primary image URL
             images: imageUrls, // All image URLs array
@@ -1429,10 +1430,8 @@ const ProductDetail: React.FC = () => {
   };
 
   const displayPrice = ownerListing
-    ? `${ownerListing.price} ${ownerListing.currency}`
-    : (product?.currency && product?.price != null
-      ? `${product.currency} ${product.price}`
-      : (product?.price != null ? `${product.price}` : ''));
+    ? formatPriceDisplay(ownerListing.currency, ownerListing.price)
+    : (product?.price != null ? formatPriceDisplay(product.currency, product.price) : '');
   const defaultDateLabel = product?.createdAt ?? 'Mon, 21 Dec 2024';
   const displayDateLabel = ownerListing?.createdAt ? formatOwnerDate(ownerListing.createdAt) : defaultDateLabel;
 
@@ -2634,7 +2633,7 @@ const ProductDetail: React.FC = () => {
                 )}
               </div>
               <div className="mt-1" style={{ fontSize: '26px', color: '#212121', fontWeight: 600, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {isOwnerView ? displayPrice : `£ ${product.price}`}
+                {isOwnerView ? displayPrice : formatPriceDisplay(product.currency, product.price)}
               </div>
             </div>
             {!isOwnerView && (
@@ -4274,7 +4273,7 @@ const ProductDetail: React.FC = () => {
                             </div>
                           </div>
                           <div className="text-sm font-semibold text-gray-900 mb-1">
-                            {relatedProduct.currency || '£'}{relatedProduct.price.toLocaleString()}
+                            {formatPriceDisplay(relatedProduct.currency, relatedProduct.price)}
                           </div>
                           <div className="flex items-center text-xs text-gray-500">
                             <img
@@ -4369,7 +4368,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          £ 31.7
+                          £31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4468,7 +4467,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          £ 31.7
+                          £31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4567,7 +4566,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          £ 31.7
+                          £31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4666,7 +4665,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          £ 31.7
+                          £31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4765,7 +4764,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                          £ 31.7
+                          £31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -4864,7 +4863,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex flex-col" style={{ padding: '0 10px 10px 10px' }}>
                       <div className="flex items-center justify-between" style={{ marginBottom: '3px' }}>
                         <div className="font-semibold text-gray-900" style={{ fontSize: '14px', lineHeight: '1.2' }}>
-                        £ 31.7
+                        £31.7
                         </div>
                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
                           display: 'flex',
@@ -5032,7 +5031,7 @@ const ProductDetail: React.FC = () => {
                               </div>
                             </div>
                             <div className="text-sm font-semibold text-gray-900 mb-1">
-                              {relatedProduct.currency || '£'}{relatedProduct.price?.toLocaleString() ?? ''}
+                              {formatPriceDisplay(relatedProduct.currency, relatedProduct.price)}
                             </div>
                           </div>
                         </Link>

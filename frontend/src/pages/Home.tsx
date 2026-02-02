@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { getProductCountry, countries } from '../utils/countryHelpers';
+import { getCurrencyDisplaySymbol, formatPriceDisplay, formatRequestPriceRangeLabel } from '../utils/currency';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -279,11 +280,11 @@ const Home: React.FC = () => {
 
   const priceOptions = [
     { label: 'All', value: '' },
-    { label: 'Less than 10 GBP', value: 'less-than-10' },
-    { label: '10 ~ 50 GBP', value: '10-50' },
-    { label: '50 ~ 100 GBP', value: '50-100' },
-    { label: '100 ~ 200 GBP', value: '100-200' },
-    { label: 'More than 200 GBP', value: 'more-than-200' }
+    { label: 'Less than £10', value: 'less-than-10' },
+    { label: '£10 ~ £50', value: '10-50' },
+    { label: '£50 ~ £100', value: '50-100' },
+    { label: '£100 ~ £200', value: '100-200' },
+    { label: 'More than £200', value: 'more-than-200' }
   ];
 
   // Get filtered location suggestions
@@ -760,31 +761,20 @@ const Home: React.FC = () => {
     .map(c => ({ name: c.name, code: c.code, flag: c.flag }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Format price range for requests (matching the modal logic)
+  // Format price range for requests (display as £50, not GBP)
   const formatPriceRange = (minPrice: number | null | undefined, maxPrice: number | null | undefined, currency: string | null | undefined): string => {
     const min = minPrice ?? 0;
     const max = maxPrice ?? 1000;
-    const curr = (currency || 'GBP').toUpperCase();
+    const symbol = getCurrencyDisplaySymbol(currency);
 
-    // Currency symbol mapping
-    const currencySymbols: Record<string, string> = {
-      'USD': '$',
-      'GBP': '£',
-      'CAD': 'C$',
-      'EUR': '€',
-    };
-
-    const symbol = currencySymbols[curr] || curr;
-
-    // Handle different range types
     if (min === 0 && max >= 1000000) {
-      return `Any price ${curr}`;
+      return `Any price ${symbol}`;
     } else if (min === 0) {
       return `Less than ${symbol}${max}`;
     } else if (max >= 1000000) {
       return `More than ${symbol}${min}`;
     } else {
-      return `${symbol}${min} - ${symbol}${max} ${curr}`;
+      return `${symbol}${min} - ${symbol}${max}`;
     }
   };
 
@@ -3215,7 +3205,7 @@ const Home: React.FC = () => {
                               {/* Price and Verified Badge Row */}
                               <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                 <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                  £ {product.price}
+                                  {formatPriceDisplay(product.currency, product.price)}
                                 </div>
                                 {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3394,7 +3384,7 @@ const Home: React.FC = () => {
                                     {/* Price and Verified Badge Row */}
                                     <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                       <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                        £ {product.price}
+                                        {formatPriceDisplay(product.currency, product.price)}
                                       </div>
                                       {/* {product.verified ? (
                                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3589,7 +3579,7 @@ const Home: React.FC = () => {
                                     {/* Price and Verified Badge Row */}
                                     <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                       <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                        £ {product.price}
+                                        {formatPriceDisplay(product.currency, product.price)}
                                       </div>
                                       {/* {product.verified ? (
                                         <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3839,7 +3829,7 @@ const Home: React.FC = () => {
                                 {/* Price and Verified Badge Row */}
                                 <div className="flex items-center justify-between" style={{ marginBottom: window.innerWidth < 640 ? '4px' : '4px' }}>
                                   <div className="font-bold text-gray-900" style={{ fontSize: window.innerWidth < 640 ? '12px' : '16px' }}>
-                                    £ {product.price}
+                                    {formatPriceDisplay(product.currency, product.price)}
                                   </div>
                                   {/* {product.verified ? (
                                 <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -3946,7 +3936,7 @@ const Home: React.FC = () => {
                             {/* Price and Verified Badge Row */}
                             <div className="flex items-center justify-between mb-1">
                               <div className="font-bold text-gray-900" style={{ fontSize: '16px' }}>
-                                £ {product.price}
+                                {formatPriceDisplay(product.currency, product.price)}
                               </div>
                               {/* {product.verified ? (
                             <div className="flex items-center text-green-600 bg-green-50 rounded" style={{ display: 'flex', padding: '1px 4px', justifyContent: 'center', alignItems: 'center', gap: '1px', fontSize: '9px' }}>
@@ -5152,7 +5142,7 @@ const Home: React.FC = () => {
                       whiteSpace: 'nowrap'
                     }}
                   >
-                    {range}
+                    {formatRequestPriceRangeLabel(range)}
                   </button>
                 ))}
               </div>
@@ -5171,7 +5161,7 @@ const Home: React.FC = () => {
                   textAlign: 'center'
                 }}
               >
-                More than 200 GBP
+                {formatRequestPriceRangeLabel('More than 200 GBP')}
               </button>
             </div>
 
@@ -5520,7 +5510,7 @@ const Home: React.FC = () => {
                       whiteSpace: 'nowrap'
                     }}
                   >
-                    {range}
+                    {formatRequestPriceRangeLabel(range)}
                   </button>
                 ))}
               </div>
@@ -5539,7 +5529,7 @@ const Home: React.FC = () => {
                   textAlign: 'center'
                 }}
               >
-                More than 200 GBP
+                {formatRequestPriceRangeLabel('More than 200 GBP')}
               </button>
             </div>
 
@@ -6951,22 +6941,13 @@ const Home: React.FC = () => {
                     const query = mobileSearchQuery.toLowerCase().trim();
                     const productCategory = getProductCategory(product.id);
 
-                    // If image is selected, API will handle similarity matching
-                    // For now, if image is selected and no other filters, show empty results to demonstrate no results state
-                    // When API is integrated, replace this with actual API results
-                    // Example: const apiResults = await fetch('/api/search-by-image', { method: 'POST', body: imageFormData });
-                    // Then filter products to only include those in apiResults
                     let matchesSearch = false;
                     if (selectedImage) {
-                      // In production, this will be replaced with actual API results
-                      // For now, if no filters are applied, simulate no results
                       // When API returns empty results, filteredProducts will be empty and no results state will show
                       if (mobileFilterCategory || mobileFilterProductOrigin || mobileFilterSellerLocation) {
                         // If filters are applied, show products matching those filters
                         matchesSearch = true;
                       } else {
-                        // Simulate: if no filters, no results (API will handle this in production)
-                        // In production, this will be: matchesSearch = apiResults.includes(product.id);
                         matchesSearch = false; // Simulate no results for image search
                       }
                     } else {
@@ -7099,7 +7080,7 @@ const Home: React.FC = () => {
                                   {/* Price and Verified Badge Row */}
                                   <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
                                     <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
-                                      £ {product.price}
+                                      {formatPriceDisplay(product.currency, product.price)}
                                     </div>
                                     {/* {product.verified ? (
                                       <div className="flex items-center text-green-600 bg-green-50 rounded" style={{
@@ -7234,7 +7215,7 @@ const Home: React.FC = () => {
                               {/* Price and Verified Badge Row */}
                               <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
                                 <div className="font-bold text-gray-900" style={{ fontSize: '12px' }}>
-                                  £ {product.price}
+                                  {formatPriceDisplay(product.currency, product.price)}
                                 </div>
                                 {/* {product.verified ? (
                                   <div className="flex items-center text-green-600 bg-green-50 rounded" style={{

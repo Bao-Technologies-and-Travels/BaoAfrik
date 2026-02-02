@@ -4,6 +4,7 @@ import Header from '../components/layout/Header';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getProductCountry, countries } from '../utils/countryHelpers';
+import { getCurrencyDisplaySymbol, formatRequestPriceRangeLabel } from '../utils/currency';
 import { useNotificationToast } from '../contexts/NotificationToastContext';
 
 import listIcon from '../assets/images/pre/list.svg';
@@ -536,7 +537,7 @@ const MyRequests: React.FC = () => {
                             origin: req.origin || '',
                             minPrice: req.minPrice,
                             maxPrice: req.maxPrice,
-                            currency: req.currency || 'USD',
+                            currency: req.currency || 'GBP',
                             status: mapBackendStatusToFrontend(req.status || 'PENDING'),
                             description: req.description || ''
                         };
@@ -4327,7 +4328,7 @@ const MyRequests: React.FC = () => {
                                                 whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            {range}
+                                            {formatRequestPriceRangeLabel(range)}
                                         </button>
                                     ))}
                                 </div>
@@ -4346,7 +4347,7 @@ const MyRequests: React.FC = () => {
                                         textAlign: 'center'
                                     }}
                                 >
-                                    More than 200 GBP
+                                    {formatRequestPriceRangeLabel('More than 200 GBP')}
                                 </button>
                             </div>
 
@@ -4695,7 +4696,7 @@ const MyRequests: React.FC = () => {
                                                 whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            {range}
+                                            {formatRequestPriceRangeLabel(range)}
                                         </button>
                                     ))}
                                 </div>
@@ -4714,7 +4715,7 @@ const MyRequests: React.FC = () => {
                                         textAlign: 'center'
                                     }}
                                 >
-                                    More than 200 GBP
+                                    {formatRequestPriceRangeLabel('More than 200 GBP')}
                                 </button>
                             </div>
 

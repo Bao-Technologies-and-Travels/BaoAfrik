@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { formatPriceDisplay } from '../utils/currency';
 
 import EmojiPicker, { Emoji } from 'emoji-picker-react';
 import logo from '../assets/images/pre/logo.png';
@@ -4714,7 +4715,7 @@ const Messages: React.FC = (): JSX.Element => {
                                           <div className="flex-1">
                                             <div className="flex items-center justify-between">
                                               <div className="text-xl font-semibold" style={{ color: message.isIncoming ? '#212121' : '#FFFFFF' }}>
-                                                {message.productData.currency || '£'} {message.productData.price}
+                                                {formatPriceDisplay(message.productData.currency, message.productData.price)}
                                               </div>
                                               {message.productData.location && (
                                                 <div className="flex items-center space-x-2 text-[10px]" style={{ color: message.isIncoming ? '#BABABA' : 'rgba(255,255,255,0.7)' }}>
@@ -5179,7 +5180,7 @@ const Messages: React.FC = (): JSX.Element => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>£ {productData.price}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#6A6A6A' }}>{formatPriceDisplay(productData.currency, productData.price)}</div>
                         <div className="flex items-center space-x-0.5" style={{ fontSize: '8px', color: '#BABABA' }}>
                           <img src={locIcon} alt="Location" className="w-2.5 h-2.5" />
                           <span>{productData.location}</span>
@@ -5559,7 +5560,7 @@ const Messages: React.FC = (): JSX.Element => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
                             <div style={{ fontSize: '9px', fontWeight: 600, color: '#64B5F6' }}>
-                              {productData.currency || '£'} {productData.price}
+                              {formatPriceDisplay(productData.currency, productData.price)}
                             </div>
                             {productData.location && (
                               <div className="flex items-center space-x-0.5" style={{ fontSize: '7px', color: '#64B5F6' }}>
@@ -7989,7 +7990,7 @@ const Messages: React.FC = (): JSX.Element => {
                                               <div className="flex-1">
                                                 <div className="flex items-center justify-between">
                                                   <div className="text-xl font-semibold" style={{ color: '#333333' }}>
-                                                    {message.productData.currency || '£'} {message.productData.price}
+                                                    {formatPriceDisplay(message.productData.currency, message.productData.price)}
                                                   </div>
                                                   {message.productData.location && (
                                                     <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#333333' }}>
@@ -8618,7 +8619,7 @@ const Messages: React.FC = (): JSX.Element => {
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
                                 <div className="text-xl font-semibold" style={{ color: '#6A6A6A' }}>
-                                  {productData.currency || '£'} {productData.price}
+                                  {formatPriceDisplay(productData.currency, productData.price)}
                                 </div>
                                 <div className="flex items-center space-x-2 text-[10px]" style={{ color: '#BABABA' }}>
                                   <img src={locIcon} alt="Location" className="w-4 h-4" />
