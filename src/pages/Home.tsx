@@ -1016,7 +1016,7 @@ const Home: React.FC = () => {
                       zIndex: 1000
                     }}
                   >
-                    {/* Manage request */}
+                    {/* Contact requester */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1049,7 +1049,7 @@ const Home: React.FC = () => {
                           filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }} 
                       />
-                      <span>Manage request</span>
+                      <span>Contact requester</span>
                     </button>
                     
                     {/* Share the request */}
@@ -1136,7 +1136,7 @@ const Home: React.FC = () => {
                 }}
               >
                 <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
-                Manage request
+                Contact requester
               </button>
               <button
                 className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -1256,7 +1256,7 @@ const Home: React.FC = () => {
                       zIndex: 1000
                     }}
                   >
-                    {/* Manage request */}
+                    {/* Contact requester */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1289,7 +1289,7 @@ const Home: React.FC = () => {
                           filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }} 
                       />
-                      <span>Manage request</span>
+                      <span>Contact requester</span>
                     </button>
                     
                     {/* Share the request */}
@@ -4303,7 +4303,7 @@ const Home: React.FC = () => {
                           }}
                         >
                           <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
-                        Manage request
+                        Contact requester
                       </button>
                         <button
                           className="w-8 h-8 rounded-full flex items-center justify-center"
