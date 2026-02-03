@@ -20,6 +20,7 @@ import blackArrowIcon from '../assets/images/pre/black.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import backArrowIcon from '../assets/images/pre/back arrow.svg';
 import SDicon from '../assets/images/pre/SDicon.svg';
+import LocationAutocomplete from '../components/LocationAutocomplete';
 
 const Requests: React.FC = () => {
   const navigate = useNavigate();
@@ -1769,34 +1770,22 @@ const Requests: React.FC = () => {
                         filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                       }}
                     />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onFocus={() => {
-                        setIsSearchFocused(true);
-                        if (searchQuery.trim()) {
-                          setShowSearchSuggestions(true);
-                        }
-                      }}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSearch();
-                        }
-                      }}
-                      placeholder="Buyer location ?"
-                      className="w-full border rounded-lg focus:outline-none pl-10"
-                      style={{ 
-                        backgroundColor: '#FFFFFF',
-                        borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                        borderWidth: isSearchFocused ? '2px' : '1px',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '10px' : '14px',
-                        color: searchQuery ? '#212121' : '#D9D9D9',
-                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                      }}
-                    />
+                    <div className="flex-1" style={{ minWidth: 0 }}>
+                      <LocationAutocomplete
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Type area or city"
+                        inputStyle={{ 
+                          backgroundColor: '#FFFFFF',
+                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                          borderWidth: isSearchFocused ? 2 : 1,
+                          fontSize: isMobile ? '10px' : '14px',
+                          paddingLeft: '36px',
+                          paddingRight: '44px',
+                          padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                        }}
+                      />
+                    </div>
                     <button
                       onClick={handleSearch}
                       className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -1811,58 +1800,6 @@ const Requests: React.FC = () => {
                     >
                       <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
                     </button>
-                    {/* Suggestions Dropdown */}
-                    {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
-                      <>
-                        <style>{`
-                          .search-suggestions-dropdown::-webkit-scrollbar {
-                            display: none;
-                          }
-                          .search-suggestions-dropdown {
-                            -ms-overflow-style: none;
-                            scrollbar-width: none;
-                          }
-                        `}</style>
-                        <div
-                          className="search-suggestions-dropdown absolute top-full left-0 right-0 mt-1 z-50"
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                            maxHeight: '180px',
-                            overflowY: 'auto'
-                          }}
-                        >
-                        {getFilteredSuggestions().map((location, index) => (
-                          <div
-                            key={index}
-                            onClick={() => {
-                              setSearchQuery(location);
-                              setShowSearchSuggestions(false);
-                              handleSearch();
-                            }}
-                            className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
-                            style={{
-                              padding: isMobile ? '6px 10px' : '8px 12px'
-                            }}
-                          >
-                            <img 
-                              src={locationIcon} 
-                              alt="Location"
-                              style={{ 
-                                width: isMobile ? '12px' : '14px', 
-                                height: isMobile ? '12px' : '14px',
-                                filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
-                              }}
-                            />
-                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '9px' : '13px', fontFamily: 'Poppins, sans-serif' }}>
-                              {location}
-                            </span>
-                          </div>
-                        ))}
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
               )
@@ -1880,33 +1817,21 @@ const Requests: React.FC = () => {
                       filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                     }}
                   />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onFocus={() => {
-                      setIsSearchFocused(true);
-                      if (searchQuery.trim()) {
-                        setShowSearchSuggestions(true);
-                      }
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSearch();
-                      }
-                    }}
-                    placeholder="Buyer location ?"
-                    className="w-full border rounded-lg focus:outline-none pl-10"
-                    style={{ 
-                      backgroundColor: '#FFFFFF',
-                      borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                      fontFamily: 'Poppins, sans-serif',
-                      fontSize: isMobile ? '10px' : '14px',
-                      color: searchQuery ? '#212121' : '#D9D9D9',
-                      padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                    }}
-                  />
+                  <div className="flex-1" style={{ minWidth: 0 }}>
+                    <LocationAutocomplete
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      placeholder="Type area or city"
+                      inputStyle={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                        fontSize: isMobile ? '10px' : '14px',
+                        paddingLeft: '36px',
+                        paddingRight: '44px',
+                        padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                      }}
+                    />
+                  </div>
                   <button
                     onClick={handleSearch}
                     className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -1921,44 +1846,6 @@ const Requests: React.FC = () => {
                   >
                     <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
                   </button>
-                  {/* Suggestions Dropdown */}
-                  {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
-                    <div
-                      className="absolute top-full left-0 right-0 mt-1 z-50"
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                        maxHeight: '200px',
-                        overflowY: 'auto'
-                      }}
-                    >
-                      {getFilteredSuggestions().map((location, index) => (
-                        <div
-                          key={index}
-                          onClick={() => {
-                            setSearchQuery(location);
-                            setShowSearchSuggestions(false);
-                            handleSearch();
-                          }}
-                          className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
-                        >
-                          <img 
-                            src={locationIcon} 
-                            alt="Location"
-                            style={{ 
-                              width: '16px', 
-                              height: '16px',
-                              filter: 'brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(2000%) hue-rotate(0deg) brightness(1) contrast(1)'
-                            }}
-                          />
-                          <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
-                            {location}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -1990,34 +1877,22 @@ const Requests: React.FC = () => {
                         filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                       }}
                     />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onFocus={() => {
-                        setIsSearchFocused(true);
-                        if (searchQuery.trim()) {
-                          setShowSearchSuggestions(true);
-                        }
-                      }}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSearch();
-                        }
-                      }}
-                      placeholder="Buyer location ?"
-                      className="w-full border rounded-lg focus:outline-none pl-10"
-                      style={{ 
-                        backgroundColor: '#FFFFFF',
-                        borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                        borderWidth: isSearchFocused ? '2px' : '1px',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '10px' : '14px',
-                        color: searchQuery ? '#212121' : '#D9D9D9',
-                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                      }}
-                    />
+                    <div className="flex-1" style={{ minWidth: 0 }}>
+                      <LocationAutocomplete
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Type area or city"
+                        inputStyle={{ 
+                          backgroundColor: '#FFFFFF',
+                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                          borderWidth: isSearchFocused ? 2 : 1,
+                          fontSize: isMobile ? '10px' : '14px',
+                          paddingLeft: '36px',
+                          paddingRight: '44px',
+                          padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                        }}
+                      />
+                    </div>
                     <button
                       onClick={handleSearch}
                       className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -2032,58 +1907,6 @@ const Requests: React.FC = () => {
                     >
                       <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
                     </button>
-                    {/* Suggestions Dropdown */}
-                    {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
-                      <>
-                        <style>{`
-                          .search-suggestions-dropdown::-webkit-scrollbar {
-                            display: none;
-                          }
-                          .search-suggestions-dropdown {
-                            -ms-overflow-style: none;
-                            scrollbar-width: none;
-                          }
-                        `}</style>
-                        <div
-                          className="search-suggestions-dropdown absolute top-full left-0 right-0 mt-1 z-50"
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                            maxHeight: '180px',
-                            overflowY: 'auto'
-                          }}
-                        >
-                        {getFilteredSuggestions().map((location, index) => (
-                          <div
-                            key={index}
-                            onClick={() => {
-                              setSearchQuery(location);
-                              setShowSearchSuggestions(false);
-                              handleSearch();
-                            }}
-                            className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
-                            style={{
-                              padding: isMobile ? '6px 10px' : '8px 12px'
-                            }}
-                          >
-                            <img 
-                              src={locationIcon} 
-                              alt="Location"
-                              style={{ 
-                                width: isMobile ? '12px' : '14px', 
-                                height: isMobile ? '12px' : '14px',
-                                filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
-                              }}
-                            />
-                            <span style={{ color: '#6A6A6A', fontSize: isMobile ? '9px' : '13px', fontFamily: 'Poppins, sans-serif' }}>
-                              {location}
-                            </span>
-                          </div>
-                        ))}
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
               </div>
@@ -2284,33 +2107,21 @@ const Requests: React.FC = () => {
                           filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        onFocus={() => {
-                          setIsSearchFocused(true);
-                          if (searchQuery.trim()) {
-                            setShowSearchSuggestions(true);
-                          }
-                        }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSearch();
-                          }
-                        }}
-                        placeholder="Buyer location ?"
-                        className="w-full border rounded-lg focus:outline-none pl-10"
-                        style={{ 
-                          backgroundColor: '#FFFFFF',
-                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '10px' : '14px',
-                          color: searchQuery ? '#212121' : '#D9D9D9',
-                          padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                        }}
-                      />
+                      <div className="flex-1" style={{ minWidth: 0 }}>
+                        <LocationAutocomplete
+                          value={searchQuery}
+                          onChange={setSearchQuery}
+                          placeholder="Type area or city"
+                          inputStyle={{ 
+                            backgroundColor: '#FFFFFF',
+                            borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                            fontSize: isMobile ? '10px' : '14px',
+                            paddingLeft: '36px',
+                            paddingRight: '44px',
+                            padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                          }}
+                        />
+                      </div>
                       <button
                         onClick={handleSearch}
                         className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -2325,44 +2136,6 @@ const Requests: React.FC = () => {
                       >
                         <img src={buyerIcon} alt="Search" style={{ width: isMobile ? '12px' : '16px', height: isMobile ? '12px' : '16px' }} />
                       </button>
-                      {/* Suggestions Dropdown */}
-                      {showSearchSuggestions && getFilteredSuggestions().length > 0 && (
-                        <div
-                          className="absolute top-full left-0 right-0 mt-1 z-50"
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                            maxHeight: '200px',
-                            overflowY: 'auto'
-                          }}
-                        >
-                          {getFilteredSuggestions().map((location, index) => (
-                            <div
-                              key={index}
-                              onClick={() => {
-                                setSearchQuery(location);
-                                setShowSearchSuggestions(false);
-                                handleSearch();
-                              }}
-                              className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50"
-                            >
-                              <img 
-                                src={locationIcon} 
-                                alt="Location"
-                                style={{ 
-                                  width: '16px', 
-                                  height: '16px',
-                                  filter: 'brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(2000%) hue-rotate(0deg) brightness(1) contrast(1)'
-                                }}
-                              />
-                              <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
-                                {location}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
