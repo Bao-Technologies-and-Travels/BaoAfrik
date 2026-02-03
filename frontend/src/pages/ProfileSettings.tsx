@@ -4352,8 +4352,10 @@ const ProfileSettings: React.FC = () => {
                                     </div>
                                   </div>
                                   <button
-                                    onClick={() => handleSocialToggle(platform.key as keyof typeof socialConnections)}
-                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                                    type="button"
+                                    disabled
+                                    aria-label={`${platform.name} verification (coming soon)`}
+                                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors opacity-60 cursor-not-allowed"
                                     style={{ backgroundColor: socialConnections[platform.key as keyof typeof socialConnections] ? '#64B5F6' : '#E4E4E4' }}
                                   >
                                     <span
@@ -6281,16 +6283,16 @@ const ProfileSettings: React.FC = () => {
                         className="w-5 h-5"
                       />
                       <span>©</span>
-                      <span className="text-[11px]">All rights reserved</span>
+                      <span className="text-[11px]">&copy; BaoAfrik 2025. All rights reserved</span>
                     </div>
                     <div className="flex items-center space-x-3 text-[11px]">
-                      <Link to="/contact" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
+                      <Link to="/contact-support" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
                       <span style={{ color: '#BABABA' }}>|</span>
                       <Link to="/terms" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
                       <span style={{ color: '#BABABA' }}>|</span>
                       <Link to="/privacy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Privacy policies</Link>
                       <span style={{ color: '#BABABA' }}>|</span>
-                      <Link to="/cookies" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
+                      <Link to="/cookie-policy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
                     </div>
                   </div>
                 </div>

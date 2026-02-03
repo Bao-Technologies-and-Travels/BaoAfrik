@@ -76,10 +76,14 @@ const faqs = [
           As a user of BaoAfrik, you’re responsible for giving accurate information in your profile and listings, dealing fairly with other users, and only listing items that are allowed. You must not harass others, mislead buyers or sellers, or use the platform for anything illegal.
         </p>
         <p className="mb-3">
-          BaoAfrik is a peer-to-peer marketplace: we connect buyers and sellers but don’t verify users or guarantee transactions. You’re responsible for your own deals, including payment and delivery. BaoAfrik does not verify listings, so sellers are responsible for compliance. For full details, see our{' '}
-          <Link to="/community-guidelines" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Community Guidelines</Link>,{' '}
-          <Link to="/terms" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Terms of Use</Link>, and{' '}
-          <Link to="/safety-trust" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Safety & Trust</Link> pages.
+          <ul>
+            <li>We connect buyers and sellers, but we don’t verify users on the platform or guarantee transactions. You’re responsible for your own deals, including payment and delivery.</li>
+            <li>BaoAfrik does not verify listings, so sellers are responsible for compliance.</li>
+            <li>For full details, see our{' '}
+              <Link to="/community-guidelines" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Community Guidelines</Link>,{' '}
+              <Link to="/terms" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Terms of Use</Link>, and{' '}
+              <Link to="/safety-trust" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Safety & Trust</Link> pages.</li>
+          </ul>
         </p>
       </>
     ),

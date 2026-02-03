@@ -5,7 +5,7 @@ export interface CountryInfo {
   abbreviation: string;
 }
 
-// Standardized country names - these are the canonical names
+// Standardized country names 
 const countries: CountryInfo[] = [
   { name: 'Algeria', code: 'dz', flag: 'https://flagcdn.com/w20/dz.png', abbreviation: 'DZA' },
   { name: 'Angola', code: 'ao', flag: 'https://flagcdn.com/w20/ao.png', abbreviation: 'AGO' },

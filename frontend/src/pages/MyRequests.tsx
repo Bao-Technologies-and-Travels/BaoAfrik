@@ -5,6 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getProductCountry, countries } from '../utils/countryHelpers';
 import { getCurrencyDisplaySymbol, formatRequestPriceRangeLabel } from '../utils/currency';
+import { UK_CITIES_PLAIN, formatCityDisplay, getCityPlain } from '../utils/ukCities';
 import { useNotificationToast } from '../contexts/NotificationToastContext';
 
 import listIcon from '../assets/images/pre/list.svg';
@@ -258,7 +259,6 @@ const MyRequests: React.FC = () => {
     const [selectedSort, setSelectedSort] = useState<{ label: string; value: SortValue } | null>(null);
     const sortDropdownRef = useRef<HTMLDivElement | null>(null);
     const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
-    const moreOptionsRef = useRef<HTMLDivElement | null>(null);
     const [statusModalOpenFor, setStatusModalOpenFor] = useState<string | null>(null);
     const [viewRequestModalOpen, setViewRequestModalOpen] = useState(false);
     const [selectedRequestForView, setSelectedRequestForView] = useState<Request | null>(null);
@@ -285,12 +285,8 @@ const MyRequests: React.FC = () => {
     const requestProductOriginDropdownRef = useRef<HTMLDivElement>(null);
     const locationDropdownRef = useRef<HTMLDivElement>(null);
 
-    // UK cities for location dropdown
-    const ukCities = [
-        'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds',
-        'Sheffield', 'Edinburgh', 'Glasgow', 'Bristol', 'Cardiff',
-        'Newcastle', 'Nottingham', 'Leicester', 'Southampton', 'Belfast'
-    ];
+    // UK cities for location dropdown (shared list)
+    const ukCities = UK_CITIES_PLAIN;
 
     // African countries for origin dropdown
     const africanCountries = countries
@@ -642,7 +638,11 @@ const MyRequests: React.FC = () => {
     const isSearchNoResultsState = shouldShowEmptyState && isSearchActive;
     const totalRequests = requests.length;
 
-    const toggleStatusDropdown = () => setIsStatusDropdownOpen((prev) => !prev);
+    const toggleStatusDropdown = () => {
+        setMoreOptionsOpenFor(null);
+        setStatusModalOpenFor(null);
+        setIsStatusDropdownOpen((prev) => !prev);
+    };
     const handleStatusSelect = (option: StatusFilter) => {
         setStatusFilter(option);
         setIsStatusDropdownOpen(false);
@@ -683,7 +683,7 @@ const MyRequests: React.FC = () => {
                 setIsSortDropdownOpen(false);
                 setHoveredSecondarySort(null);
             }
-            if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
+            if (moreOptionsOpenFor !== null && !target.closest('[data-more-options]')) {
                 setMoreOptionsOpenFor(null);
             }
             // Check if click is outside any status modal
@@ -710,7 +710,7 @@ const MyRequests: React.FC = () => {
         };
         document.addEventListener('click', handleClickOutsideDelayed);
         return () => document.removeEventListener('click', handleClickOutsideDelayed);
-    }, [statusModalOpenFor]);
+    }, [statusModalOpenFor, moreOptionsOpenFor]);
 
     // mobile detection
     useEffect(() => {
@@ -895,7 +895,13 @@ const MyRequests: React.FC = () => {
                     }}
                     onClick={(e) => {
                         e.stopPropagation();
-                        setStatusModalOpenFor(isModalOpen ? null : requestId);
+                        if (isModalOpen) {
+                            setStatusModalOpenFor(null);
+                        } else {
+                            setMoreOptionsOpenFor(null);
+                            setIsStatusDropdownOpen(false);
+                            setStatusModalOpenFor(requestId);
+                        }
                     }}
                 >
                     <span
@@ -911,7 +917,13 @@ const MyRequests: React.FC = () => {
                         className="status-modal-button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            setStatusModalOpenFor(isModalOpen ? null : requestId);
+                            if (isModalOpen) {
+                                setStatusModalOpenFor(null);
+                            } else {
+                                setMoreOptionsOpenFor(null);
+                                setIsStatusDropdownOpen(false);
+                                setStatusModalOpenFor(requestId);
+                            }
                         }}
                         style={{
                             background: 'transparent',
@@ -1077,7 +1089,13 @@ const MyRequests: React.FC = () => {
                                     type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                                        if (isStatusModalOpen) {
+                                            setStatusModalOpenFor(null);
+                                        } else {
+                                            setMoreOptionsOpenFor(null);
+                                            setIsStatusDropdownOpen(false);
+                                            setStatusModalOpenFor(request.id);
+                                        }
                                     }}
                                     className="inline-flex items-center gap-1 px-2.5"
                                     style={{
@@ -1198,7 +1216,7 @@ const MyRequests: React.FC = () => {
                             </div>
 
                             {/* More Options Button */}
-                            <div style={{ position: 'relative' }}>
+                            <div style={{ position: 'relative' }} data-more-options>
                                 <button
                                     type="button"
                                     className="w-5 h-5 rounded-full border flex items-center justify-center"
@@ -1211,7 +1229,13 @@ const MyRequests: React.FC = () => {
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setMoreOptionsOpenFor(isMoreOptionsOpen ? null : request.id);
+                                        if (isMoreOptionsOpen) {
+                                            setMoreOptionsOpenFor(null);
+                                        } else {
+                                            setIsStatusDropdownOpen(false);
+                                            setStatusModalOpenFor(null);
+                                            setMoreOptionsOpenFor(request.id);
+                                        }
                                     }}
                                 >
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1377,7 +1401,13 @@ const MyRequests: React.FC = () => {
                                         className="status-modal-button"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setStatusModalOpenFor(isStatusModalOpen ? null : request.id);
+                                            if (isStatusModalOpen) {
+                                                setStatusModalOpenFor(null);
+                                            } else {
+                                                setMoreOptionsOpenFor(null);
+                                                setIsStatusDropdownOpen(false);
+                                                setStatusModalOpenFor(request.id);
+                                            }
                                         }}
                                         style={{
                                             background: 'transparent',
@@ -1491,7 +1521,7 @@ const MyRequests: React.FC = () => {
                             </div>
 
                             {/* More Options Button */}
-                            <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                            <div style={{ position: 'relative' }} data-more-options>
                                 <button
                                     type="button"
                                     className="w-4 h-4 rounded-full border flex items-center justify-center"
@@ -1504,7 +1534,13 @@ const MyRequests: React.FC = () => {
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setMoreOptionsOpenFor(isMoreOptionsOpen ? null : request.id);
+                                        if (isMoreOptionsOpen) {
+                                            setMoreOptionsOpenFor(null);
+                                        } else {
+                                            setIsStatusDropdownOpen(false);
+                                            setStatusModalOpenFor(null);
+                                            setMoreOptionsOpenFor(request.id);
+                                        }
                                     }}
                                 >
                                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1675,7 +1711,7 @@ const MyRequests: React.FC = () => {
                                     className="w-3 h-3"
                                     style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
                                 />
-                                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.sellerLocation}</span>
+                                <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{formatCityDisplay(request.sellerLocation)}</span>
                             </div>
 
                             {/* Second Row - Price and Country */}
@@ -1749,7 +1785,7 @@ const MyRequests: React.FC = () => {
                                     filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
                                 }}
                             />
-                            <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.sellerLocation}</span>
+                            <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{formatCityDisplay(request.sellerLocation)}</span>
                         </div>
 
                         {/* Second Row - Price and Country */}
@@ -2239,7 +2275,7 @@ const MyRequests: React.FC = () => {
                                                 maxWidth: '120px'
                                             }}
                                         >
-                                            {request.sellerLocation}
+                                            {formatCityDisplay(request.sellerLocation)}
                                         </span>
                                     </>
                                 );
@@ -2284,8 +2320,8 @@ const MyRequests: React.FC = () => {
                         </div>
 
                         {/* Column 7: More Options */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', paddingLeft: '8px' }} onClick={(e) => e.stopPropagation()}>
-                            <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', paddingLeft: '8px' }} onClick={(e) => e.stopPropagation()} data-more-options>
+                            <div style={{ position: 'relative' }}>
                                 <button
                                     type="button"
                                     className="w-5 h-5 rounded-full border flex items-center justify-center"
@@ -2298,7 +2334,13 @@ const MyRequests: React.FC = () => {
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setMoreOptionsOpenFor(moreOptionsOpenFor === request.id ? null : request.id);
+                                        if (moreOptionsOpenFor === request.id) {
+                                            setMoreOptionsOpenFor(null);
+                                        } else {
+                                            setIsStatusDropdownOpen(false);
+                                            setStatusModalOpenFor(null);
+                                            setMoreOptionsOpenFor(request.id);
+                                        }
                                     }}
                                 >
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2445,7 +2487,7 @@ const MyRequests: React.FC = () => {
             const query = mobileSearchQuery.toLowerCase().trim();
             return (
                 request.productName.toLowerCase().includes(query) ||
-                request.sellerLocation.toLowerCase().includes(query) ||
+                getCityPlain(request.sellerLocation || '').toLowerCase().includes(query) ||
                 (request.origin && request.origin.toLowerCase().includes(query)) ||
                 (request.description && request.description.toLowerCase().includes(query))
             );
@@ -2941,7 +2983,7 @@ const MyRequests: React.FC = () => {
                                     </div>
 
                                     {/* Status Filter */}
-                                    <div className="relative" ref={statusDropdownRef}>
+                                    <div className="relative" ref={statusDropdownRef} style={isStatusDropdownOpen ? { zIndex: 10001, isolation: 'isolate' } : undefined}>
                                         {statusFilter === 'All Status' ? (
                                             <button
                                                 type="button"
@@ -2993,12 +3035,14 @@ const MyRequests: React.FC = () => {
 
                                         {isStatusDropdownOpen && (
                                             <div
-                                                className="absolute right-0 mt-2 bg-white z-10"
+                                                className="absolute right-0 mt-2 bg-white"
                                                 style={{
                                                     borderRadius: '10px',
                                                     border: '1px solid #E9E9E9',
                                                     boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                                                    minWidth: '160px'
+                                                    minWidth: '160px',
+                                                    zIndex: 10001,
+                                                    isolation: 'isolate'
                                                 }}
                                             >
                                                 {statusOptions.map((option) => (
@@ -3197,7 +3241,7 @@ const MyRequests: React.FC = () => {
                                                     className="w-3 h-3"
                                                     style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                                                 />
-                                                <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.sellerLocation}</span>
+                                                <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{formatCityDisplay(selectedRequestForView.sellerLocation)}</span>
                                             </div>
 
                                             {/* Price and Country Badges */}
@@ -3397,7 +3441,7 @@ const MyRequests: React.FC = () => {
                                                 className="w-3 h-3"
                                                 style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                                             />
-                                            <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{selectedRequestForView.sellerLocation}</span>
+                                            <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>{formatCityDisplay(selectedRequestForView.sellerLocation)}</span>
                                         </div>
 
                                         {/* Price and Country Badges */}
@@ -4256,7 +4300,7 @@ const MyRequests: React.FC = () => {
                                             <img src={locIcon} alt="Location" style={{ width: '12px', height: '12px' }} />
                                             <input
                                                 type="text"
-                                                value={location}
+                                                value={formatCityDisplay(location)}
                                                 readOnly
                                                 className="text-xs font-medium border-none focus:outline-none cursor-default"
                                                 style={{ color: '#64B5F6', backgroundColor: 'transparent', fontSize: '10px' }}
@@ -4284,18 +4328,18 @@ const MyRequests: React.FC = () => {
                                         <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
                                             <div className="p-2 max-h-60 overflow-auto">
                                                 <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                                                {ukCities.map((city) => (
+                                                {ukCities.map((city: string) => (
                                                     <button
                                                         key={city}
                                                         type="button"
                                                         className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
                                                         onClick={() => {
-                                                            setLocation(`${city} | United Kingdom`);
+                                                            setLocation(city);
                                                             setIsLocationDropdownOpen(false);
                                                         }}
                                                         style={{ fontSize: '10px' }}
                                                     >
-                                                        {city}
+                                                        {formatCityDisplay(city)}
                                                     </button>
                                                 ))}
                                             </div>
@@ -4634,7 +4678,7 @@ const MyRequests: React.FC = () => {
                                     <div className="flex items-center justify-between">
                                         <input
                                             type="text"
-                                            value={location}
+                                            value={formatCityDisplay(location)}
                                             readOnly
                                             className="text-xs font-medium border-none focus:outline-none cursor-default"
                                             style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
@@ -4653,17 +4697,17 @@ const MyRequests: React.FC = () => {
                                         <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
                                             <div className="p-2 max-h-60 overflow-auto">
                                                 <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                                                {ukCities.map((city) => (
+                                                {ukCities.map((city: string) => (
                                                     <button
                                                         key={city}
                                                         type="button"
                                                         className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
                                                         onClick={() => {
-                                                            setLocation(`${city} | United Kingdom`);
+                                                            setLocation(city);
                                                             setIsLocationDropdownOpen(false);
                                                         }}
                                                     >
-                                                        {city}
+                                                        {formatCityDisplay(city)}
                                                     </button>
                                                 ))}
                                             </div>

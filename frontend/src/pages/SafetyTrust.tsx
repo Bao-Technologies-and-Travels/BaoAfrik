@@ -13,7 +13,7 @@ const SafetyTrust: React.FC = () => {
       description: 'Use our messaging system to discuss items, prices, and delivery arrangements directly with the other user. Be honest and courteous so both parties have a smooth, trustworthy experience.',
     },
     {
-      title: 'Verify product details before agreeing to a transaction',
+    title: 'Verify product details before agreeing to a transaction',
       description: 'Ask for clear photos, descriptions, and condition details. Confirm price, quantity, and any other terms before you commit to a deal. Note that BaoAfrik does not verify listings, so sellers are responsible for compliance.',
     },
     {

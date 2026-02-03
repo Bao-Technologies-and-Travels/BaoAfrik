@@ -2777,13 +2777,13 @@ const MyListings: React.FC = () => {
                                 <span className="text-[11px]">All rights reserved</span>
                             </div>
                             <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
-                                <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                                <Link to="/contact-support" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
                                 <span style={{ color: '#BABABA' }}>|</span>
                                 <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
                                 <span style={{ color: '#BABABA' }}>|</span>
                                 <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
                                 <span style={{ color: '#BABABA' }}>|</span>
-                                <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
+                                <Link to="/cookie-policy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
                             </div>
                         </div>
                     </div>
@@ -4673,13 +4673,13 @@ const MyListings: React.FC = () => {
                                     <span className="text-[11px]">All rights reserved</span>
                                 </div>
                                 <div className="flex items-center space-x-3 text-[11px]">
-                                    <Link to="/contact" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
+                                    <Link to="/contact-support" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Contact Us</Link>
                                     <span style={{ color: '#BABABA' }}>|</span>
                                     <Link to="/terms" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
                                     <span style={{ color: '#BABABA' }}>|</span>
                                     <Link to="/privacy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Privacy policies</Link>
                                     <span style={{ color: '#BABABA' }}>|</span>
-                                    <Link to="/cookies" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
+                                    <Link to="/cookie-policy" className="hover:text-gray-900" style={{ color: '#BABABA' }}>Cookies</Link>
                                 </div>
                             </div>
 
@@ -4691,13 +4691,13 @@ const MyListings: React.FC = () => {
                                     <span className="text-[11px]">All rights reserved</span>
                                 </div>
                                 <div className="flex items-center space-x-1.5 text-[10px] flex-wrap justify-center">
-                                    <Link to="/contact" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
+                                    <Link to="/contact-support" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Contact Us</Link>
                                     <span style={{ color: '#BABABA' }}>|</span>
                                     <Link to="/terms" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Terms and conditions of use</Link>
                                     <span style={{ color: '#BABABA' }}>|</span>
                                     <Link to="/privacy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Privacy policies</Link>
                                     <span style={{ color: '#BABABA' }}>|</span>
-                                    <Link to="/cookies" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
+                                    <Link to="/cookie-policy" className="hover:text-gray-900 whitespace-nowrap" style={{ color: '#BABABA' }}>Cookies</Link>
                                 </div>
                             </div>
                         </div>

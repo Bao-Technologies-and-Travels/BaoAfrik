@@ -33,6 +33,7 @@ import zapIcon from '../assets/images/pre/zap1.svg';
 import { apiClient } from '../services';
 import { getProductCountry, countries as africanCountriesList } from '../utils/countryHelpers';
 import { getCurrencyDisplaySymbol } from '../utils/currency';
+import { UK_CITIES_PLAIN, formatCityDisplay, getCityPlain } from '../utils/ukCities';
 import { format } from 'date-fns';
 
 interface ProductRequest {
@@ -96,39 +97,8 @@ const Requests: React.FC = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [currentRequestForShare, setCurrentRequestForShare] = useState<ProductRequest | null>(null);
 
-  // Only UK cities for buyer location filter
-  const locationSuggestions = [
-    'London, United Kingdom',
-    'Manchester, United Kingdom',
-    'Birmingham, United Kingdom',
-    'Glasgow, United Kingdom',
-    'Liverpool, United Kingdom',
-    'Leeds, United Kingdom',
-    'Edinburgh, United Kingdom',
-    'Bristol, United Kingdom',
-    'Cardiff, United Kingdom',
-    'Sheffield, United Kingdom',
-    'Newcastle, United Kingdom',
-    'Nottingham, United Kingdom',
-    'Leicester, United Kingdom',
-    'Coventry, United Kingdom',
-    'Belfast, United Kingdom',
-    'Southampton, United Kingdom',
-    'Portsmouth, United Kingdom',
-    'Brighton, United Kingdom',
-    'Reading, United Kingdom',
-    'Northampton, United Kingdom',
-    'Aberdeen, United Kingdom',
-    'Norwich, United Kingdom',
-    'Bournemouth, United Kingdom',
-    'Swindon, United Kingdom',
-    'Oxford, United Kingdom',
-    'Cambridge, United Kingdom',
-    'York, United Kingdom',
-    'Peterborough, United Kingdom',
-    'Dundee, United Kingdom',
-    'Exeter, United Kingdom'
-  ];
+  // UK cities for buyer location filter (plain city names – store plain, display with formatCityDisplay)
+  const locationSuggestions = UK_CITIES_PLAIN;
 
   const priceOptions = [
     { label: 'All', value: '' },
@@ -229,13 +199,14 @@ const Requests: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openFilterDropdown, openPriceDropdown]);
 
-  // Filter location suggestions based on search query
+  // Filter location suggestions based on search query (return plain city names)
   const getFilteredSuggestions = () => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-    return locationSuggestions.filter(location =>
-      location.toLowerCase().startsWith(query) ||
-      location.toLowerCase().includes(query)
+    return locationSuggestions.filter((loc) =>
+      loc.toLowerCase().startsWith(query) ||
+      loc.toLowerCase().includes(query) ||
+      formatCityDisplay(loc).toLowerCase().includes(query)
     ).slice(0, 6);
   };
 
@@ -248,10 +219,10 @@ const Requests: React.FC = () => {
     }
   };
 
-  // Handle search input change
+  // Handle search input change (store plain city name)
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value);
+    setSearchQuery(getCityPlain(value));
     if (value.trim()) {
       setShowSearchSuggestions(true);
     } else {
@@ -477,13 +448,15 @@ const Requests: React.FC = () => {
   const getFilteredCards = () => {
     let filtered = getAllCards();
 
-    // Apply search filter
+    // Apply search filter (compare location as plain city)
     if (isSearchActive && searchQuery.trim()) {
+      const query = getCityPlain(searchQuery).toLowerCase().trim();
+      const searchLower = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(card =>
-        card.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (card.description && card.description.toLowerCase().includes(searchQuery.toLowerCase()))
+        getCityPlain(card.location || '').toLowerCase().includes(query) ||
+        card.title.toLowerCase().includes(searchLower) ||
+        card.country.toLowerCase().includes(searchLower) ||
+        (card.description && card.description.toLowerCase().includes(searchLower))
       );
     }
 
@@ -1679,7 +1652,7 @@ const Requests: React.FC = () => {
                   style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
                 />
                 <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
-                  {req ? req.sellerLocation : (productData ? productData.location : '')}
+                  {req ? formatCityDisplay(req.sellerLocation) : (productData ? formatCityDisplay(productData.location) : '')}
                 </span>
               </div>
 
@@ -1783,7 +1756,7 @@ const Requests: React.FC = () => {
                 }}
               />
               <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
-                {req ? req.sellerLocation : (productData ? productData.location : '')}
+                {req ? formatCityDisplay(req.sellerLocation) : (productData ? formatCityDisplay(productData.location) : '')}
               </span>
             </div>
 
@@ -1981,12 +1954,13 @@ const Requests: React.FC = () => {
   // Mobile Search View
   if (showMobileSearch && isMobile) {
     const mobileSearchFiltered = mobileSearchSubmitted ? getAllCards().filter((card: { title: string; country: string; flag: string; location: string; description?: string; price: number; request?: ProductRequest }) => {
-      const query = mobileSearchQuery.toLowerCase().trim();
+      const query = getCityPlain(mobileSearchQuery).toLowerCase().trim();
+      const searchLower = mobileSearchQuery.toLowerCase().trim();
       return (
-        card.title.toLowerCase().includes(query) ||
-        card.location.toLowerCase().includes(query) ||
-        card.country.toLowerCase().includes(query) ||
-        (card.description && card.description.toLowerCase().includes(query))
+        card.title.toLowerCase().includes(searchLower) ||
+        getCityPlain(card.location || '').toLowerCase().includes(query) ||
+        card.country.toLowerCase().includes(searchLower) ||
+        (card.description && card.description.toLowerCase().includes(searchLower))
       );
     }) : [];
 
@@ -2046,11 +2020,11 @@ const Requests: React.FC = () => {
               onChange={(e) => setMobileSearchQuery(e.target.value)}
               className="flex-1 outline-none"
               style={{ fontFamily: 'Poppins, sans-serif', fontSize: '14px', color: '#212121', paddingLeft: '0' }}
-              placeholder="Buyer location ?"
+              placeholder="Buyer location"
               autoFocus
             />
             <style>{`
-              input[placeholder="Buyer location ?"]::placeholder {
+              input[placeholder="Buyer location"]::placeholder {
                 color: #D9D9D9 !important;
               }
             `}</style>
@@ -2080,11 +2054,11 @@ const Requests: React.FC = () => {
                 marginTop: '4px'
               }}
             >
-              {mobileSearchSuggestions.map((location, index) => (
+              {mobileSearchSuggestions.map((city, index) => (
                 <div
                   key={index}
                   onClick={() => {
-                    setMobileSearchQuery(location);
+                    setMobileSearchQuery(city);
                     setMobileSearchSubmitted(true);
                   }}
                   className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
@@ -2102,7 +2076,7 @@ const Requests: React.FC = () => {
                     }}
                   />
                   <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                    {location}
+                    {formatCityDisplay(city)}
                   </span>
                 </div>
               ))}
@@ -2330,7 +2304,7 @@ const Requests: React.FC = () => {
                               handleSearch();
                             }
                           }}
-                          placeholder="Buyer location ?"
+                          placeholder="Buyer location"
                           className="w-full border rounded-lg focus:outline-none pl-10"
                           style={{
                             backgroundColor: '#FFFFFF',
@@ -2378,11 +2352,11 @@ const Requests: React.FC = () => {
                                 overflowY: 'auto'
                               }}
                             >
-                              {getFilteredSuggestions().map((location, index) => (
+                              {getFilteredSuggestions().map((city, index) => (
                                 <div
                                   key={index}
                                   onClick={() => {
-                                    setSearchQuery(location);
+                                    setSearchQuery(city);
                                     setShowSearchSuggestions(false);
                                     handleSearch();
                                   }}
@@ -2401,7 +2375,7 @@ const Requests: React.FC = () => {
                                     }}
                                   />
                                   <span style={{ color: '#6A6A6A', fontSize: isMobile ? '9px' : '13px', fontFamily: 'Poppins, sans-serif' }}>
-                                    {location}
+                                    {formatCityDisplay(city)}
                                   </span>
                                 </div>
                               ))}
@@ -2441,7 +2415,7 @@ const Requests: React.FC = () => {
                             handleSearch();
                           }
                         }}
-                        placeholder="Buyer location ?"
+                        placeholder="Buyer location"
                         className="w-full border rounded-lg focus:outline-none pl-10"
                         style={{
                           backgroundColor: '#FFFFFF',
@@ -2478,11 +2452,11 @@ const Requests: React.FC = () => {
                             overflowY: 'auto'
                           }}
                         >
-                          {getFilteredSuggestions().map((location, index) => (
+                          {getFilteredSuggestions().map((city, index) => (
                             <div
                               key={index}
                               onClick={() => {
-                                setSearchQuery(location);
+                                setSearchQuery(city);
                                 setShowSearchSuggestions(false);
                                 handleSearch();
                               }}
@@ -2498,7 +2472,7 @@ const Requests: React.FC = () => {
                                 }}
                               />
                               <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
-                                {location}
+                                {formatCityDisplay(city)}
                               </span>
                             </div>
                           ))}
@@ -2551,7 +2525,7 @@ const Requests: React.FC = () => {
                           handleSearch();
                         }
                       }}
-                      placeholder="Buyer location ?"
+                      placeholder="Buyer location"
                       className="w-full border rounded-lg focus:outline-none pl-10"
                       style={{
                         backgroundColor: '#FFFFFF',
@@ -2599,11 +2573,11 @@ const Requests: React.FC = () => {
                             overflowY: 'auto'
                           }}
                         >
-                          {getFilteredSuggestions().map((location, index) => (
+                          {getFilteredSuggestions().map((city, index) => (
                             <div
                               key={index}
                               onClick={() => {
-                                setSearchQuery(location);
+                                setSearchQuery(city);
                                 setShowSearchSuggestions(false);
                                 handleSearch();
                               }}
@@ -2622,7 +2596,7 @@ const Requests: React.FC = () => {
                                 }}
                               />
                               <span style={{ color: '#6A6A6A', fontSize: isMobile ? '9px' : '13px', fontFamily: 'Poppins, sans-serif' }}>
-                                {location}
+                                {formatCityDisplay(city)}
                               </span>
                             </div>
                           ))}
@@ -2808,7 +2782,7 @@ const Requests: React.FC = () => {
                             handleSearch();
                           }
                         }}
-                        placeholder="Buyer location ?"
+                        placeholder="Buyer location"
                         className="w-full border rounded-lg focus:outline-none pl-10"
                         style={{
                           backgroundColor: '#FFFFFF',
@@ -2845,11 +2819,11 @@ const Requests: React.FC = () => {
                             overflowY: 'auto'
                           }}
                         >
-                          {getFilteredSuggestions().map((location, index) => (
+                          {getFilteredSuggestions().map((city, index) => (
                             <div
                               key={index}
                               onClick={() => {
-                                setSearchQuery(location);
+                                setSearchQuery(city);
                                 setShowSearchSuggestions(false);
                                 handleSearch();
                               }}
@@ -2865,7 +2839,7 @@ const Requests: React.FC = () => {
                                 }}
                               />
                               <span style={{ color: '#6A6A6A', fontSize: isMobile ? '10px' : '14px', fontFamily: 'Poppins, sans-serif' }}>
-                                {location}
+                                {formatCityDisplay(city)}
                               </span>
                             </div>
                           ))}
@@ -3574,7 +3548,7 @@ const Requests: React.FC = () => {
                         style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                       />
                       <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>
-                        {selectedCard.sellerLocation || 'Location not specified'}
+                        {formatCityDisplay(selectedCard.sellerLocation || '') || 'Location not specified'}
                       </span>
                     </div>
 
@@ -3830,7 +3804,7 @@ const Requests: React.FC = () => {
                       style={{ filter: 'brightness(0) saturate(100%) invert(64%) sepia(52%) saturate(555%) hue-rotate(176deg) brightness(97%) contrast(92%)' }}
                     />
                     <span style={{ fontSize: '12px', color: '#64B5F6', fontWeight: 400 }}>
-                      {selectedCard.sellerLocation || 'Location not specified'}
+                      {formatCityDisplay(selectedCard.sellerLocation || '') || 'Location not specified'}
                     </span>
                   </div>
 

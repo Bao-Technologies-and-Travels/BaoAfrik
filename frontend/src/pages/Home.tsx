@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { getProductCountry, countries } from '../utils/countryHelpers';
 import { getCurrencyDisplaySymbol, formatPriceDisplay, formatRequestPriceRangeLabel } from '../utils/currency';
+import { UK_CITIES_PLAIN, formatCityDisplay, getCityPlain } from '../utils/ukCities';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -128,7 +129,7 @@ const Home: React.FC = () => {
           </>
         )}
         <path
-          d="M14.0166 1.6665H5.98327C4.20827 1.6665 2.7666 3.1165 2.7666 4.88317V16.6248C2.7666 18.1248 3.8416 18.7582 5.15827 18.0332L9.22493 15.7748C9.65827 15.5332 10.3583 15.5332 10.7833 15.7748L14.8499 18.0332C16.1666 18.7665 17.2416 18.1332 17.2416 16.6248V4.88317C17.2333 3.1165 15.7916 1.6665 14.0166 1.6665Z"
+          d="M14.0166 1.6665H5.98327C4.20827 1.6665 2.7666 3.1165 2.7666 4.88317V16.6248C2.7666 18.1248 3.8416 18.7582 5.15827 18.0332L9.22493 15.7748C9.65827 15.5332 10.3583 15.5332 10.7833 15.7748L14.8499 18.0332C16.1666 18.7665 17.2416 18.1332 17.2416 16.6248V4.88317C17.2888888 3.1165 15.7916 1.6665 14.0166 1.6665Z"
           stroke={saved ? '#64B5F6' : '#BABABA'}
           strokeWidth="1.25"
           strokeLinecap="round"
@@ -211,7 +212,7 @@ const Home: React.FC = () => {
   const [requestBuyerLocation, setRequestBuyerLocation] = useState('');
   const [requestFilterCountry, setRequestFilterCountry] = useState('');
   const [requestFilterPrice, setRequestFilterPrice] = useState('');
-  const [location, setLocation] = useState('London |  United Kingdom');
+  const [location, setLocation] = useState('London');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [categoryPages, setCategoryPages] = useState<Record<string, number>>({});
@@ -287,24 +288,30 @@ const Home: React.FC = () => {
     { label: 'More than £200', value: 'more-than-200' }
   ];
 
-  // Get filtered location suggestions
+  // Get filtered location suggestions (mobile filter – UK cities, plain stored)
   const getFilteredLocationSuggestions = () => {
-    if (!mobileFilterSellerLocation.trim()) return [];
+    if (!mobileFilterSellerLocation.trim()) return UK_CITIES_PLAIN.slice(0, 6);
     const query = mobileFilterSellerLocation.toLowerCase();
-    return locationSuggestions.filter(location =>
-      location.toLowerCase().startsWith(query) ||
-      location.toLowerCase().includes(query)
+    return UK_CITIES_PLAIN.filter(
+      (loc) =>
+        loc.toLowerCase().startsWith(query) ||
+        loc.toLowerCase().includes(query) ||
+        formatCityDisplay(loc).toLowerCase().includes(query)
     ).slice(0, 6);
   };
   const categoryDropdownRef = React.useRef<HTMLDivElement>(null);
   const productOriginDropdownRef = React.useRef<HTMLDivElement>(null);
 
-  const ukCities = [
-    'London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool',
-    'Leeds', 'Newcastle', 'Sheffield', 'Bristol', 'Belfast',
-    'Edinburgh', 'Cardiff', 'Leicester', 'Coventry', 'Nottingham',
-    'Southampton', 'Plymouth', 'Derby', 'Reading', 'York'
-  ];
+  const getFilteredSellerLocationSuggestions = () => {
+    const query = sellerLocation.trim().toLowerCase();
+    if (!query) return UK_CITIES_PLAIN.slice(0, 6);
+    return UK_CITIES_PLAIN.filter(
+      (loc) =>
+        loc.toLowerCase().startsWith(query) ||
+        loc.toLowerCase().includes(query) ||
+        formatCityDisplay(loc).toLowerCase().includes(query)
+    ).slice(0, 8);
+  };
 
   // Ref to prevent duplicate product fetches within the same render cycle (React StrictMode)
   const fetchingProductsRef = useRef(false);
@@ -706,28 +713,28 @@ const Home: React.FC = () => {
   const bannerSlides = [
     {
       id: 1,
-      title: "Cameroonian Spices & Sauces",
-      description: "Discover our authentic spices and traditional blends from Cameroon",
+      title: "African Spices & Sauces",
+      description: "Discover our authentic spices and traditional blends from Africa",
       image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&h=300&fit=crop",
       category: "Food & Spices"
     },
     {
       id: 2,
-      title: "Cameroonian Fashion",
+      title: "African Fashion",
       description: "Beautiful traditional Kente and handwoven African fabrics",
       image: cameroonianFashion, // Traditional fabrics image
       category: "Fashion & Textiles"
     },
     {
       id: 3,
-      title: "Cameroonian Decor",
+      title: "African Decor",
       description: "Handcrafted wooden combs and authentic traditional accessories",
       image: cameroonianDecor, // Wooden combs image
       category: "Home & Decor"
     },
     {
       id: 4,
-      title: "Cameroonian Culture",
+      title: "African Culture",
       description: "Traditional woven bags and unique handmade cultural crafts",
       image: cameroonianCulture, // Traditional woven bag image
       category: "Books & Media"
@@ -1085,8 +1092,9 @@ const Home: React.FC = () => {
       }
 
       if (sellerLocation.trim()) {
+        const locPlain = sellerLocation.toLowerCase().trim();
         products = products.filter(product =>
-          product.location.toLowerCase().includes(sellerLocation.toLowerCase())
+          getCityPlain(product.location || '').toLowerCase().includes(locPlain)
         );
       }
 
@@ -1131,9 +1139,9 @@ const Home: React.FC = () => {
         setIsRequestProductOriginDropdownOpen(false);
       }
       if (mobileCountryPickerOpen &&
-          (!mobileCountryPickerPortalRef.current || !mobileCountryPickerPortalRef.current.contains(target)) &&
-          (mobileCountryPickerRef.current ? !mobileCountryPickerRef.current.contains(target) : true) &&
-          (homeCountryPickerRef.current ? !homeCountryPickerRef.current.contains(target) : true)) {
+        (!mobileCountryPickerPortalRef.current || !mobileCountryPickerPortalRef.current.contains(target)) &&
+        (mobileCountryPickerRef.current ? !mobileCountryPickerRef.current.contains(target) : true) &&
+        (homeCountryPickerRef.current ? !homeCountryPickerRef.current.contains(target) : true)) {
         setMobileCountryPickerOpen(false);
         setMobileCountryPickerPosition(null);
       }
@@ -1449,7 +1457,7 @@ const Home: React.FC = () => {
       const productName = product.name?.toLowerCase() || '';
       const productCategory = product.category?.toLowerCase() || '';
       const productOrigin = product.origin?.toLowerCase() || '';
-      const productLocation = product.location?.toLowerCase() || '';
+      const productLocationPlain = getCityPlain(product.location || '').toLowerCase();
       const selectedOrigin = selectedPlaceOfOriginText?.toLowerCase() || '';
       const sellerLoc = sellerLocation.toLowerCase().trim();
       // Check if product matches search query (if any)
@@ -1463,7 +1471,7 @@ const Home: React.FC = () => {
 
       // Check if product matches seller location (if any location is specified)
       const matchesLocation = !sellerLoc ||
-        (productLocation && productLocation.includes(sellerLoc));
+        (productLocationPlain && productLocationPlain.includes(sellerLoc));
       return matchesSearch && matchesOrigin && matchesLocation;
     });
     setSearchResults(filtered);
@@ -2084,7 +2092,7 @@ const Home: React.FC = () => {
               )}
 
               <div className="flex flex-col justify-center flex-1">
-                <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
+                <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Product</label>
                 <input
                   type="text"
                   placeholder={selectedImage ? "Wanna be more specific ?" : "Search a product"}
@@ -2110,7 +2118,8 @@ const Home: React.FC = () => {
               <style>
                 {`
                   .product-search-input::placeholder {
-                    color: #E9E9E9;
+                    color: #888888;
+                    font-weight: 600;
                   }
                   .product-search-input {
                     caret-color: #64B5F6;
@@ -2147,7 +2156,7 @@ const Home: React.FC = () => {
                   }}
                 />
               )}
-              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Categories</label>
+              <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Categories</label>
               <button
                 onClick={() => {
                   setFocusedSearchSection('categories');
@@ -2163,7 +2172,7 @@ const Home: React.FC = () => {
                 className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
                 style={{ fontSize: '11px', color: selectedCategoryText ? '#212121' : '#E9E9E9', background: 'transparent' }}
               >
-                <span>{selectedCategoryText || 'Choose a category'}</span>
+                <span style={{ fontWeight: 600, color: '#888888' }}>{selectedCategoryText || 'Choose a category'}</span>
                 <img
                   src={arrowDownIcon}
                   alt="Arrow"
@@ -2201,18 +2210,20 @@ const Home: React.FC = () => {
                   }}
                 />
               )}
-              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
+              <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Place of Origin</label>
               <div className="relative flex items-center w-full">
                 <style>
                   {`
                   .place-of-origin-input::placeholder {
-                    color: #E9E9E9;
+                    color: #888888888888;
+                    font-weight: 600;
                   }
                 `}
                 </style>
                 <input
                   type="text"
                   placeholder="Type a country"
+
                   value={selectedPlaceOfOriginText || placeOfOriginInput}
                   onChange={(e) => {
                     setPlaceOfOriginInput(e.target.value);
@@ -2252,7 +2263,7 @@ const Home: React.FC = () => {
 
             {/* Seller Location Section */}
             <div
-              className="flex flex-col justify-center px-4 flex-1"
+              className="flex flex-col justify-center px-4 flex-1 relative"
               style={{
                 background: focusedSearchSection === 'sellerLocation' ? '#FFF' : 'transparent',
                 borderTopLeftRadius: focusedSearchSection === 'sellerLocation' ? '30px' : '0',
@@ -2265,14 +2276,15 @@ const Home: React.FC = () => {
                 height: '58px'
               }}
             >
-              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Seller Location</label>
+              <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Seller Location</label>
               <input
                 type="text"
                 placeholder="Insert location"
-                value={sellerLocation}
+                value={sellerLocation && UK_CITIES_PLAIN.includes(sellerLocation) ? formatCityDisplay(sellerLocation) : sellerLocation}
                 onChange={(e) => {
                   const value = e.target.value;
-                  setSellerLocation(value);
+                  const plain = getCityPlain(value);
+                  setSellerLocation(plain);
                   if (value.trim()) {
                     setShowSellerLocationSuggestions(true);
                   } else {
@@ -2281,9 +2293,7 @@ const Home: React.FC = () => {
                 }}
                 onFocus={() => {
                   setFocusedSearchSection('sellerLocation');
-                  if (sellerLocation.trim()) {
-                    setShowSellerLocationSuggestions(true);
-                  }
+                  setShowSellerLocationSuggestions(true);
                 }}
                 onBlur={() => {
                   setTimeout(() => {
@@ -2292,8 +2302,45 @@ const Home: React.FC = () => {
                   }, 200);
                 }}
                 className="border-0 p-0 focus:outline-none focus:ring-0"
-                style={{ fontSize: '11px', color: '#212121', background: 'transparent' }}
+                style={{ fontSize: '11px', color: '#888888', background: 'transparent' }}
               />
+              {/* UK city suggestions dropdown (desktop) - like Requests buyer location */}
+              {showSellerLocationSuggestions && focusedSearchSection === 'sellerLocation' && getFilteredSellerLocationSuggestions().length > 0 && (
+                <div
+                  className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg overflow-hidden"
+                  style={{
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    maxHeight: '180px',
+                    overflowY: 'auto'
+                  }}
+                >
+                  {getFilteredSellerLocationSuggestions().map((city, index) => (
+                    <div
+                      key={index}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setSellerLocation(city);
+                        setShowSellerLocationSuggestions(false);
+                      }}
+                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
+                      style={{ padding: '8px 12px' }}
+                    >
+                      <img
+                        src={locationIcon}
+                        alt="Location"
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
+                        }}
+                      />
+                      <span style={{ color: '#6A6A6A', fontSize: '11px', fontFamily: 'Poppins, sans-serif' }}>
+                        {formatCityDisplay(city)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Scan Icon or Clear Image Button */}
@@ -2626,13 +2673,14 @@ const Home: React.FC = () => {
                     border: 'none',
                     fontFamily: 'Poppins, sans-serif',
                     color: '#212121',
-                    caretColor: '#64B5F6'
+                    caretColor: '#888888'
                   }}
                 />
                 <style>{`
                   .md\\:hidden input::placeholder {
-                    color: #D9D9D9;
+                    color: #888888;
                     font-size: 12px;
+                    font-weight: 600;
                   }
                 `}</style>
                 {/* {selectedImage ? (
@@ -2920,59 +2968,59 @@ const Home: React.FC = () => {
                 </svg>
               </button> */}
 
-            {/* Africa Button */}
-            <button
-              onClick={() => setSelectedCountry('')}
-              className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
-              style={{
-                backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
-                border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
-                fontFamily: 'Poppins, sans-serif'
-              }}
-            >
-              <img
-                src={globyIcon}
-                alt="Globe"
-                className="w-3.5 h-3.5"
-                style={{
-                  filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                }}
-              />
-              <span
-                className="text-xs font-normal whitespace-nowrap"
-                style={{
-                  color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
-                }}
-              >
-                Africa
-              </span>
-            </button>
-
-            {/* Country Buttons */}
-            {africanCountries.map((country) => (
+              {/* Africa Button */}
               <button
-                key={country.name}
-                onClick={() => setSelectedCountry(country.name)}
+                onClick={() => setSelectedCountry('')}
                 className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
                 style={{
-                  backgroundColor: '#FAFAFA',
-                  border: 'none',
+                  backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
+                  border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
                   fontFamily: 'Poppins, sans-serif'
                 }}
               >
                 <img
-                  src={country.flag}
-                  alt={`${country.name} flag`}
-                  className="w-3.5 h-3.5 object-cover rounded-full"
+                  src={globyIcon}
+                  alt="Globe"
+                  className="w-3.5 h-3.5"
+                  style={{
+                    filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                  }}
                 />
                 <span
                   className="text-xs font-normal whitespace-nowrap"
-                  style={{ color: '#6A6A6A' }}
+                  style={{
+                    color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
+                  }}
                 >
-                  {country.name}
+                  Africa
                 </span>
               </button>
-            ))}
+
+              {/* Country Buttons */}
+              {africanCountries.map((country) => (
+                <button
+                  key={country.name}
+                  onClick={() => setSelectedCountry(country.name)}
+                  className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                  style={{
+                    backgroundColor: '#FAFAFA',
+                    border: 'none',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  <img
+                    src={country.flag}
+                    alt={`${country.name} flag`}
+                    className="w-3.5 h-3.5 object-cover rounded-full"
+                  />
+                  <span
+                    className="text-xs font-normal whitespace-nowrap"
+                    style={{ color: '#6A6A6A' }}
+                  >
+                    {country.name}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -3251,7 +3299,7 @@ const Home: React.FC = () => {
                                     height: window.innerWidth < 640 ? '8px' : '10px',
                                     marginRight: window.innerWidth < 640 ? '3px' : '4px'
                                   }} />
-                                  <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                  <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{formatCityDisplay(product.location)}</span>
                                 </div>
                                 {/* Bookmark Button */}
                                 <button
@@ -3321,6 +3369,7 @@ const Home: React.FC = () => {
                                 disabled={getCategoryPage(category) >= Math.ceil(filteredProducts.length / productsPerPage)}
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 aria-label="Next page"
+                                style={{ fontWeight: getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? 'bold' : 'normal' }}
                               >
                                 <img
                                   src={getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? blackArrowIcon : grayArrowIcon}
@@ -3429,7 +3478,7 @@ const Home: React.FC = () => {
                                           height: window.innerWidth < 640 ? '8px' : '10px',
                                           marginRight: window.innerWidth < 640 ? '3px' : '4px'
                                         }} />
-                                        <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                        <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{formatCityDisplay(product.location)}</span>
                                       </div>
 
                                       {/* Bookmark Button */}
@@ -3504,7 +3553,7 @@ const Home: React.FC = () => {
                                   src={getCategoryPage(category) > 1 ? blackArrowIcon : grayArrowIcon}
                                   alt="Previous"
                                   className="w-full h-full"
-                                  style={{ transform: 'scaleX(-1)' }}
+                                  style={{ transform: 'rotate(180deg)' }}
                                 />
                               </button>
                               <span className="text-sm text-gray-600">
@@ -3515,6 +3564,7 @@ const Home: React.FC = () => {
                                 disabled={getCategoryPage(category) >= Math.ceil(filteredProducts.length / productsPerPage)}
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 aria-label="Next page"
+                                style={{ fontWeight: getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? 'bold' : 'normal' }}
                               >
                                 <img
                                   src={getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? blackArrowIcon : grayArrowIcon}
@@ -3624,7 +3674,7 @@ const Home: React.FC = () => {
                                           height: window.innerWidth < 640 ? '8px' : '10px',
                                           marginRight: window.innerWidth < 640 ? '3px' : '4px'
                                         }} />
-                                        <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                        <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{formatCityDisplay(product.location)}</span>
                                       </div>
 
                                       {/* Bookmark Button */}
@@ -3875,7 +3925,7 @@ const Home: React.FC = () => {
                                       height: window.innerWidth < 640 ? '8px' : '10px',
                                       marginRight: window.innerWidth < 640 ? '3px' : '4px'
                                     }} />
-                                    <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{product.location}</span>
+                                    <span className="truncate font-normal" style={{ fontSize: window.innerWidth < 640 ? '8px' : '10px' }}>{formatCityDisplay(product.location)}</span>
                                   </div>
                                   {/* Bookmark Button */}
                                   <button
@@ -3959,7 +4009,7 @@ const Home: React.FC = () => {
                               {/* Location */}
                               <div className="flex items-center text-gray-500 flex-1 min-w-0">
                                 <img src={locationIcon} alt="Location" className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
-                                <span className="truncate font-normal" style={{ fontSize: '10px' }}>{product.location}</span>
+                                <span className="truncate font-normal" style={{ fontSize: '10px' }}>{formatCityDisplay(product.location)}</span>
                               </div>
 
                               {/* Bookmark Button */}
@@ -4225,7 +4275,7 @@ const Home: React.FC = () => {
                 Can't find what you're looking for?
               </h3>
               <p className="text-sm sm:text-base text-gray-600 mb-6 max-w-2xl">
-              Post a request and local sellers can message you if they have it.
+                Post a request and local sellers can message you if they have it.
               </p>
               <button
                 onClick={handleMakeRequestClick}
@@ -4402,7 +4452,7 @@ const Home: React.FC = () => {
                             onClick={() => navigate('/requests')}
                           >
                             <img src={requestIcon} alt="Request" style={{ width: '12px', height: '12px' }} />
-                            Manage request
+                            View request
                           </button>
                           <button
                             className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -4502,7 +4552,7 @@ const Home: React.FC = () => {
                               className="w-3 h-3"
                               style={{ filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)' }}
                             />
-                            <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.sellerLocation || 'Location not specified'}</span>
+                            <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{formatCityDisplay(request.sellerLocation || '') || 'Location not specified'}</span>
                           </div>
 
                           {/* Second Row - Price and Country */}
@@ -4609,7 +4659,7 @@ const Home: React.FC = () => {
                               filter: 'brightness(0) saturate(100%) invert(70%) sepia(99%) saturate(1352%) hue-rotate(349deg) brightness(102%) contrast(97%)'
                             }}
                           />
-                          <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{request.sellerLocation || 'Location not specified'}</span>
+                          <span style={{ fontSize: '8px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{formatCityDisplay(request.sellerLocation || '') || 'Location not specified'}</span>
                         </div>
 
                         {/* Second Row - Price and Country */}
@@ -4857,7 +4907,7 @@ const Home: React.FC = () => {
         <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {/* Header with Title and X Button */}
           <div className="flex items-center justify-between px-4 pt-4 pb-3">
-            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif', fontStyle: 'bold' }}>
               Do a request
             </h1>
             <button
@@ -5070,7 +5120,7 @@ const Home: React.FC = () => {
                     <img src={locIcon} alt="Location" style={{ width: '12px', height: '12px' }} />
                     <input
                       type="text"
-                      value={location}
+                      value={formatCityDisplay(location)}
                       readOnly
                       className="text-xs font-medium border-none focus:outline-none cursor-default"
                       style={{ color: '#64B5F6', backgroundColor: 'transparent', fontSize: '10px' }}
@@ -5098,18 +5148,18 @@ const Home: React.FC = () => {
                   <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
                     <div className="p-2 max-h-60 overflow-auto">
                       <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                      {ukCities.map((city) => (
+                      {UK_CITIES_PLAIN.map((city) => (
                         <button
                           key={city}
                           type="button"
                           className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
                           onClick={() => {
-                            setLocation(`${city} | United Kingdom`);
+                            setLocation(city);
                             setIsLocationDropdownOpen(false);
                           }}
                           style={{ fontSize: '10px' }}
                         >
-                          {city}
+                          {formatCityDisplay(city)}
                         </button>
                       ))}
                     </div>
@@ -5448,7 +5498,7 @@ const Home: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <input
                     type="text"
-                    value={location}
+                    value={formatCityDisplay(location)}
                     readOnly
                     className="text-xs font-medium border-none focus:outline-none cursor-default"
                     style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
@@ -5467,17 +5517,17 @@ const Home: React.FC = () => {
                   <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
                     <div className="p-2 max-h-60 overflow-auto">
                       <div className="px-3 py-2 text-xs font-medium text-gray-500">United Kingdom</div>
-                      {ukCities.map((city) => (
+                      {UK_CITIES_PLAIN.map((city) => (
                         <button
                           key={city}
                           type="button"
                           className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded"
                           onClick={() => {
-                            setLocation(`${city} | United Kingdom`);
+                            setLocation(city);
                             setIsLocationDropdownOpen(false);
                           }}
                         >
-                          {city}
+                          {formatCityDisplay(city)}
                         </button>
                       ))}
                     </div>
@@ -6149,11 +6199,11 @@ const Home: React.FC = () => {
                     border: 'none'
                   }}
                 >
-                  {getFilteredLocationSuggestions().map((location, index) => (
+                  {getFilteredLocationSuggestions().map((city, index) => (
                     <div
                       key={index}
                       onClick={() => {
-                        setMobileFilterSellerLocation(location);
+                        setMobileFilterSellerLocation(city);
                         setShowSellerLocationSuggestions(false);
                       }}
                       className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
@@ -6171,7 +6221,7 @@ const Home: React.FC = () => {
                         }}
                       />
                       <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                        {location}
+                        {formatCityDisplay(city)}
                       </span>
                     </div>
                   ))}
@@ -6212,7 +6262,7 @@ const Home: React.FC = () => {
         <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {/* Header */}
           <div className="flex items-center justify-between px-4 pt-4 pb-3">
-            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif', fontStyle: 'bold' }}>
               Search a product
             </h1>
             <button
@@ -6292,7 +6342,7 @@ const Home: React.FC = () => {
                       border: 'none',
                       fontFamily: 'Poppins, sans-serif',
                       color: '#212121',
-                      caretColor: '#64B5F6',
+                      caretColor: '#888888',
                       fontSize: '11px'
                     }}
                   />
@@ -6301,7 +6351,7 @@ const Home: React.FC = () => {
                       input[placeholder="What are you looking for today ?"]::placeholder,
                       input[placeholder="Wanna be more specific ?"]::placeholder {
                       font-size: 11px;
-                      color: #D9D9D9;
+                      color: #888888;
                     }
                   `}
                   </style>
@@ -6632,7 +6682,7 @@ const Home: React.FC = () => {
 
               const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
               const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.origin).name === mobileFilterProductOrigin;
-              const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
+              const matchesLocation = !mobileFilterSellerLocation || getCityPlain(product.location || '').toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
 
               return matchesSearch && matchesCategory && matchesOrigin && matchesLocation;
             });
@@ -6686,54 +6736,54 @@ const Home: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif'
                       }}
                     >
-                    <img
-                      src={globyIcon}
-                      alt="Globe"
-                      className="w-3.5 h-3.5"
-                      style={{
-                        filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                      }}
-                    />
-                    <span
-                      className="text-xs font-normal whitespace-nowrap"
-                      style={{
-                        color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
-                      }}
-                    >
-                      Africa
-                    </span>
-                  </button>
-
-                  {/* Country Buttons */}
-                  {africanCountries.slice(0, 10).map((country) => (
-                    <button
-                      key={country.name}
-                      onClick={() => setSelectedCountry(country.name)}
-                      className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
-                      style={{
-                        backgroundColor: '#FAFAFA',
-                        border: 'none',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
                       <img
-                        src={country.flag}
-                        alt={`${country.name} flag`}
-                        className="w-3.5 h-3.5 object-cover rounded-full"
+                        src={globyIcon}
+                        alt="Globe"
+                        className="w-3.5 h-3.5"
+                        style={{
+                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                        }}
                       />
                       <span
                         className="text-xs font-normal whitespace-nowrap"
                         style={{
-                          color: '#6A6A6A'
+                          color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
                         }}
                       >
-                        {country.name}
+                        Africa
                       </span>
                     </button>
-                  ))}
+
+                    {/* Country Buttons */}
+                    {africanCountries.slice(0, 10).map((country) => (
+                      <button
+                        key={country.name}
+                        onClick={() => setSelectedCountry(country.name)}
+                        className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
+                        style={{
+                          backgroundColor: '#FAFAFA',
+                          border: 'none',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        <img
+                          src={country.flag}
+                          alt={`${country.name} flag`}
+                          className="w-3.5 h-3.5 object-cover rounded-full"
+                        />
+                        <span
+                          className="text-xs font-normal whitespace-nowrap"
+                          style={{
+                            color: '#6A6A6A'
+                          }}
+                        >
+                          {country.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
             )}
 
           {/* Category and Country Filters - Show when no filters applied and search is submitted, but hide when no results */}
@@ -6770,7 +6820,7 @@ const Home: React.FC = () => {
 
               const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
               const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.origin).name === mobileFilterProductOrigin;
-              const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
+              const matchesLocation = !mobileFilterSellerLocation || getCityPlain(product.location || '').toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
 
               return matchesSearch && matchesCategory && matchesOrigin && matchesLocation;
             });
@@ -6849,30 +6899,30 @@ const Home: React.FC = () => {
                     {/* Africa Button */}
                     <button
                       onClick={() => setSelectedCountry('')}
-                    className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
-                    style={{
-                      backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
-                      border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
-                      fontFamily: 'Poppins, sans-serif'
-                    }}
-                  >
-                    <img
-                      src={globyIcon}
-                      alt="Globe"
-                      className="w-3.5 h-3.5"
+                      className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
                       style={{
-                        filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
-                      }}
-                    />
-                    <span
-                      className="text-xs font-normal whitespace-nowrap"
-                      style={{
-                        color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
+                        backgroundColor: !selectedCountry ? '#F0F8FE' : '#FAFAFA',
+                        border: !selectedCountry ? '1px solid #CFE8FC' : 'none',
+                        fontFamily: 'Poppins, sans-serif'
                       }}
                     >
-                      Africa
-                    </span>
-                  </button>
+                      <img
+                        src={globyIcon}
+                        alt="Globe"
+                        className="w-3.5 h-3.5"
+                        style={{
+                          filter: selectedCountry ? 'grayscale(100%) brightness(0.7)' : 'none'
+                        }}
+                      />
+                      <span
+                        className="text-xs font-normal whitespace-nowrap"
+                        style={{
+                          color: !selectedCountry ? '#5BA5E0' : '#6A6A6A'
+                        }}
+                      >
+                        Africa
+                      </span>
+                    </button>
 
                     {/* Country Buttons */}
                     {africanCountries.map((country) => (
@@ -6881,27 +6931,27 @@ const Home: React.FC = () => {
                         onClick={() => setSelectedCountry(country.name)}
                         className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md"
                         style={{
-                        backgroundColor: '#FAFAFA',
-                        border: 'none',
-                        fontFamily: 'Poppins, sans-serif'
-                      }}
-                    >
-                      <img
-                        src={country.flag}
-                        alt={`${country.name} flag`}
-                        className="w-3.5 h-3.5 object-cover rounded-full"
-                      />
-                      <span
-                        className="text-xs font-normal whitespace-nowrap"
-                        style={{
-                          color: '#6A6A6A'
+                          backgroundColor: '#FAFAFA',
+                          border: 'none',
+                          fontFamily: 'Poppins, sans-serif'
                         }}
                       >
-                        {country.name}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                        <img
+                          src={country.flag}
+                          alt={`${country.name} flag`}
+                          className="w-3.5 h-3.5 object-cover rounded-full"
+                        />
+                        <span
+                          className="text-xs font-normal whitespace-nowrap"
+                          style={{
+                            color: '#6A6A6A'
+                          }}
+                        >
+                          {country.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -6959,7 +7009,7 @@ const Home: React.FC = () => {
 
                     const matchesCategory = !mobileFilterCategory || productCategory === mobileFilterCategory;
                     const matchesOrigin = !mobileFilterProductOrigin || getProductCountry(product.origin).name === mobileFilterProductOrigin;
-                    const matchesLocation = !mobileFilterSellerLocation || product.location?.toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
+                    const matchesLocation = !mobileFilterSellerLocation || getCityPlain(product.location || '').toLowerCase().includes(mobileFilterSellerLocation.toLowerCase());
 
                     return matchesSearch && matchesCategory && matchesOrigin && matchesLocation;
                   });
@@ -7126,7 +7176,7 @@ const Home: React.FC = () => {
                                         height: '8px',
                                         marginRight: '3px'
                                       }} />
-                                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>{product.location}</span>
+                                      <span className="truncate font-normal" style={{ fontSize: '8px' }}>{formatCityDisplay(product.location)}</span>
                                     </div>
                                     {/* Bookmark Button */}
                                     <button
@@ -7260,7 +7310,7 @@ const Home: React.FC = () => {
                                     height: '8px',
                                     marginRight: '3px'
                                   }} />
-                                  <span className="truncate font-normal" style={{ fontSize: '8px' }}>{product.location}</span>
+                                  <span className="truncate font-normal" style={{ fontSize: '8px' }}>{formatCityDisplay(product.location)}</span>
                                 </div>
 
                                 {/* Bookmark Button */}

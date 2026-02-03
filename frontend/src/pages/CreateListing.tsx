@@ -39,6 +39,7 @@ import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
 import { Socket } from "socket.io-client";
 import { useAuth } from "../contexts/AuthContext";
 import { getCurrencyDisplaySymbol, formatPriceDisplay, toApiCurrency } from '../utils/currency';
+import { UK_CITIES_OPTIONS, formatCityDisplay, getCityPlain } from '../utils/ukCities';
 import { useToast } from '../contexts/ToastContext';
 import { useNotificationToast } from '../contexts/NotificationToastContext';
 
@@ -66,7 +67,7 @@ const CreateListing: React.FC = () => {
   const [category, setCategory] = useState('');
   const [origin, setOrigin] = useState('');
   const [deliveryAvailable, setDeliveryAvailable] = useState(false);
-  const [location, setLocation] = useState('London, United Kingdom');
+  const [location, setLocation] = useState('London');
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isImageLoading, setIsImageLoading] = useState(false);
@@ -125,28 +126,7 @@ const CreateListing: React.FC = () => {
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
   const locationDropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const ukCities: Array<{ value: string; label: string }> = [
-    { value: 'london', label: 'London, United Kingdom' },
-    { value: 'birmingham', label: 'Birmingham, United Kingdom' },
-    { value: 'manchester', label: 'Manchester, United Kingdom' },
-    { value: 'glasgow', label: 'Glasgow, United Kingdom' },
-    { value: 'liverpool', label: 'Liverpool, United Kingdom' },
-    { value: 'leeds', label: 'Leeds, United Kingdom' },
-    { value: 'newcastle', label: 'Newcastle, United Kingdom' },
-    { value: 'sheffield', label: 'Sheffield, United Kingdom' },
-    { value: 'bristol', label: 'Bristol, United Kingdom' },
-    { value: 'belfast', label: 'Belfast, United Kingdom' },
-    { value: 'edinburgh', label: 'Edinburgh, United Kingdom' },
-    { value: 'cardiff', label: 'Cardiff, United Kingdom' },
-    { value: 'leicester', label: 'Leicester, United Kingdom' },
-    { value: 'coventry', label: 'Coventry, United Kingdom' },
-    { value: 'nottingham', label: 'Nottingham, United Kingdom' },
-    { value: 'southampton', label: 'Southampton, United Kingdom' },
-    { value: 'plymouth', label: 'Plymouth, United Kingdom' },
-    { value: 'derby', label: 'Derby, United Kingdom' },
-    { value: 'reading', label: 'Reading, United Kingdom' },
-    { value: 'york', label: 'York, United Kingdom' }
-  ];
+  const ukCities = UK_CITIES_OPTIONS;
 
   const clearListingsCache = () => {
     try {
@@ -533,7 +513,7 @@ const CreateListing: React.FC = () => {
         setOrigin(product.origin || '');
         // setSaleType(product.saleType || 'Default');
         setDeliveryAvailable(product.deliveryAvailable || false);
-        setLocation(product.location || 'London,  United Kingdom');
+        setLocation(product.location ? getCityPlain(product.location) : 'London');
 
         if (product.images && product.images.length > 0) {
           const existingImageUrls = product.images.map((img: any) => img.url);
@@ -673,7 +653,7 @@ const CreateListing: React.FC = () => {
     if (prefill.currency) setCurrency(prefill.currency);
     if (prefill.quantity != null && prefill.quantity !== '') setQuantity(Math.max(0, Number(prefill.quantity) || 0));
     if (prefill.category) setCategory(prefill.category);
-    if (prefill.location) setLocation(prefill.location);
+    if (prefill.location) setLocation(getCityPlain(prefill.location));
     if (typeof prefill.deliveryAvailable === 'boolean') setDeliveryAvailable(prefill.deliveryAvailable);
 
     // Handle country/origin
@@ -2573,7 +2553,7 @@ const CreateListing: React.FC = () => {
                       </div>
                       <input
                         type="text"
-                        value={location}
+                        value={formatCityDisplay(location)}
                         readOnly
                         className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
                         style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
@@ -2643,7 +2623,7 @@ const CreateListing: React.FC = () => {
                                 }}
                               />
                             )}
-                            <span style={{ position: 'relative', zIndex: 1 }}>{loc.label}</span>
+                            <span style={{ position: 'relative', zIndex: 1 }}>{formatCityDisplay(loc.label)}</span>
                           </button>
                         </div>
                       ))}
@@ -3106,7 +3086,7 @@ const CreateListing: React.FC = () => {
                       </div>
                       <input
                         type="text"
-                        value={location}
+                        value={formatCityDisplay(location)}
                         readOnly
                         className="text-xs font-medium border-none focus:outline-none cursor-default"
                         style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
@@ -3182,7 +3162,7 @@ const CreateListing: React.FC = () => {
                                 }}
                               />
                             )}
-                            <span style={{ position: 'relative', zIndex: 1 }}>{loc.label}</span>
+                            <span style={{ position: 'relative', zIndex: 1 }}>{formatCityDisplay(loc.label)}</span>
                           </button>
                         </div>
                       ))}

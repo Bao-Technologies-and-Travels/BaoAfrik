@@ -38,12 +38,12 @@ const TermsOfUse: React.FC = () => {
                 <li>Use the platform only for lawful purposes and in accordance with these terms.</li>
                 <li>Respect other users and refrain from harassment, fraud, or misleading conduct.</li>
                 <li>Not list prohibited items or content that violates applicable laws or our Community Guidelines.</li>
-                <li>Honour commitments made in transactions directly with other users (e.g. payment and delivery arrangements within agreed terms).</li>
+                <li>Honour commitments made in agreements between users directly with other users (e.g. payment and delivery arrangements within agreed terms).</li>
                 <li>Keep your account credentials secure and notify us of any unauthorised use.</li>
               </ul>
 
               <p className="mt-6">
-                BaoAfrik provides a marketplace that connects buyers and sellers. We do not take ownership of items listed, nor do we guarantee the quality, safety, or legality of listings. Transactions are between users, and you use the platform at your own risk.
+                BaoAfrik provides a marketplace that connects buyers and sellers. We do not verify users on the platform or guarantee agreements between users. We do not take ownership of items listed, nor do we guarantee the quality, safety, or legality of listings. agreements between users are between the users, and we don't handle any payment or delivery.
               </p>
 
               <p>
