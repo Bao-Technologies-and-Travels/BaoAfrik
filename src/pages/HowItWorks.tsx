@@ -1,56 +1,32 @@
 import React, { useEffect } from 'react';
-import userIcon from '../assets/images/admin/user.svg';
-import listingboxIcon from '../assets/images/admin/listingbox.svg';
-import requestIcon from '../assets/images/admin/requesticon.svg';
+import { Link } from 'react-router-dom';
+import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import sendIcon from '../assets/images/admin/send.svg';
+import requestIcon from '../assets/images/admin/requesticon.svg';
 import perfomanceIcon from '../assets/images/admin/perfomance.svg';
-import warningIcon from '../assets/images/admin/warning.svg';
 import cultureImg from '../assets/images/logos/culture.png';
 import decorImg from '../assets/images/logos/decor.png';
 
 const steps = [
   {
-    icon: userIcon,
-    title: 'Create an account and complete your profile',
-    description: 'Sign up with your email or social account, then add a profile photo and a short bio. A complete profile helps other users trust you and makes it easier to connect over shared interests in African products and culture.',
-  },
-  {
-    icon: listingboxIcon,
-    title: 'List products you have available',
-    description: 'Any user can create listings for items they want to sell or offer—whether that’s spices, crafts, textiles, or other authentic products. Add clear photos and descriptions so buyers know exactly what you’re offering.',
-  },
-  {
-    icon: requestIcon,
-    title: 'Browse listings or post requests',
-    description: 'Look through existing listings to find what you need, or post a request describing the item you’re looking for. Sellers and buyers can find each other through both listings and requests.',
+    icon: searchNormalIcon,
+    title: 'Browse or search',
+    description: 'Use search and filters to find products by category, origin, and location.',
   },
   {
     icon: sendIcon,
-    title: 'Contact each other through the platform',
-    description: 'Use BaoAfrik’s messaging system to ask questions, negotiate prices, and agree on details. Keeping conversations on the platform helps protect both parties and keeps a record of your agreement.',
+    title: 'Message the seller',
+    description: 'Contact sellers directly on BaoAfrik to ask questions and confirm availability.',
   },
   {
     icon: perfomanceIcon,
-    title: 'Agree on payment and delivery between you',
-    description: 'Payments and delivery are arranged directly between buyer and seller. You decide together how to pay (e.g. bank transfer, cash on delivery) and how items will be sent or collected. BaoAfrik does not handle the money or the shipping.',
-  },
-];
-
-const doesNot = [
-  {
-    icon: warningIcon,
-    text: 'Process payments',
-    detail: 'We do not hold or transfer money. All payment arrangements are made and carried out by users.',
+    title: 'Agree the details',
+    description: 'Buyers and sellers agree on price, pickup location, and delivery (if needed) directly in chat.',
   },
   {
-    icon: warningIcon,
-    text: 'Deliver products',
-    detail: 'We do not ship or deliver items. Delivery is agreed and organised between buyer and seller.',
-  },
-  {
-    icon: warningIcon,
-    text: 'Act as a buyer or seller',
-    detail: 'BaoAfrik is only the platform. Every transaction is between the users who list, buy, or request.',
+    icon: requestIcon,
+    title: "Make a request if you can't find it",
+    description: 'Post a request so sellers who have the item can message you.',
   },
 ];
 
@@ -84,109 +60,121 @@ const HowItWorks: React.FC = () => {
       </section>
 
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        {/* Intro */}
-        <div className="relative pl-5 mb-12 animate-fade-in-up opacity-0" style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}>
-          <div className="absolute left-0 top-0 bottom-0 w-1 rounded-full hidden sm:block" style={{ background: 'linear-gradient(180deg, #E55325 0%, #F9A825 100%)' }} />
-          <p className="text-[#374151] text-base lg:text-lg leading-relaxed max-w-4xl">
-            On BaoAfrik, people list items they have, post requests for what they want, and message each other to agree on price and delivery. The platform connects you; the rest is between you and the other user. Here’s how it works step by step.
-          </p>
-        </div>
-
-        {/* Section: Here's how it works — 5 steps, side by side (left and right) */}
+        {/* Steps Section */}
         <section className="mb-16">
           <h2
             className="text-xl font-bold text-[#212121] mb-8 animate-fade-in-up opacity-0"
-            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", animationDelay: '0.15s', animationFillMode: 'forwards' }}
+            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", animationDelay: '0.1s', animationFillMode: 'forwards' }}
           >
-            Here’s how it works
+            Here's how it works
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl mx-auto">
             {steps.map((step, index) => (
               <div
                 key={index}
-                className={`flex gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up opacity-0 ${index === 4 ? 'sm:col-span-2 sm:max-w-xl sm:mx-auto sm:w-full' : ''}`}
+                className="flex gap-4 p-5 sm:p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 animate-fade-in-up opacity-0 w-full"
                 style={{
-                  animationDelay: `${0.2 + index * 0.07}s`,
+                  animationDelay: `${0.15 + index * 0.08}s`,
                   animationFillMode: 'forwards',
                 }}
               >
-                <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 border border-slate-200">
+                <div className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-slate-100 border border-slate-200">
                   <img src={step.icon} alt="" className="w-5 h-5 opacity-90" aria-hidden style={{ filter: 'brightness(0) opacity(0.7)' }} />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-semibold text-[#212121] text-sm sm:text-base" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                  <p className="font-semibold text-[#212121] text-base" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                     {index + 1}. {step.title}
                   </p>
-                  <p className="mt-1 text-sm text-[#374151] leading-relaxed">{step.description}</p>
+                  <p className="mt-1.5 text-sm text-[#4b5563] leading-relaxed">{step.description}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Section: BaoAfrik does not + image */}
-        <section className="mb-16">
-          <h2
-            className="text-xl font-bold text-[#212121] mb-8 animate-fade-in-up opacity-0"
-            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", animationDelay: '0.6s', animationFillMode: 'forwards' }}
+        {/* Important Note - Full Width */}
+        <section 
+          className="mb-16 animate-fade-in-up opacity-0 -mx-4 sm:-mx-6 lg:-mx-8 px-0"
+          style={{ animationDelay: '0.5s', animationFillMode: 'forwards', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)', width: '100vw' }}
+        >
+          <div
+            className="relative p-6 sm:p-8 overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #fffbf8 0%, #fff9f0 100%)',
+              borderTop: '1px solid rgba(249, 168, 34, 0.25)',
+              borderBottom: '1px solid rgba(249, 168, 34, 0.25)',
+              boxShadow: '0 2px 12px rgba(249, 168, 34, 0.08)',
+            }}
           >
-            BaoAfrik does not
-          </h2>
-          <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            <div className="lg:col-span-5 order-2 lg:order-1 animate-fade-in-up opacity-0" style={{ animationDelay: '0.65s', animationFillMode: 'forwards' }}>
-              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-                <img src={cultureImg} alt="We connect communities—payments and delivery stay between you and the other user" className="w-full h-56 sm:h-64 object-cover object-center" />
-                <p className="p-3 text-center text-sm text-[#374151] bg-gray-50">
-                  We connect communities; payments and delivery stay between you and the other user.
+            <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: 'linear-gradient(180deg, #E55325 0%, #F9A825 100%)' }} aria-hidden />
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="pl-4">
+                <h3
+                  className="text-lg font-bold text-[#212121] mb-2"
+                  style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
+                >
+                  Important note
+                </h3>
+                <p className="text-[#4b5563] text-base leading-relaxed">
+                  BaoAfrik is a community marketplace. We do not handle payments or delivery. Transactions are agreed directly between users.
                 </p>
               </div>
-            </div>
-            <div className="lg:col-span-7 order-1 lg:order-2 space-y-4">
-              {doesNot.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex gap-3 p-4 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in-up opacity-0"
-                  style={{
-                    animationDelay: `${0.7 + index * 0.08}s`,
-                    animationFillMode: 'forwards',
-                  }}
-                >
-                  <div className="shrink-0 flex items-center justify-center">
-                    <img src={item.icon} alt="" className="w-5 h-5" aria-hidden style={{ filter: 'brightness(0) opacity(0.65)' }} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#212121] text-sm" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                      {item.text}
-                    </p>
-                    <p className="mt-0.5 text-sm text-[#374151] leading-relaxed">{item.detail}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
 
-        {/* Section: Your responsibility + image */}
+        {/* What we provide + Image */}
+        <section className="mb-16">
+          <h2
+            className="text-xl font-bold text-[#212121] mb-6 animate-fade-in-up opacity-0"
+            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", animationDelay: '0.55s', animationFillMode: 'forwards' }}
+          >
+            What we provide
+          </h2>
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            <div className="lg:col-span-5 order-2 lg:order-1 animate-fade-in-up opacity-0" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
+              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                <img src={cultureImg} alt="BaoAfrik connects communities" className="w-full h-56 sm:h-64 object-cover object-center" />
+                <p className="p-3 text-center text-sm text-[#4b5563] bg-gray-50">
+                  Connecting communities through authentic African products.
+                </p>
+              </div>
+            </div>
+            <div className="lg:col-span-7 order-1 lg:order-2 animate-fade-in-up opacity-0" style={{ animationDelay: '0.65s', animationFillMode: 'forwards' }}>
+              <p className="text-[#4b5563] text-base leading-relaxed mb-4">
+                BaoAfrik provides a digital space where you can discover products, post requests, and connect with other users. We focus on building a trusted community for buying and selling authentic African goods.
+              </p>
+              <p className="text-[#4b5563] text-base leading-relaxed">
+                All payments and delivery arrangements are made directly between buyer and seller. We encourage everyone to communicate clearly and follow our{' '}
+                <Link to="/safety-trust" className="text-[#E55325] hover:underline font-medium">Safety &amp; Trust</Link> and{' '}
+                <Link to="/community-guidelines" className="text-[#E55325] hover:underline font-medium">Community Guidelines</Link>{' '}
+                to keep the marketplace safe and positive.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Your responsibility + Image */}
         <section>
           <h2
             className="text-xl font-bold text-[#212121] mb-6 animate-fade-in-up opacity-0"
-            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", animationDelay: '0.88s', animationFillMode: 'forwards' }}
+            style={{ fontFamily: "'Bricolage Grotesque', sans-serif", animationDelay: '0.7s', animationFillMode: 'forwards' }}
           >
             Your responsibility
           </h2>
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            <div className="lg:col-span-7 animate-fade-in-up opacity-0" style={{ animationDelay: '0.92s', animationFillMode: 'forwards' }}>
-              <p className="text-[#374151] text-base leading-relaxed mb-4">
-                All transactions and agreements are the responsibility of the users involved. When you buy or sell on BaoAfrik, you are dealing directly with another person: you agree on price, payment method, and delivery. We recommend communicating clearly, keeping records of your arrangements, and following our <a href="/safety-trust" className="text-[#E55325] hover:underline font-medium">Safety & Trust</a> and <a href="/community-guidelines" className="text-[#E55325] hover:underline font-medium">Community Guidelines</a> so the marketplace stays safe and positive for everyone.
+            <div className="lg:col-span-7 animate-fade-in-up opacity-0" style={{ animationDelay: '0.75s', animationFillMode: 'forwards' }}>
+              <p className="text-[#4b5563] text-base leading-relaxed mb-4">
+                When you buy or sell on BaoAfrik, you are dealing directly with another person. You agree on price, payment method, and delivery between yourselves. We recommend keeping records of your arrangements and communicating through the platform.
               </p>
-              <p className="text-[#374151] text-base leading-relaxed">
-                Whether you’re listing spices, cultural crafts, or other African products, you’re part of a peer-to-peer community. BaoAfrik provides the place to connect; the rest is up to you and your counterpart.
+              <p className="text-[#4b5563] text-base leading-relaxed">
+                Whether you're listing spices, cultural crafts, or other African products, you're part of a peer-to-peer community. BaoAfrik provides the place to connect; the rest is up to you and your counterpart.
               </p>
             </div>
-            <div className="lg:col-span-5 animate-fade-in-up opacity-0" style={{ animationDelay: '0.96s', animationFillMode: 'forwards' }}>
+            <div className="lg:col-span-5 animate-fade-in-up opacity-0" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
               <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
                 <img src={decorImg} alt="African crafts and artisan products" className="w-full h-56 sm:h-64 object-cover object-center" />
-                <p className="p-3 text-center text-sm text-[#374151] bg-gray-50">
+                <p className="p-3 text-center text-sm text-[#4b5563] bg-gray-50">
                   African crafts, decor, and artisan products—traded directly between users.
                 </p>
               </div>
