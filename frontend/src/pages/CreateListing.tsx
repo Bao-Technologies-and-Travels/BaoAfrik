@@ -42,6 +42,7 @@ import { getCurrencyDisplaySymbol, formatPriceDisplay, toApiCurrency } from '../
 import { UK_CITIES_OPTIONS, formatCityDisplay, getCityPlain } from '../utils/ukCities';
 import { useToast } from '../contexts/ToastContext';
 import { useNotificationToast } from '../contexts/NotificationToastContext';
+import LocationAutocomplete from '../components/LocationAutocomplete';
 
 interface DraftListing {
   id: string;
@@ -2544,91 +2545,14 @@ const CreateListing: React.FC = () => {
                 </div>
 
                 {/* Location Section */}
-                <div className="relative location-dropdown-container">
-                  <div className="flex items-start justify-between mt-4" style={{ maxWidth: '560px' }}>
-                    <div className="flex flex-col">
-                      <div className="flex items-center space-x-1.5 mb-1">
-                        <img src={locIcon} alt="Location" className="w-4 h-4" />
-                        <span className="text-xs font-medium" style={{ color: '#6A6A6A' }}>Your location</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={formatCityDisplay(location)}
-                        readOnly
-                        className="text-xs font-medium border-none focus:outline-none ml-6 cursor-default"
-                        style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                      className="px-4 py-3 rounded-lg text-xs font-medium whitespace-nowrap"
-                      style={{ backgroundColor: '#F0F8FE', color: '#64B5F6' }}
-                    >
-                      Change location
-                    </button>
-                  </div>
-                  {/* Location Dropdown */}
-                  {isLocationDropdownOpen && (
-                    <div
-                      ref={locationDropdownRef}
-                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg location-dropdown-scroll"
-                      style={{
-                        borderRadius: '12px',
-                        top: '100%',
-                        right: 0,
-                        width: 'auto',
-                        minWidth: '280px',
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                        overflowX: 'hidden'
-                      }}
-                    >
-                      {ukCities.map((loc, index) => (
-                        <div
-                          key={loc.value}
-                          className={`w-full ${index === 0 ? 'rounded-t-xl' : ''
-                            } ${index === ukCities.length - 1 ? 'rounded-b-xl' : ''
-                            }`}
-                          style={{
-                            backgroundColor: 'transparent'
-                          }}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLocation(loc.label);
-                              setIsLocationDropdownOpen(false);
-                            }}
-                            className="w-full text-left transition-colors relative"
-                            style={{
-                              color: '#6A6A6A',
-                              cursor: 'pointer',
-                              fontSize: '0.85rem',
-                              padding: '10px 16px',
-                              fontWeight: 500
-                            }}
-                          >
-                            {location === loc.label && (
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: '8px',
-                                  right: '8px',
-                                  top: '4px',
-                                  bottom: '4px',
-                                  backgroundColor: '#F0F8FE',
-                                  borderRadius: '8px',
-                                  zIndex: -1
-                                }}
-                              />
-                            )}
-                            <span style={{ position: 'relative', zIndex: 1 }}>{formatCityDisplay(loc.label)}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div className="mt-4" style={{ maxWidth: '560px' }}>
+                  <LocationAutocomplete
+                    value={location}
+                    onChange={setLocation}
+                    placeholder="Type area or city"
+                    showLabel
+                    labelText="Your location"
+                  />
                 </div>
               </div>
 
@@ -3077,97 +3001,15 @@ const CreateListing: React.FC = () => {
                 </div>
 
                 {/* Mobile Location Section */}
-                <div className="relative location-dropdown">
-                  <div className="flex items-start justify-between mt-4 mb-4">
-                    <div className="flex flex-col">
-                      <div className="flex items-center mb-0.5" style={{ marginLeft: '-2px' }}>
-                        <img src={locIcon} alt="Location" className="w-3 h-3 hidden" />
-                        <span className="text-xs font-medium" style={{ color: '#6A6A6A', fontSize: '0.7rem' }}>Your location</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={formatCityDisplay(location)}
-                        readOnly
-                        className="text-xs font-medium border-none focus:outline-none cursor-default"
-                        style={{ color: '#64B5F6', backgroundColor: 'transparent' }}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap"
-                      style={{
-                        backgroundColor: '#F0F8FE',
-                        color: '#64B5F6',
-                        fontSize: '0.7rem',
-                        border: isLocationDropdownOpen ? '1px solid #97CDF9' : 'none',
-                        boxShadow: isLocationDropdownOpen ? '0 0 0 2px #97CDF9' : 'none'
-                      }}
-                    >
-                      Change location
-                    </button>
-                  </div>
-                  {/* Location Dropdown */}
-                  {isLocationDropdownOpen && (
-                    <div
-                      ref={locationDropdownRef}
-                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 shadow-lg location-dropdown-scroll"
-                      style={{
-                        borderRadius: '12px',
-                        top: '100%',
-                        right: 0,
-                        width: 'auto',
-                        minWidth: '240px',
-                        maxHeight: '180px',
-                        overflowY: 'auto',
-                        overflowX: 'hidden'
-                      }}
-                    >
-                      {ukCities.map((loc, index) => (
-                        <div
-                          key={loc.value}
-                          className={`w-full ${index === 0 ? 'rounded-t-xl' : ''
-                            } ${index === ukCities.length - 1 ? 'rounded-b-xl' : ''
-                            }`}
-                          style={{
-                            backgroundColor: 'transparent'
-                          }}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLocation(loc.label);
-                              setIsLocationDropdownOpen(false);
-                            }}
-                            className="w-full text-left transition-colors relative"
-                            style={{
-                              color: '#6A6A6A',
-                              cursor: 'pointer',
-                              fontSize: '0.75rem',
-                              padding: '10px 16px',
-                              fontWeight: 500
-                            }}
-                          >
-                            {location === loc.label && (
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: '8px',
-                                  right: '8px',
-                                  top: '4px',
-                                  bottom: '4px',
-                                  backgroundColor: '#F0F8FE',
-                                  borderRadius: '8px',
-                                  zIndex: -1
-                                }}
-                              />
-                            )}
-                            <span style={{ position: 'relative', zIndex: 1 }}>{formatCityDisplay(loc.label)}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div className="mt-24 mb-24">
+                  <LocationAutocomplete
+                    value={location}
+                    onChange={setLocation}
+                    placeholder="Type area or city"
+                    showLabel
+                    labelText="Your location"
+                    inputStyle={{ fontSize: '0.7rem' }}
+                  />
                 </div>
 
                 {/* Mobile Title Input */}

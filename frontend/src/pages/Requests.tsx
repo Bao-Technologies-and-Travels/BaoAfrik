@@ -35,6 +35,7 @@ import { getProductCountry, countries as africanCountriesList } from '../utils/c
 import { getCurrencyDisplaySymbol } from '../utils/currency';
 import { UK_CITIES_PLAIN, formatCityDisplay, getCityPlain } from '../utils/ukCities';
 import { format } from 'date-fns';
+import LocationAutocomplete from '../components/LocationAutocomplete';
 
 interface ProductRequest {
   id: string;
@@ -2288,34 +2289,22 @@ const Requests: React.FC = () => {
                             filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                           }}
                         />
-                        <input
-                          ref={searchInputRef}
-                          type="text"
-                          value={searchQuery}
-                          onChange={handleSearchChange}
-                          onFocus={() => {
-                            setIsSearchFocused(true);
-                            if (searchQuery.trim()) {
-                              setShowSearchSuggestions(true);
-                            }
-                          }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleSearch();
-                            }
-                          }}
-                          placeholder="Buyer location"
-                          className="w-full border rounded-lg focus:outline-none pl-10"
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                            borderWidth: isSearchFocused ? '2px' : '1px',
-                            fontFamily: 'Poppins, sans-serif',
-                            fontSize: isMobile ? '10px' : '14px',
-                            color: searchQuery ? '#212121' : '#D9D9D9',
-                            padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                          }}
-                        />
+                        <div className="flex-1" style={{ minWidth: 0 }}>
+                          <LocationAutocomplete
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            placeholder="Type area or city"
+                            inputStyle={{
+                              backgroundColor: '#FFFFFF',
+                              borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                              borderWidth: isSearchFocused ? 2 : 1,
+                              fontSize: isMobile ? '10px' : '14px',
+                              paddingLeft: '36px',
+                              paddingRight: '44px',
+                              padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                            }}
+                          />
+                        </div>
                         <button
                           onClick={handleSearch}
                           className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -2399,33 +2388,22 @@ const Requests: React.FC = () => {
                           filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        onFocus={() => {
-                          setIsSearchFocused(true);
-                          if (searchQuery.trim()) {
-                            setShowSearchSuggestions(true);
-                          }
-                        }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSearch();
-                          }
-                        }}
-                        placeholder="Buyer location"
-                        className="w-full border rounded-lg focus:outline-none pl-10"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '10px' : '14px',
-                          color: searchQuery ? '#212121' : '#D9D9D9',
-                          padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                        }}
-                      />
+                      <div className="flex-1" style={{ minWidth: 0 }}>
+                        <LocationAutocomplete
+                          value={searchQuery}
+                          onChange={setSearchQuery}
+                          placeholder="Type area or city"
+                          inputStyle={{
+                            backgroundColor: '#FFFFFF',
+                            borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                            borderWidth: isSearchFocused ? 2 : 1,
+                            fontSize: isMobile ? '10px' : '14px',
+                            paddingLeft: '36px',
+                            paddingRight: '44px',
+                            padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                          }}
+                        />
+                      </div>
                       <button
                         onClick={handleSearch}
                         className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -2509,34 +2487,22 @@ const Requests: React.FC = () => {
                         filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                       }}
                     />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onFocus={() => {
-                        setIsSearchFocused(true);
-                        if (searchQuery.trim()) {
-                          setShowSearchSuggestions(true);
-                        }
-                      }}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSearch();
-                        }
-                      }}
-                      placeholder="Buyer location"
-                      className="w-full border rounded-lg focus:outline-none pl-10"
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                        borderWidth: isSearchFocused ? '2px' : '1px',
-                        fontFamily: 'Poppins, sans-serif',
-                        fontSize: isMobile ? '10px' : '14px',
-                        color: searchQuery ? '#212121' : '#D9D9D9',
-                        padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                      }}
-                    />
+                    <div className="flex-1" style={{ minWidth: 0 }}>
+                      <LocationAutocomplete
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Type area or city"
+                        inputStyle={{
+                          backgroundColor: '#FFFFFF',
+                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                          borderWidth: isSearchFocused ? 2 : 1,
+                          fontSize: isMobile ? '10px' : '14px',
+                          paddingLeft: '36px',
+                          paddingRight: '44px',
+                          padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                        }}
+                      />
+                    </div>
                     <button
                       onClick={handleSearch}
                       className="absolute right-2 flex items-center justify-center cursor-pointer"
@@ -2766,33 +2732,21 @@ const Requests: React.FC = () => {
                           filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                         }}
                       />
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        onFocus={() => {
-                          setIsSearchFocused(true);
-                          if (searchQuery.trim()) {
-                            setShowSearchSuggestions(true);
-                          }
-                        }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSearch();
-                          }
-                        }}
-                        placeholder="Buyer location"
-                        className="w-full border rounded-lg focus:outline-none pl-10"
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
-                          fontFamily: 'Poppins, sans-serif',
-                          fontSize: isMobile ? '10px' : '14px',
-                          color: searchQuery ? '#212121' : '#D9D9D9',
-                          padding: isMobile ? '6px 50px 6px 32px' : '10px 112px 10px 40px'
-                        }}
-                      />
+                      <div className="flex-1" style={{ minWidth: 0 }}>
+                        <LocationAutocomplete
+                          value={searchQuery}
+                          onChange={setSearchQuery}
+                          placeholder="Type area or city"
+                          inputStyle={{
+                            backgroundColor: '#FFFFFF',
+                            borderColor: isSearchFocused ? '#CFE8FC' : '#E4E4E4',
+                            fontSize: isMobile ? '10px' : '14px',
+                            paddingLeft: '36px',
+                            paddingRight: '44px',
+                            padding: isMobile ? '6px 44px 6px 36px' : '10px 44px 10px 36px'
+                          }}
+                        />
+                      </div>
                       <button
                         onClick={handleSearch}
                         className="absolute right-2 flex items-center justify-center cursor-pointer"

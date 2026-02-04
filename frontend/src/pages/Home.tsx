@@ -7,6 +7,7 @@ import { productUrlSlug } from '../utils/slug';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import LocationAutocomplete from '../components/LocationAutocomplete';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -2102,7 +2103,7 @@ const Home: React.FC = () => {
               )}
 
               <div className="flex flex-col justify-center flex-1">
-                <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Product</label>
+                <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Product</label>
                 <input
                   type="text"
                   placeholder={selectedImage ? "Wanna be more specific ?" : "Search a product"}
@@ -2128,8 +2129,7 @@ const Home: React.FC = () => {
               <style>
                 {`
                   .product-search-input::placeholder {
-                    color: #888888;
-                    font-weight: 600;
+                    color: #919191;
                   }
                   .product-search-input {
                     caret-color: #64B5F6;
@@ -2166,7 +2166,7 @@ const Home: React.FC = () => {
                   }}
                 />
               )}
-              <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Categories</label>
+              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Categories</label>
               <button
                 onClick={() => {
                   setFocusedSearchSection('categories');
@@ -2180,9 +2180,9 @@ const Home: React.FC = () => {
                   }, 200);
                 }}
                 className="border-0 p-0 focus:outline-none text-left flex items-center justify-between w-full"
-                style={{ fontSize: '11px', color: selectedCategoryText ? '#212121' : '#E9E9E9', background: 'transparent' }}
+                style={{ fontSize: '11px', color: selectedCategoryText ? '#212121' : '#919191', background: 'transparent' }}
               >
-                <span style={{ fontWeight: 600, color: '#888888' }}>{selectedCategoryText || 'Choose a category'}</span>
+                <span>{selectedCategoryText || 'Choose a category'}</span>
                 <img
                   src={arrowDownIcon}
                   alt="Arrow"
@@ -2220,13 +2220,12 @@ const Home: React.FC = () => {
                   }}
                 />
               )}
-              <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Place of Origin</label>
+              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Place of Origin</label>
               <div className="relative flex items-center w-full">
                 <style>
                   {`
                   .place-of-origin-input::placeholder {
-                    color: #888888888888;
-                    font-weight: 600;
+                    color: #919191;
                   }
                 `}
                 </style>
@@ -2286,8 +2285,17 @@ const Home: React.FC = () => {
                 height: '58px'
               }}
             >
-              <label style={{ fontSize: '12px', color: '#888888', marginBottom: '2px', fontWeight: 600 }}>Seller Location</label>
-              <input
+              <label style={{ fontSize: '12px', color: '#BABABA', marginBottom: '2px' }}>Seller Location</label>
+              <div onFocus={() => setFocusedSearchSection('sellerLocation')} onBlur={() => setTimeout(() => setFocusedSearchSection(null), 200)}>
+                <LocationAutocomplete
+                  value={location}
+                  onChange={setLocation}
+                  placeholder="Type area or city"
+                  dropdownVariant="filter"
+                  inputStyle={{ fontSize: '11px', color: '#212121', background: 'transparent', border: 'none', padding: 0, boxShadow: 'none' }}
+                />
+              </div>
+              {/* <input
                 type="text"
                 placeholder="Insert location"
                 value={sellerLocation && UK_CITIES_PLAIN.includes(sellerLocation) ? formatCityDisplay(sellerLocation) : sellerLocation}
@@ -2313,9 +2321,9 @@ const Home: React.FC = () => {
                 }}
                 className="border-0 p-0 focus:outline-none focus:ring-0"
                 style={{ fontSize: '11px', color: '#888888', background: 'transparent' }}
-              />
+              /> */}
               {/* UK city suggestions dropdown (desktop) - like Requests buyer location */}
-              {showSellerLocationSuggestions && focusedSearchSection === 'sellerLocation' && getFilteredSellerLocationSuggestions().length > 0 && (
+              {/* {showSellerLocationSuggestions && focusedSearchSection === 'sellerLocation' && getFilteredSellerLocationSuggestions().length > 0 && (
                 <div
                   className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg overflow-hidden"
                   style={{
@@ -2350,7 +2358,7 @@ const Home: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Scan Icon or Clear Image Button */}
@@ -3364,28 +3372,31 @@ const Home: React.FC = () => {
                                 onClick={() => scrollCategoryLeft(category)}
                                 disabled={getCategoryPage(category) === 1}
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                aria-label="Previous page"
+                                aria-label="Scroll left"
                                 style={{ fontWeight: getCategoryPage(category) > 1 ? 'bold' : 'normal' }}
                               >
-                                <img
+                                {/* <img
                                   src={getCategoryPage(category) > 1 ? blackArrowIcon : grayArrowIcon}
                                   alt="Previous"
                                   className="w-full h-full"
                                   style={{ transform: 'scaleX(-1)' }}
                                 />
+                                 */}
+                                 <img src={grayArrowIcon} alt="Previous" className="w-full h-full" />
                               </button>
                               <button
                                 onClick={() => scrollCategoryRight(category)}
                                 disabled={getCategoryPage(category) >= Math.ceil(filteredProducts.length / productsPerPage)}
                                 className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                aria-label="Next page"
+                                aria-label="Scroll right"
                                 style={{ fontWeight: getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? 'bold' : 'normal' }}
                               >
-                                <img
+                                {/* <img
                                   src={getCategoryPage(category) < Math.ceil(filteredProducts.length / productsPerPage) ? blackArrowIcon : grayArrowIcon}
                                   alt="Next"
                                   className="w-full h-full"
-                                />
+                                /> */}
+                                <img src={blackArrowIcon} alt="Next" className="w-full h-full" />
                               </button>
                             </div>
                           </div>
@@ -5695,86 +5706,21 @@ const Home: React.FC = () => {
 
             {/* Content */}
             <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
-              {/* Set your location label */}
-              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '8px' }}>
-                Set your location
-              </label>
-
-              {/* Location Input */}
-              <input
-                type="text"
+              <LocationAutocomplete
                 value={changeLocationQuery}
-                onChange={(e) => setChangeLocationQuery(e.target.value)}
-                onFocus={() => setIsChangeLocationInputFocused(true)}
-                onBlur={() => setIsChangeLocationInputFocused(false)}
-                placeholder=""
-                autoFocus
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '8px',
-                  border: `1px solid ${isChangeLocationInputFocused ? '#64B5F6' : '#E9E9E9'}`,
-                  fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif',
-                  outline: 'none',
-                  marginBottom: '16px'
+                onChange={setChangeLocationQuery}
+                placeholder="Type area or city"
+                showLabel
+                labelText="Set your location"
+                inputStyle={{ padding: '10px 12px', fontSize: '12px', marginBottom: '16px' }}
+                onSelect={(v) => {
+                  setRequestUserLocation(v);
+                  setShowChangeLocationModal(false);
+                  setChangeLocationQuery('');
+                  setHoveredLocationSuggestion(null);
+                  setIsChangeLocationInputFocused(false);
                 }}
               />
-
-              {/* Location Suggestions List */}
-              {changeLocationQuery.trim() && (
-                <div style={{ marginBottom: '20px' }}>
-                  {locationSuggestions
-                    .filter(location =>
-                      location.toLowerCase().includes(changeLocationQuery.toLowerCase())
-                    )
-                    .slice(0, 5)
-                    .map((location) => (
-                      <button
-                        key={location}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setRequestUserLocation(location);
-                          setShowChangeLocationModal(false);
-                          setChangeLocationQuery('');
-                          setHoveredLocationSuggestion(null);
-                          setIsChangeLocationInputFocused(false);
-                        }}
-                        onMouseEnter={() => setHoveredLocationSuggestion(location)}
-                        onMouseLeave={() => setHoveredLocationSuggestion(null)}
-                        style={{
-                          width: '100%',
-                          padding: '8px 12px',
-                          marginBottom: '4px',
-                          backgroundColor: hoveredLocationSuggestion === location ? '#F0F8FE' : 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          textAlign: 'left',
-                          fontFamily: 'Poppins, sans-serif'
-                        }}
-                      >
-                        {/* Location Icon - Same as home page */}
-                        <img
-                          src={locationIcon}
-                          alt="Location"
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            flexShrink: 0,
-                            filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
-                          }}
-                        />
-                        <span style={{ fontSize: '12px', color: '#212121' }}>
-                          {location}
-                        </span>
-                      </button>
-                    ))}
-                </div>
-              )}
-
             </div>
 
             {/* Save the location Button */}
@@ -6161,82 +6107,22 @@ const Home: React.FC = () => {
             </div>
 
             {/* Seller Location Filter */}
-            <div className="relative">
-              <label style={{ fontSize: '12px', fontWeight: 500, color: '#6A6A6A', marginBottom: '8px', display: 'block' }}>
-                Seller location
-              </label>
-              <input
-                type="text"
+            <div>
+              <LocationAutocomplete
                 value={mobileFilterSellerLocation}
-                onChange={(e) => {
-                  setMobileFilterSellerLocation(e.target.value);
-                  if (e.target.value.trim()) {
-                    setShowSellerLocationSuggestions(true);
-                  } else {
-                    setShowSellerLocationSuggestions(false);
-                  }
-                }}
-                onFocus={() => {
-                  if (mobileFilterSellerLocation.trim()) {
-                    setShowSellerLocationSuggestions(true);
-                  }
-                }}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setShowSellerLocationSuggestions(false);
-                  }, 200);
-                }}
-                placeholder="Choose seller location"
-                className="w-full px-3 py-2.5 border rounded-lg"
-                style={{
-                  border: '1px solid #E9E9E9',
+                onChange={setMobileFilterSellerLocation}
+                placeholder="Type area or city"
+                showLabel
+                labelText="Seller location"
+                dropdownVariant="filter"
+                inputStyle={{
+                  borderColor: '#E9E9E9',
                   borderRadius: '8px',
                   backgroundColor: '#FFFFFF',
                   color: '#212121',
                   fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif'
                 }}
               />
-
-              {/* Location Suggestions Dropdown */}
-              {showSellerLocationSuggestions && getFilteredLocationSuggestions().length > 0 && (
-                <div
-                  className="absolute top-full left-0 right-0 mt-1 z-50 bg-white rounded-lg"
-                  style={{
-                    maxHeight: '180px',
-                    overflowY: 'auto',
-                    boxShadow: 'none',
-                    border: 'none'
-                  }}
-                >
-                  {getFilteredLocationSuggestions().map((city, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setMobileFilterSellerLocation(city);
-                        setShowSellerLocationSuggestions(false);
-                      }}
-                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-50"
-                      style={{
-                        padding: '8px 12px'
-                      }}
-                    >
-                      <img
-                        src={locationIcon}
-                        alt="Location"
-                        style={{
-                          width: '14px',
-                          height: '14px',
-                          filter: 'brightness(0) saturate(100%) invert(73%) sepia(52%) saturate(1685%) hue-rotate(352deg) brightness(103%) contrast(95%)'
-                        }}
-                      />
-                      <span style={{ color: '#6A6A6A', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
-                        {formatCityDisplay(city)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
