@@ -33,6 +33,7 @@ import a4 from '../assets/images/pre/a4.png';
 import verityIcon from '../assets/images/pre/verity.svg';
 import avatar from '../assets/images/logos/avatar.png';
 import listingtoastIcon from '../assets/images/pre/listingtoast.svg';
+import downArrowIcon from '../assets/images/admin/downarrow.svg';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 
@@ -136,6 +137,12 @@ const CreateListing: React.FC = () => {
     const [countdown, setCountdown] = useState(10);
     const [showNotification, setShowNotification] = useState(false);
     const [isSavingDraft, setIsSavingDraft] = useState(false);
+    
+    // Pricing modal state
+    const [showPricingModal, setShowPricingModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<'starter' | 'regular' | 'professional'>('starter');
+    const [expandedPlan, setExpandedPlan] = useState<'starter' | 'regular' | 'professional'>('starter');
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   // Check if all required fields are filled
   const isFormComplete = title.trim() !== '' && 
@@ -510,9 +517,27 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
   };
 
   const handlePostListing = () => {
-    if (!isFormComplete) return;
+    console.log('handlePostListing called, isFormComplete:', isFormComplete);
+    console.log('Form values:', { title, description, price, quantity, category, origin, imageUrls: imageUrls.length });
+    if (!isFormComplete) {
+      console.log('Form is not complete, returning early');
+      return;
+    }
     
-    console.log('Posting listing...');
+    console.log('Opening pricing modal...');
+    // Show pricing modal first
+    setShowPricingModal(true);
+  };
+
+  const handleConfirmPricing = () => {
+    if (!acceptedTerms) return;
+    
+    console.log('Confirming pricing, selected plan:', selectedPlan);
+    // Close pricing modal
+    setShowPricingModal(false);
+    // Reset terms acceptance for next time
+    setAcceptedTerms(false);
+    
     // Show success modal
     setShowSuccessModal(true);
     setCountdown(10);
@@ -521,6 +546,19 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
     setTimeout(() => {
       setShowNotification(true);
     }, 2000);
+  };
+
+  const handleCancelPricing = () => {
+    setShowPricingModal(false);
+    setAcceptedTerms(false);
+  };
+
+  const handlePlanSelect = (plan: 'starter' | 'regular' | 'professional') => {
+    setSelectedPlan(plan);
+  };
+
+  const handleCardExpand = (plan: 'starter' | 'regular' | 'professional') => {
+    setExpandedPlan(expandedPlan === plan ? plan : plan);
   };
 
   // Countdown effect
@@ -2537,6 +2575,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
               {/* Mobile Buttons */}
               <div className="flex flex-col items-center space-y-2.5 mt-4">
                 <button
+                  type="button"
                   onClick={handlePostListing}
                   className="flex items-center justify-center space-x-2 w-full py-2 rounded-xl font-medium transition-colors text-sm"
                   style={{ 
@@ -3627,6 +3666,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                     )}
                   </button>
                   <button
+                    type="button"
                     onClick={handlePostListing}
                     className="flex items-center space-x-2 px-16 py-2.5 rounded-xl font-medium transition-colors text-sm"
                     style={{ 
@@ -3646,7 +3686,7 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
                           : 'none'
                       }}
                     />
-          </button>
+                  </button>
                 </div>
               </div>
         </div>
@@ -3654,6 +3694,453 @@ const buildDraftPrefillPayload = (draft: DraftListing) => {
         </div>
         ) : null}
       </div>
+
+      {/* Pricing Modal */}
+      {showPricingModal && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 z-[60]"
+            style={{ backgroundColor: '#0000001A' }}
+            onClick={handleCancelPricing}
+          />
+          
+          {/* Pricing Modal - Centered */}
+          <div className="fixed inset-0 z-[70] flex items-center justify-center px-4">
+            <div 
+              className="bg-white relative max-w-[650px] w-full"
+              style={{ borderRadius: '30px', minHeight: '520px' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-5 pt-10 pb-3">
+                <div className="flex items-start justify-between">
+                  <h2 
+                    className="text-lg font-semibold"
+                    style={{ 
+                      color: '#212121', 
+                      fontFamily: "'Bricolage Grotesque', sans-serif"
+                    }}
+                  >
+                    Enjoy 3 months of free listings
+                  </h2>
+                  <button 
+                    onClick={handleCancelPricing}
+                    className="p-1 hover:opacity-70 transition-opacity"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <p 
+                  className="mt-1.5 text-xs"
+                  style={{ color: '#919191' }}
+                >
+                  Create, edit, and publish as many listings as you want during the free period. No credit card required, and you'll be notified before any charges apply.
+                </p>
+              </div>
+
+              {/* Pricing Cards */}
+              <div className="px-5 pb-3 pt-4 space-y-2">
+                {/* Starter Card */}
+                <div 
+                  className="rounded-[14px] overflow-hidden cursor-pointer transition-all duration-200"
+                  style={{ 
+                    backgroundColor: selectedPlan === 'starter' ? '#FFFEFB' : '#FFFFFF',
+                    border: `1.5px solid ${selectedPlan === 'starter' ? '#FCD79B' : '#E1E1E1'}`
+                  }}
+                  onClick={() => handleCardExpand('starter')}
+                >
+                  <div className="p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2.5">
+                        {/* Radio Button */}
+                        <div 
+                          className="w-4 h-4 rounded-full border-2 flex items-center justify-center mt-[3px] cursor-pointer"
+                          style={{ borderColor: selectedPlan === 'starter' ? '#F9A825' : '#BABABA' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePlanSelect('starter');
+                          }}
+                        >
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: selectedPlan === 'starter' ? '#F9A825' : '#BABABA' }}
+                          />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span 
+                              className="font-semibold text-sm"
+                              style={{ 
+                                color: '#212121', 
+                                fontFamily: "'Bricolage Grotesque', sans-serif"
+                              }}
+                            >
+                              Starter
+                            </span>
+                            {/* Free Trial Badge - shown next to title when collapsed */}
+                            {expandedPlan !== 'starter' && (
+                              <span 
+                                className="px-1.5 py-0.5 text-[10px] font-medium"
+                                style={{ 
+                                  backgroundColor: '#EDFBF0',
+                                  color: '#369A47',
+                                  borderRadius: '4px'
+                                }}
+                              >
+                                Free Trial
+                              </span>
+                            )}
+                          </div>
+                          {/* Show View details when collapsed, Free Trial badge when expanded */}
+                          {expandedPlan === 'starter' ? (
+                            <span 
+                              className="px-1.5 py-0.5 text-[10px] font-medium inline-block mt-0.5"
+                              style={{ 
+                                backgroundColor: '#EDFBF0',
+                                color: '#369A47',
+                                borderRadius: '4px'
+                              }}
+                            >
+                              Free Trial
+                            </span>
+                          ) : (
+                            <p 
+                              className="text-xs"
+                              style={{ color: '#919191' }}
+                            >
+                              View details
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p 
+                          className="text-sm line-through"
+                          style={{ color: '#919191', fontWeight: '400' }}
+                        >
+                          £1 per listing
+                        </p>
+                        <p 
+                          className="text-xs"
+                          style={{ color: '#369A47' }}
+                        >
+                          Free until 02 April 2026
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Expanded Content */}
+                    {expandedPlan === 'starter' && (
+                      <div className="mt-2">
+                        <div className="space-y-1.5 py-2">
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Create unlimited listings</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>No payment required</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>No card needed</span>
+                          </div>
+                        </div>
+                        <p 
+                          className="text-xs mt-3"
+                          style={{ color: '#919191' }}
+                        >
+                          Enjoy your <span style={{ fontWeight: '600' }}>free trial period for 3 months</span>. After that, you will be subject to the platform's standard rates.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Regular Card */}
+                <div 
+                  className="rounded-[14px] overflow-hidden cursor-pointer transition-all duration-200"
+                  style={{ 
+                    backgroundColor: selectedPlan === 'regular' ? '#FFFEFB' : '#FFFFFF',
+                    border: `1.5px solid ${selectedPlan === 'regular' ? '#FCD79B' : '#E1E1E1'}`
+                  }}
+                  onClick={() => handleCardExpand('regular')}
+                >
+                  <div className="p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2.5">
+                        {/* Radio Button */}
+                        <div 
+                          className="w-4 h-4 rounded-full border-2 flex items-center justify-center mt-[3px] cursor-pointer"
+                          style={{ borderColor: selectedPlan === 'regular' ? '#F9A825' : '#BABABA' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePlanSelect('regular');
+                          }}
+                        >
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: selectedPlan === 'regular' ? '#F9A825' : '#BABABA' }}
+                          />
+                        </div>
+                        <div>
+                          <span 
+                            className="font-semibold text-sm block"
+                            style={{ 
+                              color: '#212121', 
+                              fontFamily: "'Bricolage Grotesque', sans-serif"
+                            }}
+                          >
+                            Regular
+                          </span>
+                          <p 
+                            className="text-xs flex items-center gap-1"
+                            style={{ color: expandedPlan === 'regular' ? '#64B5F6' : '#919191' }}
+                          >
+                            {expandedPlan === 'regular' ? 'View less' : 'View details'}
+                            {expandedPlan === 'regular' && <img src={downArrowIcon} alt="" className="w-3 h-3" style={{ filter: 'invert(68%) sepia(52%) saturate(561%) hue-rotate(180deg) brightness(98%) contrast(94%)' }} />}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p 
+                          className="font-medium text-sm"
+                          style={{ color: '#212121' }}
+                        >
+                          £5
+                        </p>
+                        <p 
+                          className="text-xs"
+                          style={{ color: '#919191' }}
+                        >
+                          for 10 listings
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Expanded Content */}
+                    {expandedPlan === 'regular' && (
+                      <div className="mt-2">
+                        <div className="space-y-1.5 py-2">
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Create up to 10 listings</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Payment needed</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Card needed</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Ideal for small businesses or regular sellers</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Flexible and cost-effective option</span>
+                          </div>
+                        </div>
+                        <p 
+                          className="text-xs mt-3"
+                          style={{ color: '#919191' }}
+                        >
+                          One-time bundle of 10 listings
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Professional Card */}
+                <div 
+                  className="rounded-[14px] overflow-hidden cursor-pointer transition-all duration-200"
+                  style={{ 
+                    backgroundColor: selectedPlan === 'professional' ? '#FFFEFB' : '#FFFFFF',
+                    border: `1.5px solid ${selectedPlan === 'professional' ? '#FCD79B' : '#E1E1E1'}`
+                  }}
+                  onClick={() => handleCardExpand('professional')}
+                >
+                  <div className="p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2.5">
+                        {/* Radio Button */}
+                        <div 
+                          className="w-4 h-4 rounded-full border-2 flex items-center justify-center mt-[3px] cursor-pointer"
+                          style={{ borderColor: selectedPlan === 'professional' ? '#F9A825' : '#BABABA' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePlanSelect('professional');
+                          }}
+                        >
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: selectedPlan === 'professional' ? '#F9A825' : '#BABABA' }}
+                          />
+                        </div>
+                        <div>
+                          <span 
+                            className="font-semibold text-sm block"
+                            style={{ 
+                              color: '#212121', 
+                              fontFamily: "'Bricolage Grotesque', sans-serif"
+                            }}
+                          >
+                            Professionnal
+                          </span>
+                          <p 
+                            className="text-xs flex items-center gap-1"
+                            style={{ color: expandedPlan === 'professional' ? '#64B5F6' : '#919191' }}
+                          >
+                            {expandedPlan === 'professional' ? 'View less' : 'View details'}
+                            {expandedPlan === 'professional' && <img src={downArrowIcon} alt="" className="w-3 h-3" style={{ filter: 'invert(68%) sepia(52%) saturate(561%) hue-rotate(180deg) brightness(98%) contrast(94%)' }} />}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p 
+                          className="font-medium text-sm"
+                          style={{ color: '#212121' }}
+                        >
+                          £10
+                        </p>
+                        <p 
+                          className="text-xs"
+                          style={{ color: '#919191' }}
+                        >
+                          Unlimited listing · Monthly
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Expanded Content */}
+                    {expandedPlan === 'professional' && (
+                      <div className="mt-2">
+                        <div className="space-y-1.5 py-2">
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Create unlimited listings every month</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Payment needed</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Card needed</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Best option for professionals & growing businesses</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="#4CD964" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#212121', fontSize: '12px', fontWeight: '500' }}>Best value for frequent listings</span>
+                          </div>
+                        </div>
+                        <p 
+                          className="text-xs mt-3"
+                          style={{ color: '#919191' }}
+                        >
+                          Unlimited access, billed monthly
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Terms Checkbox */}
+              <div className="px-5 pb-3">
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-0.5 w-3.5 h-3.5 rounded border-2"
+                    style={{ accentColor: '#919191', borderColor: '#919191', backgroundColor: 'transparent' }}
+                  />
+                  <span className="text-xs" style={{ color: '#919191' }}>
+                    By ticking this box, I accept the{' '}
+                    <span 
+                      className="underline cursor-pointer font-medium"
+                      style={{ color: '#212121' }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Could navigate to terms page
+                      }}
+                    >
+                      policies, terms and conditions of use of Bao Afrik
+                    </span>
+                    .
+                  </span>
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="px-5 pb-8 pt-3 flex justify-end gap-3">
+                <button
+                  onClick={handleCancelPricing}
+                  className="px-6 py-2.5 font-medium text-xs transition-colors"
+                  style={{ 
+                    backgroundColor: '#FFFFFF',
+                    color: '#939393',
+                    border: '1px solid #E4E4E4',
+                    borderRadius: '12px'
+                  }}
+                >
+                  No, Cancel
+                </button>
+                <button
+                  onClick={handleConfirmPricing}
+                  disabled={!acceptedTerms}
+                  className="px-6 py-2.5 font-medium text-xs transition-colors"
+                  style={{ 
+                    backgroundColor: acceptedTerms ? '#F9A825' : '#E9E9E9',
+                    color: acceptedTerms ? '#FFFFFF' : '#919191',
+                    cursor: acceptedTerms ? 'pointer' : 'not-allowed',
+                    borderRadius: '12px'
+                  }}
+                >
+                  Yes, Create a listing · Free
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Success Modal */}
       {showSuccessModal && (
