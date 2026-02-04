@@ -15,7 +15,7 @@ const benefits = [
   { title: 'Visibility', description: 'Reach buyers and sellers who care about authentic African products and community-led trade.' },
   { title: 'Support', description: 'Access to guidance on listing, messaging, and growing your presence on the platform.' },
   { title: 'Trust', description: 'Align with a marketplace built on transparency, safety, and community guidelines.' },
-  { title: 'Community', description: 'Join a network of partners working toward the same goals: culture, trade, and entrepreneurship.' },
+  { title: 'Community', description: 'Join a network of partners working toward the same goals, culture, trade and entrepreneurship.' },
 ];
 
 const PartnershipsPage: React.FC = () => {
