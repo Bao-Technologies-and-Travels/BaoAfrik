@@ -29,24 +29,24 @@ model User {
   passwordResetCode         String?   @map("password_reset_code")
   passwordResetExpires      DateTime? @map("password_reset_expires")
 
-  provider         String? // 'local', 'google', 'facebook', 'github'
-  providerId       String?   @map("provider_id")
-  isActive         Boolean   @default(true) @map("is_active")
-  isVerifiedSeller Boolean   @default(false) @map("is_verified_seller")
-  rating           Float?    @default(0.0)
-  totalSales       Int       @default(0) @map("total_sales")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-  lastLoginAt      DateTime? @map("last_login_at")
-  cookiePreferences String?  @map("cookie_preferences") // 'all', 'none', 'essential', or JSON string for granular preferences
+  provider          String? // 'local', 'google', 'facebook', 'github'
+  providerId        String?   @map("provider_id")
+  isActive          Boolean   @default(true) @map("is_active")
+  isVerifiedSeller  Boolean   @default(false) @map("is_verified_seller")
+  rating            Float?    @default(0.0)
+  totalSales        Int       @default(0) @map("total_sales")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  lastLoginAt       DateTime? @map("last_login_at")
+  cookiePreferences String?   @map("cookie_preferences") // 'all', 'none', 'essential', or JSON string for granular preferences
 
   // Relations
   products                 Product[]
   productLikes             ProductLike[]
   productSaves             ProductSave[]
   productReviews           ProductReview[]
-  userReviews              UserReview[] @relation("UserReviews")
-  reviewsGiven             UserReview[] @relation("UserReviewer")
+  userReviews              UserReview[]              @relation("UserReviews")
+  reviewsGiven             UserReview[]              @relation("UserReviewer")
   sentMessages             Message[]
   refreshTokens            RefreshToken[]
   conversationParticipants ConversationParticipant[]
@@ -80,6 +80,7 @@ model Product {
   id                String        @id @default(uuid())
   sellerId          String        @map("seller_id")
   title             String
+  slug              String?       @unique
   description       String?
   price             Decimal       @db.Decimal(10, 2)
   currency          String        @default("USD")
@@ -98,7 +99,7 @@ model Product {
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
   publishedAt       DateTime?     @map("published_at")
-  expiresAt         DateTime?     @map("expires_at")
+  expiresAt         DateTime?     @map("expires_at") 
 
   // Relations
   seller        User            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
@@ -146,9 +147,9 @@ model ProductReview {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product            Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  helpfulnessVotes   ReviewHelpfulness[]
+  product          Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helpfulnessVotes ReviewHelpfulness[]
 
   @@unique([productId, userId])
   @@map("product_reviews")
@@ -177,8 +178,8 @@ model UserReview {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  user     User   @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
-  reviewer User   @relation("UserReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  user             User                    @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer         User                    @relation("UserReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
   helpfulnessVotes UserReviewHelpfulness[]
 
   @@unique([userId, reviewerId])
@@ -281,16 +282,16 @@ model MessageReaction {
 }
 
 model MessageMetadata {
-  id            String   @id @default(uuid())
-  messageId     String   @map("message_id")
-  userId        String   @map("user_id")
-  isPinned      Boolean  @default(false) @map("is_pinned")
-  isArchived    Boolean  @default(false) @map("is_archived")
-  isImportant   Boolean  @default(false) @map("is_important")
-  isDeletedForMe Boolean @default(false) @map("is_deleted_for_me")
-  label         String? // label name or null
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  messageId      String   @map("message_id")
+  userId         String   @map("user_id")
+  isPinned       Boolean  @default(false) @map("is_pinned")
+  isArchived     Boolean  @default(false) @map("is_archived")
+  isImportant    Boolean  @default(false) @map("is_important")
+  isDeletedForMe Boolean  @default(false) @map("is_deleted_for_me")
+  label          String? // label name or null
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -32,7 +32,7 @@ const PrivacyPolicy: React.FC = () => {
               <ul className="list-disc pl-6 space-y-2 text-[#6A6A6A]">
                 <li>Name, email address, phone number</li>
                 <li>Location and profile details</li>
-                <li>Listings, requests, and messages</li>
+                <li>Listings, requests, and messages sent through the platform</li>
                 <li>Technical data such as device information and IP address</li>
               </ul>
             </section>

@@ -71,6 +71,7 @@ import avatar from "../assets/images/logos/avatar.png";
 
 import { useToast } from "../contexts/ToastContext";
 import { getProductCountry } from '../utils/countryHelpers';
+import { productUrlSlug } from '../utils/slug';
 interface OwnerListingState {
   fromMyListings?: boolean;
   listing?: {
@@ -264,7 +265,8 @@ const ProductDetail: React.FC = () => {
   const [isDescriptionClamped, setIsDescriptionClamped] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
-  const { id } = useParams<{ id: string }>();
+  const { slug: slugParam } = useParams<{ slug: string }>();
+  const slug = slugParam ?? '';
   const routerLocation = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -649,7 +651,7 @@ const ProductDetail: React.FC = () => {
 
   // Load product reviews from backend
   const loadReviews = useCallback(async () => {
-    if (!id) return;
+    if (!product?.id) return;
 
     let isMounted = true;
 
@@ -665,7 +667,7 @@ const ProductDetail: React.FC = () => {
       }
 
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/products/${id}/reviews`,
+        `${process.env.REACT_APP_API_URL}/products/${product.id}/reviews`,
         { headers, cache: 'no-cache' }
       );
 
@@ -724,7 +726,7 @@ const ProductDetail: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [id, addToast]);
+  }, [product?.id, addToast]);
 
   // Initial load of reviews
   useEffect(() => {
@@ -950,21 +952,20 @@ const ProductDetail: React.FC = () => {
   const lastFetchedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Prevent duplicate calls for the same product ID
-    if (!id || fetchingProductRef.current || lastFetchedIdRef.current === id) {
+    if (!slug || fetchingProductRef.current || lastFetchedIdRef.current === slug) {
       return;
     }
 
     const fetchProduct = async () => {
       fetchingProductRef.current = true;
-      lastFetchedIdRef.current = id;
+      lastFetchedIdRef.current = slug;
 
       try {
         setIsLoading(true);
         setError(null);
 
         const token = localStorage.getItem("accessToken");
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/slug/${encodeURIComponent(slug)}`, {
           headers: token ? {
             'Authorization': `Bearer ${token}`
           } : {}
@@ -1001,7 +1002,18 @@ const ProductDetail: React.FC = () => {
     };
 
     fetchProduct();
-  }, [id]); // Removed addToast from dependencies - it's stable from context
+  }, [slug]);
+
+  // Replace URL with canonical slug when product is loaded (no id exposed)
+  useEffect(() => {
+    if (!product) return;
+    const expectedSlug = productUrlSlug(product);
+    if (!expectedSlug) return;
+    const expectedPath = `/product/${expectedSlug}`;
+    if (window.location.pathname !== expectedPath) {
+      navigate(expectedPath, { replace: true });
+    }
+  }, [product, navigate]);
 
   // Ref to prevent duplicate seller products fetch
   const fetchingSellerProductsRef = useRef(false);
@@ -1450,11 +1462,11 @@ const ProductDetail: React.FC = () => {
   };
 
   const handlePostReview = async () => {
-    if (!id) {
+    if (!product?.id) {
       addToast({
         type: 'error',
         title: 'Cannot post review',
-        message: 'Product ID is missing.',
+        message: 'Product is not loaded.',
         duration: 2000
       });
       return;
@@ -1483,7 +1495,7 @@ const ProductDetail: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}/reviews`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/products/${product.id}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -4189,7 +4201,7 @@ const ProductDetail: React.FC = () => {
                     return (
                       <Link
                         key={relatedProduct.id}
-                        to={`/product/${relatedProduct.id}`}
+                        to={`/product/${productUrlSlug(relatedProduct)}`}
                         className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
                       >
                         <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
@@ -4952,7 +4964,7 @@ const ProductDetail: React.FC = () => {
                       return (
                         <Link
                           key={relatedProduct.id}
-                          to={`/product/${relatedProduct.id}`}
+                          to={`/product/${productUrlSlug(relatedProduct)}`}
                           className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
                         >
                           <div className="aspect-square relative overflow-hidden mb-1 sm:mb-2" style={{ borderRadius: '12px' }}>
@@ -5098,7 +5110,7 @@ const ProductDetail: React.FC = () => {
                 <input
                   type="text"
                   readOnly
-                  value={`${window.location.origin}/product/${product.id}`}
+                  value={`${window.location.origin}/product/${productUrlSlug(product)}`}
                   className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium focus:outline-none"
                   style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
                 />

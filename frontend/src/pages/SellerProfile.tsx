@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getProductCountry } from '../utils/countryHelpers';
+import { productUrlSlug } from '../utils/slug';
 import { useParams, useSearchParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 import Header from '../components/layout/Header';
@@ -1654,7 +1655,7 @@ const SellerProfile: React.FC = () => {
                   {sellerProducts.map((product) => (
                     <Link
                       key={product.id}
-                      to={`/product/${product.id}`}
+                      to={`/product/${productUrlSlug(product)}`}
                       className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group"
                     >
                       {/* Product Image - Top */}

@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS "products" (
     "id" TEXT NOT NULL,
     "seller_id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
+    "slug" TEXT,
     "description" TEXT,
     "price" DECIMAL(10,2) NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'USD',
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS "products" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "published_at" TIMESTAMP(3),
+    "expires_at" TIMESTAMP(3),
 
     CONSTRAINT "products_pkey" PRIMARY KEY ("id")
 );
@@ -209,6 +211,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "refresh_tokens_token_key" ON "refresh_tokens"("token");
 CREATE UNIQUE INDEX IF NOT EXISTS "product_likes_user_id_product_id_key" ON "product_likes"("user_id", "product_id");
 CREATE UNIQUE INDEX IF NOT EXISTS "product_saves_user_id_product_id_key" ON "product_saves"("user_id", "product_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "products_slug_key" ON "products"("slug");
 CREATE UNIQUE INDEX IF NOT EXISTS "categories_name_key" ON "categories"("name");
 CREATE UNIQUE INDEX IF NOT EXISTS "categories_slug_key" ON "categories"("slug");
 CREATE UNIQUE INDEX IF NOT EXISTS "countries_name_key" ON "countries"("name");

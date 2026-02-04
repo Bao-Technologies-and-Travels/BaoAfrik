@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { getProductCountry, countries } from '../utils/countryHelpers';
 import { getCurrencyDisplaySymbol, formatPriceDisplay, formatRequestPriceRangeLabel } from '../utils/currency';
 import { UK_CITIES_PLAIN, formatCityDisplay, getCityPlain } from '../utils/ukCities';
+import { productUrlSlug } from '../utils/slug';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -960,7 +961,9 @@ const Home: React.FC = () => {
         reviewStatus: 'success' as const
       };
 
-      navigate(`/product/${productId}`, {
+      const slug = productUrlSlug({ slug: (originalProduct as any)?.slug, title: originalProduct.title });
+      window.scrollTo(0, 0);
+      navigate(`/product/${slug}`, {
         state: {
           fromMyListings: true,
           listing: productData,
@@ -969,7 +972,9 @@ const Home: React.FC = () => {
       });
     } else {
       // Navigate normally for products the user doesn't own
-      navigate(`/product/${productId}`);
+      const slug = productUrlSlug({ slug: (originalProduct as any)?.slug, title: originalProduct?.title, id: String(productId) });
+      window.scrollTo(0, 0);
+      navigate(`/product/${slug}`);
     }
   };
 
@@ -7086,7 +7091,14 @@ const Home: React.FC = () => {
                           {/* Product Cards */}
                           <div className="grid grid-cols-2 gap-3">
                             {Object.values(allProductsComputed).flat().slice(0, 6).map((product) => (
-                              <div key={product.id} onClick={(e) => handleProductClick(e, product.id)} className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer">
+                              <div
+                                key={product.id}
+                                onClick={(e) => {
+                                  handleProductClick(e, product.id);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="bg-white rounded-lg overflow-hidden transition-all duration-200 block group cursor-pointer"
+                              >
                                 {/* Product Image - Top */}
                                 <div className="aspect-square relative overflow-hidden mb-1" style={{ borderRadius: '10px' }}>
                                   <img
@@ -7221,7 +7233,8 @@ const Home: React.FC = () => {
                         {filteredProducts.map((product) => (
                           <Link
                             key={product.id}
-                            to={`/product/${product.id}`}
+                            to={`/product/${productUrlSlug({ slug: (product as any).slug, title: product.name, id: String(product.id) })}`}
+                            onClick={() => window.scrollTo(0, 0)}
                             className="bg-white rounded-lg overflow-hidden transition-all duration-200 block"
                           >
                             {/* Product Image - Top */}

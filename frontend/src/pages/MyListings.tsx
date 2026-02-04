@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getProductCountry } from '../utils/countryHelpers';
 import { formatPriceDisplay } from '../utils/currency';
+import { productUrlSlug } from '../utils/slug';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import ErrorBoundary from './ErrorBoundary';
@@ -975,7 +976,8 @@ const MyListings: React.FC = () => {
     };
 
     const handleListingNavigation = (listing: Listing) => {
-        navigate(`/product/${listing.id}`, {
+        const slug = productUrlSlug({ slug: (listing as any).slug, title: listing.title, id: listing.id });
+        navigate(`/product/${slug}`, {
             state: {
                 fromMyListings: true,
                 listing,

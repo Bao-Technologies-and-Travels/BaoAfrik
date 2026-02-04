@@ -36,7 +36,6 @@ export const UK_CITIES_WITH_COUNTRY: string[] = UK_CITIES_PLAIN.map((city) =>
 
 /**
  * Normalize a location string to plain city name (strip ", United Kingdom" or " | United Kingdom" if present).
- * Use when comparing or storing from API/UI that may include country.
  */
 export function getCityPlain(location: string): string {
   if (!location || typeof location !== 'string') return location || '';

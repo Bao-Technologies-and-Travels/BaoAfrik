@@ -2,11 +2,22 @@ import nodemailer from 'nodemailer';
 import logger from '@/config/logger';
 import { Resend } from 'resend';
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 interface EmailOptions {
   to: string;
   subject: string;
   html: string;
   text?: string;
+  from?: string;
+  replyTo?: string;
 }
 
 interface EmailTemplate {
@@ -87,12 +98,14 @@ class EmailService {
     try {
       // Use Resend if configured
       if (this.emailService === 'resend' && this.resend) {
+        const from = options.from ?? `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`;
         const result = await this.resend.emails.send({
-          from: `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`,
+          from,
           to: options.to,
           subject: options.subject,
           html: options.html,
           text: options.text,
+          ...(options.replyTo && { replyTo: options.replyTo }),
         });
 
         if (result.error) {
@@ -108,12 +121,14 @@ class EmailService {
 
       // Fallback to SMTP
       if (this.transporter) {
+        const from = options.from ?? `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`;
         const mailOptions = {
-          from: `${process.env.EMAIL_FROM_NAME || 'BaoAfrik Team'} <${process.env.EMAIL_FROM_ADDRESS}>`,
+          from,
           to: options.to,
           subject: options.subject,
           html: options.html,
           text: options.text,
+          ...(options.replyTo && { replyTo: options.replyTo }),
         };
 
         const info = await this.transporter.sendMail(mailOptions);
@@ -512,6 +527,82 @@ class EmailService {
     });
   }
 
+  /** Send contact support form to pageo.fonsah@baotechnologiesandtravels.com */
+  async sendContactSupportEmail(payload: {
+    name: string;
+    email: string;
+    phone?: string;
+    subject: string;
+    message: string;
+  }): Promise<boolean> {
+    const CONTACT_SUPPORT_TO = 'pageo.fonsah@baotechnologiesandtravels.com';
+    const { name, email, phone, subject: userSubject, message } = payload;
+    const subject = `BaoAfrik Contact Support: ${userSubject}`;
+    const replyTo = `"${name.replace(/"/g, '\\"')}" <${email}>`;
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contact Support - BaoAfrik</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { padding: 20px 0; border-bottom: 2px solid #F9A825; }
+          .content { padding: 20px 0; }
+          .field { margin-bottom: 16px; }
+          .label { font-weight: bold; color: #212121; }
+          .value { margin-top: 4px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <strong>BaoAfrik</strong> – Contact Support form submission
+          </div>
+          <div class="content">
+            <div class="field">
+              <div class="label">From (name)</div>
+              <div class="value">${escapeHtml(name)}</div>
+            </div>
+            <div class="field">
+              <div class="label">Email</div>
+              <div class="value">${escapeHtml(email)}</div>
+            </div>
+            ${phone ? `<div class="field"><div class="label">Phone</div><div class="value">${escapeHtml(phone)}</div></div>` : ''}
+            <div class="field">
+              <div class="label">Subject</div>
+              <div class="value">${escapeHtml(userSubject)}</div>
+            </div>
+            <div class="field">
+              <div class="label">Message</div>
+              <div class="value">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    const text = [
+      `BaoAfrik Contact Support`,
+      `From: ${name}`,
+      `Email: ${email}`,
+      ...(phone ? [`Phone: ${phone}`] : []),
+      `Subject: ${userSubject}`,
+      ``,
+      message,
+    ].join('\n');
+
+    return await this.sendEmail({
+      to: CONTACT_SUPPORT_TO,
+      subject,
+      html,
+      text,
+      replyTo,
+    });
+  }
+
   async testEmailConnection(): Promise<boolean> {
     try {
       if (this.emailService === 'resend') {
@@ -544,6 +635,7 @@ const emailService = new EmailService();
 export const sendVerificationEmail = emailService.sendVerificationEmail.bind(emailService);
 export const sendPasswordResetEmail = emailService.sendPasswordResetEmail.bind(emailService);
 export const sendWelcomeEmail = emailService.sendWelcomeEmail.bind(emailService);
+export const sendContactSupportEmail = emailService.sendContactSupportEmail.bind(emailService);
 export const testEmailConnection = emailService.testEmailConnection.bind(emailService);
 
 export default emailService;

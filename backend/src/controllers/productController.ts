@@ -140,7 +140,40 @@ export class ProductController {
     }
   }
 
-  // Get single product
+  // Get single product by slug (SEO-friendly, no id in URL)
+  async getProductBySlug(req: Request, res: Response) {
+    try {
+      const { slug } = req.params;
+
+      if (!slug) {
+        return res.status(400).json({
+          success: false,
+          message: 'Product slug is required'
+        });
+      }
+
+      const product = await productService.getProductBySlug(slug);
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found'
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: product
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  // Get single product by ID (legacy / internal)
   async getProduct(req: Request, res: Response) {
     try {
       const { id } = req.params;

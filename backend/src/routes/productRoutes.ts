@@ -27,6 +27,9 @@ router.get('/:id/saved', authenticateToken, productController.checkProductSaved)
 router.post('/reviews/:reviewId/helpfulness', authenticateToken, productController.voteReviewHelpfulness);
 router.get('/reviews/:reviewId/helpfulness', productController.getReviewHelpfulnessCounts);
 
+// Product by slug (must be before /:id so "slug" is not captured as id)
+router.get('/slug/:slug', productController.getProductBySlug);
+
 // Product CRUD routes - parameterized routes must come last
 router.get('/:id', productController.getProduct);
 router.post('/:id/view', productController.trackProductView);

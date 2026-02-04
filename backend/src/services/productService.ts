@@ -80,6 +80,17 @@ function toPrismaJson(images: ProductImage[]): Prisma.JsonArray {
     return images as unknown as Prisma.JsonArray;
 }
 
+function slugify(title: string): string {
+    if (!title || typeof title !== 'string') return '';
+    return title
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
 export interface ProductReviewInput {
     rating: number;
     comment?: string;
@@ -101,10 +112,18 @@ export class ProductService {
                 'home': 'Home & Decor'
             };
 
+            const baseSlug = slugify(productData.title) || 'product';
+            let slug = baseSlug;
+            let n = 1;
+            while (await prisma.product.findUnique({ where: { slug } })) {
+                slug = `${baseSlug}-${n++}`;
+            }
+
             const processedData = {
                 ...productData,
                 category: categoryMap[productData.category] || productData.category,
-                sellerId
+                sellerId,
+                slug
             };
 
             const product = await prisma.product.create({
@@ -125,6 +144,71 @@ export class ProductService {
             return product;
         } catch (error: any) {
             throw new Error(`Error creating product: ${error.message}`);
+        }
+    }
+
+    // Get product by slug (SEO-friendly URL, no id exposed). If slug looks like UUID, fall back to get by id (legacy/notifications).
+    // Resolves by exact slug first; if not found, finds by slugified title (for products with null slug) and backfills slug.
+    async getProductBySlug(slug: string): Promise<Product | null> {
+        try {
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (uuidRegex.test(slug)) {
+                return this.getProductById(slug);
+            }
+            let product = await prisma.product.findUnique({
+                where: { slug },
+                include: {
+                    seller: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            profileImage: true,
+                            rating: true,
+                            totalSales: true,
+                            isVerifiedSeller: true
+                        }
+                    },
+                    likes: true,
+                    saves: true
+                }
+            });
+
+            // Fallback: resolve by slugified title (products with null slug or legacy data)
+            if (!product) {
+                const candidates = await prisma.product.findMany({
+                    where: { status: ProductStatus.PUBLISHED, isActive: true },
+                    select: { id: true, title: true, slug: true },
+                    take: 500
+                });
+                const normalizedSlug = slug.toLowerCase().trim();
+                const match = candidates.find(
+                    (p) => p.slug === normalizedSlug || (slugify(p.title) === normalizedSlug)
+                );
+                if (match) {
+                    if (!match.slug) {
+                        let uniqueSlug = normalizedSlug;
+                        let n = 1;
+                        while (await prisma.product.findFirst({ where: { slug: uniqueSlug } })) {
+                            uniqueSlug = `${normalizedSlug}-${n++}`;
+                        }
+                        await prisma.product.update({
+                            where: { id: match.id },
+                            data: { slug: uniqueSlug }
+                        });
+                    }
+                    return this.getProductById(match.id);
+                }
+                return null;
+            }
+
+            await prisma.product.update({
+                where: { id: product.id },
+                data: { viewCount: { increment: 1 } }
+            });
+            return product;
+        } catch (error: any) {
+            throw new Error(`Error fetching product by slug: ${error.message}`);
         }
     }
 
@@ -254,9 +338,22 @@ export class ProductService {
                 throw new Error('Product not found or unauthorized');
             }
 
+            const data: any = { ...updateData };
+            if (updateData.title !== undefined) {
+                const baseSlug = slugify(updateData.title) || 'product';
+                let slug = baseSlug;
+                let n = 1;
+                let existing = await prisma.product.findFirst({ where: { slug } });
+                while (existing && existing.id !== id) {
+                    slug = `${baseSlug}-${n++}`;
+                    existing = await prisma.product.findFirst({ where: { slug } });
+                }
+                data.slug = slug;
+            }
+
             const product = await prisma.product.update({
                 where: { id },
-                data: updateData,
+                data,
                 include: {
                     seller: {
                         select: {
@@ -511,10 +608,10 @@ export class ProductService {
 
             if (isNewlyPublished) {
                 updateData.publishedAt = new Date();
-                // Set expiresAt to 7 days from now when product is published/republished
-                const expiresAt = new Date();
-                expiresAt.setDate(expiresAt.getDate() + 7);
-                updateData.expiresAt = expiresAt;
+                // expiresAt: uncomment when DB has expires_at column
+                // const expiresAt = new Date();
+                // expiresAt.setDate(expiresAt.getDate() + 7);
+                // updateData.expiresAt = expiresAt;
             }
 
             const product = await prisma.product.update({

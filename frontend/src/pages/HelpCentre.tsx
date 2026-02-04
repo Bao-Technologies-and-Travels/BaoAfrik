@@ -36,10 +36,10 @@ const faqs = [
     answer: (
       <>
         <p className="mb-3">
-          If you’re looking for something that isn’t listed yet, you can create a request. Describe what you want, and sellers can respond with offers. You can manage your requests from the Requests section, where you’ll see incoming offers and can accept, decline, or message sellers.
+          If you’re looking for something that isn’t listed yet, you can create a request. Describe what you want, and sellers can respond if they have the requested product. You can manage your requests from the Requests section, where you’ll see incoming requests and can accept, decline, or message sellers.
         </p>
         <p className="mb-3">
-          Sellers can also browse requests and reply to buyers. Once you agree on price and delivery, use messaging to finalise the details. Keep track of open and closed requests so you don’t miss offers.
+          Sellers can also browse requests and reply to buyers. Once you agree on price and delivery, use messaging to finalise the details. Keep track of open and closed requests so you don’t miss reqeusts from buyers.
         </p>
       </>
     ),
@@ -49,21 +49,17 @@ const faqs = [
     question: 'How do I message other users?',
     answer: (
       <>
-        <p className="mb-3">
-          <ul>
-            <li>You can message a seller by opening a listing and choosing “Contact seller” or “Message”.</li>
-            <li>For requests, you can message buyers who have posted requests you can fulfil.</li>
-            <li>All messages go through BaoAfrik’s messaging system so you have a record of your conversations.</li>
-          </ul>
-        </p>
-        <p className="mb-3">
-          <ul>
-            <li>Use messaging to agree on price, delivery, and how payment will be handled between you and the other user.</li>
-            <li>Be clear and respectful.</li>
-            <li>We don’t read your private messages, but we may act on reports of abuse, fraud, or rule-breaking.</li>
-            <li>Don’t share personal payment details outside the platform before you’re sure the other party is trustworthy.</li>
-          </ul>
-        </p>
+        <ul className="mb-3">
+          <li>You can message a seller by opening a listing and choosing “Contact seller” or “Message”.</li>
+          <li>For requests, you can message buyers who have posted requests you can fulfil.</li>
+          <li>All messages go through BaoAfrik’s messaging system so you have a record of your conversations.</li>
+        </ul>
+        <ul className="mb-3">
+          <li>Use messaging to agree on price, delivery, and how payment will be handled between you and the other user.</li>
+          <li>Be clear and respectful.</li>
+          <li>We don’t read your private messages, but we may act on reports of abuse, fraud, or rule-breaking.</li>
+          <li>Don’t share personal payment details outside the platform before you’re sure the other party is trustworthy.</li>
+        </ul>
       </>
     ),
   },
@@ -75,16 +71,14 @@ const faqs = [
         <p className="mb-3">
           As a user of BaoAfrik, you’re responsible for giving accurate information in your profile and listings, dealing fairly with other users, and only listing items that are allowed. You must not harass others, mislead buyers or sellers, or use the platform for anything illegal.
         </p>
-        <p className="mb-3">
-          <ul>
-            <li>We connect buyers and sellers, but we don’t verify users on the platform or guarantee transactions. You’re responsible for your own deals, including payment and delivery.</li>
-            <li>BaoAfrik does not verify listings, so sellers are responsible for compliance.</li>
-            <li>For full details, see our{' '}
-              <Link to="/community-guidelines" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Community Guidelines</Link>,{' '}
-              <Link to="/terms" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Terms of Use</Link>, and{' '}
-              <Link to="/safety-trust" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Safety & Trust</Link> pages.</li>
-          </ul>
-        </p>
+        <ul className="mb-3">
+          <li>We connect buyers and sellers, but we don’t verify users on the platform or guarantee transactions. You’re responsible for your own deals, including payment and delivery.</li>
+          <li>BaoAfrik does not verify listings, so sellers are responsible for compliance.</li>
+          <li>For full details, see our{' '}
+            <Link to="/community-guidelines" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Community Guidelines</Link>,{' '}
+            <Link to="/terms" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Terms of Use</Link>, and{' '}
+            <Link to="/safety-trust" className="font-medium underline hover:opacity-90" style={{ color: '#64B5F6' }}>Safety & Trust</Link> pages.</li>
+        </ul>
       </>
     ),
   },

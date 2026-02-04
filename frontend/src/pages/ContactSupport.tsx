@@ -1,37 +1,93 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import sendIcon from '../assets/images/admin/send.svg';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MESSAGE_MIN_LENGTH = 10;
+
+type FieldErrors = { name?: string; email?: string; subject?: string; message?: string };
+
 const ContactSupport: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const validate = useCallback((): boolean => {
+    const next: FieldErrors = {};
+    const n = name.trim();
+    const e = email.trim();
+    const s = subject.trim();
+    const m = message.trim();
+
+    if (!n) next.name = 'Name is required.';
+    if (!e) next.email = 'Email is required.';
+    else if (!EMAIL_REGEX.test(e)) next.email = 'Please enter a valid email address.';
+    if (!s) next.subject = 'Subject is required.';
+    if (!m) next.message = 'Message is required.';
+    else if (m.length < MESSAGE_MIN_LENGTH) next.message = `Message must be at least ${MESSAGE_MIN_LENGTH} characters.`;
+
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }, [name, email, subject, message]);
+
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!name.trim() || !email.trim() || !message.trim()) return;
+      setSubmitError(null);
+      if (!validate()) return;
+
+      const payload = {
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim() || undefined,
+        subject: subject.trim(),
+        message: message.trim(),
+      };
+
       setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
+      try {
+        const base = process.env.REACT_APP_API_URL || '';
+        const url = base ? `${base.replace(/\/$/, '')}/contact-support` : '/api/contact-support';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'include',
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setSubmitError(data.message || 'Something went wrong. Please try again.');
+          return;
+        }
         setShowConfirmation(true);
         setName('');
         setEmail('');
         setPhone('');
+        setSubject('');
         setMessage('');
-      }, 800);
+        setErrors({});
+      } catch {
+        setSubmitError('We could not send your message. Please try again later.');
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [name, email, message]
+    [name, email, phone, subject, message, validate]
   );
 
   const handleCloseConfirmation = useCallback(() => {
     setShowConfirmation(false);
+    setSubmitError(null);
   }, []);
 
   return (
@@ -150,100 +206,152 @@ const ContactSupport: React.FC = () => {
               >
                 Send us a message
               </h2>
+              {submitError && (
+                <div
+                  role="alert"
+                  className="mb-5 p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {submitError}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <label
-                      htmlFor="contact-name"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{ color: '#212121' }}
-                    >
-                      Name <span style={{ color: '#E55325' }}>*</span>
-                    </label>
-                    <input
-                      id="contact-name"
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="contact-email"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{ color: '#212121' }}
-                    >
-                      Email <span style={{ color: '#E55325' }}>*</span>
-                    </label>
-                    <input
-                      id="contact-email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="contact-phone"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{ color: '#212121' }}
-                    >
-                      Phone number
-                    </label>
-                    <input
-                      id="contact-phone"
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Optional"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="contact-message"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{ color: '#212121' }}
-                    >
-                      Message <span style={{ color: '#E55325' }}>*</span>
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      required
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="How can we help? Include as much detail as you can."
-                      rows={5}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200 resize-y min-h-[120px]"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3.5 px-6 rounded-xl font-medium text-white flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                    style={{
-                      background: 'linear-gradient(135deg, #E55325 0%, #F9A825 100%)',
-                      fontFamily: "'Poppins', sans-serif",
-                      boxShadow: '0 4px 14px rgba(229, 83, 37, 0.35)',
-                    }}
+                <div>
+                  <label
+                    htmlFor="contact-name"
+                    className="block text-sm font-medium mb-1.5"
+                    style={{ color: '#212121' }}
                   >
-                    <img src={sendIcon} alt="" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} aria-hidden />
-                    {isSubmitting ? 'Sending…' : 'Send message'}
-                  </button>
-                </form>
-              </div>
+                    Name <span style={{ color: '#E55325' }}>*</span>
+                  </label>
+                  <input
+                    id="contact-name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => { setName(e.target.value); setErrors((prev) => ({ ...prev, name: undefined })); }}
+                    placeholder="Your name"
+                    className={`w-full px-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200 ${errors.name ? 'border-red-400' : 'border-gray-200'}`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? 'contact-name-error' : undefined}
+                  />
+                  {errors.name && (
+                    <p id="contact-name-error" className="mt-1.5 text-sm text-red-600" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {errors.name}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="contact-email"
+                    className="block text-sm font-medium mb-1.5"
+                    style={{ color: '#212121' }}
+                  >
+                    Email <span style={{ color: '#E55325' }}>*</span>
+                  </label>
+                  <input
+                    id="contact-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setErrors((prev) => ({ ...prev, email: undefined })); }}
+                    placeholder="name@example.com"
+                    className={`w-full px-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200 ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? 'contact-email-error' : undefined}
+                  />
+                  {errors.email && (
+                    <p id="contact-email-error" className="mt-1.5 text-sm text-red-600" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="contact-phone"
+                    className="block text-sm font-medium mb-1.5"
+                    style={{ color: '#212121' }}
+                  >
+                    Phone number
+                  </label>
+                  <input
+                    id="contact-phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Optional"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="contact-subject"
+                    className="block text-sm font-medium mb-1.5"
+                    style={{ color: '#212121' }}
+                  >
+                    Subject <span style={{ color: '#E55325' }}>*</span>
+                  </label>
+                  <input
+                    id="contact-subject"
+                    type="text"
+                    value={subject}
+                    onChange={(e) => { setSubject(e.target.value); setErrors((prev) => ({ ...prev, subject: undefined })); }}
+                    placeholder="Brief subject for your message"
+                    className={`w-full px-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200 ${errors.subject ? 'border-red-400' : 'border-gray-200'}`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    aria-invalid={!!errors.subject}
+                    aria-describedby={errors.subject ? 'contact-subject-error' : undefined}
+                  />
+                  {errors.subject && (
+                    <p id="contact-subject-error" className="mt-1.5 text-sm text-red-600" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {errors.subject}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="contact-message"
+                    className="block text-sm font-medium mb-1.5"
+                    style={{ color: '#212121' }}
+                  >
+                    Message <span style={{ color: '#E55325' }}>*</span>
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    value={message}
+                    onChange={(e) => { setMessage(e.target.value); setErrors((prev) => ({ ...prev, message: undefined })); }}
+                    placeholder="How can we help? Include as much detail as you can."
+                    rows={5}
+                    className={`w-full px-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E55325]/30 focus:border-[#E55325] transition-all duration-200 resize-y min-h-[120px] ${errors.message ? 'border-red-400' : 'border-gray-200'}`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    aria-invalid={!!errors.message}
+                    aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                  />
+                  {errors.message && (
+                    <p id="contact-message-error" className="mt-1.5 text-sm text-red-600" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {errors.message}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 px-6 rounded-xl font-medium text-white flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    background: 'linear-gradient(135deg, #E55325 0%, #F9A825 100%)',
+                    fontFamily: "'Poppins', sans-serif",
+                    boxShadow: '0 4px 14px rgba(229, 83, 37, 0.35)',
+                  }}
+                >
+                  <img src={sendIcon} alt="" className="w-5 h-5" style={{ filter: 'brightness(0) invert(1)' }} aria-hidden />
+                  {isSubmitting ? 'Sending…' : 'Send message'}
+                </button>
+              </form>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
       {/* Confirmation popup */}
       {showConfirmation && (
