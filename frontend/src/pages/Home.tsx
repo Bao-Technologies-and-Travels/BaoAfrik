@@ -243,8 +243,8 @@ const Home: React.FC = () => {
   const [hoveredCategoryOption, setHoveredCategoryOption] = useState<string | null>(null);
   const [hoveredOriginOption, setHoveredOriginOption] = useState<string | null>(null);
 
-  const filterDropdownRef = React.useRef<HTMLDivElement>(null);
-  const priceDropdownRef = React.useRef<HTMLDivElement>(null);
+  const filterDropdownRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
+  const priceDropdownRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
   const locationDropdownRef = React.useRef<HTMLDivElement>(null);
   const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
   const [openPriceDropdown, setOpenPriceDropdown] = useState<string | null>(null);
@@ -999,19 +999,6 @@ const Home: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
-        setOpenFilterDropdown(null);
-      }
-      if (priceDropdownRef.current && !priceDropdownRef.current.contains(event.target as Node)) {
-        setOpenPriceDropdown(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   // Function to update cookie preferences on backend
   const updateCookiePreferences = async (preferences: string) => {
     if (!user) {
@@ -1130,7 +1117,7 @@ const Home: React.FC = () => {
     }
   }, [navigationLocation.state, isMobile]);
 
-  // Handle click outside for filter dropdowns
+  // Handle click outside and Escape for filter dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -1150,10 +1137,28 @@ const Home: React.FC = () => {
         setMobileCountryPickerOpen(false);
         setMobileCountryPickerPosition(null);
       }
+      if (openFilterDropdown !== null) {
+        const ref = filterDropdownRefs.current[openFilterDropdown];
+        if (!ref?.contains(target)) setOpenFilterDropdown(null);
+      }
+      if (openPriceDropdown !== null) {
+        const ref = priceDropdownRefs.current[openPriceDropdown];
+        if (!ref?.contains(target)) setOpenPriceDropdown(null);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpenFilterDropdown(null);
+        setOpenPriceDropdown(null);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openFilterDropdown, openPriceDropdown, mobileCountryPickerOpen]);
 
   // Render price filter button with dropdown
   const renderPriceFilterButton = (position: 'relative' | 'absolute' = 'relative', sectionId: string = 'default') => {
@@ -1164,7 +1169,7 @@ const Home: React.FC = () => {
     const selectedPriceOption = priceOptions.find(opt => opt.value === currentPrice);
 
     return (
-      <div ref={sectionId === 'default' ? priceDropdownRef : null} style={{ position, zIndex: 20 }}>
+      <div ref={(el) => { priceDropdownRefs.current[sectionId] = el; }} style={{ position, zIndex: 20 }}>
         {currentPrice ? (
           // Selected price pill
           <div
@@ -1281,7 +1286,7 @@ const Home: React.FC = () => {
     const isOpen = openFilterDropdown === sectionId;
 
     return (
-      <div ref={sectionId === 'default' ? filterDropdownRef : null} style={{ position, zIndex: 20 }}>
+      <div ref={(el) => { filterDropdownRefs.current[sectionId] = el; }} style={{ position, zIndex: 20 }}>
         {currentCountry ? (
           // Selected country pill
           <div

@@ -563,20 +563,20 @@ class EmailService {
           </div>
           <div class="content">
             <div class="field">
-              <div class="label">From (name)</div>
+              <div class="label">From: </div>
               <div class="value">${escapeHtml(name)}</div>
             </div>
             <div class="field">
-              <div class="label">Email</div>
+              <div class="label">Email: </div>
               <div class="value">${escapeHtml(email)}</div>
             </div>
-            ${phone ? `<div class="field"><div class="label">Phone</div><div class="value">${escapeHtml(phone)}</div></div>` : ''}
+            ${phone ? `<div class="field"><div class="label">Phone Number: </div><div class="value">${escapeHtml(phone)}</div></div>` : ''}
             <div class="field">
-              <div class="label">Subject</div>
+              <div class="label">Subject: </div>
               <div class="value">${escapeHtml(userSubject)}</div>
             </div>
             <div class="field">
-              <div class="label">Message</div>
+              <div class="label">Message: </div>
               <div class="value">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
             </div>
           </div>
