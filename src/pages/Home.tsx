@@ -53,6 +53,11 @@ import SDicon from '../assets/images/pre/SDicon.svg';
 import searchNormalIcon from '../assets/images/pre/search-normal.svg';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 
+// Import admin icons for request modal
+import infoIcon from '../assets/images/admin/info.svg';
+import calenderIcon from '../assets/images/admin/calender.svg';
+import newlocIcon from '../assets/images/admin/newloc.svg';
+
 
 const Home: React.FC = () => {
   const { user, isVisitor } = useAuth();
@@ -175,6 +180,19 @@ const Home: React.FC = () => {
   const [requestDescription, setRequestDescription] = useState('');
   const [requestPriceRange, setRequestPriceRange] = useState('');
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [requestStep, setRequestStep] = useState(1);
+  const [requestCategory, setRequestCategory] = useState('');
+  const [requestQuantity, setRequestQuantity] = useState('');
+  const [requestQuantityUnit, setRequestQuantityUnit] = useState('KG');
+  const [requestEndDate, setRequestEndDate] = useState('');
+  const [requestLocation, setRequestLocation] = useState('London, United Kingdom');
+  const [requestImages, setRequestImages] = useState<File[]>([]);
+  const [isRequestCategoryDropdownOpen, setIsRequestCategoryDropdownOpen] = useState(false);
+  const [isRequestQuantityUnitDropdownOpen, setIsRequestQuantityUnitDropdownOpen] = useState(false);
+  const [focusedRequestField, setFocusedRequestField] = useState<string | null>(null);
+  const requestCategoryDropdownRef = React.useRef<HTMLDivElement>(null);
+  const requestQuantityUnitDropdownRef = React.useRef<HTMLDivElement>(null);
+  const requestEndDateRef = React.useRef<HTMLInputElement>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showChangeLocationModal, setShowChangeLocationModal] = useState(false);
   const [changeLocationQuery, setChangeLocationQuery] = useState('');
@@ -592,6 +610,12 @@ const Home: React.FC = () => {
       }
       if (requestProductOriginDropdownRef.current && !requestProductOriginDropdownRef.current.contains(target)) {
         setIsRequestProductOriginDropdownOpen(false);
+      }
+      if (requestQuantityUnitDropdownRef.current && !requestQuantityUnitDropdownRef.current.contains(target)) {
+        setIsRequestQuantityUnitDropdownOpen(false);
+      }
+      if (requestCategoryDropdownRef.current && !requestCategoryDropdownRef.current.contains(target)) {
+        setIsRequestCategoryDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -4992,7 +5016,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       ) : showRequestModal && !isMobile ? (
-        // Desktop/Tablet: Modal Overlay
+        // Desktop/Tablet: Modal Overlay - Redesigned
         <div 
           style={{
             position: 'fixed',
@@ -5006,247 +5030,763 @@ const Home: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'center'
           }}
-          onClick={() => setShowRequestModal(false)}
+          onClick={() => {
+            setShowRequestModal(false);
+            setRequestStep(1);
+          }}
         >
           {/* Request Modal */}
           <div 
+            className="request-modal-container"
             style={{
-              width: '580px',
-              height: 'auto',
-              maxHeight: '90vh',
+              width: '560px',
+              maxHeight: '88vh',
               flexShrink: 0,
-              borderRadius: '30px',
-              background: '#FFF',
-              padding: '24px 32px',
+              borderRadius: '24px',
+              background: '#FFFFFF',
               position: 'relative',
               fontFamily: 'Poppins, sans-serif',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            <style>{`
+              .request-modal-container::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
             {/* Header */}
-            <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '600' }}>
-                Do a request
-              </h2>
-              <button 
-                onClick={() => setShowRequestModal(false)}
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  color: '#212121',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Product Name Input */}
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
-                Product name
-              </label>
-              <input 
-                type="text"
-                value={requestProductName}
-                onChange={(e) => setRequestProductName(e.target.value)}
-                placeholder="Enter product name"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  border: '1px solid #E4E4E4',
-                  fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif',
-                  outline: 'none'
-                }}
-              />
-            </div>
-
-            {/* Product Origin Input */}
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
-                Product Origin
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="text"
-                  value={requestProductOrigin}
-                  onChange={(e) => setRequestProductOrigin(e.target.value)}
-                  placeholder="Choose a location"
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #E4E4E4',
-                    fontSize: '12px',
-                    fontFamily: 'Poppins, sans-serif',
-                    outline: 'none',
-                    color: requestProductOrigin ? '#212121' : '#D9D9D9'
-                  }}
-                />
-                <svg 
-                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px' }}
-                  fill="none" 
-                  stroke="#6A6A6A" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Description Input */}
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
-                Description
-              </label>
-              <textarea 
-                value={requestDescription}
-                onChange={(e) => setRequestDescription(e.target.value)}
-                placeholder="Add an description"
-                rows={3}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  border: '1px solid #E4E4E4',
-                  fontSize: '11px',
-                  fontFamily: 'Poppins, sans-serif',
-                  outline: 'none',
-                  resize: 'none',
-                  color: requestDescription ? '#212121' : '#D9D9D9'
-                }}
-              />
-            </div>
-
-            {/* Location Section */}
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '-4px' }}>
-                Your location
-              </label>
-              <div className="flex items-center justify-between">
-                <span style={{ fontSize: '12px', color: '#64B5F6' }}>
-                  London, United Kingdom
-                </span>
+            <div style={{ padding: '20px 24px 0 24px' }}>
+              <div className="flex items-center justify-between" style={{ marginBottom: '14px' }}>
+                <h2 style={{ fontSize: '16px', color: '#212121', fontWeight: '600', fontFamily: 'Bricolage Grotesque, sans-serif', margin: 0 }}>
+                  Post a request
+                </h2>
                 <button 
+                  onClick={() => {
+                    setShowRequestModal(false);
+                    setRequestStep(1);
+                  }}
                   style={{
-                    padding: '6px 12px',
-                    borderRadius: '8px',
-                    backgroundColor: '#F0F8FE',
-                    color: '#64B5F6',
+                    width: '20px',
+                    height: '20px',
+                    color: '#212121',
+                    background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '12px',
-                    fontFamily: 'Poppins, sans-serif'
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0
                   }}
                 >
-                  Change location
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
                 </button>
               </div>
+
+              {/* Progress Indicator Bar */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    color: requestStep === 1 ? '#212121' : '#919191', 
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: requestStep === 1 ? 500 : 400
+                  }}>
+                    {requestStep === 1 ? 'Informations' : 'Information'}
+                  </span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#919191" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    color: requestStep === 2 ? '#212121' : '#919191', 
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: requestStep === 2 ? 500 : 400
+                  }}>
+                    Images
+                  </span>
+                </div>
+                
+                {/* Circular Progress Indicator - Blue only when fields filled */}
+                {(() => {
+                  const step1Complete = requestProductName.trim() !== '' && requestProductOrigin !== '';
+                  const progressValue = step1Complete ? (requestStep === 2 ? 2 : 1) : 0;
+                  return (
+                    <div style={{ position: 'relative', width: '40px', height: '40px' }}>
+                      <svg width="40" height="40" viewBox="0 0 40 40">
+                        {/* Background circle */}
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="17"
+                          fill="none"
+                          stroke="#E9E9E9"
+                          strokeWidth="3"
+                        />
+                        {/* Progress circle - only shows when fields are filled */}
+                        {progressValue > 0 && (
+                          <circle
+                            cx="20"
+                            cy="20"
+                            r="17"
+                            fill="none"
+                            stroke="#64B5F6"
+                            strokeWidth="3"
+                            strokeDasharray={`${(progressValue / 2) * 106.8} 106.8`}
+                            strokeLinecap="round"
+                            transform="rotate(-90 20 20)"
+                          />
+                        )}
+                      </svg>
+                      <span style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        fontSize: '10px',
+                        color: '#919191',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        {requestStep}/2
+                      </span>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Description */}
+              <p style={{ fontSize: '11px', color: '#919191', margin: '-6px 0 10px 0', fontFamily: 'Poppins, sans-serif' }}>
+                {requestStep === 1 ? 'Please fill out the information form for your request.' : 'Add images of what you need for easy identification.'}
+              </p>
+              
+              {/* Divider below description */}
+              <div style={{ height: '1px', backgroundColor: '#F1F1F1', width: 'calc(100% + 48px)', marginLeft: '-24px' }} />
             </div>
 
-            {/* Price Range Section */}
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '14px', color: '#212121', marginBottom: '10px', fontWeight: '500' }}>
-                How much would you like to pay for the product?
-              </h3>
-              <div className="flex gap-2" style={{ marginBottom: '8px', flexWrap: 'wrap' }}>
-                {['Less than 10 USD', '10 - 50 USD', '50 - 100 USD', '100 - 200 USD'].map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setRequestPriceRange(range)}
+            {/* Step 1: Information Form */}
+            {requestStep === 1 && (
+              <div style={{ padding: '14px 24px 18px 24px', flex: 1 }}>
+                <style>{`
+                  .request-modal-input::placeholder, .request-modal-textarea::placeholder {
+                    color: #E4E4E4 !important;
+                  }
+                  .request-dropdown-scroll::-webkit-scrollbar {
+                    display: none;
+                  }
+                  .request-dropdown-scroll {
+                    scrollbar-width: none;
+                    -ms-overflow-style: none;
+                  }
+                  .request-date-input::-webkit-calendar-picker-indicator {
+                    display: none;
+                    -webkit-appearance: none;
+                  }
+                  .request-date-input::-webkit-inner-spin-button,
+                  .request-date-input::-webkit-clear-button {
+                    display: none;
+                  }
+                `}</style>
+
+                {/* Product Name Input - Full Width */}
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    Product name
+                  </label>
+                  <input 
+                    type="text"
+                    className="request-modal-input"
+                    value={requestProductName}
+                    onChange={(e) => setRequestProductName(e.target.value)}
+                    onFocus={() => setFocusedRequestField('productName')}
+                    onBlur={() => setFocusedRequestField(null)}
+                    placeholder="Enter the product name"
                     style={{
-                      width: '110px',
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#E4E4E4'}`,
-                      backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
-                      color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
-                      cursor: 'pointer',
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '12px',
+                      border: `1px solid ${focusedRequestField === 'productName' ? '#97CDF9' : '#E4E4E4'}`,
                       fontSize: '12px',
                       fontFamily: 'Poppins, sans-serif',
-                      textAlign: 'center',
-                      whiteSpace: 'nowrap'
+                      outline: 'none',
+                      backgroundColor: '#FFFFFF',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
+                    }}
+                  />
+                </div>
+
+                {/* Product Origin + Categories - Side by Side */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                  {/* Product Origin */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      Product Origin
+                    </label>
+                    <div style={{ position: 'relative' }} ref={requestProductOriginDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsRequestProductOriginDropdownOpen(!isRequestProductOriginDropdownOpen)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          border: `1px solid ${isRequestProductOriginDropdownOpen ? '#97CDF9' : '#E4E4E4'}`,
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'border-color 0.2s'
+                        }}
+                      >
+                        {requestProductOrigin ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <img 
+                              src={africanCountries.find(c => c.name === requestProductOrigin)?.flag} 
+                              alt={requestProductOrigin} 
+                              style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} 
+                            />
+                            <span style={{ color: '#212121' }}>{requestProductOrigin}</span>
+                          </div>
+                        ) : (
+                          <span style={{ color: '#E4E4E4' }}>Select the product's origin</span>
+                        )}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {isRequestProductOriginDropdownOpen && (
+                        <div 
+                          className="request-dropdown-scroll"
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            marginTop: '4px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #E4E4E4',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                            zIndex: 100,
+                            maxHeight: '180px',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {africanCountries.map((country) => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setRequestProductOrigin(country.name);
+                                setIsRequestProductOriginDropdownOpen(false);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                backgroundColor: requestProductOrigin === country.name ? '#F0F8FE' : 'transparent',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                color: requestProductOrigin === country.name ? '#64B5F6' : '#212121',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              <img src={country.flag} alt={country.name} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
+                              {country.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Categories */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      Categories <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                    </label>
+                    <div style={{ position: 'relative' }} ref={requestCategoryDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsRequestCategoryDropdownOpen(!isRequestCategoryDropdownOpen)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          border: `1px solid ${isRequestCategoryDropdownOpen ? '#97CDF9' : '#E4E4E4'}`,
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'border-color 0.2s'
+                        }}
+                      >
+                        <span style={{ color: requestCategory ? '#212121' : '#E4E4E4' }}>
+                          {requestCategory || 'Select the product category'}
+                        </span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {isRequestCategoryDropdownOpen && (
+                        <div 
+                          className="request-dropdown-scroll"
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            marginTop: '4px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #E4E4E4',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                            zIndex: 100,
+                            maxHeight: '180px',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {['Food & Spices', 'Fashion & Clothing', 'Beauty & Skincare', 'Home & Decor', 'Art & Crafts', 'Health & Wellness', 'Electronics', 'Other'].map((cat) => (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => {
+                                setRequestCategory(cat);
+                                setIsRequestCategoryDropdownOpen(false);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                backgroundColor: requestCategory === cat ? '#F0F8FE' : 'transparent',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                color: requestCategory === cat ? '#64B5F6' : '#212121',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quantity + End Date - Side by Side */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                  {/* Quantity */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      Quantity <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                    </label>
+                    <div style={{ 
+                      display: 'flex', 
+                      border: `1px solid ${isRequestQuantityUnitDropdownOpen || focusedRequestField === 'quantity' ? '#97CDF9' : '#E4E4E4'}`, 
+                      borderRadius: '12px', 
+                      transition: 'border-color 0.2s',
+                      position: 'relative'
+                    }}>
+                      {/* Unit Dropdown */}
+                      <div style={{ position: 'relative' }} ref={requestQuantityUnitDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsRequestQuantityUnitDropdownOpen(!isRequestQuantityUnitDropdownOpen);
+                          }}
+                          style={{
+                            padding: '10px 8px',
+                            border: 'none',
+                            borderRight: '1px solid #E4E4E4',
+                            backgroundColor: '#FFFFFF',
+                            borderTopLeftRadius: '12px',
+                            borderBottomLeftRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            color: '#919191',
+                            fontFamily: 'Poppins, sans-serif',
+                            minWidth: '55px'
+                          }}
+                        >
+                          {requestQuantityUnit}
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {isRequestQuantityUnitDropdownOpen && (
+                          <div 
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              position: 'absolute',
+                              top: 'calc(100% + 4px)',
+                              left: '-1px',
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '12px',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              zIndex: 9999,
+                              minWidth: '145px',
+                              padding: '4px'
+                            }}
+                          >
+                            {[
+                              { label: 'Kilogram · KG', value: 'KG' },
+                              { label: 'Liter · L', value: 'L' },
+                              { label: 'Pack · PK', value: 'PK' }
+                            ].map((unit) => (
+                              <button
+                                key={unit.value}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRequestQuantityUnit(unit.value);
+                                  setIsRequestQuantityUnitDropdownOpen(false);
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  border: 'none',
+                                  backgroundColor: requestQuantityUnit === unit.value ? '#F0F8FE' : 'transparent',
+                                  borderRadius: '8px',
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  fontSize: '11px',
+                                  color: requestQuantityUnit === unit.value ? '#64B5F6' : '#919191',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '1px'
+                                }}
+                              >
+                                {unit.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {/* Quantity Input */}
+                      <input
+                        type="text"
+                        className="request-modal-input"
+                        value={requestQuantity}
+                        onChange={(e) => setRequestQuantity(e.target.value)}
+                        onFocus={() => setFocusedRequestField('quantity')}
+                        onBlur={() => setFocusedRequestField(null)}
+                        placeholder="Ex : 1"
+                        style={{
+                          flex: 1,
+                          padding: '10px 12px',
+                          border: 'none',
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          borderTopRightRadius: '12px',
+                          borderBottomRightRadius: '12px'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* End Date */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      End date of the request <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                      <img src={infoIcon} alt="Info" style={{ width: '10px', height: '10px', opacity: 0.6 }} />
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        ref={requestEndDateRef}
+                        type="date"
+                        className="request-modal-input request-date-input"
+                        value={requestEndDate}
+                        onChange={(e) => setRequestEndDate(e.target.value)}
+                        onFocus={() => setFocusedRequestField('endDate')}
+                        onBlur={() => setFocusedRequestField(null)}
+                        min={new Date().toISOString().split('T')[0]}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          paddingLeft: '36px',
+                          borderRadius: '12px',
+                          border: `1px solid ${focusedRequestField === 'endDate' ? '#97CDF9' : '#E4E4E4'}`,
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          boxSizing: 'border-box',
+                          transition: 'border-color 0.2s',
+                          color: requestEndDate ? '#212121' : '#E4E4E4'
+                        }}
+                      />
+                      <img 
+                        src={calenderIcon} 
+                        alt="Calendar" 
+                        onClick={() => requestEndDateRef.current?.showPicker()}
+                        style={{ 
+                          position: 'absolute', 
+                          left: '12px', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)', 
+                          width: '14px', 
+                          height: '14px',
+                          opacity: 0.4,
+                          cursor: 'pointer'
+                        }} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    Description <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                  </label>
+                  <textarea 
+                    className="request-modal-textarea"
+                    value={requestDescription}
+                    onChange={(e) => setRequestDescription(e.target.value)}
+                    onFocus={() => setFocusedRequestField('description')}
+                    onBlur={() => setFocusedRequestField(null)}
+                    placeholder="Enter description for the product"
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '12px',
+                      border: `1px solid ${focusedRequestField === 'description' ? '#97CDF9' : '#E4E4E4'}`,
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      outline: 'none',
+                      resize: 'none',
+                      backgroundColor: '#FFFFFF',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
+                    }}
+                  />
+                </div>
+
+                {/* Your Location */}
+                <div style={{ marginBottom: '14px' }}>
+                  <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    Your location
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <LocationAutocomplete
+                      value={requestLocation}
+                      onChange={(val) => setRequestLocation(val)}
+                      onSelect={(val) => setRequestLocation(val)}
+                      placeholder="Type area or city"
+                      showLabel={false}
+                      inputStyle={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        paddingLeft: '36px',
+                        borderRadius: '12px',
+                        border: `1px solid ${focusedRequestField === 'location' ? '#97CDF9' : '#E4E4E4'}`,
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif',
+                        outline: 'none',
+                        backgroundColor: '#FFFFFF',
+                        boxSizing: 'border-box',
+                        transition: 'border-color 0.2s',
+                        color: '#939393'
+                      }}
+                    />
+                    <img 
+                      src={newlocIcon} 
+                      alt="Location" 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '12px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        width: '14px', 
+                        height: '14px', 
+                        opacity: 0.6,
+                        pointerEvents: 'none',
+                        zIndex: 1
+                      }} 
+                    />
+                  </div>
+                </div>
+
+                {/* Price Range Section */}
+                <div style={{ marginBottom: '18px' }}>
+                  <h3 style={{ fontSize: '12px', color: '#212121', marginBottom: '10px', fontWeight: 500, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    How much would you like to pay for the product ?
+                  </h3>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {['Less than 10 USD', '10 ~ 50 USD', '50 ~ 100 USD', '100 ~ 200 USD', 'More than 200 USD'].map((range) => (
+                      <button
+                        key={range}
+                        onClick={() => setRequestPriceRange(range)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '50px',
+                          border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#F1F1F1'}`,
+                          backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFFFFF',
+                          color: requestPriceRange === range ? '#64B5F6' : '#919191',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {range}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bottom Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
+                  {/* Save as Draft */}
+                  <button
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #E4E4E4',
+                      backgroundColor: '#FFFFFF',
+                      color: '#939393',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    {range}
+                    Save as draft
                   </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setRequestPriceRange('More than 200 USD')}
-                style={{
-                  width: '228px',
-                  padding: '8px 10px',
-                  borderRadius: '8px',
-                  border: `1px solid ${requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#E4E4E4'}`,
-                  backgroundColor: requestPriceRange === 'More than 200 USD' ? '#F0F8FE' : '#FFF',
-                  color: requestPriceRange === 'More than 200 USD' ? '#64B5F6' : '#6A6A6A',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontFamily: 'Poppins, sans-serif',
-                  textAlign: 'center'
-                }}
-              >
-                More than 200 USD
-              </button>
-            </div>
 
-            {/* Create Request Button */}
-            <button
-              style={{
-                display: 'flex',
-                width: '480px',
-                height: '40px',
-                padding: '10px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '10px',
-                flexShrink: 0,
-                borderRadius: '8px',
-                backgroundColor: '#F9A825',
-                color: '#FFF',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontFamily: 'Poppins, sans-serif',
-                fontWeight: '400',
-                margin: '0 auto'
-              }}
-              onClick={async () => {
-                // Validate form
-                if (!requestProductName || !requestProductOrigin || !requestDescription || !requestPriceRange) {
-                  alert('Please fill all fields');
-                  return;
-                }
+                  {/* Cancel + Next */}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => {
+                        setShowRequestModal(false);
+                        setRequestStep(1);
+                      }}
+                      style={{
+                        padding: '8px 20px',
+                        borderRadius: '8px',
+                        border: '1px solid #E4E4E4',
+                        backgroundColor: '#FFFFFF',
+                        color: '#939393',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => setRequestStep(2)}
+                      style={{
+                        padding: '8px 24px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: '#DFDEDE',
+                        color: '#FFFFFF',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Images - Placeholder for now */}
+            {requestStep === 2 && (
+              <div style={{ padding: '20px 28px 24px 28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <p style={{ color: '#919191', fontSize: '13px', textAlign: 'center', marginTop: '40px' }}>
+                  Image upload section coming next...
+                </p>
                 
-                setIsSubmittingRequest(true);
-                
-                // Simulate API call with loading state
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                setIsSubmittingRequest(false);
-                setShowRequestModal(false);
-                setShowConfirmationModal(true);
-                
-                // Reset form
-                setRequestProductName('');
-                setRequestProductOrigin('');
-                setRequestDescription('');
-                setRequestPriceRange('');
-              }}
-              disabled={isSubmittingRequest}
-            >
-              {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
-            </button>
+                {/* Bottom Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: '24px', gap: '10px' }}>
+                  <button
+                    onClick={() => setRequestStep(1)}
+                    style={{
+                      padding: '10px 24px',
+                      borderRadius: '12px',
+                      border: '1px solid #E4E4E4',
+                      backgroundColor: '#FFFFFF',
+                      color: '#939393',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!requestProductName || !requestProductOrigin) {
+                        alert('Please fill required fields');
+                        return;
+                      }
+                      
+                      setIsSubmittingRequest(true);
+                      await new Promise(resolve => setTimeout(resolve, 2000));
+                      
+                      setIsSubmittingRequest(false);
+                      setShowRequestModal(false);
+                      setRequestStep(1);
+                      setShowConfirmationModal(true);
+                      
+                      // Reset form
+                      setRequestProductName('');
+                      setRequestProductOrigin('');
+                      setRequestCategory('');
+                      setRequestQuantity('');
+                      setRequestEndDate('');
+                      setRequestDescription('');
+                      setRequestPriceRange('');
+                      setRequestImages([]);
+                    }}
+                    disabled={isSubmittingRequest}
+                    style={{
+                      padding: '10px 28px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      backgroundColor: '#F9A825',
+                      color: '#FFFFFF',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    {isSubmittingRequest ? 'Submitting...' : 'Post a request'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : null}
