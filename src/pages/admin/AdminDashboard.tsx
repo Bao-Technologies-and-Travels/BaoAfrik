@@ -2335,7 +2335,7 @@ const AdminDashboard: React.FC = () => {
                             onSelect={handleCategorySelect}
                           />
                         ))}
-            </div>
+                      </div>
                     </div>
                   )}
 
