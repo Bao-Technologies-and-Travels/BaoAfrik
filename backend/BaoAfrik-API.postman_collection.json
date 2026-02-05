@@ -26,12 +26,7 @@
           "name": "Register User",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\",\n  \"confirmPassword\": \"TestPassword123!\"\n}"
@@ -56,6 +51,9 @@
                   "    if (response.data && response.data.accessToken) {",
                   "        pm.environment.set('accessToken', response.data.accessToken);",
                   "        pm.environment.set('refreshToken', response.data.refreshToken);",
+                  "        if (response.data.user && response.data.user.id) {",
+                  "            pm.environment.set('userId', response.data.user.id);",
+                  "        }",
                   "    }",
                   "}"
                 ],
@@ -65,12 +63,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\"\n}"
@@ -87,12 +80,7 @@
           "name": "Get User Profile",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
             "url": {
               "raw": "{{baseUrl}}/api/auth/me",
               "host": ["{{baseUrl}}"],
@@ -105,12 +93,7 @@
           "name": "Verify Email",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"test@example.com\",\n  \"verificationCode\": \"123456\"\n}"
@@ -127,12 +110,7 @@
           "name": "Resend Verification",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"test@example.com\"\n}"
@@ -149,12 +127,7 @@
           "name": "Forgot Password",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"test@example.com\"\n}"
@@ -168,15 +141,27 @@
           "response": []
         },
         {
+          "name": "Verify Reset Code",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"verificationCode\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-reset-code",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "verify-reset-code"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Reset Password",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"token\": \"reset-token-here\",\n  \"newPassword\": \"NewPassword123!\",\n  \"confirmPassword\": \"NewPassword123!\"\n}"
@@ -190,15 +175,27 @@
           "response": []
         },
         {
+          "name": "Verify Login OTP",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify-login-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "verify-login-otp"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Refresh Token",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
@@ -215,16 +212,1013 @@
           "name": "Logout",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
             "url": {
               "raw": "{{baseUrl}}/api/auth/logout",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"TestPassword123!\",\n  \"newPassword\": \"NewPassword456!\",\n  \"confirmPassword\": \"NewPassword456!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/delete-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "delete-user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cookie Preferences",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/cookie-preferences",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "cookie-preferences"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cookie Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"essential\": true,\n  \"analytics\": false,\n  \"marketing\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/cookie-preferences",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "cookie-preferences"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Get Conversations",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Conversations",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/product/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "product", "{{productId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Conversation Details",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Conversation Messages",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}", "messages"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participantId\": \"{{userId}}\",\n  \"productId\": null,\n  \"initialMessage\": \"Hello!\",\n  \"productData\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello, is this item still available?\",\n  \"messageType\": \"text\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}", "messages"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Chat Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"image.jpg\",\n  \"fileType\": \"image/jpeg\",\n  \"fileSize\": 102400\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/upload-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "upload-url"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Conversation as Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"messageIds\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}", "read"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Counts",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/unread-counts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "unread-counts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contact Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"initialMessage\": \"Hi, I'm interested in this product\",\n  \"productData\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/contact-seller",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "contact-seller"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contact Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{requestId}}\",\n  \"message\": \"I have this product available\",\n  \"productData\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/contact-request",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "contact-request"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Message Reaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reaction\": \"thumbsup\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/messages/{{messageId}}/reactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "messages", "{{messageId}}", "reactions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Message Reaction",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/messages/{{messageId}}/reactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "messages", "{{messageId}}", "reactions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Message Metadata",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isPinned\": false,\n  \"isArchived\": false,\n  \"isImportant\": false,\n  \"label\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/messages/{{messageId}}/metadata",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "messages", "{{messageId}}", "metadata"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Message Metadata",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/messages/{{messageId}}/metadata",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "messages", "{{messageId}}", "metadata"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Conversation Metadata",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isPinned\": false,\n  \"isArchived\": false,\n  \"isMuted\": false,\n  \"label\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/metadata",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}", "metadata"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Conversation Metadata",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/metadata",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}", "metadata"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Conversation",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "{{conversationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Archived Count",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/conversations/archived/count",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat", "conversations", "archived", "count"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"\",\n  \"category\": \"\",\n  \"minPrice\": null,\n  \"maxPrice\": null,\n  \"origin\": \"\",\n  \"page\": 1,\n  \"limit\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "search"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Product Name\",\n  \"description\": \"Product description\",\n  \"price\": 29.99,\n  \"currency\": \"GBP\",\n  \"quantity\": 10,\n  \"category\": \"fashion\",\n  \"origin\": \"Cameroon\",\n  \"location\": \"London\",\n  \"deliveryAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Products",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/my-products?status=ALL",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "my-products"],
+              "query": [{"key": "status", "value": "ALL"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Products (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "user", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/slug/my-product-slug",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "slug", "my-product-slug"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Track Product View",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/view",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "view"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Product Name\",\n  \"description\": \"Updated description\",\n  \"price\": 39.99,\n  \"currency\": \"GBP\",\n  \"quantity\": 5,\n  \"category\": \"fashion\",\n  \"origin\": \"Cameroon\",\n  \"location\": \"London\",\n  \"deliveryAvailable\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upsert Product Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Great product!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/user/{{userId}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "user", "{{userId}}", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Seller Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/user/{{userId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "user", "{{userId}}", "reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excellent seller!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/user/{{userId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "user", "{{userId}}", "reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Saved Products",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/saved",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "saved"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Save Product",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/save",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "save"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Product Saved",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/saved",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "saved"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vote Review Helpfulness",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"helpful\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/reviews/{{reviewId}}/helpfulness",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "reviews", "{{reviewId}}", "helpfulness"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Review Helpfulness Counts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/reviews/{{reviewId}}/helpfulness",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "reviews", "{{reviewId}}", "helpfulness"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Image Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"product-image.jpg\",\n  \"fileType\": \"image/jpeg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/images/upload-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "images", "upload-url"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Product Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"images\": [\n    {\"url\": \"https://storage.googleapis.com/bucket/path/image.jpg\", \"key\": \"path/to/image.jpg\", \"isPrimary\": true, \"order\": 0}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/images",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "images"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Requests",
+      "item": [
+        {
+          "name": "Get Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/requests?status=PENDING&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requests"],
+              "query": [
+                {"key": "status", "value": "PENDING"},
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Request by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/requests/{{requestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requests", "{{requestId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productName\": \"African Shea Butter\",\n  \"description\": \"Looking for organic shea butter from West Africa\",\n  \"origin\": \"Ghana\",\n  \"sellerLocation\": \"United Kingdom\",\n  \"minPrice\": 10,\n  \"maxPrice\": 50,\n  \"currency\": \"GBP\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requests"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Request",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"FULFILLED\",\n  \"productName\": \"African Shea Butter\",\n  \"description\": \"Updated description\",\n  \"origin\": \"Ghana\",\n  \"sellerLocation\": \"United Kingdom\",\n  \"minPrice\": 15,\n  \"maxPrice\": 45,\n  \"currency\": \"GBP\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/requests/{{requestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requests", "{{requestId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Request",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/requests/{{requestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requests", "{{requestId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Get Profile Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"profile.jpg\",\n  \"fileType\": \"image/jpeg\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Chat Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"attachment.jpg\",\n  \"fileType\": \"image/jpeg\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "chat"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"product-image.jpg\",\n  \"fileType\": \"image/jpeg\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/product",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "product"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get View URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"path/to/file.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/view-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "view-url"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"path/to/file.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/delete-file",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "delete-file"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Batch Upload URLs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"files\": [\n    {\"fileName\": \"image1.jpg\", \"fileType\": \"image/jpeg\"},\n    {\"fileName\": \"image2.jpg\", \"fileType\": \"image/jpeg\"}\n  ],\n  \"uploadType\": \"product\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/batch-upload-urls",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "batch-upload-urls"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contact Support",
+      "item": [
+        {
+          "name": "Submit Contact Form",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+44 123 456 7890\",\n  \"subject\": \"General inquiry\",\n  \"message\": \"I have a question about your marketplace.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contact-support",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contact-support"]
             }
           },
           "response": []
@@ -251,12 +1245,7 @@
           "name": "Send Test Email",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"your-test-email@example.com\",\n  \"name\": \"Test User\"\n}"
@@ -273,12 +1262,7 @@
           "name": "Get Verification Code (Dev Only)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"test@example.com\"\n}"
@@ -295,26 +1279,15 @@
     }
   ],
   "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [""]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [""]
-      }
-    }
+    {"listen": "prerequest", "script": {"type": "text/javascript", "exec": [""]}},
+    {"listen": "test", "script": {"type": "text/javascript", "exec": [""]}}
   ],
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3001",
-      "type": "string"
-    }
+    {"key": "baseUrl", "value": "http://localhost:3001", "type": "string"},
+    {"key": "productId", "value": "", "type": "string"},
+    {"key": "conversationId", "value": "", "type": "string"},
+    {"key": "messageId", "value": "", "type": "string"},
+    {"key": "requestId", "value": "", "type": "string"},
+    {"key": "reviewId", "value": "", "type": "string"}
   ]
 }
