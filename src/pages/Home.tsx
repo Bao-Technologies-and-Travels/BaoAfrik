@@ -57,6 +57,8 @@ import LocationAutocomplete from '../components/LocationAutocomplete';
 import infoIcon from '../assets/images/admin/info.svg';
 import calenderIcon from '../assets/images/admin/calender.svg';
 import newlocIcon from '../assets/images/admin/newloc.svg';
+import bulbIcon from '../assets/images/admin/bulb.svg';
+import imageIcon from '../assets/images/pre/image.svg';
 
 
 const Home: React.FC = () => {
@@ -190,6 +192,7 @@ const Home: React.FC = () => {
   const [isRequestCategoryDropdownOpen, setIsRequestCategoryDropdownOpen] = useState(false);
   const [isRequestQuantityUnitDropdownOpen, setIsRequestQuantityUnitDropdownOpen] = useState(false);
   const [focusedRequestField, setFocusedRequestField] = useState<string | null>(null);
+  const [showEndDateTooltip, setShowEndDateTooltip] = useState(false);
   const requestCategoryDropdownRef = React.useRef<HTMLDivElement>(null);
   const requestQuantityUnitDropdownRef = React.useRef<HTMLDivElement>(null);
   const requestEndDateRef = React.useRef<HTMLInputElement>(null);
@@ -5513,9 +5516,52 @@ const Home: React.FC = () => {
 
                   {/* End Date */}
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '11px', color: '#212121', display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, position: 'relative' }}>
                       End date of the request <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
-                      <img src={infoIcon} alt="Info" style={{ width: '10px', height: '10px', opacity: 0.6 }} />
+                      <div 
+                        style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                        onMouseEnter={() => setShowEndDateTooltip(true)}
+                        onMouseLeave={() => setShowEndDateTooltip(false)}
+                        onClick={() => setShowEndDateTooltip(!showEndDateTooltip)}
+                      >
+                        <img src={infoIcon} alt="Info" style={{ width: '10px', height: '10px', opacity: 0.6, cursor: 'pointer' }} />
+                        {showEndDateTooltip && (
+                          <div style={{
+                            position: 'absolute',
+                            top: 'calc(100% + 6px)',
+                            left: '50%',
+                            transform: 'translateX(-80%)',
+                            backgroundColor: '#212121',
+                            borderRadius: '10px',
+                            padding: '10px 12px',
+                            width: '180px',
+                            zIndex: 9999,
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                          }}>
+                            {/* Arrow pointing up */}
+                            <div style={{
+                              position: 'absolute',
+                              top: '-5px',
+                              left: '80%',
+                              transform: 'translateX(-50%)',
+                              width: 0,
+                              height: 0,
+                              borderLeft: '5px solid transparent',
+                              borderRight: '5px solid transparent',
+                              borderBottom: '5px solid #212121'
+                            }} />
+                            {/* Title with bulb icon */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '5px' }}>
+                              <img src={bulbIcon} alt="Bulb" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                              <span style={{ color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600, fontSize: '10px' }}>End date</span>
+                            </div>
+                            {/* Description */}
+                            <p style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '9px', lineHeight: '1.4', margin: 0 }}>
+                              This date refers to the end date of your request; after this date, your request will no longer be visible on the platform, and you can find it among your inactive requests and reactivate it if you wish from your requests list.
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </label>
                     <div style={{ position: 'relative' }}>
                       <input
@@ -5707,11 +5753,12 @@ const Home: React.FC = () => {
                         padding: '8px 24px',
                         borderRadius: '8px',
                         border: 'none',
-                        backgroundColor: '#DFDEDE',
+                        backgroundColor: requestProductName.trim() !== '' && requestProductOrigin !== '' ? '#F9A825' : '#DFDEDE',
                         color: '#FFFFFF',
                         cursor: 'pointer',
                         fontSize: '12px',
-                        fontFamily: 'Poppins, sans-serif'
+                        fontFamily: 'Poppins, sans-serif',
+                        transition: 'background-color 0.2s'
                       }}
                     >
                       Next
@@ -5721,29 +5768,173 @@ const Home: React.FC = () => {
               </div>
             )}
 
-            {/* Step 2: Images - Placeholder for now */}
+            {/* Step 2: Images */}
             {requestStep === 2 && (
-              <div style={{ padding: '20px 28px 24px 28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <p style={{ color: '#919191', fontSize: '13px', textAlign: 'center', marginTop: '40px' }}>
-                  Image upload section coming next...
+              <div style={{ padding: '20px 24px 24px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {/* Image Upload Area */}
+                <div 
+                  style={{
+                    borderRadius: '12px',
+                    padding: '40px 20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#FDFDFD',
+                    marginTop: '8px',
+                    minHeight: '200px',
+                    cursor: 'pointer',
+                    background: `#FDFDFD url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='%23FDFDFD' rx='12' ry='12' stroke='%23D9D9D9' stroke-width='1.5' stroke-dasharray='16%2c 10' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e")`,
+                    backgroundSize: '100% 100%'
+                  }}
+                  onClick={() => document.getElementById('request-image-input')?.click()}
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const files = Array.from(e.dataTransfer.files).filter(file => 
+                      file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
+                    );
+                    if (files.length + requestImages.length <= 5) {
+                      setRequestImages([...requestImages, ...files.slice(0, 5 - requestImages.length)]);
+                    }
+                  }}
+                >
+                  {requestImages.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+                      {requestImages.map((file, index) => (
+                        <div key={index} style={{ position: 'relative' }}>
+                          <img 
+                            src={URL.createObjectURL(file)} 
+                            alt={`Preview ${index + 1}`}
+                            style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }}
+                          />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setRequestImages(requestImages.filter((_, i) => i !== index));
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '-6px',
+                              right: '-6px',
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '50%',
+                              backgroundColor: '#FF5252',
+                              border: 'none',
+                              color: 'white',
+                              fontSize: '10px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      <img 
+                        src={imageIcon} 
+                        alt="Upload" 
+                        style={{ 
+                          width: '24px', 
+                          height: '24px', 
+                          marginBottom: '12px',
+                          filter: 'brightness(0) saturate(100%) invert(79%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(91%) contrast(87%)'
+                        }} 
+                      />
+                      <p style={{ 
+                        fontSize: '12px', 
+                        color: '#212121', 
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        marginBottom: '6px',
+                        fontWeight: 500
+                      }}>
+                        Drag and drop product images here
+                      </p>
+                      <p style={{ 
+                        fontSize: '10px', 
+                        color: '#999999', 
+                        fontFamily: 'Poppins, sans-serif',
+                        marginBottom: '16px'
+                      }}>
+                        Compatible file types : JPEG, JPG, PNG · Maximum size 5MB
+                      </p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          document.getElementById('request-image-input')?.click();
+                        }}
+                        style={{
+                          padding: '8px 20px',
+                          borderRadius: '8px',
+                          border: '1px solid #999999',
+                          backgroundColor: '#FFFFFF',
+                          color: '#999999',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Browse files
+                      </button>
+                    </>
+                  )}
+                  <input
+                    id="request-image-input"
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/jpg,image/png"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []).filter(file => 
+                        file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
+                      );
+                      if (files.length + requestImages.length <= 5) {
+                        setRequestImages([...requestImages, ...files.slice(0, 5 - requestImages.length)]);
+                      }
+                      e.target.value = '';
+                    }}
+                  />
+                </div>
+
+                {/* Up to 5 images text */}
+                <p style={{ 
+                  fontSize: '11px', 
+                  color: '#999999', 
+                  fontFamily: 'Poppins, sans-serif',
+                  textAlign: 'right',
+                  marginTop: '8px',
+                  marginBottom: '100px'
+                }}>
+                  Up to 5 images
                 </p>
                 
                 {/* Bottom Buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: '24px', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: '20px', gap: '10px' }}>
                   <button
-                    onClick={() => setRequestStep(1)}
+                    onClick={() => {
+                      setShowRequestModal(false);
+                      setRequestStep(1);
+                    }}
                     style={{
-                      padding: '10px 24px',
-                      borderRadius: '12px',
+                      padding: '8px 20px',
+                      borderRadius: '8px',
                       border: '1px solid #E4E4E4',
                       backgroundColor: '#FFFFFF',
                       color: '#939393',
                       cursor: 'pointer',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       fontFamily: 'Poppins, sans-serif'
                     }}
                   >
-                    Back
+                    Cancel
                   </button>
                   <button
                     onClick={async () => {
@@ -5772,14 +5963,15 @@ const Home: React.FC = () => {
                     }}
                     disabled={isSubmittingRequest}
                     style={{
-                      padding: '10px 28px',
-                      borderRadius: '12px',
+                      padding: '8px 20px',
+                      borderRadius: '8px',
                       border: 'none',
-                      backgroundColor: '#F9A825',
+                      backgroundColor: requestImages.length > 0 ? '#F9A825' : '#DFDEDE',
                       color: '#FFFFFF',
                       cursor: 'pointer',
-                      fontSize: '13px',
-                      fontFamily: 'Poppins, sans-serif'
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      transition: 'background-color 0.2s'
                     }}
                   >
                     {isSubmittingRequest ? 'Submitting...' : 'Post a request'}
