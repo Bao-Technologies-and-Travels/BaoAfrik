@@ -30,6 +30,7 @@ import locationIcon from '../assets/images/pre/PL.svg';
 import bookmarkIcon from '../assets/images/pre/bm.svg';
 import verifyIcon from '../assets/images/pre/verify.svg';
 import unverifyIcon from '../assets/images/pre/unverify.svg';
+import verityIcon from '../assets/images/pre/verity.svg';
 import globyIcon from '../assets/images/pre/globy.svg';
 import buyerIcon from '../assets/images/pre/buyer.svg';
 import moneyIcon from '../assets/images/pre/money.svg';
@@ -59,6 +60,7 @@ import calenderIcon from '../assets/images/admin/calender.svg';
 import newlocIcon from '../assets/images/admin/newloc.svg';
 import bulbIcon from '../assets/images/admin/bulb.svg';
 import imageIcon from '../assets/images/pre/image.svg';
+import loadIcon from '../assets/images/pre/load.svg';
 
 
 const Home: React.FC = () => {
@@ -189,6 +191,11 @@ const Home: React.FC = () => {
   const [requestEndDate, setRequestEndDate] = useState('');
   const [requestLocation, setRequestLocation] = useState('London, United Kingdom');
   const [requestImages, setRequestImages] = useState<File[]>([]);
+  const [requestImageUrls, setRequestImageUrls] = useState<string[]>([]);
+  const [isRequestImageLoading, setIsRequestImageLoading] = useState(false);
+  const [requestUploadProgress, setRequestUploadProgress] = useState(0);
+  const [requestPrimaryImageIndex, setRequestPrimaryImageIndex] = useState(0);
+  const [isRequestDraggingOver, setIsRequestDraggingOver] = useState(false);
   const [isRequestCategoryDropdownOpen, setIsRequestCategoryDropdownOpen] = useState(false);
   const [isRequestQuantityUnitDropdownOpen, setIsRequestQuantityUnitDropdownOpen] = useState(false);
   const [focusedRequestField, setFocusedRequestField] = useState<string | null>(null);
@@ -5771,7 +5778,7 @@ const Home: React.FC = () => {
             {/* Step 2: Images */}
             {requestStep === 2 && (
               <div style={{ padding: '20px 24px 24px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {/* Image Upload Area */}
+                {/* Image Upload Area - Always shows drag/drop interface */}
                 <div 
                   style={{
                     borderRadius: '12px',
@@ -5780,61 +5787,86 @@ const Home: React.FC = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: '#FDFDFD',
+                    backgroundColor: (isRequestImageLoading || isRequestDraggingOver) ? 'transparent' : '#FDFDFD',
+                    background: (isRequestImageLoading || isRequestDraggingOver) 
+                      ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
+                      : '#FDFDFD',
                     marginTop: '8px',
                     minHeight: '200px',
                     cursor: 'pointer',
-                    background: `#FDFDFD url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='%23FDFDFD' rx='12' ry='12' stroke='%23D9D9D9' stroke-width='1.5' stroke-dasharray='16%2c 10' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e")`,
-                    backgroundSize: '100% 100%'
+                    border: (isRequestImageLoading || isRequestDraggingOver) ? '2px dashed #83C4F8' : '1.5px dashed #CCCCCC'
                   }}
-                  onClick={() => document.getElementById('request-image-input')?.click()}
-                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                  onClick={() => !isRequestImageLoading && requestImageUrls.length < 5 && document.getElementById('request-image-input')?.click()}
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsRequestDraggingOver(true); }}
+                  onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsRequestDraggingOver(true); }}
+                  onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsRequestDraggingOver(false); }}
                   onDrop={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    setIsRequestDraggingOver(false);
                     const files = Array.from(e.dataTransfer.files).filter(file => 
                       file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
                     );
-                    if (files.length + requestImages.length <= 5) {
-                      setRequestImages([...requestImages, ...files.slice(0, 5 - requestImages.length)]);
+                    if (files.length > 0 && requestImages.length < 5) {
+                      files.slice(0, 5 - requestImages.length).forEach((file) => {
+                        setIsRequestImageLoading(true);
+                        setRequestUploadProgress(0);
+                        
+                        const reader = new FileReader();
+                        let progress = 0;
+                        const progressInterval = setInterval(() => {
+                          progress += Math.random() * 15 + 5;
+                          if (progress > 100) progress = 100;
+                          setRequestUploadProgress(Math.floor(progress));
+                          if (progress >= 100) clearInterval(progressInterval);
+                        }, 200);
+                        
+                        reader.onload = (event) => {
+                          setTimeout(() => {
+                            setRequestImages(prev => [...prev, file]);
+                            setRequestImageUrls(prev => {
+                              const newUrls = [...prev, event.target?.result as string];
+                              setRequestPrimaryImageIndex(newUrls.length - 1);
+                              return newUrls;
+                            });
+                            setIsRequestImageLoading(false);
+                            setRequestUploadProgress(0);
+                          }, 1500);
+                        };
+                        reader.readAsDataURL(file);
+                      });
                     }
                   }}
                 >
-                  {requestImages.length > 0 ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-                      {requestImages.map((file, index) => (
-                        <div key={index} style={{ position: 'relative' }}>
-                          <img 
-                            src={URL.createObjectURL(file)} 
-                            alt={`Preview ${index + 1}`}
-                            style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }}
+                  {isRequestImageLoading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <p style={{ fontSize: '12px', color: '#83C4F8', fontWeight: 500, marginBottom: '16px', fontFamily: 'Poppins, sans-serif' }}>
+                        Image loading
+                      </p>
+                      <div style={{ position: 'relative', marginBottom: '12px' }}>
+                        <svg width="60" height="60" style={{ transform: 'rotate(-90deg)' }}>
+                          <circle cx="30" cy="30" r="27" fill="none" stroke="#E9E9E9" strokeWidth="3" />
+                          <circle 
+                            cx="30" cy="30" r="27" fill="none" stroke="#83C4F8" strokeWidth="3"
+                            strokeDasharray={`${(requestUploadProgress / 100) * 170} 170`}
+                            strokeLinecap="round"
                           />
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setRequestImages(requestImages.filter((_, i) => i !== index));
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img 
+                            src={loadIcon} 
+                            alt="Loading" 
+                            style={{ 
+                              width: '24px', 
+                              height: '24px',
+                              filter: 'brightness(0) saturate(100%) invert(70%) sepia(36%) saturate(624%) hue-rotate(172deg) brightness(100%) contrast(96%)'
                             }}
-                            style={{
-                              position: 'absolute',
-                              top: '-6px',
-                              right: '-6px',
-                              width: '18px',
-                              height: '18px',
-                              borderRadius: '50%',
-                              backgroundColor: '#FF5252',
-                              border: 'none',
-                              color: 'white',
-                              fontSize: '10px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}
-                          >
-                            ×
-                          </button>
+                          />
                         </div>
-                      ))}
+                      </div>
+                      <p style={{ fontSize: '14px', color: '#83C4F8', fontFamily: 'Poppins, sans-serif' }}>
+                        {requestUploadProgress}%
+                      </p>
                     </div>
                   ) : (
                     <>
@@ -5869,7 +5901,9 @@ const Home: React.FC = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          document.getElementById('request-image-input')?.click();
+                          if (requestImageUrls.length < 5) {
+                            document.getElementById('request-image-input')?.click();
+                          }
                         }}
                         style={{
                           padding: '8px 20px',
@@ -5896,25 +5930,115 @@ const Home: React.FC = () => {
                       const files = Array.from(e.target.files || []).filter(file => 
                         file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
                       );
-                      if (files.length + requestImages.length <= 5) {
-                        setRequestImages([...requestImages, ...files.slice(0, 5 - requestImages.length)]);
+                      if (files.length > 0 && requestImages.length < 5) {
+                        files.slice(0, 5 - requestImages.length).forEach((file) => {
+                          setIsRequestImageLoading(true);
+                          setRequestUploadProgress(0);
+                          
+                          const reader = new FileReader();
+                          let progress = 0;
+                          const progressInterval = setInterval(() => {
+                            progress += Math.random() * 15 + 5;
+                            if (progress > 100) progress = 100;
+                            setRequestUploadProgress(Math.floor(progress));
+                            if (progress >= 100) clearInterval(progressInterval);
+                          }, 200);
+                          
+                          reader.onload = (event) => {
+                            setTimeout(() => {
+                              setRequestImages(prev => [...prev, file]);
+                              setRequestImageUrls(prev => {
+                                const newUrls = [...prev, event.target?.result as string];
+                                setRequestPrimaryImageIndex(newUrls.length - 1);
+                                return newUrls;
+                              });
+                              setIsRequestImageLoading(false);
+                              setRequestUploadProgress(0);
+                            }, 1500);
+                          };
+                          reader.readAsDataURL(file);
+                        });
                       }
                       e.target.value = '';
                     }}
                   />
                 </div>
 
-                {/* Up to 5 images text */}
+                {/* Up to 5 images / Count text - directly below upload area */}
                 <p style={{ 
                   fontSize: '11px', 
                   color: '#999999', 
                   fontFamily: 'Poppins, sans-serif',
                   textAlign: 'right',
-                  marginTop: '8px',
-                  marginBottom: '100px'
+                  marginTop: '8px'
                 }}>
-                  Up to 5 images
+                  {requestImageUrls.length > 0 ? `${requestImageUrls.length}/5` : 'Up to 5 images'}
                 </p>
+
+                {/* Image Thumbnails - Simple version */}
+                {requestImageUrls.length > 0 && (
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '12px', alignItems: 'center' }}>
+                    {requestImageUrls.map((url, index) => (
+                      <div 
+                        key={index}
+                        style={{ 
+                          position: 'relative',
+                          width: '70px', 
+                          height: '70px',
+                          flexShrink: 0,
+                          borderRadius: '10px',
+                          overflow: 'visible'
+                        }}
+                      >
+                        <img 
+                          src={url} 
+                          alt={`Preview ${index + 1}`}
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover', 
+                            borderRadius: '10px'
+                          }}
+                        />
+                        {/* Remove button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRequestImages(prev => prev.filter((_, i) => i !== index));
+                            setRequestImageUrls(prev => prev.filter((_, i) => i !== index));
+                            if (requestPrimaryImageIndex === index) {
+                              setRequestPrimaryImageIndex(0);
+                            } else if (requestPrimaryImageIndex > index) {
+                              setRequestPrimaryImageIndex(prev => prev - 1);
+                            }
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            width: '18px',
+                            height: '18px',
+                            backgroundColor: '#4D4D4D',
+                            borderRadius: '50%',
+                            border: '2px solid white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            zIndex: 20
+                          }}
+                        >
+                          <svg width="6" height="6" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+                            <path d="M1 1L9 9M9 1L1 9" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Spacer */}
+                <div style={{ flex: 1, minHeight: '60px' }} />
                 
                 {/* Bottom Buttons */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: '20px', gap: '10px' }}>
@@ -5960,13 +6084,15 @@ const Home: React.FC = () => {
                       setRequestDescription('');
                       setRequestPriceRange('');
                       setRequestImages([]);
+                      setRequestImageUrls([]);
+                      setRequestPrimaryImageIndex(0);
                     }}
                     disabled={isSubmittingRequest}
                     style={{
                       padding: '8px 20px',
                       borderRadius: '8px',
                       border: 'none',
-                      backgroundColor: requestImages.length > 0 ? '#F9A825' : '#DFDEDE',
+                      backgroundColor: requestImageUrls.length > 0 ? '#F9A825' : '#DFDEDE',
                       color: '#FFFFFF',
                       cursor: 'pointer',
                       fontSize: '12px',
@@ -6171,31 +6297,31 @@ const Home: React.FC = () => {
           {/* Confirmation Modal Content */}
           <div 
             style={{
-                width: '520px',
-                maxWidth: '520px',
+              width: '420px',
+              maxWidth: '420px',
               height: 'auto',
-                borderRadius: '30px',
+              borderRadius: '24px',
               background: '#FFF',
-                padding: '32px 40px',
+              padding: '40px 32px',
               position: 'relative',
               fontFamily: 'Poppins, sans-serif',
               textAlign: 'center'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Verify Icon */}
-              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-                <img src={verifyIcon} alt="Success" style={{ width: '70px', height: '70px' }} />
+            {/* Verity Icon */}
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+              <img src={verityIcon} alt="Success" style={{ width: '56px', height: '56px' }} />
             </div>
 
             {/* Success Message */}
-              <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '500', marginBottom: '10px' }}>
-              Your request has been registered
+            <h2 style={{ fontSize: '16px', color: '#212121', fontWeight: '600', marginBottom: '12px', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Your request has been submitted
             </h2>
 
             {/* Description */}
-              <p style={{ fontSize: '13px', color: '#6A6A6A', marginBottom: '24px', lineHeight: '1.6' }}>
-              Lorem ipsum dolor sit amet consectetur. Molestie etiam mattis ornare adipiscing adipiscing
+            <p style={{ fontSize: '12px', color: '#939393', marginBottom: '28px', lineHeight: '1.6' }}>
+              Your request is under review. Please wait for notification on its availability. It will take less than a minute
             </p>
 
             {/* Close Button */}
@@ -6203,9 +6329,9 @@ const Home: React.FC = () => {
               onClick={() => setShowConfirmationModal(false)}
               style={{
                 display: 'flex',
-                width: '100%',
-                  height: '40px',
-                  padding: '10px',
+                width: '70%',
+                height: '38px',
+                padding: '10px',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '10px',
@@ -6215,9 +6341,9 @@ const Home: React.FC = () => {
                 color: '#FFF',
                 border: 'none',
                 cursor: 'pointer',
-                  fontSize: '14px',
+                fontSize: '12px',
                 fontFamily: 'Poppins, sans-serif',
-                fontWeight: '400',
+                fontWeight: '500',
                 margin: '0 auto'
               }}
             >
