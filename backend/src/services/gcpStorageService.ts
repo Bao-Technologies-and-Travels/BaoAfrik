@@ -15,7 +15,8 @@ const BUCKET_NAME = process.env.GCP_STORAGE_BUCKET!;
 const STORAGE_PREFIXES = {
   profile: process.env.STORAGE_PROFILE_PREFIX || 'profile-images',
   chat: process.env.STORAGE_ATTACHMENTS_PREFIX || 'chat-uploads',
-  product: process.env.STORAGE_PRODUCT_PREFIX || 'product-images'
+  product: process.env.STORAGE_PRODUCT_PREFIX || 'product-images',
+  request: process.env.STORAGE_REQUEST_PREFIX || 'request-images'
 };
 
 export interface PresignedUrlResponse {
@@ -25,7 +26,7 @@ export interface PresignedUrlResponse {
 }
 
 export class GCPStorageService {
-  private validateFile(fileType: string, fileSize?: number, uploadType?: 'product'|'profile'|'chat'): void {
+  private validateFile(fileType: string, fileSize?: number, uploadType?: 'product'|'profile'|'chat'|'request'): void {
     let allowedTypes = [
       'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
       'audio/webm', 'audio/mpeg', 'audio/wav',
@@ -74,7 +75,7 @@ export class GCPStorageService {
   async generateSignedUrl(
     fileName: string,
     fileType: string,
-    uploadType: 'product' | 'profile' | 'chat',
+    uploadType: 'product' | 'profile' | 'chat' | 'request',
     userId: string,
     fileSize?: number
   ): Promise<PresignedUrlResponse> {
@@ -110,7 +111,7 @@ export class GCPStorageService {
   // Generate batch signed URLs
   async generateBatchSignedUrls(
     files: Array<{ fileName: string; fileType: string; fileSize?: number }>,
-    uploadType: 'product' | 'profile' | 'chat',
+    uploadType: 'product' | 'profile' | 'chat' | 'request',
     userId: string
   ): Promise<PresignedUrlResponse[]> {
     try {

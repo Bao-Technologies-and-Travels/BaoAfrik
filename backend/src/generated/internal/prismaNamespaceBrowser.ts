@@ -388,6 +388,11 @@ export const ProductRequestScalarFieldEnum = {
   maxPrice: 'maxPrice',
   currency: 'currency',
   status: 'status',
+  category: 'category',
+  quantity: 'quantity',
+  quantityUnit: 'quantityUnit',
+  endDate: 'endDate',
+  images: 'images',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

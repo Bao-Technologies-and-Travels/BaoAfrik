@@ -424,23 +424,33 @@ export const validateUUIDParam = (paramName: string = 'id') => [
 
 export const createRequestValidation = [
   body('productName').trim().notEmpty().withMessage('Product name is required'),
-  body('description').trim().notEmpty().withMessage('Description is required'),
+  body('description').optional().trim(),
   body('origin').trim().notEmpty().withMessage('Origin is required'),
   body('sellerLocation').trim().notEmpty().withMessage('Seller location is required'),
   body('minPrice').optional().isFloat({ min: 0 }).withMessage('Minimum price must be a positive number'),
   body('maxPrice').optional().isFloat({ min: 0 }).withMessage('Maximum price must be a positive number'),
-  body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be a 3-letter code')
+  body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be a 3-letter code'),
+  body('category').optional().trim(),
+  body('quantity').optional().trim(),
+  body('quantityUnit').optional().trim(),
+  body('endDate').optional().isISO8601().withMessage('End date must be a valid date'),
+  body('images').optional().isArray().withMessage('Images must be an array')
 ];
 export const updateRequestValidation = [
   param('id').isUUID().withMessage('Invalid request ID'),
   body('status').optional().isIn(['PENDING', 'FULFILLED', 'REJECTED', 'ONGOING']).withMessage('Invalid status'),
   body('productName').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
-  body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
+  body('description').optional().trim(),
   body('origin').optional().trim().notEmpty().withMessage('Origin cannot be empty'),
   body('sellerLocation').optional().trim().notEmpty().withMessage('Seller location cannot be empty'),
   body('minPrice').optional().isFloat({ min: 0 }).withMessage('Minimum price must be a positive number'),
   body('maxPrice').optional().isFloat({ min: 0 }).withMessage('Maximum price must be a positive number'),
-  body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be a 3-letter code')
+  body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be a 3-letter code'),
+  body('category').optional().trim(),
+  body('quantity').optional().trim(),
+  body('quantityUnit').optional().trim(),
+  body('endDate').optional().isISO8601().withMessage('End date must be a valid date'),
+  body('images').optional().isArray().withMessage('Images must be an array')
 ];
 export const requestIdValidation = [
   param('id').isUUID().withMessage('Invalid request ID')

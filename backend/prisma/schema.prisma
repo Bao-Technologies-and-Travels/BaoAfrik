@@ -391,7 +391,12 @@ model ProductRequest {
   minPrice       Float?         @map("min_price")
   maxPrice       Float?         @map("max_price")
   currency       String         @default("USD")
-  status         String         @default("PENDING") // PENDING, FULFILLED, REJECTED
+  status         String         @default("PENDING") // PENDING, FULFILLED, REJECTED, ONGOING
+  category       String?        // Optional category
+  quantity       String?        // Optional quantity value
+  quantityUnit   String?        @map("quantity_unit") // KG, L, PK, etc.
+  endDate        DateTime?      @map("end_date") // Optional end date for the request
+  images         Json?          // Array of image objects with url, isPrimary, etc.
   userId         String         @map("user_id")
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime       @default(now()) @map("created_at")

@@ -46,6 +46,10 @@ export type ProductRequestMinAggregateOutputType = {
   maxPrice: number | null
   currency: string | null
   status: string | null
+  category: string | null
+  quantity: string | null
+  quantityUnit: string | null
+  endDate: Date | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -61,6 +65,10 @@ export type ProductRequestMaxAggregateOutputType = {
   maxPrice: number | null
   currency: string | null
   status: string | null
+  category: string | null
+  quantity: string | null
+  quantityUnit: string | null
+  endDate: Date | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -76,6 +84,11 @@ export type ProductRequestCountAggregateOutputType = {
   maxPrice: number
   currency: number
   status: number
+  category: number
+  quantity: number
+  quantityUnit: number
+  endDate: number
+  images: number
   userId: number
   createdAt: number
   updatedAt: number
@@ -103,6 +116,10 @@ export type ProductRequestMinAggregateInputType = {
   maxPrice?: true
   currency?: true
   status?: true
+  category?: true
+  quantity?: true
+  quantityUnit?: true
+  endDate?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -118,6 +135,10 @@ export type ProductRequestMaxAggregateInputType = {
   maxPrice?: true
   currency?: true
   status?: true
+  category?: true
+  quantity?: true
+  quantityUnit?: true
+  endDate?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -133,6 +154,11 @@ export type ProductRequestCountAggregateInputType = {
   maxPrice?: true
   currency?: true
   status?: true
+  category?: true
+  quantity?: true
+  quantityUnit?: true
+  endDate?: true
+  images?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -235,6 +261,11 @@ export type ProductRequestGroupByOutputType = {
   maxPrice: number | null
   currency: string
   status: string
+  category: string | null
+  quantity: string | null
+  quantityUnit: string | null
+  endDate: Date | null
+  images: runtime.JsonValue | null
   userId: string
   createdAt: Date
   updatedAt: Date
@@ -273,6 +304,11 @@ export type ProductRequestWhereInput = {
   maxPrice?: Prisma.FloatNullableFilter<"ProductRequest"> | number | null
   currency?: Prisma.StringFilter<"ProductRequest"> | string
   status?: Prisma.StringFilter<"ProductRequest"> | string
+  category?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  quantity?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  quantityUnit?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"ProductRequest"> | Date | string | null
+  images?: Prisma.JsonNullableFilter<"ProductRequest">
   userId?: Prisma.StringFilter<"ProductRequest"> | string
   createdAt?: Prisma.DateTimeFilter<"ProductRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProductRequest"> | Date | string
@@ -290,6 +326,11 @@ export type ProductRequestOrderByWithRelationInput = {
   maxPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  quantity?: Prisma.SortOrderInput | Prisma.SortOrder
+  quantityUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  images?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -310,6 +351,11 @@ export type ProductRequestWhereUniqueInput = Prisma.AtLeast<{
   maxPrice?: Prisma.FloatNullableFilter<"ProductRequest"> | number | null
   currency?: Prisma.StringFilter<"ProductRequest"> | string
   status?: Prisma.StringFilter<"ProductRequest"> | string
+  category?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  quantity?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  quantityUnit?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"ProductRequest"> | Date | string | null
+  images?: Prisma.JsonNullableFilter<"ProductRequest">
   userId?: Prisma.StringFilter<"ProductRequest"> | string
   createdAt?: Prisma.DateTimeFilter<"ProductRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProductRequest"> | Date | string
@@ -327,6 +373,11 @@ export type ProductRequestOrderByWithAggregationInput = {
   maxPrice?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  quantity?: Prisma.SortOrderInput | Prisma.SortOrder
+  quantityUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  images?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -350,6 +401,11 @@ export type ProductRequestScalarWhereWithAggregatesInput = {
   maxPrice?: Prisma.FloatNullableWithAggregatesFilter<"ProductRequest"> | number | null
   currency?: Prisma.StringWithAggregatesFilter<"ProductRequest"> | string
   status?: Prisma.StringWithAggregatesFilter<"ProductRequest"> | string
+  category?: Prisma.StringNullableWithAggregatesFilter<"ProductRequest"> | string | null
+  quantity?: Prisma.StringNullableWithAggregatesFilter<"ProductRequest"> | string | null
+  quantityUnit?: Prisma.StringNullableWithAggregatesFilter<"ProductRequest"> | string | null
+  endDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ProductRequest"> | Date | string | null
+  images?: Prisma.JsonNullableWithAggregatesFilter<"ProductRequest">
   userId?: Prisma.StringWithAggregatesFilter<"ProductRequest"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProductRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProductRequest"> | Date | string
@@ -365,6 +421,11 @@ export type ProductRequestCreateInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProductRequestsInput
@@ -381,6 +442,11 @@ export type ProductRequestUncheckedCreateInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -397,6 +463,11 @@ export type ProductRequestUpdateInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProductRequestsNestedInput
@@ -413,6 +484,11 @@ export type ProductRequestUncheckedUpdateInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -429,6 +505,11 @@ export type ProductRequestCreateManyInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -444,6 +525,11 @@ export type ProductRequestUpdateManyMutationInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -458,6 +544,11 @@ export type ProductRequestUncheckedUpdateManyInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -488,6 +579,11 @@ export type ProductRequestCountOrderByAggregateInput = {
   maxPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  quantityUnit?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+  images?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -508,6 +604,10 @@ export type ProductRequestMaxOrderByAggregateInput = {
   maxPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  quantityUnit?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -523,6 +623,10 @@ export type ProductRequestMinOrderByAggregateInput = {
   maxPrice?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  quantityUnit?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -601,6 +705,11 @@ export type ProductRequestCreateWithoutUserInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.ConversationCreateNestedManyWithoutRequestInput
@@ -616,6 +725,11 @@ export type ProductRequestUncheckedCreateWithoutUserInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutRequestInput
@@ -660,6 +774,11 @@ export type ProductRequestScalarWhereInput = {
   maxPrice?: Prisma.FloatNullableFilter<"ProductRequest"> | number | null
   currency?: Prisma.StringFilter<"ProductRequest"> | string
   status?: Prisma.StringFilter<"ProductRequest"> | string
+  category?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  quantity?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  quantityUnit?: Prisma.StringNullableFilter<"ProductRequest"> | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"ProductRequest"> | Date | string | null
+  images?: Prisma.JsonNullableFilter<"ProductRequest">
   userId?: Prisma.StringFilter<"ProductRequest"> | string
   createdAt?: Prisma.DateTimeFilter<"ProductRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProductRequest"> | Date | string
@@ -675,6 +794,11 @@ export type ProductRequestCreateWithoutConversationsInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProductRequestsInput
@@ -690,6 +814,11 @@ export type ProductRequestUncheckedCreateWithoutConversationsInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -721,6 +850,11 @@ export type ProductRequestUpdateWithoutConversationsInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProductRequestsNestedInput
@@ -736,6 +870,11 @@ export type ProductRequestUncheckedUpdateWithoutConversationsInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -751,6 +890,11 @@ export type ProductRequestCreateManyUserInput = {
   maxPrice?: number | null
   currency?: string
   status?: string
+  category?: string | null
+  quantity?: string | null
+  quantityUnit?: string | null
+  endDate?: Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -765,6 +909,11 @@ export type ProductRequestUpdateWithoutUserInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationUpdateManyWithoutRequestNestedInput
@@ -780,6 +929,11 @@ export type ProductRequestUncheckedUpdateWithoutUserInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutRequestNestedInput
@@ -795,6 +949,11 @@ export type ProductRequestUncheckedUpdateManyWithoutUserInput = {
   maxPrice?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantityUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  images?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -840,6 +999,11 @@ export type ProductRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   maxPrice?: boolean
   currency?: boolean
   status?: boolean
+  category?: boolean
+  quantity?: boolean
+  quantityUnit?: boolean
+  endDate?: boolean
+  images?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -858,6 +1022,11 @@ export type ProductRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   maxPrice?: boolean
   currency?: boolean
   status?: boolean
+  category?: boolean
+  quantity?: boolean
+  quantityUnit?: boolean
+  endDate?: boolean
+  images?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -874,6 +1043,11 @@ export type ProductRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   maxPrice?: boolean
   currency?: boolean
   status?: boolean
+  category?: boolean
+  quantity?: boolean
+  quantityUnit?: boolean
+  endDate?: boolean
+  images?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -890,12 +1064,17 @@ export type ProductRequestSelectScalar = {
   maxPrice?: boolean
   currency?: boolean
   status?: boolean
+  category?: boolean
+  quantity?: boolean
+  quantityUnit?: boolean
+  endDate?: boolean
+  images?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProductRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productName" | "description" | "origin" | "sellerLocation" | "minPrice" | "maxPrice" | "currency" | "status" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["productRequest"]>
+export type ProductRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productName" | "description" | "origin" | "sellerLocation" | "minPrice" | "maxPrice" | "currency" | "status" | "category" | "quantity" | "quantityUnit" | "endDate" | "images" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["productRequest"]>
 export type ProductRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   conversations?: boolean | Prisma.ProductRequest$conversationsArgs<ExtArgs>
@@ -924,6 +1103,11 @@ export type $ProductRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     maxPrice: number | null
     currency: string
     status: string
+    category: string | null
+    quantity: string | null
+    quantityUnit: string | null
+    endDate: Date | null
+    images: runtime.JsonValue | null
     userId: string
     createdAt: Date
     updatedAt: Date
@@ -1361,6 +1545,11 @@ export interface ProductRequestFieldRefs {
   readonly maxPrice: Prisma.FieldRef<"ProductRequest", 'Float'>
   readonly currency: Prisma.FieldRef<"ProductRequest", 'String'>
   readonly status: Prisma.FieldRef<"ProductRequest", 'String'>
+  readonly category: Prisma.FieldRef<"ProductRequest", 'String'>
+  readonly quantity: Prisma.FieldRef<"ProductRequest", 'String'>
+  readonly quantityUnit: Prisma.FieldRef<"ProductRequest", 'String'>
+  readonly endDate: Prisma.FieldRef<"ProductRequest", 'DateTime'>
+  readonly images: Prisma.FieldRef<"ProductRequest", 'Json'>
   readonly userId: Prisma.FieldRef<"ProductRequest", 'String'>
   readonly createdAt: Prisma.FieldRef<"ProductRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProductRequest", 'DateTime'>

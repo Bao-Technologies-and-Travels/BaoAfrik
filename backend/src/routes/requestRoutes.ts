@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { body } from 'express-validator';
 import { RequestController } from '../controllers/requestController';
 import { createRequestValidation, getRequestsValidation, updateRequestValidation, requestIdValidation, validate } from '../middleware/validationMiddleware';
 import { authenticateToken } from '../middleware/authMiddleware';
@@ -70,6 +71,22 @@ router.delete(
     requestIdValidation,
     validate,
     handleAuthRoute(RequestController.deleteRequest as AuthenticatedRequestHandler)
+);
+
+// Image upload routes for requests
+router.post('/images/upload-url', authenticateToken,
+    [
+        body('fileName').notEmpty().withMessage('File name is required'),
+        body('fileType').notEmpty().withMessage('File type is required')
+    ],
+    validate,
+    handleAuthRoute(RequestController.generateImageUploadUrl as AuthenticatedRequestHandler)
+);
+
+router.post('/:id/images', authenticateToken,
+    requestIdValidation,
+    validate,
+    handleAuthRoute(RequestController.addRequestImages as AuthenticatedRequestHandler)
 );
 
 export default router;

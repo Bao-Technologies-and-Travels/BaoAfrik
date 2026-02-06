@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { requestService } from '../services/requestService'
+import { requestService } from '../services/requestService';
+import { gcpStorageService } from '../services/gcpStorageService';
 
 type AuthenticatedRequest = Request & {
     user?: {
@@ -173,6 +174,91 @@ export const RequestController = {
         } catch (error) {
             console.error('Error deleting request:', error);
             return res.status(500).json({ error: 'Failed to delete request' });
+        }
+    },
+
+    // Generate presigned URL for request image upload
+    async generateImageUploadUrl(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { fileName, fileType } = req.body;
+            const userId = req.user?.id;
+
+            if (!userId) {
+                return res.status(401).json({ error: 'Authentication required' });
+            }
+
+            if (!fileName || !fileType) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'FileName and fileType are required'
+                });
+            }
+
+            const presignedData = await gcpStorageService.generateSignedUrl(
+                fileName,
+                fileType,
+                'request',
+                userId
+            );
+
+            return res.json({
+                success: true,
+                data: presignedData
+            });
+        } catch (error: any) {
+            console.error('Error generating upload URL:', error);
+            return res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+    },
+
+    // Add images to a request
+    async addRequestImages(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { id } = req.params;
+            const { images } = req.body; // Array of { url, key, isPrimary, order }
+            const userId = req.user?.id;
+            const userRole = req.user?.role;
+
+            if (!userId) {
+                return res.status(401).json({ error: 'Authentication required' });
+            }
+
+            if (!images || !Array.isArray(images)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Images array is required'
+                });
+            }
+
+            if (!id) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Request ID is required'
+                });
+            }
+
+            // Verify ownership
+            const isOwner = await requestService.isRequestOwner(id, userId);
+            if (!isOwner && userRole !== 'ADMIN') {
+                return res.status(403).json({ error: 'Not authorized to update this request' });
+            }
+
+            const updatedRequest = await requestService.updateRequest(id, { images });
+
+            return res.json({
+                success: true,
+                message: 'Images added successfully',
+                data: updatedRequest
+            });
+        } catch (error: any) {
+            console.error('Error adding request images:', error);
+            return res.status(500).json({
+                success: false,
+                message: error.message
+            });
         }
     }
 };
