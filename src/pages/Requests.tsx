@@ -2600,7 +2600,7 @@ const Requests: React.FC = () => {
                       <h2 style={{ 
                         fontSize: '16px', 
                         fontWeight: 600, 
-                        color: '#212121',
+                        color: '#939393',
                         fontFamily: 'Bricolage Grotesque, sans-serif',
                         margin: 0
                       }}>
@@ -2642,79 +2642,79 @@ const Requests: React.FC = () => {
                       fontSize: '10px', 
                       color: '#939393', 
                       fontFamily: 'Poppins, sans-serif',
-                      marginBottom: '14px',
                       margin: '0 0 14px 0'
                     }}>
                       Avg payment by requester
                     </p>
                     
-                    {/* Location and Origin Row */}
-                    <div style={{ display: 'flex', gap: '28px', marginBottom: '14px' }}>
+                    {/* Location and Origin Row - Screenshot 4 style */}
+                    <div style={{ display: 'flex', gap: '40px', marginBottom: '14px' }}>
                       {/* Requester Location */}
                       <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '2px' }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="1.5">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                          </svg>
-                          <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
-                            Requester location
-                          </span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="1.5" style={{ marginBottom: '4px' }}>
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                          <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', marginBottom: '2px' }}>
+                          Requester location
                         </div>
-                        <span style={{ fontSize: '12px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                        <div style={{ fontSize: '12px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
                           London, United Kingdom
-                        </span>
+                        </div>
                       </div>
                       
                       {/* Product Origin */}
                       <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '2px' }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="2" y1="12" x2="22" y2="12"/>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                          </svg>
-                          <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>
-                            Product Origin
-                          </span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="1.5" style={{ marginBottom: '4px' }}>
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="2" y1="12" x2="22" y2="12"/>
+                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                        <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', marginBottom: '2px' }}>
+                          Product Origin
                         </div>
-                        <span style={{ fontSize: '12px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
+                        <div style={{ fontSize: '12px', color: '#212121', fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}>
                           {selectedCard.country}
-                        </span>
+                        </div>
                       </div>
                     </div>
                     
-                    {/* Tags */}
+                    {/* Tags - Product detail page style */}
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                       {/* Category Tag */}
                       <div style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
-                        gap: '4px',
-                        padding: '4px 10px',
+                        gap: '6px',
+                        padding: '6px 12px',
                         border: '1px solid #E4E4E4',
-                        borderRadius: '16px'
+                        borderRadius: '20px',
+                        backgroundColor: '#FFFFFF'
                       }}>
-                        <span style={{ fontSize: '12px' }}>🌶️</span>
-                        <span style={{ fontSize: '10px', color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Spices</span>
+                        <span style={{ fontSize: '14px' }}>🌶️</span>
+                        <span style={{ fontSize: '12px', color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Spices</span>
                       </div>
                       
                       {/* Available Tag */}
                       <div style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
-                        gap: '4px',
-                        padding: '4px 10px',
+                        gap: '6px',
+                        padding: '6px 12px',
                         border: '1px solid #E4E4E4',
-                        borderRadius: '16px'
+                        borderRadius: '20px',
+                        backgroundColor: '#FFFFFF'
                       }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#757575" strokeWidth="1.5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#757575" strokeWidth="2">
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                           <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
-                        <span style={{ fontSize: '10px', color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Available : 1 KG</span>
+                        <span style={{ fontSize: '12px', color: '#212121', fontFamily: 'Poppins, sans-serif' }}>Available : 1 KG</span>
                       </div>
                     </div>
+                    
+                    {/* Divider above Description */}
+                    <div style={{ height: '1px', backgroundColor: '#E9E9E9', marginBottom: '14px' }} />
                     
                     {/* Description */}
                     <div style={{ marginBottom: '14px' }}>
@@ -2723,7 +2723,6 @@ const Requests: React.FC = () => {
                         fontWeight: 600, 
                         color: '#212121',
                         fontFamily: 'Bricolage Grotesque, sans-serif',
-                        marginBottom: '6px',
                         margin: '0 0 6px 0'
                       }}>
                         Description
@@ -2781,29 +2780,29 @@ const Requests: React.FC = () => {
                         </div>
                       </div>
                       
-                      {/* See user profile */}
+                      {/* See user profile - product detail page style */}
                       <button style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px',
-                        padding: '6px 12px',
+                        gap: '6px',
+                        padding: '8px 14px',
                         border: '1px solid #E4E4E4',
-                        borderRadius: '8px',
+                        borderRadius: '20px',
                         backgroundColor: '#FFFFFF',
                         cursor: 'pointer',
                         fontFamily: 'Poppins, sans-serif',
-                        fontSize: '10px',
-                        color: '#212121'
+                        fontSize: '11px',
+                        color: '#6A6A6A'
                       }}>
                         See user profile
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2">
                           <line x1="5" y1="12" x2="19" y2="12"/>
                           <polyline points="12 5 19 12 12 19"/>
                         </svg>
                       </button>
                     </div>
                     
-                    {/* Bottom Buttons */}
+                    {/* Bottom Buttons - Screenshot 2 style */}
                     <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
                       {/* Message Buyer Button */}
                       <button
@@ -2812,13 +2811,13 @@ const Requests: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '6px',
-                          padding: '10px 16px',
-                          borderRadius: '10px',
+                          gap: '8px',
+                          padding: '12px 20px',
+                          borderRadius: '12px',
                           backgroundColor: '#F9A825',
                           color: '#FFFFFF',
                           fontFamily: 'Poppins, sans-serif',
-                          fontSize: '12px',
+                          fontSize: '13px',
                           fontWeight: 500,
                           border: 'none',
                           cursor: 'pointer'
@@ -2827,31 +2826,31 @@ const Requests: React.FC = () => {
                           console.log('Message buyer clicked');
                         }}
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                         Message Buyer
                       </button>
                       
-                      {/* Share Button */}
+                      {/* Share Button - Screenshot 2 style */}
                       <button
                         style={{
-                          width: '42px',
-                          height: '42px',
+                          width: '46px',
+                          height: '46px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          borderRadius: '10px',
+                          borderRadius: '12px',
                           border: '1px solid #E4E4E4',
                           backgroundColor: '#FFFFFF',
                           cursor: 'pointer'
                         }}
                       >
-                        <img 
-                          src={shareIcon} 
-                          alt="Share" 
-                          style={{ width: '16px', height: '16px', opacity: 0.6 }}
-                        />
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="1.5">
+                          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                          <polyline points="16 6 12 2 8 6"/>
+                          <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
                       </button>
                     </div>
                   </div>
