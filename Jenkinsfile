@@ -283,7 +283,7 @@ EOF
                 emailext(
                         subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
                         to: "${env.EMAIL}",
-                        from: 'jenkins.baoafrik.com',
+                        from: 'jenkins@baoafrik.com',
                         replyTo: 'no-reply@baoafrik.com',
                         body: """
                             <html>
@@ -307,7 +307,7 @@ EOF
                 emailext(
                 subject: "${env.JOB_NAME} - ${currentBuild.currentResult}",
                 to: "${env.BAOTECHNOLOGIES_DEV_TEAM}",
-                from: 'jenkins.baoafrik.com',
+                from: 'jenkins@baoafrik.com',
                 replyTo: 'no-reply@baoafrik.com',
                 body: """
                     <html>
@@ -315,7 +315,7 @@ EOF
                             <h2 style="color: #2E86C1;">BaoAfrik Staging Notification</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
                             <p><strong>Status:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? 'green' : 'red'};">${currentBuild.currentResult}</span></p>
-                            <p><strong>Changes made:</strong>Share request implemented for homepage and request page. Disabled bookmark link in header menu</p>
+                            <p><strong>Changes made:</strong>Updated the flow for making a request to handle image uploading, and new request details in teh modal added by designer.</p>
                             <p>Check the <a href="${env.BUILD_URL}"> console output</a> for details and also see recent changes at <a href="${env.DOMAIN}"></a>.</p>
                             <hr>
                             <p style="font-size: 0.9em; color: #565;">This is an automated email from Jenkins. Please do not reply.</p>

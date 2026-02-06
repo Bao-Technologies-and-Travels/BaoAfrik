@@ -80,7 +80,7 @@ const SuggestionOption: React.FC<{
 }> = ({ option, selectedCategory, onSelect }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const isActive = selectedCategory === option.key || isHovered;
-
+  
   return (
     <div
       onClick={() => onSelect(option.key as 'users' | 'listings' | 'requests')}
@@ -97,15 +97,15 @@ const SuggestionOption: React.FC<{
         transition: 'background-color 0.2s'
       }}
     >
-      <img
-        src={option.icon}
-        alt={option.label}
-        style={{
-          width: '16px',
+      <img 
+        src={option.icon} 
+        alt={option.label} 
+        style={{ 
+          width: '16px', 
           height: '16px',
           filter: isActive ? 'none' : 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)',
           opacity: isActive ? 1 : 0.58
-        }}
+        }} 
       />
       <span style={{
         fontSize: '11px',
@@ -120,7 +120,7 @@ const SuggestionOption: React.FC<{
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-
+  
   // Apply custom cursor to entire dashboard
   useEffect(() => {
     const style = document.createElement('style');
@@ -137,7 +137,7 @@ const AdminDashboard: React.FC = () => {
       }
     };
   }, []);
-
+  
   const [selectedSidebarOption, setSelectedSidebarOption] = useState('overview');
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
@@ -558,17 +558,17 @@ const AdminDashboard: React.FC = () => {
     authorAvatar: string;
     authorAvatarBg: string;
   }> = [
-      { id: 11, productName: 'Snails from South Africa', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Under review', statusFilterKey: 'under_review', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
-      { id: 12, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Starter Plan', verified: true, isNewUser: false, productImage: productImage2, authorAvatar: messageAvatarIcon, authorAvatarBg: '#F0F8FE' },
-      { id: 13, productName: 'African Wristband', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Starter Plan', verified: true, isNewUser: false, productImage: productImage3, authorAvatar: avatar, authorAvatarBg: '#EDFBF0' },
-      { id: 14, productName: 'Bitter Cola', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: '3 Day left', statusFilterKey: 'dayleft', authorName: 'Clara Vanstone', plan: 'Pro Plan', verified: true, isNewUser: false, productImage: productImage1, authorAvatar: messageAvatarIcon, authorAvatarBg: '#F4F4F4' },
-      { id: 15, productName: 'Schrimps', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage2, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
-      { id: 16, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Inactive', statusFilterKey: 'inactive', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage3, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
-      { id: 17, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Under review', statusFilterKey: 'under_review', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: messageAvatarIcon, authorAvatarBg: '#E3F2FD' },
-      { id: 18, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: '5 Day left', statusFilterKey: 'dayleft', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage2, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
-      { id: 19, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Inactive', statusFilterKey: 'inactive', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage3, authorAvatar: messageAvatarIcon, authorAvatarBg: '#E3F2FD' },
-      { id: 20, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
-    ];
+    { id: 11, productName: 'Snails from South Africa', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Under review', statusFilterKey: 'under_review', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 12, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Starter Plan', verified: true, isNewUser: false, productImage: productImage2, authorAvatar: messageAvatarIcon, authorAvatarBg: '#F0F8FE' },
+    { id: 13, productName: 'African Wristband', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Starter Plan', verified: true, isNewUser: false, productImage: productImage3, authorAvatar: avatar, authorAvatarBg: '#EDFBF0' },
+    { id: 14, productName: 'Bitter Cola', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: '3 Day left', statusFilterKey: 'dayleft', authorName: 'Clara Vanstone', plan: 'Pro Plan', verified: true, isNewUser: false, productImage: productImage1, authorAvatar: messageAvatarIcon, authorAvatarBg: '#F4F4F4' },
+    { id: 15, productName: 'Schrimps', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage2, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 16, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Inactive', statusFilterKey: 'inactive', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage3, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 17, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Under review', statusFilterKey: 'under_review', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: messageAvatarIcon, authorAvatarBg: '#E3F2FD' },
+    { id: 18, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: '5 Day left', statusFilterKey: 'dayleft', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage2, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+    { id: 19, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Inactive', statusFilterKey: 'inactive', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage3, authorAvatar: messageAvatarIcon, authorAvatarBg: '#E3F2FD' },
+    { id: 20, productName: 'Coconut Oil', price: 'USD 45.90', date: 'Mon, 21 Dec 2024', status: 'Active', statusFilterKey: 'active', authorName: 'Clara Vanstone', plan: 'Free Plan', verified: false, isNewUser: true, productImage: productImage1, authorAvatar: avatar, authorAvatarBg: '#E3F2FD' },
+  ];
 
   // Mock data for Users List table
   const usersListRows = [
@@ -686,7 +686,7 @@ const AdminDashboard: React.FC = () => {
       setSelectedCategory(null);
       const query = searchValue.substring(1).toLowerCase();
       const results: any[] = [];
-
+      
       mockUsers.filter(user => user.name.toLowerCase().includes(query)).forEach(user => {
         results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
       });
@@ -696,7 +696,7 @@ const AdminDashboard: React.FC = () => {
       mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
         results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...', image: request.image });
       });
-
+      
       setSearchResults(results);
     } else if (selectedCategory && searchValue.startsWith(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`)) {
       setSearchMode('category');
@@ -713,7 +713,7 @@ const AdminDashboard: React.FC = () => {
       setSelectedCategory(null);
       const query = searchValue.toLowerCase();
       const results: any[] = [];
-
+      
       mockUsers.filter(user => user.name.toLowerCase().includes(query)).forEach(user => {
         results.push({ type: 'user', ...user, path: 'Users \\ User detail...' });
       });
@@ -723,7 +723,7 @@ const AdminDashboard: React.FC = () => {
       mockRequests.filter(request => request.name.toLowerCase().includes(query)).forEach(request => {
         results.push({ type: 'request', ...request, path: 'Requests \\ Request detail...', image: request.image });
       });
-
+      
       setSearchResults(results);
     } else if (!searchValue) {
       setSearchMode('suggestions');
@@ -900,7 +900,7 @@ const AdminDashboard: React.FC = () => {
       setIsScrollable(false);
       return;
     }
-
+    
     const checkScrollable = () => {
       if (scrollableContainerRef.current && expandedPermissionLists.size > 0) {
         const container = scrollableContainerRef.current;
@@ -914,7 +914,7 @@ const AdminDashboard: React.FC = () => {
     checkScrollable();
     // Recheck when permission lists expand/collapse
     const timeoutId = setTimeout(checkScrollable, 100);
-
+    
     return () => clearTimeout(timeoutId);
   }, [expandedPermissionLists, isManageAccessView]);
 
@@ -932,7 +932,7 @@ const AdminDashboard: React.FC = () => {
 
     checkMaximizedScrollable();
     const timeoutId = setTimeout(checkMaximizedScrollable, 100);
-
+    
     return () => clearTimeout(timeoutId);
   }, [expandedPermissionLists, isManageAccessMaximized]);
 
@@ -1123,7 +1123,7 @@ const AdminDashboard: React.FC = () => {
         {/* Secondary options */}
         {isUsersList ? (
           <>
-            <div
+            <div 
               onClick={() => {
                 const user = usersListRows.find(u => u.email === moreMenu.email);
                 if (user) {
@@ -1134,8 +1134,8 @@ const AdminDashboard: React.FC = () => {
                 }
               }}
               onMouseDown={(e) => e.preventDefault()}
-              onMouseEnter={primaryHoverOn}
-              onMouseLeave={primaryHoverOff}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
               style={baseItemStyle}
             >
               <img
@@ -1150,7 +1150,7 @@ const AdminDashboard: React.FC = () => {
               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>View user profile</span>
             </div>
 
-            <div
+            <div 
               onClick={() => {
                 const user = usersListRows.find(u => u.email === moreMenu.email);
                 if (user) {
@@ -1161,8 +1161,8 @@ const AdminDashboard: React.FC = () => {
                   setMoreMenu(null);
                 }
               }}
-              onMouseEnter={primaryHoverOn}
-              onMouseLeave={primaryHoverOff}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
               style={baseItemStyle}
             >
               <img
@@ -1177,7 +1177,7 @@ const AdminDashboard: React.FC = () => {
               <span style={{ fontSize: '12px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>Edit user access</span>
             </div>
 
-            <div
+            <div 
               onClick={() => {
                 const user = usersListRows.find(u => u.email === moreMenu.email);
                 if (user) {
@@ -1189,8 +1189,8 @@ const AdminDashboard: React.FC = () => {
                   setMoreMenu(null);
                 }
               }}
-              onMouseEnter={primaryHoverOn}
-              onMouseLeave={primaryHoverOff}
+              onMouseEnter={primaryHoverOn} 
+              onMouseLeave={primaryHoverOff} 
               style={baseItemStyle}
             >
               <img
@@ -2047,15 +2047,15 @@ const AdminDashboard: React.FC = () => {
           <div style={{ flex: 1, overflowY: 'auto' }} className="admin-sidebar-scroll">
             {sidebarOptions.map((option, index) => {
               const isActive = selectedSidebarOption === option.value;
-              const showSectionTitle = index === 0 ||
+              const showSectionTitle = index === 0 || 
                 (sidebarOptions[index - 1].section !== option.section && option.section);
 
               return (
                 <React.Fragment key={option.value}>
                   {showSectionTitle && option.section && (
-                    <div style={{
-                      color: '#B0B0B0',
-                      fontSize: '10px',
+                    <div style={{ 
+                      color: '#B0B0B0', 
+                      fontSize: '10px', 
                       fontWeight: 500,
                       marginTop: index > 0 ? '16px' : '0',
                       marginBottom: '8px',
@@ -2095,9 +2095,9 @@ const AdminDashboard: React.FC = () => {
                       }
                     }}
                   >
-                    <img
-                      src={isActive ? option.activeIcon : option.inactiveIcon}
-                      alt={option.label}
+                    <img 
+                      src={isActive ? option.activeIcon : option.inactiveIcon} 
+                      alt={option.label} 
                       style={{ width: '16px', height: '16px' }}
                     />
                     <span>{option.label}</span>
@@ -2129,7 +2129,7 @@ const AdminDashboard: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <div style={{ textAlign: 'left', flex: 1 }}>
                 <div style={{ fontSize: '12px', fontWeight: 500, color: '#6A6A6A', margin: 0, fontFamily: 'Poppins, sans-serif' }}>Log Out</div>
@@ -2142,9 +2142,9 @@ const AdminDashboard: React.FC = () => {
         {/* Main Content Area */}
         <div ref={mainContentScrollRef} style={{ flex: 1, padding: '16px', paddingRight: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 32px)' }} className="admin-content-scroll">
           {/* Top Navigation Bar */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
             justifyContent: 'space-between',
             marginBottom: '16px'
           }}>
@@ -2234,57 +2234,57 @@ const AdminDashboard: React.FC = () => {
               </nav>
             ) : (
               <div className="search-container" style={{ position: 'relative', flex: 1, maxWidth: '300px' }} ref={searchDropdownRef}>
-                <div style={{ position: 'relative' }}>
-                  {selectedCategory && (
-                    <span style={{
-                      position: 'absolute',
-                      left: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      fontSize: '12px',
-                      color: '#D9D9D9',
-                      fontFamily: 'Poppins, sans-serif',
-                      pointerEvents: 'none',
-                      zIndex: 1
-                    }}>
-                      @{selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/
-                    </span>
-                  )}
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={selectedCategory && searchValue.startsWith(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`)
-                      ? searchValue.replace(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`, '')
-                      : searchValue}
-                    onChange={(e) => {
-                      if (selectedCategory) {
-                        const prefix = `@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`;
-                        setSearchValue(prefix + e.target.value);
-                      } else {
-                        setSearchValue(e.target.value);
-                      }
-                    }}
-                    onFocus={() => setIsSearchFocused(true)}
-                    placeholder={selectedCategory ? '' : 'Search, press "/" for commands'}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      paddingLeft: selectedCategory
-                        ? `calc(12px + ${`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`.length * 7}px)`
-                        : '12px',
-                      backgroundColor: '#F1F1F1',
-                      borderRadius: '12px',
-                      border: isSearchFocused ? '1px solid #CFE8FC' : 'none',
-                      outline: 'none',
-                      color: '#6A6A6A',
-                      fontSize: '12px',
-                      fontFamily: 'Poppins, sans-serif',
-                      caretColor: '#CFE8FC'
-                    }}
-                  />
-                </div>
-                <style>
-                  {`
+              <div style={{ position: 'relative' }}>
+                {selectedCategory && (
+                  <span style={{
+                    position: 'absolute',
+                    left: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    fontSize: '12px',
+                    color: '#D9D9D9',
+                    fontFamily: 'Poppins, sans-serif',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}>
+                    @{selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/
+                  </span>
+                )}
+              <input
+                  ref={searchInputRef}
+                type="text"
+                  value={selectedCategory && searchValue.startsWith(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`) 
+                    ? searchValue.replace(`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`, '')
+                    : searchValue}
+                  onChange={(e) => {
+                    if (selectedCategory) {
+                      const prefix = `@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`;
+                      setSearchValue(prefix + e.target.value);
+                    } else {
+                      setSearchValue(e.target.value);
+                    }
+                  }}
+                  onFocus={() => setIsSearchFocused(true)}
+                  placeholder={selectedCategory ? '' : 'Search, press "/" for commands'}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                    paddingLeft: selectedCategory 
+                      ? `calc(12px + ${`@${selectedCategory === 'users' ? 'User' : selectedCategory === 'listings' ? 'Listing' : 'Request'}/`.length * 7}px)`
+                      : '12px',
+                  backgroundColor: '#F1F1F1',
+                  borderRadius: '12px',
+                    border: isSearchFocused ? '1px solid #CFE8FC' : 'none',
+                    outline: 'none',
+                    color: '#6A6A6A',
+                  fontSize: '12px',
+                    fontFamily: 'Poppins, sans-serif',
+                    caretColor: '#CFE8FC'
+                }}
+              />
+              </div>
+              <style>
+                {`
                   .search-container input::placeholder {
                     color: #B2B2B2;
                   }
@@ -2292,243 +2292,243 @@ const AdminDashboard: React.FC = () => {
                     border: 1px solid #CFE8FC !important;
                   }
                 `}
-                </style>
+              </style>
 
-                {/* Search Dropdown */}
-                {isSearchFocused && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    ...(searchMode === 'suggestions' ? { width: 'auto', minWidth: '200px' } : { right: 0 }),
-                    marginTop: '4px',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '10px',
-                    border: '1px solid #F1F1F1',
-                    boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                    zIndex: 1000,
-                    maxHeight: searchMode === 'suggestions' ? '150px' : '400px',
-                    overflowY: 'auto'
-                  }}>
-                    {/* Suggestions Mode - Only show when "/" is typed */}
-                    {searchMode === 'suggestions' && searchValue === '/' && (
-                      <div style={{ padding: '8px' }}>
-                        <p style={{
-                          fontSize: '8px',
-                          color: '#B0B0B0',
-                          margin: '0 0 6px 0',
-                          fontFamily: 'Poppins, sans-serif',
-                          textTransform: 'uppercase'
+              {/* Search Dropdown */}
+              {isSearchFocused && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  ...(searchMode === 'suggestions' ? { width: 'auto', minWidth: '200px' } : { right: 0 }),
+                  marginTop: '4px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '10px',
+                  border: '1px solid #F1F1F1',
+                  boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                  zIndex: 1000,
+                  maxHeight: searchMode === 'suggestions' ? '150px' : '400px',
+                  overflowY: 'auto'
+                }}>
+                  {/* Suggestions Mode - Only show when "/" is typed */}
+                  {searchMode === 'suggestions' && searchValue === '/' && (
+                    <div style={{ padding: '8px' }}>
+                      <p style={{
+                        fontSize: '8px',
+                        color: '#B0B0B0',
+                        margin: '0 0 6px 0',
+                        fontFamily: 'Poppins, sans-serif',
+                        textTransform: 'uppercase'
+                      }}>
+                        SUGGESTED
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        {[
+                          { key: 'users', label: 'Users', icon: userIcon },
+                          { key: 'listings', label: 'Listings', icon: listingboxIcon },
+                          { key: 'requests', label: 'Requests', icon: requesticonIcon }
+                        ].map((option) => (
+                          <SuggestionOption
+                            key={option.key}
+                            option={option}
+                            selectedCategory={selectedCategory}
+                            onSelect={handleCategorySelect}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Category Search Results */}
+                  {searchMode === 'category' && selectedCategory && (
+                    <div style={{ padding: '8px' }}>
+                      {selectedCategory === 'users' && searchResults.map((user: any) => (
+                        <div key={user.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '6px',
+                          cursor: 'pointer'
                         }}>
-                          SUGGESTED
-                        </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          {[
-                            { key: 'users', label: 'Users', icon: userIcon },
-                            { key: 'listings', label: 'Listings', icon: listingboxIcon },
-                            { key: 'requests', label: 'Requests', icon: requesticonIcon }
-                          ].map((option) => (
-                            <SuggestionOption
-                              key={option.key}
-                              option={option}
-                              selectedCategory={selectedCategory}
-                              onSelect={handleCategorySelect}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Category Search Results */}
-                    {searchMode === 'category' && selectedCategory && (
-                      <div style={{ padding: '8px' }}>
-                        {selectedCategory === 'users' && searchResults.map((user: any) => (
-                          <div key={user.id} style={{
+                          <div style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '10px',
-                            padding: '6px',
-                            cursor: 'pointer'
+                            justifyContent: 'center',
+                            flexShrink: 0
                           }}>
-                            <div style={{
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              backgroundColor: '#E3F2FD',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0
-                            }}>
-                              <img src={user.avatar} alt={user.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{
-                                fontSize: '11px',
-                                color: '#6A6A6A',
-                                margin: '0 0 3px 0',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 500
-                              }}>
-                                {user.name}
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexWrap: 'wrap' }}>
-                                <span style={{
-                                  fontSize: '9px',
-                                  color: '#64B5F6',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  {user.plan}
-                                </span>
-                                <span style={{ color: '#B0B0B0', fontSize: '9px' }}>•</span>
-                                <span style={{
-                                  fontSize: '9px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  {user.verified ? 'Verified' : 'Unverified'}
-                                </span>
-                              </div>
-                            </div>
+                            <img src={user.avatar} alt={user.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
                           </div>
-                        ))}
-                        {selectedCategory === 'listings' && searchResults.map((listing: any) => (
-                          <div key={listing.id} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '6px',
-                            cursor: 'pointer'
-                          }}>
-                            <div style={{
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              backgroundColor: '#E3F2FD',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#6A6A6A',
+                              margin: '0 0 3px 0',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
                             }}>
-                              <img src={listing.image} alt={listing.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{
-                                fontSize: '11px',
-                                color: '#6A6A6A',
-                                margin: 0,
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 500
-                              }}>
-                                {listing.name}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                        {selectedCategory === 'requests' && searchResults.map((request: any) => (
-                          <div key={request.id} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '6px',
-                            cursor: 'pointer'
-                          }}>
-                            <div style={{
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              backgroundColor: '#E3F2FD',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0
-                            }}>
-                              <img src={request.image} alt={request.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{
-                                fontSize: '11px',
-                                color: '#6A6A6A',
-                                margin: 0,
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 500
-                              }}>
-                                {request.name}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Direct Search Results */}
-                    {searchMode === 'direct' && searchResults.length > 0 && (
-                      <div style={{ padding: '8px' }}>
-                        {searchResults.slice(0, 3).map((result: any, index: number) => (
-                          <div key={`${result.type}-${result.id}-${index}`} style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: '10px',
-                            padding: '6px',
-                            cursor: 'pointer'
-                          }}>
-                            <div style={{
-                              width: '40px',
-                              height: '40px',
-                              borderRadius: '50%',
-                              backgroundColor: '#E3F2FD',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0
-                            }}>
-                              <img
-                                src={result.image || result.avatar}
-                                alt={result.name}
-                                style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  objectFit: 'cover'
-                                }}
-                              />
-                            </div>
-                            <div style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '3px',
-                              flex: 1,
-                              minWidth: 0,
-                              paddingTop: '4px'
-                            }}>
+                              {user.name}
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexWrap: 'wrap' }}>
                               <span style={{
-                                fontSize: '8px',
+                                fontSize: '9px',
                                 color: '#64B5F6',
-                                fontFamily: 'Poppins, sans-serif',
-                                lineHeight: 1.2
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                {result.path}
+                                {user.plan}
                               </span>
+                              <span style={{ color: '#B0B0B0', fontSize: '9px' }}>•</span>
                               <span style={{
-                                fontSize: '13px',
-                                color: '#6A6A6A',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 500,
-                                lineHeight: 1.2,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
+                                fontSize: '9px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                {result.name}
+                                {user.verified ? 'Verified' : 'Unverified'}
                               </span>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                        </div>
+                      ))}
+                      {selectedCategory === 'listings' && searchResults.map((listing: any) => (
+                        <div key={listing.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '6px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <img src={listing.image} alt={listing.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#6A6A6A',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {listing.name}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      {selectedCategory === 'requests' && searchResults.map((request: any) => (
+                        <div key={request.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '6px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <img src={request.image} alt={request.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#6A6A6A',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {request.name}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Direct Search Results */}
+                  {searchMode === 'direct' && searchResults.length > 0 && (
+                    <div style={{ padding: '8px' }}>
+                      {searchResults.slice(0, 3).map((result: any, index: number) => (
+                        <div key={`${result.type}-${result.id}-${index}`} style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px',
+                          padding: '6px',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: '#E3F2FD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <img 
+                              src={result.image || result.avatar} 
+                              alt={result.name} 
+                              style={{ 
+                                width: '36px', 
+                                height: '36px', 
+                                borderRadius: '50%', 
+                                objectFit: 'cover' 
+                              }} 
+                            />
+                          </div>
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '3px',
+                            flex: 1,
+                            minWidth: 0,
+                            paddingTop: '4px'
+                          }}>
+                            <span style={{
+                              fontSize: '8px',
+                              color: '#64B5F6',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: 1.2
+                            }}>
+                              {result.path}
+                            </span>
+                            <span style={{
+                              fontSize: '13px',
+                              color: '#6A6A6A',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 500,
+                              lineHeight: 1.2,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {result.name}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             )}
 
             {/* Right Side Navigation */}
@@ -2613,11 +2613,11 @@ const AdminDashboard: React.FC = () => {
                     padding: '4px'
                   }}
                 >
-                  <img
-                    src={notificationIcon}
-                    alt="Notifications"
-                    style={{
-                      width: '24px',
+                  <img 
+                    src={notificationIcon} 
+                    alt="Notifications" 
+                    style={{ 
+                      width: '24px', 
                       height: '24px',
                       filter: 'brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(92%)'
                     }}
@@ -2644,7 +2644,7 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Notification Dropdown */}
                 {isNotificationOpen && (
-                  <div
+                  <div 
                     className="notification-dropdown"
                     style={{
                       position: 'fixed',
@@ -2677,7 +2677,7 @@ const AdminDashboard: React.FC = () => {
                           }}
                         >
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                           </svg>
                         </button>
                       </div>
@@ -2718,8 +2718,8 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     {/* Notification List */}
-                    <div style={{
-                      flex: 1,
+                    <div style={{ 
+                      flex: 1, 
                       overflowY: 'auto',
                       maxHeight: '400px',
                       scrollbarWidth: 'none',
@@ -2735,25 +2735,25 @@ const AdminDashboard: React.FC = () => {
                       {['Today', 'Yesterday'].map(day => {
                         const dayNotifs = filteredNotifications.filter(n => n.day === day);
                         if (dayNotifs.length === 0) return null;
-
+                        
                         return (
                           <div key={day} style={{ paddingTop: day === 'Today' ? '12px' : '8px', paddingBottom: '4px' }}>
                             <p style={{ fontSize: '10px', fontWeight: 500, margin: '0 0 8px 24px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif' }}>{day}</p>
-
+                            
                             {dayNotifs.map((notif) => (
-                              <div key={notif.id} style={{
+                              <div key={notif.id} style={{ 
                                 transition: 'background-color 0.2s',
                                 cursor: 'pointer',
                                 backgroundColor: notif.isRead ? 'transparent' : '#F5FBFF'
                               }}>
                                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', padding: '8px 24px' }}>
                                   <div style={{ position: 'relative', flexShrink: 0 }}>
-                                    <div style={{
-                                      width: '40px',
-                                      height: '40px',
-                                      borderRadius: '50%',
-                                      display: 'flex',
-                                      alignItems: 'center',
+                                    <div style={{ 
+                                      width: '40px', 
+                                      height: '40px', 
+                                      borderRadius: '50%', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
                                       justifyContent: 'center',
                                       backgroundColor: notif.type === 'message' ? '#E3F2FD' : '#F9A825',
                                       border: '2px solid white'
@@ -2764,15 +2764,15 @@ const AdminDashboard: React.FC = () => {
                                         <img src={logoIcon} alt="Logo" style={{ width: '24px', height: '24px', filter: 'brightness(0) invert(1)' }} />
                                       )}
                                     </div>
-                                    <div style={{
-                                      position: 'absolute',
-                                      bottom: '-2px',
-                                      right: '-2px',
-                                      width: '16px',
-                                      height: '16px',
-                                      borderRadius: '50%',
-                                      display: 'flex',
-                                      alignItems: 'center',
+                                    <div style={{ 
+                                      position: 'absolute', 
+                                      bottom: '-2px', 
+                                      right: '-2px', 
+                                      width: '16px', 
+                                      height: '16px', 
+                                      borderRadius: '50%', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
                                       justifyContent: 'center',
                                       backgroundColor: '#FFF'
                                     }}>
@@ -2784,7 +2784,7 @@ const AdminDashboard: React.FC = () => {
                                       <div style={{ flex: 1, minWidth: 0 }}>
                                         {notif.sender ? (
                                           <p style={{ fontSize: '11px', margin: 0, fontFamily: 'Poppins, sans-serif' }}>
-                                            <span style={{
+                                            <span style={{ 
                                               fontWeight: notif.isRead ? 400 : 600,
                                               color: notif.isRead ? '#939393' : '#616161'
                                             }}>
@@ -2793,7 +2793,7 @@ const AdminDashboard: React.FC = () => {
                                             <span style={{ color: '#939393' }}> {notif.text}</span>
                                           </p>
                                         ) : (
-                                          <p style={{
+                                          <p style={{ 
                                             fontSize: '11px',
                                             fontWeight: notif.id === 2 && !notif.isRead ? 600 : 400,
                                             color: notif.isRead ? '#939393' : '#616161',
@@ -2804,7 +2804,7 @@ const AdminDashboard: React.FC = () => {
                                           </p>
                                         )}
                                         {notif.subText && (
-                                          <p style={{
+                                          <p style={{ 
                                             fontSize: notif.id === 1 ? '11px' : '10px',
                                             color: notif.id === 1 && !notif.isRead ? '#64B5F6' : '#9E9E9E',
                                             margin: '2px 0 0 0',
@@ -2814,7 +2814,7 @@ const AdminDashboard: React.FC = () => {
                                           </p>
                                         )}
                                         {notif.subText2 && (
-                                          <p style={{
+                                          <p style={{ 
                                             fontSize: '10px',
                                             color: '#9E9E9E',
                                             margin: '2px 0 0 0',
@@ -2824,15 +2824,15 @@ const AdminDashboard: React.FC = () => {
                                           </p>
                                         )}
                                       </div>
-                                      <div style={{
-                                        display: 'flex',
+                                      <div style={{ 
+                                        display: 'flex', 
                                         flexDirection: 'column',
                                         alignItems: 'flex-end',
                                         gap: notif.isRead ? '2px' : '4px',
                                         marginLeft: '8px',
                                         flexShrink: 0
                                       }}>
-                                        <button style={{
+                                        <button style={{ 
                                           background: 'none',
                                           border: 'none',
                                           cursor: 'pointer',
@@ -2840,9 +2840,9 @@ const AdminDashboard: React.FC = () => {
                                           color: '#9C9C9C'
                                         }}>
                                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="6" cy="12" r="1.5" />
-                                            <circle cx="12" cy="12" r="1.5" />
-                                            <circle cx="18" cy="12" r="1.5" />
+                                            <circle cx="6" cy="12" r="1.5"/>
+                                            <circle cx="12" cy="12" r="1.5"/>
+                                            <circle cx="18" cy="12" r="1.5"/>
                                           </svg>
                                         </button>
                                         {notif.isRead ? (
@@ -2867,7 +2867,7 @@ const AdminDashboard: React.FC = () => {
 
                     {/* Footer */}
                     {unreadCount > 0 && (
-                      <div style={{
+                      <div style={{ 
                         padding: '16px 24px',
                         borderTop: '1px solid #E4E4E4',
                         display: 'flex',
@@ -2887,7 +2887,7 @@ const AdminDashboard: React.FC = () => {
                         >
                           Mark all as read
                         </button>
-                        <button
+                        <button 
                           onClick={() => {
                             navigate('/notifications');
                             setIsNotificationOpen(false);
@@ -2912,7 +2912,7 @@ const AdminDashboard: React.FC = () => {
               {/* Admin Info */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{
+                  <p style={{ 
                     margin: 0,
                     color: '#212121',
                     fontSize: '12px',
@@ -2921,7 +2921,7 @@ const AdminDashboard: React.FC = () => {
                   }}>
                     Herman Kabore
                   </p>
-                  <p style={{
+                  <p style={{ 
                     margin: 0,
                     color: '#B0B0B0',
                     fontSize: '10px',
@@ -2940,15 +2940,15 @@ const AdminDashboard: React.FC = () => {
                   justifyContent: 'center',
                   flexShrink: 0
                 }}>
-                  <img
-                    src={avatar}
-                    alt="Profile"
-                    style={{
-                      width: '28px',
-                      height: '28px',
+                  <img 
+                    src={avatar} 
+                    alt="Profile" 
+                    style={{ 
+                      width: '28px', 
+                      height: '28px', 
                       borderRadius: '50%',
                       objectFit: 'cover'
-                    }}
+                    }} 
                   />
                 </div>
                 <div className="relative menu-dropdown" ref={menuDropdownRef}>
@@ -2989,17 +2989,17 @@ const AdminDashboard: React.FC = () => {
                 >
                   {/* Left: Title + Description + Activity Card OR Maximized Manage Access Content OR Maximized Reviews Content */}
                   <div>
-                    {isReviewsMaximized && userDetailActiveTab === 'reviews' && !isManageAccessView ? (
-                      <div style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '18px',
-                        border: '1px solid #F1F1F1',
-                        padding: '14px',
-                        marginTop: '10px',
-                        transition: 'all 0.3s ease',
-                        animation: 'slideIn 0.3s ease'
-                      }}>
-                        <style>{`
+                  {isReviewsMaximized && userDetailActiveTab === 'reviews' && !isManageAccessView ? (
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '14px',
+                      marginTop: '10px',
+                      transition: 'all 0.3s ease',
+                      animation: 'slideIn 0.3s ease'
+                    }}>
+                      <style>{`
                         @keyframes slideIn {
                           from {
                             opacity: 0;
@@ -3011,152 +3011,152 @@ const AdminDashboard: React.FC = () => {
                           }
                         }
                       `}</style>
-                        {/* Top Bar: Filter Button (left) and Reduce Window (right) */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                          {/* Filter Dropdown */}
-                          <div style={{ position: 'relative' }} ref={filterDropdownRef}>
-                            <button
-                              onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                color: '#939393',
-                                fontSize: '11px',
-                                fontFamily: 'Poppins, sans-serif',
-                                cursor: 'pointer',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                padding: 0,
-                                transition: 'opacity 0.2s'
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                                <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" />
-                                <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5" />
-                                <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" />
-                                <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5" />
-                              </svg>
-                              <span>{selectedFilter}</span>
-                            </button>
-
-                            {/* Dropdown Menu */}
-                            {filterDropdownOpen && (
-                              <div style={{
-                                position: 'absolute',
-                                top: '24px',
-                                left: 0,
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #E5E7EB',
-                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                                zIndex: 10,
-                                borderRadius: '8px',
-                                padding: '4px',
-                                minWidth: '200px',
-                                maxWidth: '240px'
-                              }}>
-                                {filterOptions.map((option, index) => {
-                                  const isSelected = selectedFilter === option.label;
-                                  return (
-                                    <button
-                                      key={option.id}
-                                      onClick={() => handleFilterSelect(option.id)}
-                                      style={{
-                                        width: '100%',
-                                        textAlign: 'left',
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: '8px',
-                                        backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
-                                        borderRadius: isSelected ? '6px' : '0',
-                                        marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
-                                        padding: '6px 8px',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        transition: 'background-color 0.2s'
-                                      }}
-                                    >
-                                      <div style={{ flexShrink: 0, marginTop: '1px' }}>
-                                        {option.icon === 'star' ? (
-                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
-                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                          </svg>
-                                        ) : (
-                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <path d="M12 6v6l4 2" />
-                                          </svg>
-                                        )}
-                                      </div>
-                                      <div style={{ flex: 1 }}>
-                                        <div style={{
-                                          fontSize: '11px',
-                                          marginBottom: '1px',
-                                          color: isSelected ? '#64B5F6' : '#212121',
-                                          fontFamily: 'Poppins, sans-serif',
-                                          fontWeight: 500
-                                        }}>
-                                          {option.label}
-                                        </div>
-                                        <div style={{
-                                          fontSize: '9px',
-                                          color: '#939393',
-                                          fontFamily: 'Poppins, sans-serif'
-                                        }}>
-                                          {option.description}
-                                        </div>
-                                      </div>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Reduce Window Button */}
-                          <button
-                            onClick={() => setIsReviewsMaximized(false)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              color: '#64B5F6',
-                              fontSize: '11px',
+                      {/* Top Bar: Filter Button (left) and Reduce Window (right) */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        {/* Filter Dropdown */}
+                        <div style={{ position: 'relative' }} ref={filterDropdownRef}>
+                          <button 
+                            onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                            style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '6px', 
+                              color: '#939393', 
+                              fontSize: '11px', 
                               fontFamily: 'Poppins, sans-serif',
-                              padding: '4px 8px',
+                              cursor: 'pointer',
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              padding: 0,
                               transition: 'opacity 0.2s'
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
                             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                           >
-                            <span>Reduce the window</span>
-                            <img
-                              src={expandIcon}
-                              alt="Reduce"
-                              style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
-                            />
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                              <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                              <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                              <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                              <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                            </svg>
+                            <span>{selectedFilter}</span>
                           </button>
+                          
+                          {/* Dropdown Menu */}
+                          {filterDropdownOpen && (
+                            <div style={{ 
+                              position: 'absolute', 
+                              top: '24px', 
+                              left: 0, 
+                              backgroundColor: '#FFFFFF', 
+                              border: '1px solid #E5E7EB', 
+                              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', 
+                              zIndex: 10, 
+                              borderRadius: '8px', 
+                              padding: '4px', 
+                              minWidth: '200px', 
+                              maxWidth: '240px' 
+                            }}>
+                              {filterOptions.map((option, index) => {
+                                const isSelected = selectedFilter === option.label;
+                                return (
+                                  <button
+                                    key={option.id}
+                                    onClick={() => handleFilterSelect(option.id)}
+                                    style={{
+                                      width: '100%',
+                                      textAlign: 'left',
+                                      display: 'flex',
+                                      alignItems: 'flex-start',
+                                      gap: '8px',
+                                      backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                                      borderRadius: isSelected ? '6px' : '0',
+                                      marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
+                                      padding: '6px 8px',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                  >
+                                    <div style={{ flexShrink: 0, marginTop: '1px' }}>
+                                      {option.icon === 'star' ? (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                      ) : (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                          <circle cx="12" cy="12" r="10"/>
+                                          <path d="M12 6v6l4 2"/>
+                                        </svg>
+                                      )}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ 
+                                        fontSize: '11px', 
+                                        marginBottom: '1px', 
+                                        color: isSelected ? '#64B5F6' : '#212121',
+                                        fontFamily: 'Poppins, sans-serif',
+                                        fontWeight: 500
+                                      }}>
+                                        {option.label}
+                                      </div>
+                                      <div style={{ 
+                                        fontSize: '9px', 
+                                        color: '#939393',
+                                        fontFamily: 'Poppins, sans-serif'
+                                      }}>
+                                        {option.description}
+                                      </div>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
 
-                        {/* Reviews List - Scrollable */}
-                        <div
-                          className="reviews-maximized-scroll-container"
+                        {/* Reduce Window Button */}
+                        <button
+                          onClick={() => setIsReviewsMaximized(false)}
                           style={{
-                            maxHeight: '500px',
-                            overflowY: 'auto',
-                            paddingRight: '6px',
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none',
-                            position: 'relative',
-                            marginBottom: '16px'
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#64B5F6',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            padding: '4px 8px',
+                            transition: 'opacity 0.2s'
                           }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                         >
-                          <style>{`
+                          <span>Reduce the window</span>
+                          <img
+                            src={expandIcon}
+                            alt="Reduce"
+                            style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Reviews List - Scrollable */}
+                      <div
+                        className="reviews-maximized-scroll-container"
+                        style={{
+                          maxHeight: '500px',
+                          overflowY: 'auto',
+                          paddingRight: '6px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none',
+                          position: 'relative',
+                          marginBottom: '16px'
+                        }}
+                      >
+                        <style>{`
                           .reviews-maximized-scroll-container::-webkit-scrollbar {
                             display: none !important;
                             width: 0 !important;
@@ -3168,182 +3168,182 @@ const AdminDashboard: React.FC = () => {
                             scrollbar-width: none !important;
                           }
                         `}</style>
-                          {/* Render reviews based on current page */}
-                          {[1, 2, 3, 4].map((reviewNum) => {
-                            const reviewIndex = (reviewsPage - 1) * reviewsPerPage + reviewNum - 1;
-                            if (reviewIndex >= 23) return null; // Don't render beyond total reviews
-
-                            return (
-                              <div key={reviewNum} style={{ marginBottom: reviewNum < 4 ? '20px' : '0px' }}>
-                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                                  <div style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '50%',
-                                    backgroundColor: reviewNum === 1 ? '#D5E9BD' : reviewNum === 2 ? '#E3F2FD' : reviewNum === 3 ? '#F0F8FE' : '#EDFBF0',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    overflow: 'hidden',
-                                    flexShrink: 0
-                                  }}>
-                                    <img
-                                      src={reviewNum % 2 === 0 ? messageAvatarIcon : avatar}
-                                      alt={`Reviewer ${reviewNum}`}
-                                      style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        objectFit: 'cover'
-                                      }}
-                                    />
-                                  </div>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                      <span style={{
-                                        fontSize: '13px',
-                                        color: '#212121',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        fontWeight: 500
-                                      }}>
-                                        {reviewNum === 1 ? 'Samine Herald' : reviewNum === 2 ? 'Kael Otto' : reviewNum === 3 ? 'Maria Santos' : 'John Doe'}
-                                      </span>
-                                      <span style={{
-                                        fontSize: '10px',
-                                        color: '#B0B0B0',
-                                        fontFamily: 'Poppins, sans-serif'
-                                      }}>
-                                        {reviewNum === 1 ? '2 Jan 2025' : reviewNum === 2 ? '2 Jan 2025' : reviewNum === 3 ? '1 Jan 2025' : '31 Dec 2024'}
-                                      </span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                      {[1, 2, 3, 4].map((star) => (
-                                        <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
-                                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                        </svg>
-                                      ))}
-                                      {reviewNum < 5 && (
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
-                                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                        </svg>
-                                      )}
-                                      <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        marginLeft: '4px'
-                                      }}>
-                                        {reviewNum === 1 ? '4.3' : reviewNum === 2 ? '4.3' : reviewNum === 3 ? '5.0' : '3.0'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#939393',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  lineHeight: '1.5',
-                                  marginBottom: '8px',
-                                  marginTop: 0
+                        {/* Render reviews based on current page */}
+                        {[1, 2, 3, 4].map((reviewNum) => {
+                          const reviewIndex = (reviewsPage - 1) * reviewsPerPage + reviewNum - 1;
+                          if (reviewIndex >= 23) return null; // Don't render beyond total reviews
+                          
+                          return (
+                            <div key={reviewNum} style={{ marginBottom: reviewNum < 4 ? '20px' : '0px' }}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                                <div style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  borderRadius: '50%',
+                                  backgroundColor: reviewNum === 1 ? '#D5E9BD' : reviewNum === 2 ? '#E3F2FD' : reviewNum === 3 ? '#F0F8FE' : '#EDFBF0',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden',
+                                  flexShrink: 0
                                 }}>
-                                  {reviewNum === 1 ? 'I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.' : reviewNum === 2 ? 'I\'ve found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.' : reviewNum === 3 ? 'Excellent quality! The pepper arrived fresh and well-packaged. The flavor is exactly as described and it has become a staple in my kitchen. Highly recommend this seller.' : 'The product is okay but could be better. The packaging was fine but the quality didn\'t quite meet my expectations. It\'s usable but I probably won\'t order again.'}
-                                </p>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#64B5F6',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    cursor: 'pointer'
-                                  }}>
-                                    View the discussion ({reviewNum === 1 ? '1' : reviewNum === 2 ? '1' : reviewNum === 3 ? '2' : '0'})
-                                  </span>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                    <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                  <img
+                                    src={reviewNum % 2 === 0 ? messageAvatarIcon : avatar}
+                                    alt={`Reviewer ${reviewNum}`}
+                                    style={{
+                                      width: '32px',
+                                      height: '32px',
+                                      borderRadius: '50%',
+                                      objectFit: 'cover'
+                                    }}
+                                  />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                                     <span style={{
-                                      fontSize: '11px',
-                                      color: '#FF5151',
+                                      fontSize: '13px',
+                                      color: '#212121',
+                                      fontFamily: 'Poppins, sans-serif',
+                                      fontWeight: 500
+                                    }}>
+                                      {reviewNum === 1 ? 'Samine Herald' : reviewNum === 2 ? 'Kael Otto' : reviewNum === 3 ? 'Maria Santos' : 'John Doe'}
+                                    </span>
+                                    <span style={{
+                                      fontSize: '10px',
+                                      color: '#B0B0B0',
                                       fontFamily: 'Poppins, sans-serif'
                                     }}>
-                                      Delete the review
+                                      {reviewNum === 1 ? '2 Jan 2025' : reviewNum === 2 ? '2 Jan 2025' : reviewNum === 3 ? '1 Jan 2025' : '31 Dec 2024'}
+                                    </span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    {[1, 2, 3, 4].map((star) => (
+                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    ))}
+                                    {reviewNum < 5 && (
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                      </svg>
+                                    )}
+                                    <span style={{
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif',
+                                      marginLeft: '4px'
+                                    }}>
+                                      {reviewNum === 1 ? '4.3' : reviewNum === 2 ? '4.3' : reviewNum === 3 ? '5.0' : '3.0'}
                                     </span>
                                   </div>
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#939393',
+                                fontFamily: 'Poppins, sans-serif',
+                                lineHeight: '1.5',
+                                marginBottom: '8px',
+                                marginTop: 0
+                              }}>
+                                {reviewNum === 1 ? 'I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.' : reviewNum === 2 ? 'I\'ve found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.' : reviewNum === 3 ? 'Excellent quality! The pepper arrived fresh and well-packaged. The flavor is exactly as described and it has become a staple in my kitchen. Highly recommend this seller.' : 'The product is okay but could be better. The packaging was fine but the quality didn\'t quite meet my expectations. It\'s usable but I probably won\'t order again.'}
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#64B5F6',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  cursor: 'pointer'
+                                }}>
+                                  View the discussion ({reviewNum === 1 ? '1' : reviewNum === 2 ? '1' : reviewNum === 3 ? '2' : '0'})
+                                </span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                  <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#FF5151',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    Delete the review
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
 
-                        {/* Pagination */}
-                        <div style={{
-                          borderTop: '1px solid #E5E5E5',
-                          paddingTop: '24px',
-                          marginTop: '24px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between'
+                      {/* Pagination */}
+                      <div style={{ 
+                        borderTop: '1px solid #E5E5E5', 
+                        paddingTop: '24px', 
+                        marginTop: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span style={{ 
+                          fontSize: '14px', 
+                          color: '#BABABA',
+                          fontFamily: 'Poppins, sans-serif'
                         }}>
-                          <span style={{
-                            fontSize: '14px',
-                            color: '#BABABA',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            {((reviewsPage - 1) * reviewsPerPage + 1)} - {Math.min(reviewsPage * reviewsPerPage, 23)} out of 23
-                          </span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <button
-                              disabled={reviewsPage === 1}
-                              onClick={() => setReviewsPage(p => Math.max(1, p - 1))}
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: reviewsPage === 1 ? 'not-allowed' : 'pointer',
-                                opacity: reviewsPage === 1 ? 0.5 : 1,
-                                transition: 'opacity 0.2s',
-                                padding: 0
-                              }}
-                              onMouseEnter={(e) => {
-                                if (reviewsPage !== 1) e.currentTarget.style.opacity = '0.8';
-                              }}
-                              onMouseLeave={(e) => {
-                                if (reviewsPage !== 1) e.currentTarget.style.opacity = '1';
-                              }}
-                            >
-                              <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
-                            </button>
-                            <button
-                              disabled={reviewsPage >= reviewsTotalPages}
-                              onClick={() => setReviewsPage(p => Math.min(reviewsTotalPages, p + 1))}
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: reviewsPage >= reviewsTotalPages ? 'not-allowed' : 'pointer',
-                                opacity: reviewsPage >= reviewsTotalPages ? 0.5 : 1,
-                                transition: 'opacity 0.2s',
-                                padding: 0
-                              }}
-                              onMouseEnter={(e) => {
-                                if (reviewsPage < reviewsTotalPages) e.currentTarget.style.opacity = '0.8';
-                              }}
-                              onMouseLeave={(e) => {
-                                if (reviewsPage < reviewsTotalPages) e.currentTarget.style.opacity = '1';
-                              }}
-                            >
-                              <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
-                            </button>
-                          </div>
+                          {((reviewsPage - 1) * reviewsPerPage + 1)} - {Math.min(reviewsPage * reviewsPerPage, 23)} out of 23
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <button 
+                            disabled={reviewsPage === 1}
+                            onClick={() => setReviewsPage(p => Math.max(1, p - 1))}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: reviewsPage === 1 ? 'not-allowed' : 'pointer',
+                              opacity: reviewsPage === 1 ? 0.5 : 1,
+                              transition: 'opacity 0.2s',
+                              padding: 0
+                            }}
+                            onMouseEnter={(e) => {
+                              if (reviewsPage !== 1) e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onMouseLeave={(e) => {
+                              if (reviewsPage !== 1) e.currentTarget.style.opacity = '1';
+                            }}
+                          >
+                            <img src={grayArrowIcon} alt="Previous" style={{ width: '20px', height: '20px' }} />
+                          </button>
+                          <button 
+                            disabled={reviewsPage >= reviewsTotalPages}
+                            onClick={() => setReviewsPage(p => Math.min(reviewsTotalPages, p + 1))}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: reviewsPage >= reviewsTotalPages ? 'not-allowed' : 'pointer',
+                              opacity: reviewsPage >= reviewsTotalPages ? 0.5 : 1,
+                              transition: 'opacity 0.2s',
+                              padding: 0
+                            }}
+                            onMouseEnter={(e) => {
+                              if (reviewsPage < reviewsTotalPages) e.currentTarget.style.opacity = '0.8';
+                            }}
+                            onMouseLeave={(e) => {
+                              if (reviewsPage < reviewsTotalPages) e.currentTarget.style.opacity = '1';
+                            }}
+                          >
+                            <img src={blackArrowIcon} alt="Next" style={{ width: '20px', height: '20px' }} />
+                          </button>
                         </div>
                       </div>
-                    ) : isManageAccessMaximized && isManageAccessView ? (
-                      <div style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '18px',
-                        border: '1px solid #F1F1F1',
-                        padding: '14px',
-                        marginTop: '10px',
-                        transition: 'all 0.3s ease',
-                        animation: 'slideIn 0.3s ease'
-                      }}>
-                        <style>{`
+                    </div>
+                  ) : isManageAccessMaximized && isManageAccessView ? (
+                    <div style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '18px',
+                      border: '1px solid #F1F1F1',
+                      padding: '14px',
+                      marginTop: '10px',
+                      transition: 'all 0.3s ease',
+                      animation: 'slideIn 0.3s ease'
+                    }}>
+                      <style>{`
                         @keyframes slideIn {
                           from {
                             opacity: 0;
@@ -3355,68 +3355,68 @@ const AdminDashboard: React.FC = () => {
                           }
                         }
                       `}</style>
-                        {/* Maximized Manage Access Content - Only search bar and four rows move here */}
-                        {/* Search Bar with Reduce button */}
-                        <div style={{ position: 'relative', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                          <input
-                            type="text"
-                            value={accessSearchValue}
-                            onChange={(e) => setAccessSearchValue(e.target.value)}
-                            placeholder="search"
-                            style={{
-                              maxWidth: '280px',
-                              width: '100%',
-                              padding: '8px 12px',
-                              backgroundColor: '#F1F1F1',
-                              borderRadius: '8px',
-                              border: 'none',
-                              outline: 'none',
-                              color: '#6A6A6A',
-                              fontSize: '12px',
-                              fontFamily: 'Poppins, sans-serif',
-                              caretColor: '#CFE8FC'
-                            }}
-                          />
-                          <button
-                            onClick={() => setIsManageAccessMaximized(false)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              padding: '4px 8px',
-                              color: '#64B5F6',
-                              fontSize: '12px',
-                              fontFamily: 'Poppins, sans-serif',
-                              marginLeft: 'auto'
-                            }}
-                          >
-                            <span>Reduce the window</span>
-                            <img
-                              src={expandIcon}
-                              alt="Reduce"
-                              style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
-                            />
-                          </button>
-                        </div>
-
-                        {/* Access Rows - Scrollable Container */}
-                        <div
-                          ref={maximizedScrollableContainerRef}
-                          className="access-rows-scrollable-maximized"
+                      {/* Maximized Manage Access Content - Only search bar and four rows move here */}
+                      {/* Search Bar with Reduce button */}
+                      <div style={{ position: 'relative', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                        <input
+                          type="text"
+                          value={accessSearchValue}
+                          onChange={(e) => setAccessSearchValue(e.target.value)}
+                          placeholder="search"
                           style={{
-                            position: 'relative',
-                            height: '500px',
-                            overflowY: 'auto',
-                            overflowX: 'hidden',
-                            paddingRight: '4px',
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none'
-                          } as React.CSSProperties}
+                            maxWidth: '280px',
+                            width: '100%',
+                            padding: '8px 12px',
+                            backgroundColor: '#F1F1F1',
+                            borderRadius: '8px',
+                            border: 'none',
+                            outline: 'none',
+                            color: '#6A6A6A',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            caretColor: '#CFE8FC'
+                          }}
+                        />
+                        <button
+                          onClick={() => setIsManageAccessMaximized(false)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 8px',
+                            color: '#64B5F6',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            marginLeft: 'auto'
+                          }}
                         >
-                          <style>{`
+                          <span>Reduce the window</span>
+                          <img
+                            src={expandIcon}
+                            alt="Reduce"
+                            style={{ width: '16px', height: '16px', transform: 'rotate(180deg)' }}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Access Rows - Scrollable Container */}
+                      <div 
+                        ref={maximizedScrollableContainerRef}
+                        className="access-rows-scrollable-maximized"
+                        style={{ 
+                          position: 'relative',
+                          height: '500px',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          paddingRight: '4px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none'
+                        } as React.CSSProperties}
+                      >
+                        <style>{`
                           .access-rows-scrollable-maximized::-webkit-scrollbar {
                             display: none !important;
                             width: 0 !important;
@@ -3428,736 +3428,736 @@ const AdminDashboard: React.FC = () => {
                             scrollbar-width: none !important;
                           }
                         `}</style>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {/* Listings Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Listings
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#70E183',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    18/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.listings}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {/* Listings Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Listings
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.listings}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.listings ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('listings')) {
+                                    newSet.delete('listings');
+                                  } else {
+                                    newSet.add('listings');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('listings') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create', label: 'Can create a listing' },
+                                  { key: 'can-delete', label: 'Can delete a listing' },
+                                  { key: 'can-modify', label: 'Can modify a listing' },
+                                  { key: 'can-review', label: 'Can review listings from other users' },
+                                  { key: 'can-report', label: 'Can report listing from other users' },
+                                  { key: 'can-share', label: 'Can share a listing' },
+                                  { key: 'can-contact', label: 'Can contact a seller for a listing' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.listings ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('listings')) {
-                                      newSet.delete('listings');
-                                    } else {
-                                      newSet.add('listings');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('listings') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-create', label: 'Can create a listing' },
-                                    { key: 'can-delete', label: 'Can delete a listing' },
-                                    { key: 'can-modify', label: 'Can modify a listing' },
-                                    { key: 'can-review', label: 'Can review listings from other users' },
-                                    { key: 'can-report', label: 'Can report listing from other users' },
-                                    { key: 'can-share', label: 'Can share a listing' },
-                                    { key: 'can-contact', label: 'Can contact a seller for a listing' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.listings[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            listings: {
+                                              ...permissionToggles.listings,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.listings[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              listings: {
-                                                ...permissionToggles.listings,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Messages Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Messages
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#70E183',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    18/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.messages}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Messages Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Messages
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.messages}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.messages ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('messages')) {
+                                    newSet.delete('messages');
+                                  } else {
+                                    newSet.add('messages');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('messages') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-send-message', label: 'Can send message to a user' },
+                                  { key: 'can-send-files', label: 'Can send files to a user' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.messages ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('messages')) {
-                                      newSet.delete('messages');
-                                    } else {
-                                      newSet.add('messages');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('messages') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-send-message', label: 'Can send message to a user' },
-                                    { key: 'can-send-files', label: 'Can send files to a user' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.messages[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            messages: {
+                                              ...permissionToggles.messages,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.messages[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              messages: {
-                                                ...permissionToggles.messages,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Requests Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Requests
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FAB951',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    12/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.requests}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Requests Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Requests
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  12/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.requests}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.requests ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('requests')) {
+                                    newSet.delete('requests');
+                                  } else {
+                                    newSet.add('requests');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('requests') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create-request', label: 'Can create a request' },
+                                  { key: 'can-respond', label: 'Can respond to a request' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.requests ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('requests')) {
-                                      newSet.delete('requests');
-                                    } else {
-                                      newSet.add('requests');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('requests') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-create-request', label: 'Can create a request' },
-                                    { key: 'can-respond', label: 'Can respond to a request' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.requests[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            requests: {
+                                              ...permissionToggles.requests,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.requests[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              requests: {
-                                                ...permissionToggles.requests,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Users Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Users
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FAB951',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    18/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.users}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Users Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Users
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.users}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.users ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('users')) {
+                                    newSet.delete('users');
+                                  } else {
+                                    newSet.add('users');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('users') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-view', label: 'Can view user profiles' },
+                                  { key: 'can-edit', label: 'Can edit user information' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.users ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('users')) {
-                                      newSet.delete('users');
-                                    } else {
-                                      newSet.add('users');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('users') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-view', label: 'Can view user profiles' },
-                                    { key: 'can-edit', label: 'Can edit user information' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.users[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            users: {
+                                              ...permissionToggles.users,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.users[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              users: {
-                                                ...permissionToggles.users,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
-                        {/* Fade Effect at Bottom - Fixed at bottom of container */}
-                        {expandedPermissionLists.size > 0 && isMaximizedScrollable && (
-                          <div style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: '4px',
-                            height: '40px',
-                            background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-                            pointerEvents: 'none',
-                            zIndex: 1
-                          }} />
-                        )}
                       </div>
-                    ) : (
-                      <div>
-                        {/* Title and Description (match overview sizing) */}
-                        <div style={{ marginBottom: '12px' }}>
-                          <h1
-                            style={{
-                              fontSize: '16px',
-                              fontWeight: 600,
-                              color: '#202224',
-                              margin: '0 0 2px 0',
-                              fontFamily: 'Bricolage Grotesque, sans-serif'
-                            }}
-                          >
-                            User activity details
-                          </h1>
-                          <p
-                            style={{
-                              color: '#9C9C9C',
-                              fontSize: '12px',
-                              margin: 0,
-                              fontFamily: 'Poppins, sans-serif'
-                            }}
-                          >
-                            Lorem ipsum dolor sit amet consectetur. Amet mi porttitor duis facilisis amet erat urna.
-                          </p>
-                        </div>
+                      {/* Fade Effect at Bottom - Fixed at bottom of container */}
+                      {expandedPermissionLists.size > 0 && isMaximizedScrollable && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: '4px',
+                          height: '40px',
+                          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }} />
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                    {/* Title and Description (match overview sizing) */}
+                    <div style={{ marginBottom: '12px' }}>
+                      <h1
+                        style={{
+                          fontSize: '16px',
+                          fontWeight: 600,
+                          color: '#202224',
+                          margin: '0 0 2px 0',
+                          fontFamily: 'Bricolage Grotesque, sans-serif'
+                        }}
+                      >
+                        User activity details
+                      </h1>
+                      <p
+                        style={{
+                          color: '#9C9C9C',
+                          fontSize: '12px',
+                          margin: 0,
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Lorem ipsum dolor sit amet consectetur. Amet mi porttitor duis facilisis amet erat urna.
+                      </p>
+                    </div>
 
-                        {/* Activity Card */}
-                        {!isActivityDeleted && (
-                          <div
-                            style={{
-                              backgroundColor: '#FFFFFF',
-                              borderRadius: '18px',
-                              border: '1px solid #F1F1F1',
-                              padding: '16px'
-                            }}
-                          >
-                            {isViewingActivityHistory ? (
-                              <div
-                                className="activity-history-scroll"
-                                style={{
-                                  maxHeight: '540px',
-                                  overflowY: 'auto',
-                                  paddingRight: '6px',
-                                  scrollbarWidth: 'none',
-                                  msOverflowStyle: 'none'
-                                } as React.CSSProperties}
-                              >
-                                <style>{`
+                    {/* Activity Card */}
+                    {!isActivityDeleted && (
+                    <div
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '18px',
+                        border: '1px solid #F1F1F1',
+                        padding: '16px'
+                      }}
+                    >
+                    {isViewingActivityHistory ? (
+                      <div
+                        className="activity-history-scroll"
+                        style={{
+                          maxHeight: '540px',
+                          overflowY: 'auto',
+                          paddingRight: '6px',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none'
+                        } as React.CSSProperties}
+                      >
+                        <style>{`
                           .activity-history-scroll::-webkit-scrollbar {
                             display: none !important;
                             width: 0 !important;
@@ -4170,575 +4170,575 @@ const AdminDashboard: React.FC = () => {
                           }
                         `}</style>
 
-                                {/* Top Bar: Search + Export + Sort (same as default view) */}
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    marginBottom: '12px'
-                                  }}
-                                >
-                                  {/* Search Bar */}
-                                  <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
-                                    <input
-                                      type="text"
-                                      placeholder="Search an activity?"
-                                      style={{
-                                        width: '100%',
-                                        padding: '8px 12px',
-                                        border: 'none',
-                                        borderRadius: '12px',
-                                        fontSize: '12px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        color: '#6A6A6A',
-                                        backgroundColor: '#F1F1F1',
-                                        outline: 'none',
-                                        caretColor: '#CFE8FC'
-                                      }}
-                                    />
-                                  </div>
+                        {/* Top Bar: Search + Export + Sort (same as default view) */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            marginBottom: '12px'
+                          }}
+                        >
+                          {/* Search Bar */}
+                          <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
+                            <input
+                              type="text"
+                              placeholder="Search an activity?"
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: '#6A6A6A',
+                                backgroundColor: '#F1F1F1',
+                                outline: 'none',
+                                caretColor: '#CFE8FC'
+                              }}
+                            />
+                          </div>
 
-                                  {/* Export Data Button + Sort By Dropdown */}
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '8px',
-                                      marginLeft: 'auto',
-                                      flexShrink: 0
+                          {/* Export Data Button + Sort By Dropdown */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              marginLeft: 'auto',
+                              flexShrink: 0
+                            }}
+                          >
+                            {/* Export Data Button */}
+                            <button
+                              style={{
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                color: '#64B5F6',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>Export data</span>
+                              <img
+                                src={exportIcon}
+                                alt="Export"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter:
+                                    'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                                }}
+                              />
+                            </button>
+
+                            {/* Sort By Dropdown */}
+                            <select
+                              style={{
+                                padding: '4px 10px',
+                                paddingRight: '28px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: '#939393',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer',
+                                appearance: 'none',
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'none',
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 8px center',
+                                backgroundSize: '12px'
+                              }}
+                            >
+                              <option>Sort by</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {[
+                          {
+                            date: 'Today',
+                            items: [
+                              {
+                                title: 'Listing modified',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} modified a listing`,
+                                time: '19 min ago'
+                              },
+                              {
+                                title: 'Listing added',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} added a new listing`,
+                                time: '17:12'
+                              }
+                            ]
+                          },
+                          {
+                            date: 'Yesterday',
+                            items: [
+                              {
+                                title: 'Reviewed a user',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} reviewed the user @Hirald Jockovic`,
+                                time: '17:12'
+                              },
+                              {
+                                title: 'Contact a seller',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} contact the seller @Emanuelle Keinth`,
+                                time: '17:12'
+                              }
+                            ]
+                          },
+                          {
+                            date: 'Mon, 21 Dec 2025',
+                            items: [
+                              {
+                                title: 'Enable Two-step authentification',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} enable two step authentification`,
+                                time: '17:12'
+                              },
+                              {
+                                title: 'Account created',
+                                description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} ${selectedUserForProfile?.name.split(' ').slice(1).join(' ') || ''} joined Bao'Afrik`,
+                                time: '19 min ago'
+                              }
+                            ]
+                          }
+                        ].map((group, groupIdx, groups) => (
+                          <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px', marginTop: groupIdx === 0 ? '20px' : '0' }}>
+                            <div style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginBottom: '10px' }}>
+                              {group.date}
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              {group.items.map((item, idx) => (
+                                <React.Fragment key={`${group.date}-${idx}`}>
+                                  <div 
+                                    onClick={() => {
+                                      const avatarIndex = (groupIdx * 2 + idx) % 3;
+                                      const isKeyIcon = (group.date === 'Mon, 21 Dec 2025' && item.title.includes('Two-step')) ||
+                                                        (group.date === 'Yesterday' && item.title.includes('Contact a seller'));
+                                      setSelectedActivityDetail({
+                                        title: item.title,
+                                        description: item.description,
+                                        time: item.time,
+                                        date: group.date,
+                                        avatarIndex,
+                                        iconType: isKeyIcon ? 'key' : 'bell'
+                                      });
                                     }}
-                                  >
-                                    {/* Export Data Button */}
-                                    <button
-                                      style={{
-                                        border: 'none',
-                                        backgroundColor: 'transparent',
-                                        cursor: 'pointer',
+                                    style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '10px 0', cursor: 'pointer' }}>
+                                    {/* Profile with Notification Bell */}
+                                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                                      <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#D5E9BD',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '6px',
-                                        color: '#64B5F6',
-                                        fontSize: '11px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        padding: 0
-                                      }}
-                                    >
-                                      <span style={{ color: '#64B5F6' }}>Export data</span>
-                                      <img
-                                        src={exportIcon}
-                                        alt="Export"
-                                        style={{
-                                          width: '14px',
-                                          height: '14px',
-                                          filter:
-                                            'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                                        }}
-                                      />
-                                    </button>
-
-                                    {/* Sort By Dropdown */}
-                                    <select
-                                      style={{
-                                        padding: '4px 10px',
-                                        paddingRight: '28px',
-                                        borderRadius: '8px',
-                                        border: 'none',
-                                        fontSize: '11px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        color: '#939393',
-                                        backgroundColor: '#FFFFFF',
-                                        cursor: 'pointer',
-                                        appearance: 'none',
-                                        WebkitAppearance: 'none',
-                                        MozAppearance: 'none',
-                                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                                        backgroundRepeat: 'no-repeat',
-                                        backgroundPosition: 'right 8px center',
-                                        backgroundSize: '12px'
-                                      }}
-                                    >
-                                      <option>Sort by</option>
-                                    </select>
-                                  </div>
-                                </div>
-
-                                {[
-                                  {
-                                    date: 'Today',
-                                    items: [
-                                      {
-                                        title: 'Listing modified',
-                                        description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} modified a listing`,
-                                        time: '19 min ago'
-                                      },
-                                      {
-                                        title: 'Listing added',
-                                        description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} added a new listing`,
-                                        time: '17:12'
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    date: 'Yesterday',
-                                    items: [
-                                      {
-                                        title: 'Reviewed a user',
-                                        description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} reviewed the user @Hirald Jockovic`,
-                                        time: '17:12'
-                                      },
-                                      {
-                                        title: 'Contact a seller',
-                                        description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} contact the seller @Emanuelle Keinth`,
-                                        time: '17:12'
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    date: 'Mon, 21 Dec 2025',
-                                    items: [
-                                      {
-                                        title: 'Enable Two-step authentification',
-                                        description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} enable two step authentification`,
-                                        time: '17:12'
-                                      },
-                                      {
-                                        title: 'Account created',
-                                        description: `This user @${selectedUserForProfile?.name.split(' ')[0] || 'User'} ${selectedUserForProfile?.name.split(' ').slice(1).join(' ') || ''} joined Bao'Afrik`,
-                                        time: '19 min ago'
-                                      }
-                                    ]
-                                  }
-                                ].map((group, groupIdx, groups) => (
-                                  <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px', marginTop: groupIdx === 0 ? '20px' : '0' }}>
-                                    <div style={{ color: '#B0B0B0', fontSize: '11px', fontFamily: 'Poppins, sans-serif', marginBottom: '10px' }}>
-                                      {group.date}
-                                    </div>
-
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                      {group.items.map((item, idx) => (
-                                        <React.Fragment key={`${group.date}-${idx}`}>
-                                          <div
-                                            onClick={() => {
-                                              const avatarIndex = (groupIdx * 2 + idx) % 3;
-                                              const isKeyIcon = (group.date === 'Mon, 21 Dec 2025' && item.title.includes('Two-step')) ||
-                                                (group.date === 'Yesterday' && item.title.includes('Contact a seller'));
-                                              setSelectedActivityDetail({
-                                                title: item.title,
-                                                description: item.description,
-                                                time: item.time,
-                                                date: group.date,
-                                                avatarIndex,
-                                                iconType: isKeyIcon ? 'key' : 'bell'
-                                              });
-                                            }}
-                                            style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '10px 0', cursor: 'pointer' }}>
-                                            {/* Profile with Notification Bell */}
-                                            <div style={{ position: 'relative', flexShrink: 0 }}>
-                                              <div style={{
-                                                width: '40px',
-                                                height: '40px',
-                                                borderRadius: '50%',
-                                                backgroundColor: '#D5E9BD',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                overflow: 'hidden'
-                                              }}>
-                                                {selectedUserForProfile?.avatar && (
-                                                  <img
-                                                    src={
-                                                      [
-                                                        selectedUserForProfile?.avatar,
-                                                        avatar,
-                                                        messageAvatarIcon
-                                                      ][(groupIdx * 2 + idx) % 3] || selectedUserForProfile?.avatar
-                                                    }
-                                                    alt={selectedUserForProfile.name}
-                                                    style={{
-                                                      width: '36px',
-                                                      height: '36px',
-                                                      borderRadius: '50%',
-                                                      objectFit: 'cover'
-                                                    }}
-                                                  />
-                                                )}
-                                              </div>
-                                              {/* Notification Bell Icon */}
-                                              <div style={{
-                                                position: 'absolute',
-                                                bottom: '-2px',
-                                                right: '-2px',
-                                                width: '16px',
-                                                height: '16px',
-                                                borderRadius: '50%',
-                                                backgroundColor: '#FFFFFF',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                border: '1px solid #F1F1F1',
-                                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                                              }}>
-                                                <img
-                                                  src={
-                                                    (group.date === 'Mon, 21 Dec 2025' && item.title.includes('Two-step')) ||
-                                                      (group.date === 'Yesterday' && item.title.includes('Contact a seller'))
-                                                      ? keyIcon
-                                                      : notifIcon
-                                                  }
-                                                  alt="Notification"
-                                                  style={{
-                                                    width: '10px',
-                                                    height: '10px',
-                                                    filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                                                  }}
-                                                />
-                                              </div>
-                                            </div>
-
-                                            {/* Activity Content */}
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                              <div style={{
-                                                display: 'flex',
-                                                alignItems: 'flex-start',
-                                                justifyContent: 'space-between',
-                                                marginBottom: '0px',
-                                                marginTop: '4px'
-                                              }}>
-                                                <span style={{
-                                                  fontSize: '12px',
-                                                  color: '#6A6A6A',
-                                                  fontFamily: 'Bricolage Grotesque, sans-serif',
-                                                  fontWeight: 500
-                                                }}>
-                                                  {item.title}
-                                                </span>
-                                                <div
-                                                  ref={activityCardMoreMenuButtonRef}
-                                                  className="activity-card-more-options-button"
-                                                  onClick={(e) => {
-                                                    const rect = e.currentTarget.getBoundingClientRect();
-                                                    setCurrentActivityLabel(item.title);
-                                                    setActivityCardMoreMenu({ anchorRect: rect });
-                                                  }}
-                                                  style={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    cursor: 'pointer'
-                                                  }}
-                                                >
-                                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                    <circle cx="4" cy="8" r="1.5" fill="#4D4D4D" />
-                                                    <circle cx="8" cy="8" r="1.5" fill="#4D4D4D" />
-                                                    <circle cx="12" cy="8" r="1.5" fill="#4D4D4D" />
-                                                  </svg>
-                                                </div>
-                                              </div>
-                                              <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                gap: '8px',
-                                                flexWrap: 'wrap'
-                                              }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
-                                                  <span style={{
-                                                    fontSize: '11px',
-                                                    color: '#939393',
-                                                    fontFamily: 'Poppins, sans-serif'
-                                                  }}>
-                                                    {item.description.replace('View more', '')}
-                                                  </span>
-                                                  <span
-                                                    style={{
-                                                      fontSize: '11px',
-                                                      color: '#64B5F6',
-                                                      fontFamily: 'Poppins, sans-serif',
-                                                      cursor: 'pointer',
-                                                      textDecoration: 'underline'
-                                                    }}
-                                                  >
-                                                    View more
-                                                  </span>
-                                                </div>
-                                                <span style={{
-                                                  fontSize: '10px',
-                                                  color: '#B0B0B0',
-                                                  fontFamily: 'Poppins, sans-serif'
-                                                }}>
-                                                  {item.time}
-                                                </span>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          {idx !== group.items.length - 1 && (
-                                            <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%' }} />
-                                          )}
-                                        </React.Fragment>
-                                      ))}
-                                    </div>
-
-                                    {groupIdx !== groups.length - 1 && (
-                                      <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%', marginTop: '18px' }} />
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div style={{ display: 'contents' }}>
-                                {/* Top Bar: Search + Export + Sort */}
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '12px',
-                                  marginBottom: '12px'
-                                }}>
-                                  {/* Search Bar */}
-                                  <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
-                                    <input
-                                      type="text"
-                                      placeholder="Search an activity?"
-                                      style={{
-                                        width: '100%',
-                                        padding: '8px 12px',
-                                        border: 'none',
-                                        borderRadius: '12px',
-                                        fontSize: '12px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        color: '#6A6A6A',
-                                        backgroundColor: '#F1F1F1',
-                                        outline: 'none',
-                                        caretColor: '#CFE8FC'
-                                      }}
-                                    />
-                                  </div>
-
-                                  {/* Export Data Button + Sort By Dropdown */}
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
-                                    {/* Export Data Button */}
-                                    <button style={{
-                                      border: 'none',
-                                      backgroundColor: 'transparent',
-                                      cursor: 'pointer',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '6px',
-                                      color: '#64B5F6',
-                                      fontSize: '11px',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      padding: 0
-                                    }}>
-                                      <span style={{ color: '#64B5F6' }}>Export data</span>
-                                      <img
-                                        src={exportIcon}
-                                        alt="Export"
-                                        style={{
-                                          width: '14px',
-                                          height: '14px',
-                                          filter:
-                                            'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                                        }}
-                                      />
-                                    </button>
-
-                                    {/* Sort By Dropdown */}
-                                    <select style={{
-                                      padding: '4px 10px',
-                                      paddingRight: '28px',
-                                      borderRadius: '8px',
-                                      border: 'none',
-                                      fontSize: '11px',
-                                      color: '#939393',
-                                      backgroundColor: '#FFFFFF',
-                                      cursor: 'pointer',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      appearance: 'none',
-                                      WebkitAppearance: 'none',
-                                      MozAppearance: 'none',
-                                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                                      backgroundRepeat: 'no-repeat',
-                                      backgroundPosition: 'right 8px center',
-                                      backgroundSize: '12px'
-                                    }}>
-                                      <option>Sort by</option>
-                                    </select>
-                                  </div>
-                                </div>
-
-                                {/* Date Header */}
-                                <div style={{
-                                  color: '#939393',
-                                  fontSize: '11px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  marginTop: '16px',
-                                  marginBottom: '16px'
-                                }}>
-                                  Mon, 21 Dec 2025
-                                </div>
-
-                                {/* Activity Entry */}
-                                <div style={{
-                                  display: 'flex',
-                                  gap: '12px'
-                                }}>
-                                  {/* Profile with Notification Bell */}
-                                  <div style={{ position: 'relative', flexShrink: 0 }}>
-                                    <div style={{
-                                      width: '48px',
-                                      height: '48px',
-                                      borderRadius: '50%',
-                                      backgroundColor: '#D5E9BD',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      overflow: 'hidden'
-                                    }}>
-                                      <img
-                                        src={selectedUserForProfile.avatar}
-                                        alt={selectedUserForProfile.name}
-                                        style={{
-                                          width: '44px',
-                                          height: '44px',
-                                          borderRadius: '50%',
-                                          objectFit: 'cover'
-                                        }}
-                                      />
-                                    </div>
-                                    {/* Notification Bell Icon */}
-                                    <div style={{
-                                      position: 'absolute',
-                                      bottom: '-2px',
-                                      right: '-2px',
-                                      width: '20px',
-                                      height: '20px',
-                                      borderRadius: '50%',
-                                      backgroundColor: '#FFFFFF',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      border: '1px solid #F1F1F1',
-                                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                                    }}>
-                                      <img
-                                        src={notifIcon}
-                                        alt="Notification"
-                                        style={{
-                                          width: '12px',
-                                          height: '12px',
-                                          filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-
-                                  {/* Activity Content */}
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{
-                                      display: 'flex',
-                                      alignItems: 'flex-start',
-                                      justifyContent: 'space-between',
-                                      marginBottom: '0px',
-                                      marginTop: '4px'
-                                    }}>
-                                      <span style={{
-                                        fontSize: '12px',
-                                        color: '#6A6A6A',
-                                        fontFamily: 'Bricolage Grotesque, sans-serif',
-                                        fontWeight: 500
+                                        justifyContent: 'center',
+                                        overflow: 'hidden'
                                       }}>
-                                        Account created
-                                      </span>
-                                      <div
-                                        ref={activityCardMoreMenuButtonRef}
-                                        className="activity-card-more-options-button"
-                                        onClick={(e) => {
-                                          const rect = e.currentTarget.getBoundingClientRect();
-                                          setCurrentActivityLabel('Account created');
-                                          setActivityCardMoreMenu({ anchorRect: rect });
-                                        }}
-                                        style={{
-                                          width: '24px',
-                                          height: '24px',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          cursor: 'pointer'
-                                        }}
-                                      >
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                          <circle cx="4" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'} />
-                                          <circle cx="8" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'} />
-                                          <circle cx="12" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'} />
-                                        </svg>
+                                        {selectedUserForProfile?.avatar && (
+                                          <img
+                                            src={
+                                              [
+                                                selectedUserForProfile?.avatar,
+                                                avatar,
+                                                messageAvatarIcon
+                                              ][(groupIdx * 2 + idx) % 3] || selectedUserForProfile?.avatar
+                                            }
+                                            alt={selectedUserForProfile.name}
+                                            style={{
+                                              width: '36px',
+                                              height: '36px',
+                                              borderRadius: '50%',
+                                              objectFit: 'cover'
+                                            }}
+                                          />
+                                        )}
+                                      </div>
+                                      {/* Notification Bell Icon */}
+                                      <div style={{
+                                        position: 'absolute',
+                                        bottom: '-2px',
+                                        right: '-2px',
+                                        width: '16px',
+                                        height: '16px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#FFFFFF',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #F1F1F1',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                                      }}>
+                                        <img
+                                          src={
+                                            (group.date === 'Mon, 21 Dec 2025' && item.title.includes('Two-step')) ||
+                                            (group.date === 'Yesterday' && item.title.includes('Contact a seller'))
+                                              ? keyIcon
+                                              : notifIcon
+                                          }
+                                          alt="Notification"
+                                          style={{
+                                            width: '10px',
+                                            height: '10px',
+                                            filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                                          }}
+                                        />
                                       </div>
                                     </div>
-                                    <div style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      gap: '8px',
-                                      flexWrap: 'wrap'
-                                    }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+
+                                    {/* Activity Content */}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0px',
+                                        marginTop: '4px'
+                                      }}>
                                         <span style={{
-                                          fontSize: '11px',
-                                          color: '#939393',
-                                          fontFamily: 'Poppins, sans-serif'
-                                        }}>
-                                          This user @
-                                        </span>
-                                        <span style={{
-                                          fontSize: '11px',
-                                          color: '#939393',
-                                          fontFamily: 'Poppins, sans-serif',
+                                          fontSize: '12px',
+                                          color: '#6A6A6A',
+                                          fontFamily: 'Bricolage Grotesque, sans-serif',
                                           fontWeight: 500
                                         }}>
-                                          {selectedUserForProfile.name.split(' ')[0]}
+                                          {item.title}
                                         </span>
+                                        <div
+                                          ref={activityCardMoreMenuButtonRef}
+                                          className="activity-card-more-options-button"
+                                          onClick={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setCurrentActivityLabel(item.title);
+                                            setActivityCardMoreMenu({ anchorRect: rect });
+                                          }}
+                                          style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer'
+                                          }}
+                                        >
+                                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="4" cy="8" r="1.5" fill="#4D4D4D"/>
+                                            <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
+                                            <circle cx="12" cy="8" r="1.5" fill="#4D4D4D"/>
+                                          </svg>
+                                        </div>
+                                      </div>
+                                      <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        gap: '8px',
+                                        flexWrap: 'wrap'
+                                      }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                                          <span style={{
+                                            fontSize: '11px',
+                                            color: '#939393',
+                                            fontFamily: 'Poppins, sans-serif'
+                                          }}>
+                                            {item.description.replace('View more', '')}
+                                          </span>
+                                          <span
+                                            style={{
+                                              fontSize: '11px',
+                                              color: '#64B5F6',
+                                              fontFamily: 'Poppins, sans-serif',
+                                              cursor: 'pointer',
+                                              textDecoration: 'underline'
+                                            }}
+                                          >
+                                            View more
+                                          </span>
+                                        </div>
                                         <span style={{
-                                          fontSize: '11px',
+                                          fontSize: '10px',
                                           color: '#B0B0B0',
                                           fontFamily: 'Poppins, sans-serif'
                                         }}>
-                                          {selectedUserForProfile.name.split(' ').slice(1).join(' ')} joined Bao'Afrik
-                                        </span>
-                                        <span
-                                          style={{
-                                            fontSize: '11px',
-                                            color: '#64B5F6',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            cursor: 'pointer',
-                                            textDecoration: 'underline'
-                                          }}
-                                        >
-                                          View more
+                                          {item.time}
                                         </span>
                                       </div>
-                                      <span style={{
-                                        fontSize: '10px',
-                                        color: '#B0B0B0',
-                                        fontFamily: 'Poppins, sans-serif'
-                                      }}>
-                                        19 min ago
-                                      </span>
                                     </div>
                                   </div>
-                                </div>
-                              </div>
+
+                                  {idx !== group.items.length - 1 && (
+                                    <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%' }} />
+                                  )}
+                                </React.Fragment>
+                              ))}
+                            </div>
+
+                            {groupIdx !== groups.length - 1 && (
+                              <div style={{ height: '1px', backgroundColor: '#E9E9E9', width: '100%', marginTop: '18px' }} />
                             )}
                           </div>
-                        )}
+                        ))}
+                      </div>
+                    ) : (
+                    <div style={{ display: 'contents' }}>
+                    {/* Top Bar: Search + Export + Sort */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      marginBottom: '12px'
+                    }}>
+                      {/* Search Bar */}
+                      <div style={{ flex: 1, position: 'relative', maxWidth: '280px' }}>
+                        <input
+                          type="text"
+                          placeholder="Search an activity?"
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            border: 'none',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                            fontFamily: 'Poppins, sans-serif',
+                            color: '#6A6A6A',
+                            backgroundColor: '#F1F1F1',
+                            outline: 'none',
+                            caretColor: '#CFE8FC'
+                          }}
+                        />
+                      </div>
 
-                        {/*
+                      {/* Export Data Button + Sort By Dropdown */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
+                        {/* Export Data Button */}
+                        <button style={{
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#64B5F6',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0
+                        }}>
+                          <span style={{ color: '#64B5F6' }}>Export data</span>
+                          <img
+                            src={exportIcon}
+                            alt="Export"
+                            style={{
+                              width: '14px',
+                              height: '14px',
+                              filter:
+                                'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                            }}
+                          />
+                        </button>
+
+                        {/* Sort By Dropdown */}
+                        <select style={{
+                          padding: '4px 10px',
+                          paddingRight: '28px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          fontSize: '11px',
+                          color: '#939393',
+                          backgroundColor: '#FFFFFF',
+                          cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 8px center',
+                          backgroundSize: '12px'
+                        }}>
+                          <option>Sort by</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Date Header */}
+                    <div style={{
+                      color: '#939393',
+                      fontSize: '11px',
+                      fontFamily: 'Poppins, sans-serif',
+                      marginTop: '16px',
+                      marginBottom: '16px'
+                    }}>
+                      Mon, 21 Dec 2025
+                    </div>
+
+                    {/* Activity Entry */}
+                    <div style={{
+                      display: 'flex',
+                      gap: '12px'
+                    }}>
+                      {/* Profile with Notification Bell */}
+                      <div style={{ position: 'relative', flexShrink: 0 }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '50%',
+                          backgroundColor: '#D5E9BD',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden'
+                        }}>
+                          <img
+                            src={selectedUserForProfile.avatar}
+                            alt={selectedUserForProfile.name}
+                            style={{
+                              width: '44px',
+                              height: '44px',
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        </div>
+                        {/* Notification Bell Icon */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-2px',
+                          right: '-2px',
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '1px solid #F1F1F1',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                        }}>
+                          <img
+                            src={notifIcon}
+                            alt="Notification"
+                            style={{
+                              width: '12px',
+                              height: '12px',
+                              filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Activity Content */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'space-between',
+                          marginBottom: '0px',
+                          marginTop: '4px'
+                        }}>
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#6A6A6A',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontWeight: 500
+                          }}>
+                            Account created
+                          </span>
+                          <div 
+                            ref={activityCardMoreMenuButtonRef}
+                            className="activity-card-more-options-button"
+                            onClick={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setCurrentActivityLabel('Account created');
+                              setActivityCardMoreMenu({ anchorRect: rect });
+                            }}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <circle cx="4" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                              <circle cx="8" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                              <circle cx="12" cy="8" r="1.5" fill={activityCardMoreMenu ? '#64B5F6' : '#4D4D4D'}/>
+                            </svg>
+                          </div>
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px',
+                          flexWrap: 'wrap'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                            <span style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              This user @
+                            </span>
+                            <span style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              fontWeight: 500
+                            }}>
+                              {selectedUserForProfile.name.split(' ')[0]}
+                            </span>
+                            <span style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {selectedUserForProfile.name.split(' ').slice(1).join(' ')} joined Bao'Afrik
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                              }}
+                            >
+                              View more
+                            </span>
+                          </div>
+                          <span style={{
+                            fontSize: '10px',
+                            color: '#B0B0B0',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            19 min ago
+                          </span>
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    )}
+                    </div>
+                    )}
+
+                    {/*
                       Activity card more-menu + delete modals are now rendered once at the page level
                       via `renderActivityCardMoreMenuAndDeleteModals()` so they work for Listings too.
                     */}
-                      </div>
-                    )}
+                    </div>
+                  )}
                   </div>
 
                   {/* Right: User Details Sidebar (aligned with title) */}
@@ -4780,8 +4780,8 @@ const AdminDashboard: React.FC = () => {
                             src={selectedUserForProfile.avatar}
                             alt={selectedUserForProfile.name}
                             style={{
-                              width: '46px',
-                              height: '46px',
+                            width: '46px',
+                            height: '46px',
                               borderRadius: '50%',
                               objectFit: 'cover'
                             }}
@@ -4882,9 +4882,9 @@ const AdminDashboard: React.FC = () => {
                             >
                               {action.icon === 'ellipsis' ? (
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                  <circle cx="4" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'} />
-                                  <circle cx="8" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'} />
-                                  <circle cx="12" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'} />
+                                  <circle cx="4" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                  <circle cx="8" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
+                                  <circle cx="12" cy="8" r="1.5" fill={isMoreMenuOpen ? '#64B5F6' : '#212121'}/>
                                 </svg>
                               ) : (
                                 <img
@@ -4956,13 +4956,13 @@ const AdminDashboard: React.FC = () => {
                             }}
                           >
                             {/* Edit user access */}
-                            <div
+                            <div 
                               onClick={() => {
                                 setIsManageAccessView(true);
                                 setSidebarMoreMenu(null);
                               }}
-                              onMouseEnter={primaryHoverOn}
-                              onMouseLeave={primaryHoverOff}
+                              onMouseEnter={primaryHoverOn} 
+                              onMouseLeave={primaryHoverOff} 
                               style={baseItemStyle}
                             >
                               <img
@@ -4978,7 +4978,7 @@ const AdminDashboard: React.FC = () => {
                             </div>
 
                             {/* Suspend/Unsuspend the user */}
-                            <div
+                            <div 
                               onClick={() => {
                                 if (isUserSuspended) {
                                   setIsUserSuspended(false);
@@ -4989,8 +4989,8 @@ const AdminDashboard: React.FC = () => {
                                   setSidebarMoreMenu(null);
                                 }
                               }}
-                              onMouseEnter={primaryHoverOn}
-                              onMouseLeave={primaryHoverOff}
+                              onMouseEnter={primaryHoverOn} 
+                              onMouseLeave={primaryHoverOff} 
                               style={baseItemStyle}
                             >
                               <img
@@ -5058,168 +5058,244 @@ const AdminDashboard: React.FC = () => {
                         );
                       })()}
 
-                      {/* Suspend Confirmation Modal */}
-                      {userToSuspend && !isSuspendSuccess && (
+                    {/* Suspend Confirmation Modal */}
+                    {userToSuspend && !isSuspendSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setUserToSuspend(null);
+                          }
+                        }}
+                      >
                         <div
                           style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: '#0000001A',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '380px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 10000
+                            flexDirection: 'column'
                           }}
-                          onClick={(e) => {
-                            if (e.target === e.currentTarget) {
-                              setUserToSuspend(null);
-                            }
-                          }}
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <div
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => setUserToSuspend(null)}
                             style={{
-                              backgroundColor: '#FFFFFF',
-                              borderRadius: '30px',
-                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                              padding: '30px',
-                              maxWidth: '380px',
-                              width: '90%',
-                              minHeight: '280px',
-                              position: 'relative',
-                              display: 'flex',
-                              flexDirection: 'column'
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
                             }}
-                            onClick={(e) => e.stopPropagation()}
                           >
-                            {/* Close Button */}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={warningIcon}
+                              alt="Warning"
+                              style={{ width: '80px', height: '80px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account will be suspended. Do you wish to continue?
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                             <button
                               type="button"
                               onClick={() => setUserToSuspend(null)}
                               style={{
-                                position: 'absolute',
-                                top: '20px',
-                                right: '20px',
-                                background: 'transparent',
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
                                 border: 'none',
+                                padding: '10px 28px',
                                 cursor: 'pointer',
-                                padding: '4px'
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
                               }}
                             >
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M18 6L6 18M6 6l12 12" />
                               </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
                             </button>
-
-                            {/* Icon */}
-                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
-                              <img
-                                src={warningIcon}
-                                alt="Warning"
-                                style={{ width: '80px', height: '80px' }}
-                              />
-                            </div>
-
-                            {/* Text */}
-                            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                              <p
-                                style={{
-                                  color: '#212121',
-                                  fontFamily: 'Bricolage Grotesque, sans-serif',
-                                  fontSize: '16px',
-                                  lineHeight: '1.5',
-                                  margin: 0
-                                }}
-                              >
-                                <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account will be suspended. Do you wish to continue?
-                              </p>
-                            </div>
-
-                            {/* Buttons */}
-                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                              <button
-                                type="button"
-                                onClick={() => setUserToSuspend(null)}
-                                style={{
-                                  backgroundColor: '#F1F1F1',
-                                  borderRadius: '12px',
-                                  border: 'none',
-                                  padding: '10px 28px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px'
-                                }}
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M18 6L6 18M6 6l12 12" />
-                                </svg>
-                                <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Cancel</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setIsSuspendSuccess(true);
-                                }}
-                                style={{
-                                  backgroundColor: '#212121',
-                                  borderRadius: '12px',
-                                  border: 'none',
-                                  padding: '10px 28px',
-                                  cursor: 'pointer',
-                                  color: '#FFFFFF',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  fontSize: '14px'
-                                }}
-                              >
-                                Yes, Deactivate
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsSuspendSuccess(true);
+                              }}
+                              style={{
+                                backgroundColor: '#212121',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Yes, Deactivate
+                            </button>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
 
-                      {/* Suspend Success Modal */}
-                      {userToSuspend && isSuspendSuccess && (
+                    {/* Suspend Success Modal */}
+                    {userToSuspend && isSuspendSuccess && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: '#0000001A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10000
+                        }}
+                        onClick={(e) => {
+                          if (e.target === e.currentTarget) {
+                            setIsUserSuspended(true);
+                            setUserToSuspend(null);
+                            setIsSuspendSuccess(false);
+                          }
+                        }}
+                      >
                         <div
                           style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: '#0000001A',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '30px',
+                            boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                            padding: '30px',
+                            maxWidth: '380px',
+                            width: '90%',
+                            minHeight: '280px',
+                            position: 'relative',
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 10000
+                            flexDirection: 'column'
                           }}
-                          onClick={(e) => {
-                            if (e.target === e.currentTarget) {
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
                               setIsUserSuspended(true);
                               setUserToSuspend(null);
                               setIsSuspendSuccess(false);
-                            }
-                          }}
-                        >
-                          <div
-                            style={{
-                              backgroundColor: '#FFFFFF',
-                              borderRadius: '30px',
-                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
-                              padding: '30px',
-                              maxWidth: '380px',
-                              width: '90%',
-                              minHeight: '280px',
-                              position: 'relative',
-                              display: 'flex',
-                              flexDirection: 'column'
                             }}
-                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              position: 'absolute',
+                              top: '20px',
+                              right: '20px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px'
+                            }}
                           >
-                            {/* Close Button */}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+
+                          {/* Icon */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
+                            <img
+                              src={verityIcon}
+                              alt="Success"
+                              style={{ width: '65px', height: '65px' }}
+                            />
+                          </div>
+
+                          {/* Text */}
+                          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <p
+                              style={{
+                                color: '#212121',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                fontSize: '16px',
+                                lineHeight: '1.5',
+                                margin: 0
+                              }}
+                            >
+                              <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account has been<br />
+                              successfully suspended.
+                            </p>
+                          </div>
+
+                          {/* Buttons */}
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsUserSuspended(false);
+                                setUserToSuspend(null);
+                                setIsSuspendSuccess(false);
+                                setSuspendCountdown(10);
+                              }}
+                              style={{
+                                backgroundColor: '#F1F1F1',
+                                borderRadius: '12px',
+                                border: 'none',
+                                padding: '10px 28px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                <path d="M21 3v5h-5" />
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                <path d="M3 21v-5h5" />
+                              </svg>
+                              <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
+                            </button>
                             <button
                               type="button"
                               onClick={() => {
@@ -5228,98 +5304,22 @@ const AdminDashboard: React.FC = () => {
                                 setIsSuspendSuccess(false);
                               }}
                               style={{
-                                position: 'absolute',
-                                top: '20px',
-                                right: '20px',
-                                background: 'transparent',
+                                backgroundColor: '#F9A825',
+                                borderRadius: '12px',
                                 border: 'none',
+                                padding: '10px 28px',
                                 cursor: 'pointer',
-                                padding: '4px'
+                                color: '#FFFFFF',
+                                fontFamily: 'Poppins, sans-serif',
+                                fontSize: '14px'
                               }}
                             >
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
+                              Close · {suspendCountdown}s
                             </button>
-
-                            {/* Icon */}
-                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '12px' }}>
-                              <img
-                                src={verityIcon}
-                                alt="Success"
-                                style={{ width: '65px', height: '65px' }}
-                              />
-                            </div>
-
-                            {/* Text */}
-                            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                              <p
-                                style={{
-                                  color: '#212121',
-                                  fontFamily: 'Bricolage Grotesque, sans-serif',
-                                  fontSize: '16px',
-                                  lineHeight: '1.5',
-                                  margin: 0
-                                }}
-                              >
-                                <span style={{ color: '#64B5F6' }}>{userToSuspend}</span> account has been<br />
-                                successfully suspended.
-                              </p>
-                            </div>
-
-                            {/* Buttons */}
-                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setIsUserSuspended(false);
-                                  setUserToSuspend(null);
-                                  setIsSuspendSuccess(false);
-                                  setSuspendCountdown(10);
-                                }}
-                                style={{
-                                  backgroundColor: '#F1F1F1',
-                                  borderRadius: '12px',
-                                  border: 'none',
-                                  padding: '10px 28px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px'
-                                }}
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A6A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                                  <path d="M21 3v5h-5" />
-                                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                                  <path d="M3 21v-5h5" />
-                                </svg>
-                                <span style={{ color: '#6A6A6A', fontFamily: 'Poppins, sans-serif', fontSize: '14px' }}>Undo</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setIsUserSuspended(true);
-                                  setUserToSuspend(null);
-                                  setIsSuspendSuccess(false);
-                                }}
-                                style={{
-                                  backgroundColor: '#F9A825',
-                                  borderRadius: '12px',
-                                  border: 'none',
-                                  padding: '10px 28px',
-                                  cursor: 'pointer',
-                                  color: '#FFFFFF',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  fontSize: '14px'
-                                }}
-                              >
-                                Close · {suspendCountdown}s
-                              </button>
-                            </div>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
                     </div>
 
                     {/* Delete User Confirmation Modal */}
@@ -5739,10 +5739,10 @@ const AdminDashboard: React.FC = () => {
                         </div>
 
                         {/* Access Rows - Scrollable Container */}
-                        <div
+                        <div 
                           ref={scrollableContainerRef}
                           className="access-rows-scrollable"
-                          style={{
+                          style={{ 
                             position: 'relative',
                             maxHeight: 'calc(100vh - 400px)',
                             overflowY: 'auto',
@@ -5770,670 +5770,670 @@ const AdminDashboard: React.FC = () => {
                             }
                           `}</style>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {/* Listings Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Listings
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#70E183',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    18/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.listings}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Listings Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Listings
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.listings}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, listings: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.listings ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.listings ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('listings')) {
+                                    newSet.delete('listings');
+                                  } else {
+                                    newSet.add('listings');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('listings') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create', label: 'Can create a listing' },
+                                  { key: 'can-delete', label: 'Can delete a listing' },
+                                  { key: 'can-modify', label: 'Can modify a listing' },
+                                  { key: 'can-review', label: 'Can review listings from other users' },
+                                  { key: 'can-report', label: 'Can report listing from other users' },
+                                  { key: 'can-share', label: 'Can share a listing' },
+                                  { key: 'can-contact', label: 'Can contact a seller for a listing' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.listings ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('listings') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('listings')) {
-                                      newSet.delete('listings');
-                                    } else {
-                                      newSet.add('listings');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('listings') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-create', label: 'Can create a listing' },
-                                    { key: 'can-delete', label: 'Can delete a listing' },
-                                    { key: 'can-modify', label: 'Can modify a listing' },
-                                    { key: 'can-review', label: 'Can review listings from other users' },
-                                    { key: 'can-report', label: 'Can report listing from other users' },
-                                    { key: 'can-share', label: 'Can share a listing' },
-                                    { key: 'can-contact', label: 'Can contact a seller for a listing' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.listings[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            listings: {
+                                              ...permissionToggles.listings,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.listings[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              listings: {
-                                                ...permissionToggles.listings,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.listings[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.listings[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Messages Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Messages
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#70E183',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    18/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.messages}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Messages Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Messages
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#70E183',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.messages}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, messages: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.messages ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.messages ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('messages')) {
+                                    newSet.delete('messages');
+                                  } else {
+                                    newSet.add('messages');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('messages') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-send-message', label: 'Can send message to a user' },
+                                  { key: 'can-send-files', label: 'Can send files to a user' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.messages ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('messages') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('messages')) {
-                                      newSet.delete('messages');
-                                    } else {
-                                      newSet.add('messages');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('messages') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-send-message', label: 'Can send message to a user' },
-                                    { key: 'can-send-files', label: 'Can send files to a user' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.messages[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            messages: {
+                                              ...permissionToggles.messages,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.messages[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              messages: {
-                                                ...permissionToggles.messages,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.messages[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.messages[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Requests Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Requests
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FAB951',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    12/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.requests}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Requests Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Requests
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  12/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.requests}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, requests: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.requests ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.requests ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('requests')) {
+                                    newSet.delete('requests');
+                                  } else {
+                                    newSet.add('requests');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('requests') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-create-request', label: 'Can create a request' },
+                                  { key: 'can-respond', label: 'Can respond to a request' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.requests ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('requests') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('requests')) {
-                                      newSet.delete('requests');
-                                    } else {
-                                      newSet.add('requests');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('requests') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-create-request', label: 'Can create a request' },
-                                    { key: 'can-respond', label: 'Can respond to a request' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.requests[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            requests: {
+                                              ...permissionToggles.requests,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.requests[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              requests: {
-                                                ...permissionToggles.requests,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.requests[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.requests[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Users Access Row */}
-                            <div>
-                              {/* Top Row: Title, Dot, Badge, Toggle */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
-                              }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: '#212121',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    fontWeight: 600
-                                  }}>
-                                    Users
-                                  </span>
-                                  <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FAB951',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    18/18 Access
-                                  </span>
-                                </div>
-                                <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={accessToggles.users}
-                                    onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
-                                    style={{ opacity: 0, width: 0, height: 0 }}
-                                  />
+                          {/* Users Access Row */}
+                          <div>
+                            {/* Top Row: Title, Dot, Badge, Toggle */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: '#212121',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                  fontWeight: 600
+                                }}>
+                                  Users
+                                </span>
+                                <span style={{ color: '#939393', fontSize: '12px' }}>•</span>
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FAB951',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  18/18 Access
+                                </span>
+                              </div>
+                              <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={accessToggles.users}
+                                  onChange={(e) => setAccessToggles({ ...accessToggles, users: e.target.checked })}
+                                  style={{ opacity: 0, width: 0, height: 0 }}
+                                />
+                                <span style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
+                                  borderRadius: '10px',
+                                  transition: 'background-color 0.3s'
+                                }}>
                                   <span style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: accessToggles.users ? '#70E183' : '#D9D9D9',
-                                    borderRadius: '10px',
-                                    transition: 'background-color 0.3s'
+                                    content: '""',
+                                    height: '16px',
+                                    width: '16px',
+                                    left: accessToggles.users ? '17px' : '3px',
+                                    bottom: '2px',
+                                    backgroundColor: '#FFFFFF',
+                                    borderRadius: '50%',
+                                    transition: 'left 0.3s'
+                                  }} />
+                                </span>
+                              </label>
+                            </div>
+                            {/* Bottom Row: Description and Arrow */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <p style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                margin: 0,
+                                lineHeight: '1.5'
+                              }}>
+                                Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
+                              </p>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#939393"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                  transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s',
+                                  cursor: 'pointer',
+                                  flexShrink: 0
+                                }}
+                                onClick={() => {
+                                  const newSet = new Set(expandedPermissionLists);
+                                  if (newSet.has('users')) {
+                                    newSet.delete('users');
+                                  } else {
+                                    newSet.add('users');
+                                  }
+                                  setExpandedPermissionLists(newSet);
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            {/* Permission List */}
+                            {expandedPermissionLists.has('users') && (
+                              <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {[
+                                  { key: 'can-view', label: 'Can view user profiles' },
+                                  { key: 'can-edit', label: 'Can edit user information' }
+                                ].map((permission) => (
+                                  <div key={permission.key} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '2px 0'
                                   }}>
                                     <span style={{
-                                      position: 'absolute',
-                                      content: '""',
-                                      height: '16px',
-                                      width: '16px',
-                                      left: accessToggles.users ? '17px' : '3px',
-                                      bottom: '2px',
-                                      backgroundColor: '#FFFFFF',
-                                      borderRadius: '50%',
-                                      transition: 'left 0.3s'
-                                    }} />
-                                  </span>
-                                </label>
-                              </div>
-                              {/* Bottom Row: Description and Arrow */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
-                              }}>
-                                <p style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  margin: 0,
-                                  lineHeight: '1.5'
-                                }}>
-                                  Lorem ipsum dolor sit amet consectetur. Neque vitae rhon cus amet nec diam in.
-                                </p>
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#939393"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{
-                                    transform: expandedPermissionLists.has('users') ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                  onClick={() => {
-                                    const newSet = new Set(expandedPermissionLists);
-                                    if (newSet.has('users')) {
-                                      newSet.delete('users');
-                                    } else {
-                                      newSet.add('users');
-                                    }
-                                    setExpandedPermissionLists(newSet);
-                                  }}
-                                >
-                                  <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                              </div>
-                              {/* Permission List */}
-                              {expandedPermissionLists.has('users') && (
-                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                  {[
-                                    { key: 'can-view', label: 'Can view user profiles' },
-                                    { key: 'can-edit', label: 'Can edit user information' }
-                                  ].map((permission) => (
-                                    <div key={permission.key} style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      padding: '2px 0'
+                                      fontSize: '11px',
+                                      color: '#939393',
+                                      fontFamily: 'Poppins, sans-serif'
                                     }}>
+                                      {permission.label}
+                                    </span>
+                                    <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={permissionToggles.users[permission.key] || false}
+                                        onChange={(e) => {
+                                          setPermissionToggles({
+                                            ...permissionToggles,
+                                            users: {
+                                              ...permissionToggles.users,
+                                              [permission.key]: e.target.checked
+                                            }
+                                          });
+                                        }}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                      />
                                       <span style={{
-                                        fontSize: '11px',
-                                        color: '#939393',
-                                        fontFamily: 'Poppins, sans-serif'
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
+                                        borderRadius: '10px',
+                                        transition: 'background-color 0.3s'
                                       }}>
-                                        {permission.label}
-                                      </span>
-                                      <label style={{ position: 'relative', display: 'inline-block', width: '36px', height: '20px', cursor: 'pointer' }}>
-                                        <input
-                                          type="checkbox"
-                                          checked={permissionToggles.users[permission.key] || false}
-                                          onChange={(e) => {
-                                            setPermissionToggles({
-                                              ...permissionToggles,
-                                              users: {
-                                                ...permissionToggles.users,
-                                                [permission.key]: e.target.checked
-                                              }
-                                            });
-                                          }}
-                                          style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
                                         <span style={{
                                           position: 'absolute',
-                                          top: 0,
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          backgroundColor: (permissionToggles.users[permission.key] || false) ? '#70E183' : '#D9D9D9',
-                                          borderRadius: '10px',
-                                          transition: 'background-color 0.3s'
-                                        }}>
-                                          <span style={{
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '16px',
-                                            width: '16px',
-                                            left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
-                                            bottom: '2px',
-                                            backgroundColor: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            transition: 'left 0.3s'
-                                          }} />
-                                        </span>
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                                          content: '""',
+                                          height: '16px',
+                                          width: '16px',
+                                          left: (permissionToggles.users[permission.key] || false) ? '17px' : '3px',
+                                          bottom: '2px',
+                                          backgroundColor: '#FFFFFF',
+                                          borderRadius: '50%',
+                                          transition: 'left 0.3s'
+                                        }} />
+                                      </span>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                           </div>
                           {/* Fade Effect at Bottom - Only show when expanded and scrollable */}
                           {expandedPermissionLists.size > 0 && isScrollable && (
@@ -6518,68 +6518,68 @@ const AdminDashboard: React.FC = () => {
 
                     {/* Tabs */}
                     {!isManageAccessView && !isManageAccessMaximized && (
-                      <div style={{
-                        display: 'flex',
-                        gap: '16px',
-                        marginBottom: '16px',
-                        marginLeft: '-14px',
-                        marginRight: '-14px',
-                        paddingLeft: '14px',
-                        paddingRight: '14px',
-                        borderBottom: '1px solid #F1F1F1'
-                      }}>
-                        {[
-                          { label: 'About user', key: 'about' as const },
-                          { label: 'Reviews and rates', key: 'reviews' as const },
-                          { label: 'Reported issues ab...', key: 'reported' as const }
-                        ].map((tab) => (
-                          <button
-                            key={tab.key}
-                            onClick={() => setUserDetailActiveTab(tab.key)}
-                            style={{
-                              padding: '8px 0',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              borderBottom: userDetailActiveTab === tab.key ? '2px solid #64B5F6' : '2px solid transparent',
-                              color: userDetailActiveTab === tab.key ? '#64B5F6' : '#B0B0B0',
-                              fontSize: '11px',
-                              fontFamily: 'Poppins, sans-serif',
-                              cursor: 'pointer',
-                              marginBottom: '-1px',
-                              transition: 'color 0.2s'
-                            }}
-                          >
-                            {tab.label}
-                          </button>
-                        ))}
-                      </div>
+                    <div style={{
+                      display: 'flex',
+                      gap: '16px',
+                      marginBottom: '16px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
+                      borderBottom: '1px solid #F1F1F1'
+                    }}>
+                      {[
+                        { label: 'About user', key: 'about' as const },
+                        { label: 'Reviews and rates', key: 'reviews' as const },
+                        { label: 'Reported issues ab...', key: 'reported' as const }
+                      ].map((tab) => (
+                        <button
+                          key={tab.key}
+                          onClick={() => setUserDetailActiveTab(tab.key)}
+                          style={{
+                            padding: '8px 0',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderBottom: userDetailActiveTab === tab.key ? '2px solid #64B5F6' : '2px solid transparent',
+                            color: userDetailActiveTab === tab.key ? '#64B5F6' : '#B0B0B0',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            cursor: 'pointer',
+                            marginBottom: '-1px',
+                            transition: 'color 0.2s'
+                          }}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
                     )}
 
                     {/* See user bio */}
                     {!isManageAccessView && userDetailActiveTab === 'about' && (
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '8px 0',
-                        marginBottom: '8px',
-                        marginLeft: '-14px',
-                        marginRight: '-14px',
-                        paddingLeft: '14px',
-                        paddingRight: '14px',
-                        borderBottom: '1px solid #F1F1F1'
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 0',
+                      marginBottom: '8px',
+                      marginLeft: '-14px',
+                      marginRight: '-14px',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
+                      borderBottom: '1px solid #F1F1F1'
+                    }}>
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#6A6A6A',
+                        fontFamily: 'Poppins, sans-serif'
                       }}>
-                        <span style={{
-                          fontSize: '12px',
-                          color: '#6A6A6A',
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          See user bio
-                        </span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </div>
+                        See user bio
+                      </span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
                     )}
 
                     {/* Reviews and Ratings View */}
@@ -6598,7 +6598,7 @@ const AdminDashboard: React.FC = () => {
                               4.3
                             </span>
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="#FBBC05">
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
                           </div>
                         </div>
@@ -6692,157 +6692,157 @@ const AdminDashboard: React.FC = () => {
                         {/* Filter and Maximize Controls - Only show when NOT maximized */}
                         {!isReviewsMaximized && (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', marginTop: '12px' }}>
-                            {/* Filter Dropdown */}
-                            <div style={{ position: 'relative' }} ref={filterDropdownRef}>
-                              <button
-                                onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '6px',
-                                  color: '#939393',
-                                  fontSize: '11px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  cursor: 'pointer',
-                                  backgroundColor: 'transparent',
-                                  border: 'none',
-                                  padding: 0,
-                                  transition: 'opacity 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                              >
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                                  <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" />
-                                  <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5" />
-                                  <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round" />
-                                  <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5" />
-                                </svg>
-                                <span>{selectedFilter}</span>
-                              </button>
-
-                              {/* Dropdown Menu */}
-                              {filterDropdownOpen && (
-                                <div style={{
-                                  position: 'absolute',
-                                  top: '24px',
-                                  left: 0,
-                                  backgroundColor: '#FFFFFF',
-                                  border: '1px solid #E5E7EB',
-                                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                                  zIndex: 10,
-                                  borderRadius: '8px',
-                                  padding: '4px',
-                                  minWidth: '200px',
-                                  maxWidth: '240px'
-                                }}>
-                                  {filterOptions.map((option, index) => {
-                                    const isSelected = selectedFilter === option.label;
-                                    return (
-                                      <button
-                                        key={option.id}
-                                        onClick={() => handleFilterSelect(option.id)}
-                                        style={{
-                                          width: '100%',
-                                          textAlign: 'left',
-                                          display: 'flex',
-                                          alignItems: 'flex-start',
-                                          gap: '8px',
-                                          backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
-                                          borderRadius: isSelected ? '6px' : '0',
-                                          marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
-                                          padding: '6px 8px',
-                                          border: 'none',
-                                          cursor: 'pointer',
-                                          transition: 'background-color 0.2s'
-                                        }}
-                                      >
-                                        {/* Icon */}
-                                        <div style={{ flexShrink: 0, marginTop: '1px' }}>
-                                          {option.icon === 'star' ? (
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
-                                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                            </svg>
-                                          ) : (
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
-                                              <circle cx="12" cy="12" r="10" />
-                                              <path d="M12 6v6l4 2" />
-                                            </svg>
-                                          )}
-                                        </div>
-
-                                        {/* Text */}
-                                        <div style={{ flex: 1 }}>
-                                          <div style={{
-                                            fontSize: '11px',
-                                            marginBottom: '1px',
-                                            color: isSelected ? '#64B5F6' : '#212121',
-                                            fontFamily: 'Poppins, sans-serif',
-                                            fontWeight: 500
-                                          }}>
-                                            {option.label}
-                                          </div>
-                                          <div style={{
-                                            fontSize: '9px',
-                                            color: '#939393',
-                                            fontFamily: 'Poppins, sans-serif'
-                                          }}>
-                                            {option.description}
-                                          </div>
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                            {/* Maximize/Minimize */}
-                            <div
-                              onClick={() => setIsReviewsMaximized(!isReviewsMaximized)}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                color: '#64B5F6',
-                                fontSize: '11px',
+                          {/* Filter Dropdown */}
+                          <div style={{ position: 'relative' }} ref={filterDropdownRef}>
+                            <button 
+                              onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                              style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '6px', 
+                                color: '#939393', 
+                                fontSize: '11px', 
                                 fontFamily: 'Poppins, sans-serif',
                                 cursor: 'pointer',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                padding: 0,
                                 transition: 'opacity 0.2s'
                               }}
                               onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
                               onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                             >
-                              <span>{isReviewsMaximized ? 'Minimize window' : 'Maximize window'}</span>
-                              <img
-                                src={expandIcon}
-                                alt={isReviewsMaximized ? 'Minimize' : 'Maximize'}
-                                style={{
-                                  width: '14px',
-                                  height: '14px',
-                                  transform: isReviewsMaximized ? 'rotate(180deg)' : 'none',
-                                  transition: 'transform 0.3s'
-                                }}
-                              />
-                            </div>
+                              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                <line x1="3" y1="6" x2="17" y2="6" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                                <circle cx="10" cy="6" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                                <line x1="3" y1="14" x2="17" y2="14" stroke="#939393" strokeWidth="1.5" strokeLinecap="round"/>
+                                <circle cx="10" cy="14" r="2" fill="#FFF" stroke="#939393" strokeWidth="1.5"/>
+                              </svg>
+                              <span>{selectedFilter}</span>
+                            </button>
+                            
+                            {/* Dropdown Menu */}
+                            {filterDropdownOpen && (
+                              <div style={{ 
+                                position: 'absolute', 
+                                top: '24px', 
+                                left: 0, 
+                                backgroundColor: '#FFFFFF', 
+                                border: '1px solid #E5E7EB', 
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', 
+                                zIndex: 10, 
+                                borderRadius: '8px', 
+                                padding: '4px', 
+                                minWidth: '200px', 
+                                maxWidth: '240px' 
+                              }}>
+                                {filterOptions.map((option, index) => {
+                                  const isSelected = selectedFilter === option.label;
+                                  return (
+                                    <button
+                                      key={option.id}
+                                      onClick={() => handleFilterSelect(option.id)}
+                                      style={{
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: '8px',
+                                        backgroundColor: isSelected ? '#F0F8FE' : 'transparent',
+                                        borderRadius: isSelected ? '6px' : '0',
+                                        marginBottom: index < filterOptions.length - 1 ? '2px' : '0',
+                                        padding: '6px 8px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.2s'
+                                      }}
+                                    >
+                                      {/* Icon */}
+                                      <div style={{ flexShrink: 0, marginTop: '1px' }}>
+                                        {option.icon === 'star' ? (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                          </svg>
+                                        ) : (
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isSelected ? '#64B5F6' : '#212121'} strokeWidth="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M12 6v6l4 2"/>
+                                          </svg>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Text */}
+                                      <div style={{ flex: 1 }}>
+                                        <div style={{ 
+                                          fontSize: '11px', 
+                                          marginBottom: '1px', 
+                                          color: isSelected ? '#64B5F6' : '#212121',
+                                          fontFamily: 'Poppins, sans-serif',
+                                          fontWeight: 500
+                                        }}>
+                                          {option.label}
+                                        </div>
+                                        <div style={{ 
+                                          fontSize: '9px', 
+                                          color: '#939393',
+                                          fontFamily: 'Poppins, sans-serif'
+                                        }}>
+                                          {option.description}
+                                        </div>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
+                          {/* Maximize/Minimize */}
+                          <div
+                            onClick={() => setIsReviewsMaximized(!isReviewsMaximized)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              color: '#64B5F6',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              cursor: 'pointer',
+                              transition: 'opacity 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                          >
+                            <span>{isReviewsMaximized ? 'Minimize window' : 'Maximize window'}</span>
+                            <img
+                              src={expandIcon}
+                              alt={isReviewsMaximized ? 'Minimize' : 'Maximize'}
+                              style={{
+                                width: '14px',
+                                height: '14px',
+                                transform: isReviewsMaximized ? 'rotate(180deg)' : 'none',
+                                transition: 'transform 0.3s'
+                              }}
+                            />
+                          </div>
+                        </div>
                         )}
 
                         {/* Reviews List - Only show when NOT maximized */}
                         {!isReviewsMaximized && (
-                          <div
-                            data-reviews-scroll
-                            className="reviews-scroll-container"
-                            style={{
-                              maxHeight: '350px',
-                              overflowY: 'auto',
-                              paddingRight: '6px',
-                              scrollbarWidth: 'none',
-                              msOverflowStyle: 'none',
-                              position: 'relative',
-                              paddingBottom: '8px'
-                            }}
-                          >
-                            <style>{`
+                        <div
+                          data-reviews-scroll
+                          className="reviews-scroll-container"
+                          style={{
+                            maxHeight: '350px',
+                            overflowY: 'auto',
+                            paddingRight: '6px',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                            position: 'relative',
+                            paddingBottom: '8px'
+                          }}
+                        >
+                          <style>{`
                             .reviews-scroll-container::-webkit-scrollbar {
                               display: none !important;
                               width: 0 !important;
@@ -6854,402 +6854,402 @@ const AdminDashboard: React.FC = () => {
                               scrollbar-width: none !important;
                             }
                           `}</style>
-                            {/* Review 1 - Samine Herald */}
-                            <div style={{ marginBottom: '20px' }}>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                                {/* Profile with square background */}
-                                <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#D5E9BD',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={avatar}
-                                    alt="Samine Herald"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
+                          {/* Review 1 - Samine Herald */}
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              {/* Profile with square background */}
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#D5E9BD',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={avatar}
+                                  alt="Samine Herald"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    Samine Herald
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    2 Jan 2025
+                                  </span>
                                 </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{
-                                      fontSize: '13px',
-                                      color: '#212121',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      fontWeight: 500
-                                    }}>
-                                      Samine Herald
-                                    </span>
-                                    <span style={{
-                                      fontSize: '10px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      2 Jan 2025
-                                    </span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {[1, 2, 3, 4].map((star) => (
-                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
-                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {[1, 2, 3, 4].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                     </svg>
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#939393',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      marginLeft: '4px'
-                                    }}>
-                                      4.3
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* Review text starts under profile - aligned with profile left edge */}
-                              <p style={{
-                                fontSize: '11px',
-                                color: '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                lineHeight: '1.5',
-                                marginBottom: '8px',
-                                marginTop: 0
-                              }}>
-                                I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span style={{
-                                  fontSize: '11px',
-                                  color: '#64B5F6',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  cursor: 'pointer'
-                                }}>
-                                  View the discussion (1)
-                                </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                  <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                  ))}
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                  </svg>
                                   <span style={{
                                     fontSize: '11px',
-                                    color: '#FF5151',
-                                    fontFamily: 'Poppins, sans-serif'
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
                                   }}>
-                                    Delete the review
+                                    4.3
                                   </span>
                                 </div>
                               </div>
                             </div>
-
-                            {/* Review 2 - Kael Otto */}
-                            <div style={{ marginBottom: '20px' }}>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                                <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#E3F2FD',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={messageAvatarIcon}
-                                    alt="Kael Otto"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{
-                                      fontSize: '13px',
-                                      color: '#212121',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      fontWeight: 500
-                                    }}>
-                                      Kael Otto
-                                    </span>
-                                    <span style={{
-                                      fontSize: '10px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      2 Jan 2025
-                                    </span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {[1, 2, 3, 4].map((star) => (
-                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
-                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#939393',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      marginLeft: '4px'
-                                    }}>
-                                      4.3
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* Review text starts under profile - aligned with profile left edge */}
-                              <p style={{
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              I found this pepper to be quite versatile, enhancing both my stews and grilled dishes. Its subtle heat is perfect for those who prefer a milder spice. I would definitely buy it again.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
                                 fontSize: '11px',
-                                color: '#939393',
+                                color: '#64B5F6',
                                 fontFamily: 'Poppins, sans-serif',
-                                lineHeight: '1.5',
-                                marginBottom: '8px',
-                                marginTop: 0
+                                cursor: 'pointer'
                               }}>
-                                I've found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                View the discussion (1)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
                                 <span style={{
                                   fontSize: '11px',
-                                  color: '#64B5F6',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  cursor: 'pointer'
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
                                 }}>
-                                  View the discussion (1)
+                                  Delete the review
                                 </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                  <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FF5151',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    Delete the review
-                                  </span>
-                                </div>
                               </div>
                             </div>
-
-                            {/* Review 3 - Additional Review */}
-                            <div style={{ marginBottom: '20px' }}>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                                <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#F0F8FE',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={avatar}
-                                    alt="Maria Santos"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{
-                                      fontSize: '13px',
-                                      color: '#212121',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      fontWeight: 500
-                                    }}>
-                                      Maria Santos
-                                    </span>
-                                    <span style={{
-                                      fontSize: '10px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      1 Jan 2025
-                                    </span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#939393',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      marginLeft: '4px'
-                                    }}>
-                                      5.0
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* Review text starts under profile - aligned with profile left edge */}
-                              <p style={{
-                                fontSize: '11px',
-                                color: '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                lineHeight: '1.5',
-                                marginBottom: '8px',
-                                marginTop: 0
-                              }}>
-                                Excellent quality! The pepper arrived fresh and well-packaged. The flavor is exactly as described and it has become a staple in my kitchen. Highly recommend this seller.
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span style={{
-                                  fontSize: '11px',
-                                  color: '#64B5F6',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  cursor: 'pointer'
-                                }}>
-                                  View the discussion (2)
-                                </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                  <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FF5151',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    Delete the review
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Review 4 - Additional Review */}
-                            <div style={{ marginBottom: '0px' }}>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                                <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#EDFBF0',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={messageAvatarIcon}
-                                    alt="John Doe"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{
-                                      fontSize: '13px',
-                                      color: '#212121',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      fontWeight: 500
-                                    }}>
-                                      John Doe
-                                    </span>
-                                    <span style={{
-                                      fontSize: '10px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      31 Dec 2024
-                                    </span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {[1, 2, 3].map((star) => (
-                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
-                                    {[4, 5].map((star) => (
-                                      <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                      </svg>
-                                    ))}
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#939393',
-                                      fontFamily: 'Poppins, sans-serif',
-                                      marginLeft: '4px'
-                                    }}>
-                                      3.0
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* Review text starts under profile - aligned with profile left edge */}
-                              <p style={{
-                                fontSize: '11px',
-                                color: '#939393',
-                                fontFamily: 'Poppins, sans-serif',
-                                lineHeight: '1.5',
-                                marginBottom: '8px',
-                                marginTop: 0
-                              }}>
-                                The product is okay but could be better. The packaging was fine but the quality didn't quite meet my expectations. It's usable but I probably won't order again.
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span style={{
-                                  fontSize: '11px',
-                                  color: '#64B5F6',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  cursor: 'pointer'
-                                }}>
-                                  View the discussion (0)
-                                </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                  <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                                  <span style={{
-                                    fontSize: '11px',
-                                    color: '#FF5151',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    Delete the review
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Fixed Fade Effect at Bottom */}
-                            <div style={{
-                              position: 'absolute',
-                              bottom: 0,
-                              left: 0,
-                              right: '6px',
-                              height: '40px',
-                              background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-                              pointerEvents: 'none',
-                              zIndex: 1
-                            }} />
                           </div>
+
+                          {/* Review 2 - Kael Otto */}
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#E3F2FD',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={messageAvatarIcon}
+                                  alt="Kael Otto"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    Kael Otto
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    2 Jan 2025
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {[1, 2, 3, 4].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                  </svg>
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
+                                  }}>
+                                    4.3
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              I've found this white pepper to be a delightful addition to my spice collection. Its subtle heat and aromatic notes enhance a variety of dishes. Highly recommended for those seeking a versatile spice.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (1)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Delete the review
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Review 3 - Additional Review */}
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#F0F8FE',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={avatar}
+                                  alt="Maria Santos"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    Maria Santos
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    1 Jan 2025
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
+                                  }}>
+                                    5.0
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              Excellent quality! The pepper arrived fresh and well-packaged. The flavor is exactly as described and it has become a staple in my kitchen. Highly recommend this seller.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (2)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Delete the review
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Review 4 - Additional Review */}
+                          <div style={{ marginBottom: '0px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
+                              <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EDFBF0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
+                              }}>
+                                <img
+                                  src={messageAvatarIcon}
+                                  alt="John Doe"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{
+                                    fontSize: '13px',
+                                    color: '#212121',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    fontWeight: 500
+                                  }}>
+                                    John Doe
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    color: '#B0B0B0',
+                                    fontFamily: 'Poppins, sans-serif'
+                                  }}>
+                                    31 Dec 2024
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  {[1, 2, 3].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  {[4, 5].map((star) => (
+                                    <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9E9E9" strokeWidth="2">
+                                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                  ))}
+                                  <span style={{
+                                    fontSize: '11px',
+                                    color: '#939393',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    marginLeft: '4px'
+                                  }}>
+                                    3.0
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Review text starts under profile - aligned with profile left edge */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: '1.5',
+                              marginBottom: '8px',
+                              marginTop: 0
+                            }}>
+                              The product is okay but could be better. The packaging was fine but the quality didn't quite meet my expectations. It's usable but I probably won't order again.
+                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#64B5F6',
+                                fontFamily: 'Poppins, sans-serif',
+                                cursor: 'pointer'
+                              }}>
+                                View the discussion (0)
+                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                                <span style={{
+                                  fontSize: '11px',
+                                  color: '#FF5151',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Delete the review
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Fixed Fade Effect at Bottom */}
+                          <div style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: '6px',
+                            height: '40px',
+                            background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+                            pointerEvents: 'none',
+                            zIndex: 1
+                          }} />
+                        </div>
                         )}
                       </div>
                     )}
@@ -7292,404 +7292,404 @@ const AdminDashboard: React.FC = () => {
                               scrollbar-width: none !important;
                             }
                           `}</style>
-
+                          
                           {/* Report Card 1 */}
                           {!deletedReportIds.has('report-1') && (
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            marginBottom: '12px',
+                            position: 'relative'
+                          }}>
+                            {/* Top Row: Report Badge and Time */}
                             <div style={{
-                              backgroundColor: '#FFFFFF',
-                              border: '1px solid #F1F1F1',
-                              borderRadius: '12px',
-                              padding: '14px',
-                              marginBottom: '12px',
-                              position: 'relative'
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
                             }}>
-                              {/* Top Row: Report Badge and Time */}
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
+                              {/* Report Badge */}
+                              <span style={{
+                                backgroundColor: '#FEF6E9',
+                                color: '#F9A825',
+                                fontSize: '10px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 500
                               }}>
-                                {/* Report Badge */}
-                                <span style={{
-                                  backgroundColor: '#FEF6E9',
-                                  color: '#F9A825',
-                                  fontSize: '10px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  fontWeight: 500
-                                }}>
-                                  Report
-                                </span>
-                                {/* Time Indicator */}
-                                <span style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  17:12
-                                </span>
-                              </div>
-
-                              {/* Title */}
-                              <h3 style={{
-                                fontSize: '13px',
-                                color: '#212121',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 600,
-                                margin: '0 0 6px 0'
-                              }}>
-                                Fake reviews or suspicious ratings
-                              </h3>
-
-                              {/* Description */}
-                              <p style={{
+                                Report
+                              </span>
+                              {/* Time Indicator */}
+                              <span style={{
                                 fontSize: '11px',
                                 color: '#B0B0B0',
-                                fontFamily: 'Poppins, sans-serif',
-                                margin: '0 0 12px 0',
-                                lineHeight: '1.5'
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                The seller appears to be using fake accounts or encouraging acquaintances to post misleading reviews.
-                              </p>
+                                17:12
+                              </span>
+                            </div>
 
-                              {/* Reporter Section */}
+                            {/* Title */}
+                            <h3 style={{
+                              fontSize: '13px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600,
+                              margin: '0 0 6px 0'
+                            }}>
+                              Fake reviews or suspicious ratings
+                            </h3>
+
+                            {/* Description */}
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 12px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              The seller appears to be using fake accounts or encouraging acquaintances to post misleading reviews.
+                            </p>
+
+                            {/* Reporter Section */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}>
+                              {/* Profile Picture */}
                               <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#E3F2FD',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
                               }}>
-                                {/* Profile Picture */}
+                                <img
+                                  src={avatar}
+                                  alt="Reporter"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+
+                              {/* Reporter Info */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#E3F2FD',
+                                  fontSize: '11px',
+                                  color: '#B0B0B0',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '2px'
+                                }}>
+                                  Report by
+                                </div>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: '#6A6A6A',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Kevin Mobinnid
+                                </div>
+                              </div>
+
+                              {/* More Options Button */}
+                              <button
+                                data-report-more-button="true"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  if (reportedIssueMoreMenu?.reportId === 'report-1') {
+                                    setReportedIssueMoreMenu(null);
+                                  } else {
+                                    setReportedIssueMoreMenu({ anchorRect: rect, reportId: 'report-1' });
+                                    reportedIssueMoreMenuButtonRef.current = e.currentTarget;
+                                  }
+                                }}
+                                style={{
+                                  background: 'transparent',
+                                  cursor: 'pointer',
+                                  padding: '2px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={avatar}
-                                    alt="Reporter"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-
-                                {/* Reporter Info */}
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{
-                                    fontSize: '11px',
-                                    color: '#B0B0B0',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    marginBottom: '2px'
-                                  }}>
-                                    Report by
-                                  </div>
-                                  <div style={{
-                                    fontSize: '12px',
-                                    color: '#6A6A6A',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    Kevin Mobinnid
-                                  </div>
-                                </div>
-
-                                {/* More Options Button */}
-                                <button
-                                  data-report-more-button="true"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    if (reportedIssueMoreMenu?.reportId === 'report-1') {
-                                      setReportedIssueMoreMenu(null);
-                                    } else {
-                                      setReportedIssueMoreMenu({ anchorRect: rect, reportId: 'report-1' });
-                                      reportedIssueMoreMenuButtonRef.current = e.currentTarget;
-                                    }
-                                  }}
-                                  style={{
-                                    background: 'transparent',
-                                    cursor: 'pointer',
-                                    padding: '2px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    border: `1px solid ${reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}`
-                                  }}
-                                >
-                                  <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
-                                    <circle cx="1.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'} />
-                                    <circle cx="5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'} />
-                                    <circle cx="8.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'} />
-                                  </svg>
-                                </button>
-                              </div>
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: `1px solid ${reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}`
+                                }}
+                              >
+                                <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
+                                  <circle cx="1.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-1' ? '#64B5F6' : '#B0B0B0'}/>
+                                </svg>
+                              </button>
                             </div>
+                          </div>
                           )}
 
                           {/* Report Card 2 */}
                           {!deletedReportIds.has('report-2') && (
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            marginBottom: '12px',
+                            position: 'relative'
+                          }}>
                             <div style={{
-                              backgroundColor: '#FFFFFF',
-                              border: '1px solid #F1F1F1',
-                              borderRadius: '12px',
-                              padding: '14px',
-                              marginBottom: '12px',
-                              position: 'relative'
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
                             }}>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
+                              <span style={{
+                                backgroundColor: '#FEF6E9',
+                                color: '#F9A825',
+                                fontSize: '10px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 500
                               }}>
-                                <span style={{
-                                  backgroundColor: '#FEF6E9',
-                                  color: '#F9A825',
-                                  fontSize: '10px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  fontWeight: 500
-                                }}>
-                                  Report
-                                </span>
-                                <span style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  16:45
-                                </span>
-                              </div>
-                              <h3 style={{
-                                fontSize: '13px',
-                                color: '#212121',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 600,
-                                margin: '0 0 6px 0'
-                              }}>
-                                Inappropriate content or behaviour
-                              </h3>
-                              <p style={{
+                                Report
+                              </span>
+                              <span style={{
                                 fontSize: '11px',
                                 color: '#B0B0B0',
-                                fontFamily: 'Poppins, sans-serif',
-                                margin: '0 0 12px 0',
-                                lineHeight: '1.5'
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                The user has been posting inappropriate comments and engaging in harassing behaviour towards other users.
-                              </p>
+                                16:45
+                              </span>
+                            </div>
+                            <h3 style={{
+                              fontSize: '13px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600,
+                              margin: '0 0 6px 0'
+                            }}>
+                              Inappropriate content or behavior
+                            </h3>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 12px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              The user has been posting inappropriate comments and engaging in harassing behavior towards other users.
+                            </p>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}>
                               <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EDFBF0',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
                               }}>
+                                <img
+                                  src={messageAvatarIcon}
+                                  alt="Reporter"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#EDFBF0',
+                                  fontSize: '11px',
+                                  color: '#B0B0B0',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '2px'
+                                }}>
+                                  Report by
+                                </div>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: '#6A6A6A',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Clara Vanstone
+                                </div>
+                              </div>
+                              <button
+                                style={{
+                                  background: 'transparent',
+                                  cursor: 'pointer',
+                                  padding: '2px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={messageAvatarIcon}
-                                    alt="Reporter"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{
-                                    fontSize: '11px',
-                                    color: '#B0B0B0',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    marginBottom: '2px'
-                                  }}>
-                                    Report by
-                                  </div>
-                                  <div style={{
-                                    fontSize: '12px',
-                                    color: '#6A6A6A',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    Clara Vanstone
-                                  </div>
-                                </div>
-                                <button
-                                  style={{
-                                    background: 'transparent',
-                                    cursor: 'pointer',
-                                    padding: '2px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    border: '1px solid #B0B0B0'
-                                  }}
-                                >
-                                  <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
-                                    <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0" />
-                                    <circle cx="5" cy="1.5" r="1" fill="#B0B0B0" />
-                                    <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0" />
-                                  </svg>
-                                </button>
-                              </div>
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: '1px solid #B0B0B0'
+                                }}
+                              >
+                                <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
+                                  <circle cx="1.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill="#B0B0B0"/>
+                                </svg>
+                              </button>
                             </div>
+                          </div>
                           )}
 
                           {/* Report Card 3 */}
                           {!deletedReportIds.has('report-3') && (
+                          <div style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #F1F1F1',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            marginBottom: '12px',
+                            position: 'relative'
+                          }}>
                             <div style={{
-                              backgroundColor: '#FFFFFF',
-                              border: '1px solid #F1F1F1',
-                              borderRadius: '12px',
-                              padding: '14px',
-                              marginBottom: '12px',
-                              position: 'relative'
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px'
                             }}>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '8px'
+                              <span style={{
+                                backgroundColor: '#FEF6E9',
+                                color: '#F9A825',
+                                fontSize: '10px',
+                                fontFamily: 'Poppins, sans-serif',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 500
                               }}>
-                                <span style={{
-                                  backgroundColor: '#FEF6E9',
-                                  color: '#F9A825',
-                                  fontSize: '10px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  fontWeight: 500
-                                }}>
-                                  Report
-                                </span>
-                                <span style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  15:30
-                                </span>
-                              </div>
-                              <h3 style={{
-                                fontSize: '13px',
-                                color: '#212121',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontWeight: 600,
-                                margin: '0 0 6px 0'
-                              }}>
-                                Spam or misleading information
-                              </h3>
-                              <p style={{
+                                Report
+                              </span>
+                              <span style={{
                                 fontSize: '11px',
                                 color: '#B0B0B0',
-                                fontFamily: 'Poppins, sans-serif',
-                                margin: '0 0 12px 0',
-                                lineHeight: '1.5'
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                Multiple listings contain misleading product descriptions and false claims about quality or origin.
-                              </p>
+                                15:30
+                              </span>
+                            </div>
+                            <h3 style={{
+                              fontSize: '13px',
+                              color: '#212121',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              fontWeight: 600,
+                              margin: '0 0 6px 0'
+                            }}>
+                              Spam or misleading information
+                            </h3>
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Poppins, sans-serif',
+                              margin: '0 0 12px 0',
+                              lineHeight: '1.5'
+                            }}>
+                              Multiple listings contain misleading product descriptions and false claims about quality or origin.
+                            </p>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}>
                               <div style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                backgroundColor: '#F0F8FE',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                flexShrink: 0
                               }}>
+                                <img
+                                  src={avatar}
+                                  alt="Reporter"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{
-                                  width: '36px',
-                                  height: '36px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#F0F8FE',
+                                  fontSize: '11px',
+                                  color: '#B0B0B0',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '2px'
+                                }}>
+                                  Report by
+                                </div>
+                                <div style={{
+                                  fontSize: '12px',
+                                  color: '#6A6A6A',
+                                  fontFamily: 'Poppins, sans-serif'
+                                }}>
+                                  Amara Diop
+                                </div>
+                              </div>
+                              <button
+                                data-report-more-button="true"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  if (reportedIssueMoreMenu?.reportId === 'report-3') {
+                                    setReportedIssueMoreMenu(null);
+                                  } else {
+                                    setReportedIssueMoreMenu({ anchorRect: rect, reportId: 'report-3' });
+                                    reportedIssueMoreMenuButtonRef.current = e.currentTarget;
+                                  }
+                                }}
+                                style={{
+                                  background: 'transparent',
+                                  cursor: 'pointer',
+                                  padding: '2px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={avatar}
-                                    alt="Reporter"
-                                    style={{
-                                      width: '32px',
-                                      height: '32px',
-                                      borderRadius: '50%',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{
-                                    fontSize: '11px',
-                                    color: '#B0B0B0',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    marginBottom: '2px'
-                                  }}>
-                                    Report by
-                                  </div>
-                                  <div style={{
-                                    fontSize: '12px',
-                                    color: '#6A6A6A',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    Amara Diop
-                                  </div>
-                                </div>
-                                <button
-                                  data-report-more-button="true"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    if (reportedIssueMoreMenu?.reportId === 'report-3') {
-                                      setReportedIssueMoreMenu(null);
-                                    } else {
-                                      setReportedIssueMoreMenu({ anchorRect: rect, reportId: 'report-3' });
-                                      reportedIssueMoreMenuButtonRef.current = e.currentTarget;
-                                    }
-                                  }}
-                                  style={{
-                                    background: 'transparent',
-                                    cursor: 'pointer',
-                                    padding: '2px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    border: `1px solid ${reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}`
-                                  }}
-                                >
-                                  <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
-                                    <circle cx="1.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'} />
-                                    <circle cx="5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'} />
-                                    <circle cx="8.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'} />
-                                  </svg>
-                                </button>
-                              </div>
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: `1px solid ${reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}`
+                                }}
+                              >
+                                <svg width="10" height="3" viewBox="0 0 10 3" fill="none">
+                                  <circle cx="1.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}/>
+                                  <circle cx="8.5" cy="1.5" r="1" fill={reportedIssueMoreMenu?.reportId === 'report-3' ? '#64B5F6' : '#B0B0B0'}/>
+                                </svg>
+                              </button>
                             </div>
+                          </div>
                           )}
 
                         </div>
@@ -7724,11 +7724,11 @@ const AdminDashboard: React.FC = () => {
                           <div
                             onClick={() => {
                               // Set report to delete based on reportId
-                              const reportData = reportedIssueMoreMenu.reportId === 'report-1'
+                              const reportData = reportedIssueMoreMenu.reportId === 'report-1' 
                                 ? { reportId: 'report-1', reportTitle: 'Fake reviews or suspicious ratings', reporterName: 'Kevin Mobinnid' }
                                 : reportedIssueMoreMenu.reportId === 'report-2'
-                                  ? { reportId: 'report-2', reportTitle: 'Inappropriate content or behaviour', reporterName: 'Esther Howard' }
-                                  : { reportId: 'report-3', reportTitle: 'Spam or misleading information', reporterName: 'Esther Howard' };
+                                ? { reportId: 'report-2', reportTitle: 'Inappropriate content or behavior', reporterName: 'Esther Howard' }
+                                : { reportId: 'report-3', reportTitle: 'Spam or misleading information', reporterName: 'Esther Howard' };
                               setReportToDelete(reportData);
                               setIsDeleteReportSuccess(false);
                               setReportedIssueMoreMenu(null);
@@ -8058,527 +8058,527 @@ const AdminDashboard: React.FC = () => {
 
                     {/* Account Information */}
                     {!isManageAccessView && userDetailActiveTab === 'about' && (
-                      <>
-                        <div style={{ marginBottom: '12px' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              marginBottom: '12px',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => setIsAccountInfoOpen(!isAccountInfoOpen)}
-                          >
-                            <span style={{
-                              fontSize: '12px',
-                              color: '#6A6A6A',
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              Account Information
-                            </span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isAccountInfoOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                          {isAccountInfoOpen && (
-                            <div style={{
-                              display: 'grid',
-                              gridTemplateColumns: '1fr 1fr',
-                              gap: '12px'
-                            }}>
-                              {/* Column 1 */}
-                              <div>
-                                <div style={{ marginBottom: '10px' }}>
-                                  <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    marginBottom: '4px'
-                                  }}>
-                                    <img
-                                      src={userIcon}
-                                      alt="Joined"
-                                      style={{
-                                        width: '14px',
-                                        height: '14px',
-                                        filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                      }}
-                                    />
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      Joined
-                                    </span>
-                                  </div>
-                                  <span style={{
-                                    fontSize: '10px',
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    paddingLeft: '20px'
-                                  }}>
-                                    06 Dec, 2025
-                                  </span>
-                                </div>
-                                <div>
-                                  <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    marginBottom: '4px'
-                                  }}>
-                                    <img
-                                      src={userIcon}
-                                      alt="Location"
-                                      style={{
-                                        width: '14px',
-                                        height: '14px',
-                                        filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                      }}
-                                    />
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      Account Location
-                                    </span>
-                                  </div>
-                                  <span style={{
-                                    fontSize: '10px',
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    paddingLeft: '20px'
-                                  }}>
-                                    France
-                                  </span>
-                                </div>
-                              </div>
-                              {/* Column 2 */}
-                              <div>
-                                <div style={{ marginBottom: '10px' }}>
-                                  <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    marginBottom: '4px'
-                                  }}>
-                                    <img
-                                      src={sendIcon}
-                                      alt="Mail"
-                                      style={{
-                                        width: '14px',
-                                        height: '14px',
-                                        filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                      }}
-                                    />
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      Mail Address
-                                    </span>
-                                  </div>
-                                  <span style={{
-                                    fontSize: '10px',
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    paddingLeft: '20px'
-                                  }}>
-                                    {selectedUserForProfile.email}
-                                  </span>
-                                </div>
-                                <div>
-                                  <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    marginBottom: '4px'
-                                  }}>
-                                    <img
-                                      src={userIcon}
-                                      alt="Connection"
-                                      style={{
-                                        width: '14px',
-                                        height: '14px',
-                                        filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
-                                      }}
-                                    />
-                                    <span style={{
-                                      fontSize: '11px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Poppins, sans-serif'
-                                    }}>
-                                      Last Connexion
-                                    </span>
-                                  </div>
-                                  <span style={{
-                                    fontSize: '10px',
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    paddingLeft: '20px'
-                                  }}>
-                                    From France
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          {/* Divider below Account Information */}
-                          <div style={{
-                            height: '1px',
-                            backgroundColor: '#F1F1F1',
-                            marginTop: '12px',
-                            marginLeft: '-14px',
-                            marginRight: '-14px'
-                          }} />
-                        </div>
-
-                        {/* Status Section */}
-                        <div style={{ marginBottom: '16px' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              marginBottom: '12px',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => setIsStatusOpen(!isStatusOpen)}
-                          >
-                            <span style={{
-                              fontSize: '12px',
-                              color: '#6A6A6A',
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              Status
-                            </span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isStatusOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                          {isStatusOpen && (
-                            <div style={{
-                              display: 'grid',
-                              gridTemplateColumns: '1fr 1fr',
-                              gap: '10px'
-                            }}>
-                              {/* Profile Completed Card */}
-                              <div style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: '10px',
-                                padding: '8px',
-                                border: '1px solid #F1F1F1'
-                              }}>
-                                <img
-                                  src={verityIcon}
-                                  alt="Verified"
-                                  style={{ width: '16px', height: '16px', marginBottom: '6px' }}
-                                />
-                                <div style={{
-                                  fontSize: '10px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  marginBottom: '8px'
-                                }}>
-                                  Profile completed
-                                </div>
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px'
-                                }}>
-                                  <span style={{
-                                    fontSize: '10px',
-                                    color: '#939393',
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    20%
-                                  </span>
-                                  <div style={{
-                                    flex: 1,
-                                    height: '4px',
-                                    backgroundColor: '#E4E4E4',
-                                    borderRadius: '2px',
-                                    overflow: 'hidden'
-                                  }}>
-                                    <div style={{
-                                      width: '20%',
-                                      height: '100%',
-                                      backgroundColor: '#45C55B',
-                                      borderRadius: '2px'
-                                    }} />
-                                  </div>
-                                </div>
-                              </div>
-                              {/* User Plan Card */}
-                              <div style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: '10px',
-                                padding: '8px',
-                                border: '1px solid #F1F1F1',
-                                position: 'relative'
-                              }}>
-                                <div style={{
-                                  display: 'flex',
-                                  alignItems: 'flex-start',
-                                  justifyContent: 'space-between',
-                                  marginBottom: '6px'
-                                }}>
-                                  <img
-                                    src={starIcon}
-                                    alt="Plan"
-                                    style={{
-                                      width: '16px',
-                                      height: '16px'
-                                    }}
-                                  />
-                                  <div style={{
-                                    position: 'absolute',
-                                    top: '8px',
-                                    right: '8px',
-                                    width: '14px',
-                                    height: '14px',
-                                    cursor: 'pointer'
-                                  }}>
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                      <circle cx="7" cy="7" r="6" stroke="#B0B0B0" strokeWidth="1" />
-                                      <circle cx="4" cy="7" r="1" fill="#212121" />
-                                      <circle cx="7" cy="7" r="1" fill="#212121" />
-                                      <circle cx="10" cy="7" r="1" fill="#212121" />
-                                    </svg>
-                                  </div>
-                                </div>
-                                <div style={{
-                                  fontSize: '11px',
-                                  color: '#212121',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  fontWeight: 500,
-                                  marginBottom: '6px'
-                                }}>
-                                  User plan · Free
-                                </div>
-                                <p style={{
-                                  fontSize: '10px',
-                                  color: '#B0B0B0',
-                                  margin: 0,
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  Post free until 23 March 2026
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                          {/* Divider below Status */}
-                          <div style={{
-                            height: '1px',
-                            backgroundColor: '#F1F1F1',
-                            marginTop: '16px',
-                            marginLeft: '-14px',
-                            marginRight: '-14px'
-                          }} />
-                        </div>
-
-                        {/* User Metrics Section */}
+                    <>
+                    <div style={{ marginBottom: '12px' }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsAccountInfoOpen(!isAccountInfoOpen)}
+                      >
+                        <span style={{
+                          fontSize: '12px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Account Information
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isAccountInfoOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </div>
+                      {isAccountInfoOpen && (
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '12px'
+                      }}>
+                        {/* Column 1 */}
                         <div>
-                          <div
-                            style={{
+                          <div style={{ marginBottom: '10px' }}>
+                            <div style={{
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'space-between',
-                              marginBottom: '12px'
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                cursor: 'pointer'
-                              }}
-                              onClick={() => setIsUserMetricsOpen(!isUserMetricsOpen)}
-                            >
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={userIcon}
+                                alt="Joined"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
                               <span style={{
-                                fontSize: '12px',
-                                color: '#6A6A6A',
+                                fontSize: '11px',
+                                color: '#B0B0B0',
                                 fontFamily: 'Poppins, sans-serif'
                               }}>
-                                User Metrics
+                                Joined
                               </span>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isUserMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              </svg>
                             </div>
                             <span style={{
-                              fontSize: '11px',
-                              color: '#64B5F6',
+                              fontSize: '10px',
+                              color: '#939393',
                               fontFamily: 'Poppins, sans-serif',
-                              cursor: 'pointer'
+                              paddingLeft: '20px'
                             }}>
-                              See all user metrics
+                              06 Dec, 2025
                             </span>
                           </div>
-                          {isUserMetricsOpen && (
+                          <div>
                             <div style={{
-                              display: 'grid',
-                              gridTemplateColumns: '1fr 1fr',
-                              gap: '10px'
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
                             }}>
-                              {/* Posted Listings Card */}
-                              <div style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: '10px',
-                                padding: '1px 6px',
-                                border: '1px solid #F1F1F1',
-                                position: 'relative',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'space-between'
+                              <img
+                                src={userIcon}
+                                alt="Location"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                <div>
-                                  <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'flex-start',
-                                    marginBottom: '0px',
-                                    marginTop: '2px'
-                                  }}>
-                                    <span style={{
-                                      fontSize: '9px',
-                                      color: '#B0B0B0',
-                                      fontFamily: 'Bricolage Grotesque, sans-serif',
-                                      margin: 0
-                                    }}>
-                                      Posted listings
-                                    </span>
-                                    <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0px', marginTop: '1px' }}>
-                                    <p style={{
-                                      fontSize: '18px',
-                                      fontWeight: 600,
-                                      color: '#212121',
-                                      margin: 0,
-                                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                                    }}>
-                                      248
-                                    </p>
-                                    <div style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '2px',
-                                      backgroundColor: '#EDFBF0',
-                                      padding: '1px 3px',
-                                      borderRadius: '8px'
-                                    }}>
-                                      <svg width="7" height="7" viewBox="0 0 24 24" fill="none">
-                                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                      </svg>
-                                      <span style={{ color: '#22C55E', fontSize: '7px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <p style={{
-                                  color: '#9C9C9C',
-                                  fontSize: '8px',
-                                  margin: 0,
-                                  marginTop: '4px',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}>
-                                  Last month: 94
-                                </p>
-                              </div>
-                              {/* Active Listings Card */}
-                              <div style={{
-                                backgroundColor: '#FFFFFF',
-                                borderRadius: '10px',
-                                padding: '1px 6px',
-                                border: '1px solid #F1F1F1',
-                                position: 'relative',
-                                overflow: 'hidden'
+                                Account Location
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
+                            }}>
+                              France
+                            </span>
+                          </div>
+                        </div>
+                        {/* Column 2 */}
+                        <div>
+                          <div style={{ marginBottom: '10px' }}>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={sendIcon}
+                                alt="Mail"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
                               }}>
-                                {/* Fade effect on the right */}
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    width: '40px',
-                                    pointerEvents: 'none',
-                                    zIndex: 1,
-                                    background: 'linear-gradient(to left, #FFFFFF 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)'
-                                  }}
-                                />
-                                {/* Navigation button */}
-                                <div style={{
-                                  position: 'absolute',
-                                  top: '50%',
-                                  right: '4px',
-                                  transform: 'translateY(-50%)',
-                                  zIndex: 2
-                                }}>
-                                  <button
-                                    style={{
-                                      width: '20px',
-                                      height: '20px',
-                                      borderRadius: '50%',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      cursor: 'pointer',
-                                      border: 'none',
-                                      backgroundColor: 'transparent',
-                                      padding: 0
-                                    }}
-                                  >
-                                    <img src={grayArrowIcon} alt="Next" style={{ width: '20px', height: '20px', transform: 'rotate(180deg)' }} />
-                                  </button>
-                                </div>
-                                <div style={{
-                                  display: 'flex',
-                                  justifyContent: 'space-between',
-                                  alignItems: 'flex-start',
-                                  marginBottom: '0px',
-                                  marginTop: '2px'
-                                }}>
-                                  <span style={{
-                                    fontSize: '9px',
-                                    color: '#B0B0B0',
-                                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                                    margin: 0
-                                  }}>
-                                    Active listings
-                                  </span>
-                                  <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
-                                </div>
-                                <div style={{ marginBottom: '0px', marginTop: '1px' }}>
-                                  <p style={{
-                                    fontSize: '18px',
-                                    fontWeight: 600,
-                                    color: '#212121',
-                                    margin: 0,
-                                    fontFamily: 'Bricolage Grotesque, sans-serif'
-                                  }}>
-                                    217
-                                  </p>
-                                </div>
-                                <span style={{
-                                  fontSize: '8px',
-                                  color: '#F9A825',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  cursor: 'pointer'
-                                }}>
-                                  31 inactive listings &gt;
-                                </span>
+                                Mail Address
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
+                            }}>
+                              {selectedUserForProfile.email}
+                            </span>
+                          </div>
+                          <div>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              marginBottom: '4px'
+                            }}>
+                              <img
+                                src={userIcon}
+                                alt="Connection"
+                                style={{
+                                  width: '14px',
+                                  height: '14px',
+                                  filter: 'brightness(0) saturate(100%) invert(70%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
+                                }}
+                              />
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}>
+                                Last Connexion
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif',
+                              paddingLeft: '20px'
+                            }}>
+                              From France
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      )}
+                      {/* Divider below Account Information */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '12px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
+                      }} />
+                    </div>
+
+                    {/* Status Section */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '12px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setIsStatusOpen(!isStatusOpen)}
+                      >
+                        <span style={{
+                          fontSize: '12px',
+                          color: '#6A6A6A',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Status
+                        </span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isStatusOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </div>
+                      {isStatusOpen && (
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px'
+                      }}>
+                        {/* Profile Completed Card */}
+                        <div style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '10px',
+                          padding: '8px',
+                          border: '1px solid #F1F1F1'
+                        }}>
+                          <img
+                            src={verityIcon}
+                            alt="Verified"
+                            style={{ width: '16px', height: '16px', marginBottom: '6px' }}
+                          />
+                          <div style={{
+                            fontSize: '10px',
+                            color: '#B0B0B0',
+                            fontFamily: 'Poppins, sans-serif',
+                            marginBottom: '8px'
+                          }}>
+                            Profile completed
+                          </div>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <span style={{
+                              fontSize: '10px',
+                              color: '#939393',
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              20%
+                            </span>
+                            <div style={{
+                              flex: 1,
+                              height: '4px',
+                              backgroundColor: '#E4E4E4',
+                              borderRadius: '2px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                width: '20%',
+                                height: '100%',
+                                backgroundColor: '#45C55B',
+                                borderRadius: '2px'
+                              }} />
+                            </div>
+                          </div>
+                        </div>
+                        {/* User Plan Card */}
+                        <div style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '10px',
+                          padding: '8px',
+                          border: '1px solid #F1F1F1',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            marginBottom: '6px'
+                          }}>
+                            <img
+                              src={starIcon}
+                              alt="Plan"
+                              style={{
+                                width: '16px',
+                                height: '16px'
+                              }}
+                            />
+                            <div style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              width: '14px',
+                              height: '14px',
+                              cursor: 'pointer'
+                            }}>
+                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <circle cx="7" cy="7" r="6" stroke="#B0B0B0" strokeWidth="1"/>
+                                <circle cx="4" cy="7" r="1" fill="#212121"/>
+                                <circle cx="7" cy="7" r="1" fill="#212121"/>
+                                <circle cx="10" cy="7" r="1" fill="#212121"/>
+                              </svg>
+                            </div>
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#212121',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 500,
+                            marginBottom: '6px'
+                          }}>
+                            User plan · Free
+                          </div>
+                          <p style={{
+                            fontSize: '10px',
+                            color: '#B0B0B0',
+                            margin: 0,
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            Post free until 23 March 2026
+                          </p>
+                        </div>
+                      </div>
+                      )}
+                      {/* Divider below Status */}
+                      <div style={{
+                        height: '1px',
+                        backgroundColor: '#F1F1F1',
+                        marginTop: '16px',
+                        marginLeft: '-14px',
+                        marginRight: '-14px'
+                      }} />
+                    </div>
+
+                    {/* User Metrics Section */}
+                    <div>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: '12px'
+                        }}
+                      >
+                        <div 
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setIsUserMetricsOpen(!isUserMetricsOpen)}
+                        >
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#6A6A6A',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            User Metrics
+                          </span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isUserMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                        <span style={{
+                          fontSize: '11px',
+                          color: '#64B5F6',
+                          fontFamily: 'Poppins, sans-serif',
+                          cursor: 'pointer'
+                        }}>
+                          See all user metrics
+                        </span>
+                      </div>
+                      {isUserMetricsOpen && (
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px'
+                      }}>
+                        {/* Posted Listings Card */}
+                        <div style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '10px',
+                          padding: '1px 6px',
+                          border: '1px solid #F1F1F1',
+                          position: 'relative',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between'
+                        }}>
+                          <div>
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              marginBottom: '0px',
+                              marginTop: '2px'
+                            }}>
+                              <span style={{
+                                fontSize: '9px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                                margin: 0
+                              }}>
+                                Posted listings
+                              </span>
+                              <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0px', marginTop: '1px' }}>
+                              <p style={{ 
+                                fontSize: '18px',
+                                fontWeight: 600,
+                                color: '#212121',
+                                margin: 0,
+                                fontFamily: 'Bricolage Grotesque, sans-serif'
+                              }}>
+                                248
+                              </p>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '2px',
+                                backgroundColor: '#EDFBF0',
+                                padding: '1px 3px',
+                                borderRadius: '8px'
+                              }}>
+                                <svg width="7" height="7" viewBox="0 0 24 24" fill="none">
+                                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                <span style={{ color: '#22C55E', fontSize: '7px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                               </div>
                             </div>
-                          )}
+                          </div>
+                          <p style={{ 
+                            color: '#9C9C9C',
+                            fontSize: '8px',
+                            margin: 0,
+                            marginTop: '4px',
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            Last month: 94
+                          </p>
                         </div>
-                      </>
+                        {/* Active Listings Card */}
+                        <div style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '10px',
+                          padding: '1px 6px',
+                          border: '1px solid #F1F1F1',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}>
+                          {/* Fade effect on the right */}
+                          <div 
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              right: 0,
+                              bottom: 0,
+                              width: '40px',
+                              pointerEvents: 'none',
+                              zIndex: 1,
+                              background: 'linear-gradient(to left, #FFFFFF 0%, rgba(255, 255, 255, 0.8) 30%, transparent 100%)'
+                            }}
+                          />
+                          {/* Navigation button */}
+                          <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            right: '4px',
+                            transform: 'translateY(-50%)',
+                            zIndex: 2
+                          }}>
+                            <button 
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                padding: 0
+                              }}
+                            >
+                              <img src={grayArrowIcon} alt="Next" style={{ width: '20px', height: '20px', transform: 'rotate(180deg)' }} />
+                            </button>
+                          </div>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            marginBottom: '0px',
+                            marginTop: '2px'
+                          }}>
+                            <span style={{
+                              fontSize: '9px',
+                              color: '#B0B0B0',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                              margin: 0
+                            }}>
+                              Active listings
+                            </span>
+                            <img src={peopleIcon} alt="Listings" style={{ width: '20px', height: '20px' }} />
+                          </div>
+                          <div style={{ marginBottom: '0px', marginTop: '1px' }}>
+                            <p style={{ 
+                              fontSize: '18px',
+                              fontWeight: 600,
+                              color: '#212121',
+                              margin: 0,
+                              fontFamily: 'Bricolage Grotesque, sans-serif'
+                            }}>
+                              217
+                            </p>
+                          </div>
+                          <span style={{
+                            fontSize: '8px',
+                            color: '#F9A825',
+                            fontFamily: 'Poppins, sans-serif',
+                            cursor: 'pointer'
+                          }}>
+                            31 inactive listings &gt;
+                          </span>
+                        </div>
+                      </div>
+                      )}
+                    </div>
+                    </>
                     )}
                   </div>
                 </div>
@@ -8588,425 +8588,338 @@ const AdminDashboard: React.FC = () => {
               <div style={{ paddingRight: '14px' }}>
                 {/* Users Management Header */}
                 <div style={{ marginTop: '10px', marginBottom: '16px' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h1 style={{
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#202224',
-                      margin: '0 0 2px 0',
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h1 style={{
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: '#202224',
+                    margin: '0 0 2px 0',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}>
+                    {usersToggle === 'activities' ? 'User activities' : 'User lists'}
+                  </h1>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <p style={{
+                      color: '#9C9C9C',
+                      fontSize: '12px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
                     }}>
-                      {usersToggle === 'activities' ? 'User activities' : 'User lists'}
-                    </h1>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                      <p style={{
-                        color: '#9C9C9C',
-                        fontSize: '12px',
-                        margin: 0,
-                        fontFamily: 'Poppins, sans-serif'
-                      }}>
-                        {usersToggle === 'activities'
-                          ? 'Explore the recent actions and events performed by users within the BAO Afrik platform.'
-                          : 'Find a directory of registered users. Sort and manage accounts easily.'}
-                      </p>
+                      {usersToggle === 'activities'
+                        ? 'Explore the recent actions and events performed by users within the BAO Afrik platform.'
+                        : 'Find a directory of registered users. Sort and manage accounts easily.'}
+                    </p>
 
-                      {/* Toggle (aligned with description) */}
-                      <div style={{
-                        backgroundColor: '#F4F4F4',
-                        borderRadius: '9px',
-                        padding: '3px',
-                        display: 'flex',
-                        gap: '3px',
-                        flexShrink: 0,
-                        border: '1px solid #F1F1F1'
-                      }}>
-                        {[
-                          { key: 'activities', label: 'Activities' },
-                          { key: 'list', label: 'User lists' }
-                        ].map((t) => {
-                          const isActive = usersToggle === (t.key as 'activities' | 'list');
-                          return (
-                            <button
-                              key={t.key}
-                              onClick={() => setUsersToggle(t.key as 'activities' | 'list')}
-                              style={{
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '6px 10px',
-                                borderRadius: '7px',
-                                backgroundColor: isActive ? '#FFFFFF' : 'transparent',
-                                color: isActive ? '#64B5F6' : '#939393',
-                                fontSize: '11px',
-                                fontFamily: 'Poppins, sans-serif',
-                                lineHeight: 1,
-                                whiteSpace: 'nowrap',
-                                boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.05)' : 'none'
-                              }}
-                            >
-                              {t.label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                    {/* Toggle (aligned with description) */}
+                    <div style={{
+                      backgroundColor: '#F4F4F4',
+                      borderRadius: '9px',
+                      padding: '3px',
+                      display: 'flex',
+                      gap: '3px',
+                      flexShrink: 0,
+                      border: '1px solid #F1F1F1'
+                    }}>
+                      {[
+                        { key: 'activities', label: 'Activities' },
+                        { key: 'list', label: 'User lists' }
+                      ].map((t) => {
+                        const isActive = usersToggle === (t.key as 'activities' | 'list');
+                        return (
+                          <button
+                            key={t.key}
+                            onClick={() => setUsersToggle(t.key as 'activities' | 'list')}
+                            style={{
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '6px 10px',
+                              borderRadius: '7px',
+                              backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                              color: isActive ? '#64B5F6' : '#939393',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: 1,
+                              whiteSpace: 'nowrap',
+                              boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.05)' : 'none'
+                            }}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Metrics Cards (only for Users list) */}
-                {usersToggle === 'list' && (
+              {/* Metrics Cards (only for Users list) */}
+              {usersToggle === 'list' && (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '10px',
+                  marginBottom: '20px'
+                }}>
+                  {/* Total user account */}
                   <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '10px',
-                    marginBottom: '20px'
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '8px',
+                    border: '1px solid #F1F1F1'
                   }}>
-                    {/* Total user account */}
-                    <div style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '18px',
-                      padding: '8px',
-                      border: '1px solid #F1F1F1'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <p style={{
-                            color: '#9C9C9C',
-                            fontSize: '10px',
-                            margin: '0 0 4px 0',
-                            fontFamily: 'Poppins, sans-serif'
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Total user account
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
                           }}>
-                            Total user account
+                            569
                           </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <p style={{
-                              fontSize: '20px',
-                              fontWeight: 600,
-                              color: '#212121',
-                              margin: 0,
-                              fontFamily: 'Bricolage Grotesque, sans-serif'
-                            }}>
-                              569
-                            </p>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              backgroundColor: '#EDFBF0',
-                              padding: '1.5px 5px',
-                              borderRadius: '10px'
-                            }}>
-                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                              <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
-                            </div>
-                          </div>
-                          {/* last month removed */}
-                        </div>
-                        <img src={statIcon} alt="Total users" style={{ width: '24px', height: '24px' }} />
-                      </div>
-                    </div>
-
-                    {/* Active accounts */}
-                    <div style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '18px',
-                      padding: '8px',
-                      border: '1px solid #F1F1F1'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <p style={{
-                            color: '#9C9C9C',
-                            fontSize: '10px',
-                            margin: '0 0 4px 0',
-                            fontFamily: 'Poppins, sans-serif'
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#EDFBF0',
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
                           }}>
-                            Active accounts
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <p style={{
-                              fontSize: '20px',
-                              fontWeight: 600,
-                              color: '#212121',
-                              margin: 0,
-                              fontFamily: 'Bricolage Grotesque, sans-serif'
-                            }}>
-                              321
-                            </p>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              backgroundColor: '#EDFBF0',
-                              padding: '1.5px 5px',
-                              borderRadius: '10px'
-                            }}>
-                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                              <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
-                            </div>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                           </div>
-                          {/* last month removed */}
                         </div>
-                        <img src={stat2Icon} alt="Active accounts" style={{ width: '24px', height: '24px' }} />
+                        {/* last month removed */}
                       </div>
-                    </div>
-
-                    {/* Inactive accounts */}
-                    <div style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '18px',
-                      padding: '8px',
-                      border: '1px solid #F1F1F1'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <p style={{
-                            color: '#9C9C9C',
-                            fontSize: '10px',
-                            margin: '0 0 4px 0',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            Inactive accounts
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <p style={{
-                              fontSize: '20px',
-                              fontWeight: 600,
-                              color: '#212121',
-                              margin: 0,
-                              fontFamily: 'Bricolage Grotesque, sans-serif'
-                            }}>
-                              204
-                            </p>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              backgroundColor: '#FFE9E9',
-                              padding: '1.5px 5px',
-                              borderRadius: '10px'
-                            }}>
-                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
-                                <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                              <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
-                            </div>
-                          </div>
-                          {/* last month removed */}
-                        </div>
-                        <img src={peopleIcon} alt="Inactive accounts" style={{ width: '24px', height: '24px' }} />
-                      </div>
-                    </div>
-
-                    {/* Suspended accounts */}
-                    <div style={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '18px',
-                      padding: '8px',
-                      border: '1px solid #F1F1F1'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <p style={{
-                            color: '#9C9C9C',
-                            fontSize: '10px',
-                            margin: '0 0 4px 0',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            Suspended accounts
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                            <p style={{
-                              fontSize: '20px',
-                              fontWeight: 600,
-                              color: '#212121',
-                              margin: 0,
-                              fontFamily: 'Bricolage Grotesque, sans-serif'
-                            }}>
-                              13
-                            </p>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              backgroundColor: '#F4F4F4',
-                              padding: '1.5px 5px',
-                              borderRadius: '10px'
-                            }}>
-                              <span style={{ color: '#939393', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
-                            </div>
-                          </div>
-                          {/* last month removed */}
-                        </div>
-                        <img src={stat3Icon} alt="Suspended accounts" style={{ width: '24px', height: '24px' }} />
-                      </div>
+                      <img src={statIcon} alt="Total users" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
-                )}
 
-                {/* Users Activities Table (same layout; data changes with toggle/tab) */}
-                <div style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: '1px solid #F1F1F1',
-                  padding: '12px 14px'
-                }}>
-                  {/* Top bar 1: tabs + export + sort OR selection controls */}
-                  {!isSelectionMode ? (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: usersToggle === 'list' ? '26px' : '18px', flexWrap: 'wrap' }}>
-                        {usersToggle === 'activities' ? (
-                          [
-                            { key: 'all', label: 'All user recent activities' },
-                            { key: 'joined', label: 'Joined' },
-                            { key: 'posted', label: 'Posted' },
-                            { key: 'reviewed', label: 'Reviewed' },
-                            { key: 'reported', label: 'Reported' },
-                          ].map((tab) => {
-                            const isActive = usersActivityTab === (tab.key as any);
-                            return (
-                              <button
-                                key={tab.key}
-                                onClick={() => setUsersActivityTab(tab.key as any)}
-                                style={{
-                                  border: 'none',
-                                  background: 'transparent',
-                                  padding: '0 0 10px 0',
-                                  cursor: 'pointer',
-                                  fontSize: '11px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  color: isActive ? '#64B5F6' : '#B0B0B0',
-                                  fontWeight: 400,
-                                  borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                                }}
-                              >
-                                {tab.label}
-                              </button>
-                            );
-                          })
-                        ) : (
-                          [
-                            { key: 'all', label: 'All users' },
-                            { key: 'new', label: 'New users' },
-                            { key: 'free', label: 'Free Plan' },
-                            { key: 'verified', label: 'Verified' },
-                            { key: 'unverified', label: 'Unverified' },
-                          ].map((tab) => {
-                            const isActive = usersListTab === (tab.key as any);
-                            return (
-                              <button
-                                key={tab.key}
-                                onClick={() => setUsersListTab(tab.key as any)}
-                                style={{
-                                  border: 'none',
-                                  background: 'transparent',
-                                  padding: '0 0 10px 0',
-                                  cursor: 'pointer',
-                                  fontSize: '11px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  color: isActive ? '#64B5F6' : '#B0B0B0',
-                                  fontWeight: 400,
-                                  borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                                }}
-                              >
-                                {tab.label}
-                              </button>
-                            );
-                          })
-                        )}
+                  {/* Active accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '8px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Active accounts
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            321
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#EDFBF0',
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
+                          }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
+                        </div>
+                        {/* last month removed */}
                       </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                        <button
-                          type="button"
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#64B5F6',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            padding: 0,
-                            marginRight: usersToggle === 'list' ? '8px' : 0
-                          }}
-                        >
-                          <span style={{ color: '#64B5F6' }}>{usersToggle === 'activities' ? 'Export data' : 'Export users datas'}</span>
-                          <img
-                            src={exportIcon}
-                            alt="Export"
-                            style={{
-                              width: '14px',
-                              height: '14px',
-                              filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                            }}
-                          />
-                        </button>
-
-                        <select
-                          value={usersSortBy}
-                          onChange={(e) => setUsersSortBy(e.target.value)}
-                          style={{
-                            padding: '0 18px 0 0',
-                            borderRadius: '8px',
-                            border: 'none',
-                            fontSize: '11px',
-                            color: '#B0B0B0',
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            fontFamily: 'Poppins, sans-serif',
-                            appearance: 'none',
-                            WebkitAppearance: 'none',
-                            MozAppearance: 'none',
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'right 4px center',
-                            backgroundSize: '12px'
-                          }}
-                        >
-                          <option>Sort by</option>
-                          <option>Date</option>
-                          <option>Activity</option>
-                        </select>
-                      </div>
+                      <img src={stat2Icon} alt="Active accounts" style={{ width: '24px', height: '24px' }} />
                     </div>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', padding: '8px 0' }}>
-                      <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        {selectedUserEmails.size} item{selectedUserEmails.size !== 1 ? 's' : ''} selected
-                      </span>
-                      <button
-                        onClick={() => {
-                          setMoreMenu(null);
-                          clearSelectionMode();
-                        }}
-                        style={{
-                          border: 'none',
-                          background: 'transparent',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          color: '#939393',
-                          fontSize: '11px',
-                          fontFamily: 'Poppins, sans-serif',
-                          padding: 0
-                        }}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                        Clear all selections
-                      </button>
+                  </div>
+
+                  {/* Inactive accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '8px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Inactive accounts
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            204
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#FFE9E9',
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
+                          }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                              <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                          </div>
+                        </div>
+                        {/* last month removed */}
+                      </div>
+                      <img src={peopleIcon} alt="Inactive accounts" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+
+                  {/* Suspended accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '8px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ 
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Suspended accounts
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ 
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            13
+                          </p>
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            backgroundColor: '#F4F4F4',
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
+                          }}>
+                            <span style={{ color: '#939393', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
+                          </div>
+                        </div>
+                        {/* last month removed */}
+                      </div>
+                      <img src={stat3Icon} alt="Suspended accounts" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Users Activities Table (same layout; data changes with toggle/tab) */}
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                border: '1px solid #F1F1F1',
+                padding: '12px 14px'
+              }}>
+                {/* Top bar 1: tabs + export + sort OR selection controls */}
+                {!isSelectionMode ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: usersToggle === 'list' ? '26px' : '18px', flexWrap: 'wrap' }}>
+                      {usersToggle === 'activities' ? (
+                        [
+                          { key: 'all', label: 'All user recent activities' },
+                          { key: 'joined', label: 'Joined' },
+                          { key: 'posted', label: 'Posted' },
+                          { key: 'reviewed', label: 'Reviewed' },
+                          { key: 'reported', label: 'Reported' },
+                        ].map((tab) => {
+                          const isActive = usersActivityTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => setUsersActivityTab(tab.key as any)}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        [
+                          { key: 'all', label: 'All users' },
+                          { key: 'new', label: 'New users' },
+                          { key: 'free', label: 'Free Plan' },
+                          { key: 'verified', label: 'Verified' },
+                          { key: 'unverified', label: 'Unverified' },
+                        ].map((tab) => {
+                          const isActive = usersListTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => setUsersListTab(tab.key as any)}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                       <button
                         type="button"
                         style={{
@@ -9016,77 +8929,130 @@ const AdminDashboard: React.FC = () => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
-                          color: '#939393',
+                          color: '#64B5F6',
                           fontSize: '11px',
                           fontFamily: 'Poppins, sans-serif',
-                          padding: 0
+                          padding: 0,
+                          marginRight: usersToggle === 'list' ? '8px' : 0
                         }}
                       >
+                        <span style={{ color: '#64B5F6' }}>{usersToggle === 'activities' ? 'Export data' : 'Export users datas'}</span>
                         <img
                           src={exportIcon}
                           alt="Export"
                           style={{
                             width: '14px',
                             height: '14px',
-                            filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                            filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
                           }}
                         />
-                        {usersToggle === 'list' ? 'Export user data' : 'Export item data'}
                       </button>
-                      {usersToggle === 'list' ? (
-                        <>
-                          <button
-                            type="button"
-                            style={{
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              color: '#B0B0B0',
-                              fontSize: '11px',
-                              fontFamily: 'Poppins, sans-serif',
-                              padding: 0
-                            }}
-                          >
-                            <img src={suspendIcon} alt="Suspend" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
-                            Suspend user account
-                          </button>
-                          <button
-                            type="button"
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const emailsToRemove = Array.from(selectedUserEmails);
-                              if (emailsToRemove.length === 0) return;
-                              setRemovedUserEmails((prev) => {
-                                const next = new Set(prev);
-                                emailsToRemove.forEach((email) => next.add(email));
-                                return next;
-                              });
-                              setMoreMenu(null);
-                              clearSelectionMode();
-                            }}
-                            style={{
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: selectedUserEmails.size ? 'pointer' : 'not-allowed',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              color: '#FF5151',
-                              fontSize: '11px',
-                              fontFamily: 'Poppins, sans-serif',
-                              padding: 0,
-                              opacity: selectedUserEmails.size ? 1 : 0.5
-                            }}
-                          >
-                            <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                            Delete user account
-                          </button>
-                        </>
-                      ) : (
+
+                      <select
+                        value={usersSortBy}
+                        onChange={(e) => setUsersSortBy(e.target.value)}
+                        style={{
+                          padding: '0 18px 0 0',
+                          borderRadius: '8px',
+                          border: 'none',
+                          fontSize: '11px',
+                          color: '#B0B0B0',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 4px center',
+                          backgroundSize: '12px'
+                        }}
+                      >
+                        <option>Sort by</option>
+                        <option>Date</option>
+                        <option>Activity</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', padding: '8px 0' }}>
+                    <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {selectedUserEmails.size} item{selectedUserEmails.size !== 1 ? 's' : ''} selected
+                    </span>
+                    <button
+                      onClick={() => {
+                        setMoreMenu(null);
+                        clearSelectionMode();
+                      }}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                      Clear all selections
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <img
+                        src={exportIcon}
+                        alt="Export"
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                        }}
+                      />
+                      {usersToggle === 'list' ? 'Export user data' : 'Export item data'}
+                    </button>
+                    {usersToggle === 'list' ? (
+                      <>
+                        <button
+                          type="button"
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#B0B0B0',
+                            fontSize: '11px',
+                            fontFamily: 'Poppins, sans-serif',
+                            padding: 0
+                          }}
+                        >
+                          <img src={suspendIcon} alt="Suspend" style={{ width: '14px', height: '14px', filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)' }} />
+                          Suspend user account
+                        </button>
                         <button
                           type="button"
                           onMouseDown={(e) => {
@@ -9117,350 +9083,384 @@ const AdminDashboard: React.FC = () => {
                           }}
                         >
                           <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                          Remove from activity list
+                          Delete user account
                         </button>
-                      )}
-                    </div>
-                  )}
-
-                  <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
-
-                  {/* Top bar 2: column headers */}
-                  <div style={{ display: 'grid', gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'), gap: '10px', padding: '14px 0 12px 0' }}>
-                    {(usersToggle === 'activities' ? [
-                      { key: 'Users', label: 'Users' },
-                      { key: 'Date of creation', label: 'Date of creation' },
-                      { key: 'Activity', label: 'Activity' },
-                      { key: 'User plan', label: 'User plan' },
-                      ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
-                    ] : [
-                      { key: 'Users', label: 'Users' },
-                      { key: 'Joined', label: 'Joined' },
-                      { key: 'User plan', label: 'User plan' },
-                      { key: 'User status', label: 'User status' },
-                      ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
-                    ]).map((h) => (
-                      <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {h.label}
-                        {h.key !== 'Actions' && (
-                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 8l-6-6-6 6" />
-                            <path d="M18 16l-6 6-6-6" />
-                          </svg>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ height: '1px', backgroundColor: '#F1F1F1' }} />
-
-                  {/* Rows */}
-                  <div>
-                    {pagedUsersRows.map((row, idx) => {
-                      const rowKey = `${row.email}-${idx}`;
-                      const isRowActive = hoveredUserRowKey === rowKey || selectedUserRowKey === rowKey;
-
-                      return (
-                        <div
-                          key={rowKey}
-                          onMouseEnter={() => setHoveredUserRowKey(rowKey)}
-                          onMouseLeave={() => setHoveredUserRowKey(null)}
-                          onClick={(e) => {
-                            // Don't trigger row selection if clicking on interactive elements
-                            const target = e.target as HTMLElement;
-                            if (target.closest('.more-options-button') ||
-                              target.closest('.checkbox-container') ||
-                              isSelectionMode) {
-                              return;
-                            }
-                            setSelectedUserRowKey(rowKey);
-                          }}
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'),
-                            gap: '10px',
-                            padding: '14px 8px',
-                            borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F1F1F1' : 'none',
-                            backgroundColor: isRowActive ? '#F6FBFF' : 'transparent',
-                            borderRadius: 0
-                          }}
-                        >
-                          {/* Users column */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                            {isSelectionMode && (
-                              <div
-                                className="checkbox-container"
-                                onMouseDown={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                  const newSelected = new Set(selectedUserEmails);
-                                  if (newSelected.has(row.email)) {
-                                    newSelected.delete(row.email);
-                                  } else {
-                                    newSelected.add(row.email);
-                                  }
-                                  setSelectedUserEmails(newSelected);
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                }}
-                                style={{
-                                  width: '18px',
-                                  height: '18px',
-                                  border: selectedUserEmails.has(row.email) ? '2px solid #64B5F6' : '2px solid #D9D9D9',
-                                  borderRadius: '4px',
-                                  backgroundColor: selectedUserEmails.has(row.email) ? '#64B5F6' : 'transparent',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  cursor: 'pointer',
-                                  flexShrink: 0
-                                }}
-                              >
-                                {selectedUserEmails.has(row.email) && (
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                  </svg>
-                                )}
-                              </div>
-                            )}
-                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: (row as any).avatarBg || '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover' }} />
-                            </div>
-                            <div style={{ minWidth: 0 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                  {row.name}
-                                </span>
-                                {row.isNewUser && (
-                                  <span style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '8px', borderRadius: '4px', padding: '2px 6px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
-                                    New user
-                                  </span>
-                                )}
-                              </div>
-                              <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
-                                {row.email}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Date/Joined */}
-                          <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.date}</div>
-
-                          {/* Activity (only for activities view) */}
-                          {usersToggle === 'activities' && (
-                            <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{(row as any).activity}</div>
-                          )}
-
-                          {/* User plan */}
-                          <div style={{ paddingTop: '4px' }}>
-                            <span style={{
-                              display: 'inline-block',
-                              padding: '3px 8px',
-                              borderRadius: '4px',
-                              fontSize: '9px',
-                              fontFamily: 'Poppins, sans-serif',
-                              ...getPlanBadgeStyle(row.plan)
-                            }}>
-                              {row.plan}
-                            </span>
-                          </div>
-
-                          {/* User status (only for list view) */}
-                          {usersToggle === 'list' && (
-                            <div style={{ paddingTop: '4px' }}>
-                              <span style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '3px 8px',
-                                borderRadius: '4px',
-                                fontSize: '9px',
-                                fontFamily: 'Poppins, sans-serif',
-                                backgroundColor: (row as any).verified ? '#EDFBF0' : '#F4F4F4',
-                                color: (row as any).verified ? '#22C55E' : '#939393'
-                              }}>
-                                <img
-                                  src={(row as any).verified ? verifyIcon : unverifyIcon}
-                                  alt={(row as any).verified ? 'Verified' : 'Unverified'}
-                                  style={{ width: '8px', height: '8px' }}
-                                />
-                                {(row as any).verified ? 'Verified' : 'Unverified'}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Actions */}
-                          {isSelectionMode ? (
-                            <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2px' }}>
-                              {selectedUserEmails.has(row.email) && (
-                                <span style={{ fontSize: '11px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Selected</span>
-                              )}
-                            </div>
-                          ) : (
-                            <div
-                              style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <button
-                                onClick={(e) => e.stopPropagation()}
-                                style={{ width: '28px', height: '28px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                  <circle cx="12" cy="12" r="3" />
-                                </svg>
-                              </button>
-                              <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-                                <button
-                                  type="button"
-                                  className="more-options-button"
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                                    moreMenuButtonRef.current = e.currentTarget as HTMLButtonElement;
-                                    setMoreMenu((prev) => (prev?.email === row.email ? null : { email: row.email, anchorRect: rect }));
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                  }}
-                                  style={{
-                                    width: '18px',
-                                    height: '18px',
-                                    borderRadius: '50%',
-                                    border: moreMenu?.email === row.email ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
-                                    backgroundColor: '#FFFFFF',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    zIndex: 1001,
-                                    position: 'relative'
-                                  }}
-                                >
-                                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="3" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
-                                    <circle cx="6" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
-                                    <circle cx="9" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Pagination (MyListings style; left controls + right Go to) */}
-                  <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '8px' }} />
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <button
-                        aria-label="Previous page"
-                        onClick={() => setUsersPage((p) => Math.max(1, p - 1))}
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '8px',
-                          backgroundColor: '#F0F0F0',
-                          border: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M15 18l-6-6 6-6" />
-                        </svg>
-                      </button>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                        {usersPaginationNumbers.map((page) => (
-                          <span
-                            key={page}
-                            onClick={() => setUsersPage(page)}
-                            style={{
-                              cursor: 'pointer',
-                              fontFamily: 'Bricolage Grotesque, sans-serif',
-                              fontSize: '14px',
-                              color: page === usersPage ? '#212121' : '#B0B0B0'
-                            }}
-                          >
-                            {page}
-                          </span>
-                        ))}
-                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
-                        <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>{usersTotalPages}</span>
-                      </div>
-
-                      <button
-                        aria-label="Next page"
-                        onClick={() => setUsersPage((p) => Math.min(usersTotalPages, p + 1))}
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '8px',
-                          backgroundColor: '#F0F0F0',
-                          border: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 6l6 6-6 6" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
-                      <input
-                        type="text"
-                        placeholder="e.g 40"
-                        value={usersGoTo}
-                        onChange={(e) => setUsersGoTo(e.target.value)}
-                        style={{
-                          border: '1px solid #BABABA',
-                          borderRadius: '8px',
-                          padding: '6px 10px',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontSize: '12px',
-                          color: '#D9D9D9',
-                          width: '64px',
-                          textAlign: 'center'
-                        }}
-                      />
+                      </>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => {
-                          const n = parseInt(usersGoTo, 10);
-                          if (!Number.isNaN(n)) setUsersPage(Math.min(usersTotalPages, Math.max(1, n)));
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const emailsToRemove = Array.from(selectedUserEmails);
+                          if (emailsToRemove.length === 0) return;
+                          setRemovedUserEmails((prev) => {
+                            const next = new Set(prev);
+                            emailsToRemove.forEach((email) => next.add(email));
+                            return next;
+                          });
+                          setMoreMenu(null);
+                          clearSelectionMode();
                         }}
                         style={{
-                          backgroundColor: '#212121',
-                          color: '#FFFFFF',
-                          borderRadius: '8px',
-                          padding: '6px 14px',
-                          fontFamily: 'Bricolage Grotesque, sans-serif',
-                          fontSize: '12px',
                           border: 'none',
-                          cursor: 'pointer'
+                          background: 'transparent',
+                          cursor: selectedUserEmails.size ? 'pointer' : 'not-allowed',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#FF5151',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0,
+                          opacity: selectedUserEmails.size ? 1 : 0.5
                         }}
                       >
-                        Go
+                        <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                        Remove from activity list
                       </button>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
+
+                {/* Top bar 2: column headers */}
+                <div style={{ display: 'grid', gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'), gap: '10px', padding: '14px 0 12px 0' }}>
+                  {(usersToggle === 'activities' ? [
+                    { key: 'Users', label: 'Users' },
+                    { key: 'Date of creation', label: 'Date of creation' },
+                    { key: 'Activity', label: 'Activity' },
+                    { key: 'User plan', label: 'User plan' },
+                    ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
+                  ] : [
+                    { key: 'Users', label: 'Users' },
+                    { key: 'Joined', label: 'Joined' },
+                    { key: 'User plan', label: 'User plan' },
+                    { key: 'User status', label: 'User status' },
+                    ...(isSelectionMode ? [] : [{ key: 'Actions', label: 'Actions' }])
+                  ]).map((h) => (
+                    <div key={h.key} style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {h.label}
+                      {h.key !== 'Actions' && (
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 8l-6-6-6 6" />
+                          <path d="M18 16l-6 6-6-6" />
+                        </svg>
+                      )}
                     </div>
+                  ))}
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1' }} />
+
+                {/* Rows */}
+                <div>
+                  {pagedUsersRows.map((row, idx) => {
+                    const rowKey = `${row.email}-${idx}`;
+                    const isRowActive = hoveredUserRowKey === rowKey || selectedUserRowKey === rowKey;
+
+                    return (
+                    <div
+                      key={rowKey}
+                      onMouseEnter={() => setHoveredUserRowKey(rowKey)}
+                      onMouseLeave={() => setHoveredUserRowKey(null)}
+                      onClick={(e) => {
+                        // Don't trigger row selection if clicking on interactive elements
+                        const target = e.target as HTMLElement;
+                        if (target.closest('.more-options-button') || 
+                            target.closest('.checkbox-container') || 
+                            isSelectionMode) {
+                          return;
+                        }
+                        setSelectedUserRowKey(rowKey);
+                      }}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: isSelectionMode ? (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr') : (usersToggle === 'activities' ? '2.2fr 1.2fr 1.6fr 1fr 0.8fr' : '2.2fr 1.2fr 1fr 1fr 0.8fr'),
+                        gap: '10px',
+                        padding: '14px 8px',
+                        borderBottom: idx < pagedUsersRows.length - 1 ? '1px solid #F1F1F1' : 'none',
+                        backgroundColor: isRowActive ? '#F6FBFF' : 'transparent',
+                        borderRadius: 0
+                      }}
+                    >
+                      {/* Users column */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                        {isSelectionMode && (
+                          <div
+                            className="checkbox-container"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              const newSelected = new Set(selectedUserEmails);
+                              if (newSelected.has(row.email)) {
+                                newSelected.delete(row.email);
+                              } else {
+                                newSelected.add(row.email);
+                              }
+                              setSelectedUserEmails(newSelected);
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              border: selectedUserEmails.has(row.email) ? '2px solid #64B5F6' : '2px solid #D9D9D9',
+                              borderRadius: '4px',
+                              backgroundColor: selectedUserEmails.has(row.email) ? '#64B5F6' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              flexShrink: 0
+                            }}
+                          >
+                            {selectedUserEmails.has(row.email) && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                        )}
+                        <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: (row as any).avatarBg || '#E3F2FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <img src={row.avatar} alt={row.name} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '13px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.name}
+                            </span>
+                            {row.isNewUser && (
+                              <span style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '8px', borderRadius: '4px', padding: '2px 6px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
+                                New user
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                            {row.email}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date/Joined */}
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{row.date}</div>
+                      
+                      {/* Activity (only for activities view) */}
+                      {usersToggle === 'activities' && (
+                        <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px' }}>{(row as any).activity}</div>
+                      )}
+
+                      {/* User plan */}
+                      <div style={{ paddingTop: '4px' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          fontSize: '9px',
+                          fontFamily: 'Poppins, sans-serif',
+                          ...getPlanBadgeStyle(row.plan)
+                        }}>
+                          {row.plan}
+                        </span>
+                      </div>
+
+                      {/* User status (only for list view) */}
+                      {usersToggle === 'list' && (
+                        <div style={{ paddingTop: '4px' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '9px',
+                            fontFamily: 'Poppins, sans-serif',
+                            backgroundColor: (row as any).verified ? '#EDFBF0' : '#F4F4F4',
+                            color: (row as any).verified ? '#22C55E' : '#939393'
+                          }}>
+                            <img 
+                              src={(row as any).verified ? verifyIcon : unverifyIcon} 
+                              alt={(row as any).verified ? 'Verified' : 'Unverified'} 
+                              style={{ width: '8px', height: '8px' }} 
+                            />
+                            {(row as any).verified ? 'Verified' : 'Unverified'}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      {isSelectionMode ? (
+                        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2px' }}>
+                          {selectedUserEmails.has(row.email) && (
+                            <span style={{ fontSize: '11px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Selected</span>
+                          )}
+                        </div>
+                      ) : (
+                        <div 
+                          style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button 
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ width: '28px', height: '28px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                          <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className="more-options-button"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                                moreMenuButtonRef.current = e.currentTarget as HTMLButtonElement;
+                                setMoreMenu((prev) => (prev?.email === row.email ? null : { email: row.email, anchorRect: rect }));
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                              }}
+                              style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                border: moreMenu?.email === row.email ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer',
+                                padding: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1001,
+                                position: 'relative'
+                              }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="3" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="6" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="9" cy="6" r="1.2" fill={moreMenu?.email === row.email ? '#64B5F6' : '#B0B0B0'} />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination (MyListings style; left controls + right Go to) */}
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '8px' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button
+                      aria-label="Previous page"
+                      onClick={() => setUsersPage((p) => Math.max(1, p - 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F0F0F0',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                      {usersPaginationNumbers.map((page) => (
+                        <span
+                          key={page}
+                          onClick={() => setUsersPage(page)}
+                          style={{
+                            cursor: 'pointer',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '14px',
+                            color: page === usersPage ? '#212121' : '#B0B0B0'
+                          }}
+                        >
+                          {page}
+                        </span>
+                      ))}
+                      <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>…</span>
+                      <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>{usersTotalPages}</span>
+                    </div>
+
+                    <button
+                      aria-label="Next page"
+                      onClick={() => setUsersPage((p) => Math.min(usersTotalPages, p + 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F0F0F0',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 6l6 6-6 6" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+                    <input
+                      type="text"
+                      placeholder="e.g 40"
+                      value={usersGoTo}
+                      onChange={(e) => setUsersGoTo(e.target.value)}
+                      style={{
+                        border: '1px solid #BABABA',
+                        borderRadius: '8px',
+                        padding: '6px 10px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        color: '#D9D9D9',
+                        width: '64px',
+                        textAlign: 'center'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const n = parseInt(usersGoTo, 10);
+                        if (!Number.isNaN(n)) setUsersPage(Math.min(usersTotalPages, Math.max(1, n)));
+                      }}
+                      style={{
+                        backgroundColor: '#212121',
+                        color: '#FFFFFF',
+                        borderRadius: '8px',
+                        padding: '6px 14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Go
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
             )
           ) : selectedSidebarOption === 'listings' ? (
             <div key={viewingListingDetail && selectedListingForDetail ? 'listing-detail' : 'listing-list'} style={{ paddingRight: '14px' }}>
@@ -9596,14 +9596,14 @@ const AdminDashboard: React.FC = () => {
                           items: isActivityDeleted
                             ? []
                             : [
-                              {
-                                title: 'New listing added',
-                                // matches the row text; modal copy uses `activityToDeleteLabel`
-                                description: '"White pepper..." has been added by',
-                                author: '@Salam Abdou',
-                                time: '19 min ago'
-                              }
-                            ]
+                                {
+                                  title: 'New listing added',
+                                  // matches the row text; modal copy uses `activityToDeleteLabel`
+                                  description: '"White pepper..." has been added by',
+                                  author: '@Salam Abdou',
+                                  time: '19 min ago'
+                                }
+                              ]
                         }
                       ].map((group, groupIdx, groups) => (
                         <div key={group.date} style={{ marginBottom: groupIdx === groups.length - 1 ? 0 : '18px', marginTop: groupIdx === 0 ? '20px' : '0' }}>
@@ -9714,9 +9714,9 @@ const AdminDashboard: React.FC = () => {
                                         }}
                                       >
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                          <circle cx="4" cy="8" r="1.5" fill="#4D4D4D" />
-                                          <circle cx="8" cy="8" r="1.5" fill="#4D4D4D" />
-                                          <circle cx="12" cy="8" r="1.5" fill="#4D4D4D" />
+                                          <circle cx="4" cy="8" r="1.5" fill="#4D4D4D"/>
+                                          <circle cx="8" cy="8" r="1.5" fill="#4D4D4D"/>
+                                          <circle cx="12" cy="8" r="1.5" fill="#4D4D4D"/>
                                         </svg>
                                       </div>
                                     </div>
@@ -9945,14 +9945,14 @@ const AdminDashboard: React.FC = () => {
                             fontWeight: 500
                           }}>
                             {selectedListingForDetail.status || 'Active'}
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
                           </span>
                         </div>
                         <p style={{ fontSize: '18px', fontWeight: 600, color: '#212121', margin: '0 0 4px 0', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedListingForDetail.price}</p>
                         <p style={{ fontSize: '11px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', margin: '0 0 12px 0' }}>Posted {selectedListingForDetail.date}</p>
                         {selectedListingForDetail.location && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                             <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>{selectedListingForDetail.location}</span>
                           </div>
                         )}
@@ -10008,7 +10008,7 @@ const AdminDashboard: React.FC = () => {
                             )}
                             {selectedListingForDetail.sellerRating != null && (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FBBC05"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                 <span style={{ fontSize: '11px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>{selectedListingForDetail.sellerRating}</span>
                               </div>
                             )}
@@ -10020,7 +10020,7 @@ const AdminDashboard: React.FC = () => {
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => setIsListingMetricsOpen(!isListingMetricsOpen)}>
                               <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>Listing Metrics</span>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" style={{ transform: isListingMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><polyline points="6 9 12 15 18 9" /></svg>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" style={{ transform: isListingMetricsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><polyline points="6 9 12 15 18 9"/></svg>
                             </div>
                           </div>
                           {isListingMetricsOpen && (
@@ -10048,7 +10048,7 @@ const AdminDashboard: React.FC = () => {
                       <div style={{ padding: '8px 0' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                           <span style={{ fontSize: '32px', color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600 }}>4.3</span>
-                          <svg width="28" height="28" viewBox="0 0 24 24" fill="#FBBC05"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="#FBBC05"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         </div>
                         <p style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Poppins, sans-serif' }}>456 Review</p>
                       </div>
@@ -10061,822 +10061,1645 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'contents' }}>
-                  {/* Listings Management Header */}
-                  <div style={{ marginTop: '10px', marginBottom: '16px' }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h1 style={{
-                        fontSize: '16px',
-                        fontWeight: 600,
-                        color: '#202224',
-                        margin: '0 0 2px 0',
-                        fontFamily: 'Bricolage Grotesque, sans-serif'
-                      }}>
-                        {listingsToggle === 'activities' ? 'Listing activities' : 'Listing lists'}
-                      </h1>
-
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                        <p style={{
-                          color: '#9C9C9C',
-                          fontSize: '12px',
-                          margin: 0,
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          {listingsToggle === 'activities' ? 'Stay informed about listing trends, behaviour and have a comprehensive activity tracking.' : 'Explore, manage, and monitor all listed listing in BAO Afrik platform with ease.'}
-                        </p>
-
-                        {/* Toggle (aligned with description) */}
-                        <div style={{
-                          backgroundColor: '#F4F4F4',
-                          borderRadius: '9px',
-                          padding: '3px',
-                          display: 'flex',
-                          gap: '3px',
-                          flexShrink: 0,
-                          border: '1px solid #F1F1F1'
-                        }}>
-                          {[
-                            { key: 'activities', label: 'Listing Activities' },
-                            { key: 'list', label: 'Listing lists' }
-                          ].map((t) => {
-                            const isActive = listingsToggle === (t.key as 'activities' | 'list');
-                            return (
-                              <button
-                                key={t.key}
-                                onClick={() => { setListingsToggle(t.key as 'activities' | 'list'); setListingsPage(1); }}
-                                style={{
-                                  border: 'none',
-                                  cursor: 'pointer',
-                                  padding: '6px 10px',
-                                  borderRadius: '7px',
-                                  backgroundColor: isActive ? '#FFFFFF' : 'transparent',
-                                  color: isActive ? '#64B5F6' : '#939393',
-                                  fontSize: '11px',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  lineHeight: 1,
-                                  whiteSpace: 'nowrap',
-                                  boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.05)' : 'none'
-                                }}
-                              >
-                                {t.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Metrics Cards (only for Listings list) */}
-                  {listingsToggle === 'list' && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
-                      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div>
-                            <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>All listings</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                              <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>569</p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EDFBF0', padding: '1.5px 5px', borderRadius: '10px' }}>
-                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
-                              </div>
-                            </div>
-                          </div>
-                          <img src={statIcon} alt="All listings" style={{ width: '24px', height: '24px' }} />
-                        </div>
-                      </div>
-                      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div>
-                            <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Active listings</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                              <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>321</p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EDFBF0', padding: '1.5px 5px', borderRadius: '10px' }}>
-                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
-                              </div>
-                            </div>
-                          </div>
-                          <img src={activelistingsIcon} alt="Active listings" style={{ width: '24px', height: '24px' }} />
-                        </div>
-                      </div>
-                      {/* Inactive listings - same structure as User list Inactive accounts */}
-                      <div style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '18px',
-                        padding: '8px',
-                        border: '1px solid #F1F1F1'
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div>
-                            <p style={{
-                              color: '#9C9C9C',
-                              fontSize: '10px',
-                              margin: '0 0 4px 0',
-                              fontFamily: 'Poppins, sans-serif'
-                            }}>
-                              Inactive listings
-                            </p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                              <p style={{
-                                fontSize: '20px',
-                                fontWeight: 600,
-                                color: '#212121',
-                                margin: 0,
-                                fontFamily: 'Bricolage Grotesque, sans-serif'
-                              }}>
-                                204
-                              </p>
-                              <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                backgroundColor: '#FFE9E9',
-                                padding: '1.5px 5px',
-                                borderRadius: '10px'
-                              }}>
-                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
-                                  <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
-                              </div>
-                            </div>
-                          </div>
-                          <img src={peopleIcon} alt="Inactive listings" style={{ width: '24px', height: '24px' }} />
-                        </div>
-                      </div>
-                      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div>
-                            <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Suspended Listings</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                              <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>13</p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#F4F4F4', padding: '1.5px 5px', borderRadius: '10px' }}>
-                                <span style={{ color: '#939393', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
-                              </div>
-                            </div>
-                          </div>
-                          <img src={stat3Icon} alt="Suspended Listings" style={{ width: '24px', height: '24px' }} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Main table container */}
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '20px',
-                    border: '1px solid #F1F1F1',
-                    padding: '12px 14px'
+              <div style={{ display: 'contents' }}>
+              {/* Listings Management Header */}
+              <div style={{ marginTop: '10px', marginBottom: '16px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h1 style={{
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: '#202224',
+                    margin: '0 0 2px 0',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
                   }}>
-                    {/* Top bar: tabs + export + sort OR selection controls (match User list/Activities) */}
-                    {!isListingsSelectionMode ? (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: listingsToggle === 'list' ? '26px' : '26px', flexWrap: 'wrap' }}>
-                          {listingsToggle === 'activities' ? (
-                            [
-                              { key: 'all', label: 'All listings activities' },
-                              { key: 'posted', label: 'Posted' },
-                              { key: 'reviewed', label: 'Reviewed' },
-                              { key: 'reported', label: 'Reported' },
-                            ].map((tab) => {
-                              const isActive = listingsActivityTab === (tab.key as any);
-                              return (
-                                <button
-                                  key={tab.key}
-                                  onClick={() => { setListingsActivityTab(tab.key as any); setListingsPage(1); }}
-                                  style={{
-                                    border: 'none',
-                                    background: 'transparent',
-                                    padding: '0 0 10px 0',
-                                    cursor: 'pointer',
-                                    fontSize: '11px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    color: isActive ? '#64B5F6' : '#B0B0B0',
-                                    fontWeight: 400,
-                                    borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                                  }}
-                                >
-                                  {tab.label}
-                                </button>
-                              );
-                            })
-                          ) : (
-                            [
-                              { key: 'all', label: 'All listings' },
-                              { key: 'active', label: 'Active' },
-                              { key: 'inactive', label: 'Inactive' },
-                              { key: 'dayleft', label: 'Day left' },
-                              { key: 'under_review', label: 'Under review' },
-                            ].map((tab) => {
-                              const isActive = listingsListTab === (tab.key as any);
-                              return (
-                                <button
-                                  key={tab.key}
-                                  onClick={() => { setListingsListTab(tab.key as any); setListingsPage(1); }}
-                                  style={{
-                                    border: 'none',
-                                    background: 'transparent',
-                                    padding: '0 0 10px 0',
-                                    cursor: 'pointer',
-                                    fontSize: '11px',
-                                    fontFamily: 'Poppins, sans-serif',
-                                    color: isActive ? '#64B5F6' : '#B0B0B0',
-                                    fontWeight: 400,
-                                    borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
-                                  }}
-                                >
-                                  {tab.label}
-                                </button>
-                              );
-                            })
-                          )}
-                        </div>
+                    {listingsToggle === 'activities' ? 'Listing activities' : 'Listing lists'}
+                  </h1>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                          <button
-                            type="button"
-                            style={{
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              color: '#64B5F6',
-                              fontSize: '11px',
-                              fontFamily: 'Poppins, sans-serif',
-                              padding: 0
-                            }}
-                          >
-                            <span style={{ color: '#64B5F6' }}>Export data</span>
-                            <img
-                              src={exportIcon}
-                              alt="Export"
-                              style={{
-                                width: '14px',
-                                height: '14px',
-                                filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
-                              }}
-                            />
-                          </button>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <p style={{
+                      color: '#9C9C9C',
+                      fontSize: '12px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      {listingsToggle === 'activities' ? 'Stay informed about listing trends, behavior and have a comprehensive activity tracking.' : 'Explore, manage, and monitor all listed listing in BAO Afrik platform with ease.'}
+                    </p>
 
-                          <select
-                            value={listingsSortBy}
-                            onChange={(e) => setListingsSortBy(e.target.value)}
-                            style={{
-                              padding: '0 18px 0 0',
-                              borderRadius: '8px',
-                              border: 'none',
-                              fontSize: '11px',
-                              color: '#B0B0B0',
-                              backgroundColor: 'transparent',
-                              cursor: 'pointer',
-                              fontFamily: 'Poppins, sans-serif',
-                              appearance: 'none',
-                              WebkitAppearance: 'none',
-                              MozAppearance: 'none',
-                              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 4px center',
-                              backgroundSize: '12px'
-                            }}
-                          >
-                            <option>Sort by</option>
-                            <option>Date</option>
-                            <option>Activity</option>
-                          </select>
-                        </div>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', padding: '8px 0' }}>
-                        <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                          </svg>
-                          {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''} selected
-                        </span>
-                        <button
-                          onClick={clearListingsSelectionMode}
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#939393',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            padding: 0
-                          }}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
-                          Clear all selections
-                        </button>
-                        <button
-                          type="button"
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#939393',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            padding: 0
-                          }}
-                        >
-                          <img
-                            src={exportIcon}
-                            alt="Export"
-                            style={{
-                              width: '14px',
-                              height: '14px',
-                              filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
-                            }}
-                          />
-                          Export item data
-                        </button>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const idsToRemove = Array.from(selectedListingIds);
-                            if (idsToRemove.length === 0) return;
-                            setRemovedListingIds((prev) => {
-                              const next = new Set(prev);
-                              idsToRemove.forEach((id) => next.add(id));
-                              return next;
-                            });
-                            clearListingsSelectionMode();
-                          }}
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: selectedListingIds.size ? 'pointer' : 'not-allowed',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#FF5151',
-                            fontSize: '11px',
-                            fontFamily: 'Poppins, sans-serif',
-                            padding: 0,
-                            opacity: selectedListingIds.size ? 1 : 0.5
-                          }}
-                        >
-                          <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
-                          Remove from activity list
-                        </button>
-                      </div>
-                    )}
-
-                    <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
-
-                    {/* Column headers */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr', gap: '8px', padding: '14px 0 12px 0' }}>
+                    {/* Toggle (aligned with description) */}
+                    <div style={{
+                      backgroundColor: '#F4F4F4',
+                      borderRadius: '9px',
+                      padding: '3px',
+                      display: 'flex',
+                      gap: '3px',
+                      flexShrink: 0,
+                      border: '1px solid #F1F1F1'
+                    }}>
                       {[
-                        { key: 'Listings', label: 'Listings' },
-                        { key: 'Date of creation', label: 'Date of creation' },
-                        { key: listingsToggle === 'list' ? 'Status' : 'Activity', label: listingsToggle === 'list' ? 'Status' : 'Activity' },
-                        { key: 'Author', label: 'Author' },
-                        { key: 'Actions', label: 'Actions' }
-                      ].map((h) => (
-                        <div
-                          key={h.key}
-                          style={{
-                            fontSize: '10px',
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            marginLeft:
-                              h.key === 'Date of creation'
-                                ? '40px'
-                                : (h.key === 'Activity' || h.key === 'Status')
-                                  ? '56px'
-                                  : h.key === 'Author'
-                                    ? '32px'
-                                    : h.key === 'Actions'
-                                      ? '64px'
-                                      : 0
-                          }}
-                        >
-                          {h.label}
-                          {h.key !== 'Actions' && (
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M18 8l-6-6-6 6" />
-                              <path d="M18 16l-6 6-6-6" />
-                            </svg>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div style={{ height: '1px', backgroundColor: '#F1F1F1' }} />
-
-                    {/* Rows */}
-                    <div>
-                      {pagedListingsRows.map((row, idx) => {
-                        const rowId = (row as { id?: number }).id;
-                        const rowKey = rowId != null ? `listing-${rowId}-${idx}` : `${row.productName}-${idx}`;
-                        const isListingRowActive = hoveredListingRowKey === rowKey || selectedListingRowKey === rowKey;
+                        { key: 'activities', label: 'Listing Activities' },
+                        { key: 'list', label: 'Listing lists' }
+                      ].map((t) => {
+                        const isActive = listingsToggle === (t.key as 'activities' | 'list');
                         return (
-                          <div
-                            key={rowId != null ? `listing-${rowId}` : `${row.productName}-${idx}`}
-                            onMouseEnter={() => setHoveredListingRowKey(rowKey)}
-                            onMouseLeave={() => setHoveredListingRowKey(null)}
-                            onClick={(e) => {
-                              const target = e.target as HTMLElement;
-                              if (target.closest('.listings-more-options-button') || target.closest('.checkbox-container') || isListingsSelectionMode) {
-                                return;
-                              }
-                              setSelectedListingRowKey(rowKey);
-                            }}
+                          <button
+                            key={t.key}
+                            onClick={() => { setListingsToggle(t.key as 'activities' | 'list'); setListingsPage(1); }}
                             style={{
-                              display: 'grid',
-                              gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr',
-                              gap: '10px',
-                              padding: '14px 8px',
-                              borderBottom: idx < pagedListingsRows.length - 1 ? '1px solid #F1F1F1' : 'none',
-                              backgroundColor: isListingRowActive ? '#F6FBFF' : 'transparent',
-                              borderRadius: 0
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '6px 10px',
+                              borderRadius: '7px',
+                              backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                              color: isActive ? '#64B5F6' : '#939393',
+                              fontSize: '11px',
+                              fontFamily: 'Poppins, sans-serif',
+                              lineHeight: 1,
+                              whiteSpace: 'nowrap',
+                              boxShadow: isActive ? '0 2px 10px rgba(0,0,0,0.05)' : 'none'
                             }}
                           >
-                            {/* Listings column */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                              {isListingsSelectionMode && (
-                                <div
-                                  className="checkbox-container"
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    if (rowId == null) return;
-                                    const newSelected = new Set(selectedListingIds);
-                                    if (newSelected.has(rowId)) {
-                                      newSelected.delete(rowId);
-                                    } else {
-                                      newSelected.add(rowId);
-                                    }
-                                    setSelectedListingIds(newSelected);
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                  }}
-                                  style={{
-                                    width: '18px',
-                                    height: '18px',
-                                    border: selectedListingIds.has(rowId!) ? '2px solid #64B5F6' : '2px solid #D9D9D9',
-                                    borderRadius: '4px',
-                                    backgroundColor: selectedListingIds.has(rowId!) ? '#64B5F6' : 'transparent',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    flexShrink: 0
-                                  }}
-                                >
-                                  {selectedListingIds.has(rowId!) && (
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                      <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                  )}
-                                </div>
-                              )}
-                              <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                                <img src={row.productImage} alt={row.productName} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
-                              </div>
-                              <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                  {row.productName}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', minWidth: 0 }}>
-                                  <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.price}</span>
-                                  {listingsToggle === 'activities' && (row as any).status != null && (
-                                    <>
-                                      <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
-                                      <span style={{ fontSize: '10px', color: getListingStatusColor((row as any).status), fontFamily: 'Bricolage Grotesque, sans-serif', whiteSpace: 'nowrap' }}>
-                                        {(row as any).status}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Date of creation */}
-                            <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px', paddingLeft: '40px' }}>
-                              {row.date}
-                            </div>
-
-                            {/* Activity or Status */}
-                            <div style={{ paddingTop: '6px', paddingLeft: '56px' }}>
-                              {listingsToggle === 'list' ? (
-                                (() => {
-                                  const status = (row as any).status as ListingListStatus | undefined;
-                                  if (!status) return null;
-                                  const badgeStyle = getListingListStatusBadgeStyle(status);
-                                  const isDayLeft = badgeStyle.iconType === 'clock';
-                                  return (
-                                    <span
-                                      style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '4px',
-                                        padding: isDayLeft ? '2px 10px' : '2px 8px',
-                                        borderRadius: '9999px',
-                                        fontSize: '10px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        backgroundColor: badgeStyle.backgroundColor,
-                                        color: badgeStyle.color
-                                      }}
-                                    >
-                                      {badgeStyle.iconType === 'clock' ? (
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                          <circle cx="12" cy="12" r="10" fill="#FAB951" />
-                                          <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                      ) : badgeStyle.icon ? (
-                                        <img src={badgeStyle.icon} alt="" style={{ width: '12px', height: '12px' }} />
-                                      ) : null}
-                                      <span style={{ color: badgeStyle.color, fontFamily: 'Poppins, sans-serif' }}>{status}</span>
-                                    </span>
-                                  );
-                                })()
-                              ) : (
-                                <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{(row as any).activity}</span>
-                              )}
-                            </div>
-
-                            {/* Author */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, paddingLeft: '32px' }}>
-                              <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: row.authorAvatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                                <img src={row.authorAvatar} alt={row.authorName} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
-                              </div>
-                              <div style={{ minWidth: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                  <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {row.authorName}
-                                  </span>
-                                  {row.isNewUser && (
-                                    <span style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '8px', borderRadius: '4px', padding: '2px 6px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
-                                      New user
-                                    </span>
-                                  )}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                                  <span style={{ fontSize: '10px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.plan}</span>
-                                  <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#B0B0B0', display: 'inline-block' }} />
-                                  <span style={{ fontSize: '10px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
-                                    {row.verified ? 'Verified' : 'Unverified'}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Actions */}
-                            {isListingsSelectionMode ? (
-                              <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2px', paddingLeft: '64px' }}>
-                                {selectedListingIds.has(rowId!) && (
-                                  <span style={{ fontSize: '11px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Selected</span>
-                                )}
-                              </div>
-                            ) : (
-                              <div
-                                style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative', paddingLeft: '64px' }}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <button
-                                  type="button"
-                                  style={{ width: '28px', height: '28px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                  </svg>
-                                </button>
-                                <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-                                  <button
-                                    type="button"
-                                    className="listings-more-options-button"
-                                    onMouseDown={(e) => {
-                                      e.stopPropagation();
-                                      e.preventDefault();
-                                      const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                                      listingsMoreMenuButtonRef.current = e.currentTarget as HTMLButtonElement;
-                                      const rId = (row as { id?: number }).id;
-                                      setListingsMoreMenu((prev) => (prev?.listingId === rId ? null : { listingId: rId!, anchorRect: rect }));
-                                    }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      e.preventDefault();
-                                    }}
-                                    style={{
-                                      width: '18px',
-                                      height: '18px',
-                                      borderRadius: '50%',
-                                      border: listingsMoreMenu?.listingId === rowId ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
-                                      backgroundColor: '#FFFFFF',
-                                      cursor: 'pointer',
-                                      padding: 0,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      zIndex: 1001,
-                                      position: 'relative'
-                                    }}
-                                  >
-                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <circle cx="3" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
-                                      <circle cx="6" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
-                                      <circle cx="9" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                            {t.label}
+                          </button>
                         );
                       })}
                     </div>
+                  </div>
+                </div>
+              </div>
 
-                    {/* Pagination (same as users) */}
-                    <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '8px' }} />
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <button
-                          aria-label="Previous page"
-                          onClick={() => setListingsPage((p) => Math.max(1, p - 1))}
-                          style={{
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '8px',
-                            backgroundColor: '#F0F0F0',
-                            border: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M15 18l-6-6 6-6" />
-                          </svg>
-                        </button>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                          {listingsPaginationNumbers.map((page) => (
-                            <span
-                              key={page}
-                              onClick={() => setListingsPage(page)}
-                              style={{
-                                cursor: 'pointer',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                                fontSize: '14px',
-                                color: listingsPage === page ? '#212121' : '#B0B0B0',
-                                fontWeight: listingsPage === page ? 600 : 500
-                              }}
-                            >
-                              {page}
-                            </span>
-                          ))}
-                          <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>...</span>
-                          <span
-                            onClick={() => setListingsPage(listingsTotalPages)}
-                            style={{
-                              cursor: 'pointer',
-                              fontFamily: 'Bricolage Grotesque, sans-serif',
-                              fontSize: '14px',
-                              color: listingsPage === listingsTotalPages ? '#212121' : '#B0B0B0',
-                              fontWeight: listingsPage === listingsTotalPages ? 600 : 500
-                            }}
-                          >
-                            {listingsTotalPages}
-                          </span>
+              {/* Metrics Cards (only for Listings list) */}
+              {listingsToggle === 'list' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>All listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>569</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EDFBF0', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
                         </div>
-
-                        <button
-                          aria-label="Next page"
-                          onClick={() => setListingsPage((p) => Math.min(listingsTotalPages, p + 1))}
-                          style={{
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '8px',
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #E9E9E9',
+                      </div>
+                      <img src={statIcon} alt="All listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Active listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>321</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EDFBF0', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                          </div>
+                        </div>
+                      </div>
+                      <img src={activelistingsIcon} alt="Active listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                  {/* Inactive listings - same structure as User list Inactive accounts */}
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '18px',
+                    padding: '8px',
+                    border: '1px solid #F1F1F1'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{
+                          color: '#9C9C9C',
+                          fontSize: '10px',
+                          margin: '0 0 4px 0',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}>
+                          Inactive listings
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{
+                            fontSize: '20px',
+                            fontWeight: 600,
+                            color: '#212121',
+                            margin: 0,
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            204
+                          </p>
+                          <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 18l6-6-6-6" />
-                          </svg>
-                        </button>
+                            gap: '4px',
+                            backgroundColor: '#FFE9E9',
+                            padding: '1.5px 5px',
+                            borderRadius: '10px'
+                          }}>
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                              <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{ color: '#EF4444', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                          </div>
+                        </div>
                       </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
-                        <input
-                          type="text"
-                          placeholder="e.g 40"
-                          value={listingsGoTo}
-                          onChange={(e) => setListingsGoTo(e.target.value)}
-                          style={{
-                            border: '1px solid #BABABA',
-                            borderRadius: '8px',
-                            padding: '6px 10px',
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            fontSize: '12px',
-                            color: '#D9D9D9',
-                            width: '64px',
-                            textAlign: 'center'
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const n = parseInt(listingsGoTo, 10);
-                            if (!Number.isNaN(n)) setListingsPage(Math.min(listingsTotalPages, Math.max(1, n)));
-                          }}
-                          style={{
-                            backgroundColor: '#212121',
-                            color: '#FFFFFF',
-                            borderRadius: '8px',
-                            padding: '6px 14px',
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            fontSize: '12px',
-                            border: 'none',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Go
-                        </button>
+                      <img src={peopleIcon} alt="Inactive listings" style={{ width: '24px', height: '24px' }} />
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', borderRadius: '18px', padding: '8px', border: '1px solid #F1F1F1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ color: '#9C9C9C', fontSize: '10px', margin: '0 0 4px 0', fontFamily: 'Poppins, sans-serif' }}>Suspended Listings</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <p style={{ fontSize: '20px', fontWeight: 600, color: '#212121', margin: 0, fontFamily: 'Bricolage Grotesque, sans-serif' }}>13</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#F4F4F4', padding: '1.5px 5px', borderRadius: '10px' }}>
+                            <span style={{ color: '#939393', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>0.00%</span>
+                          </div>
+                        </div>
                       </div>
+                      <img src={stat3Icon} alt="Suspended Listings" style={{ width: '24px', height: '24px' }} />
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* Main table container */}
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                border: '1px solid #F1F1F1',
+                padding: '12px 14px'
+              }}>
+                {/* Top bar: tabs + export + sort OR selection controls (match User list/Activities) */}
+                {!isListingsSelectionMode ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: listingsToggle === 'list' ? '26px' : '26px', flexWrap: 'wrap' }}>
+                      {listingsToggle === 'activities' ? (
+                        [
+                          { key: 'all', label: 'All listings activities' },
+                          { key: 'posted', label: 'Posted' },
+                          { key: 'reviewed', label: 'Reviewed' },
+                          { key: 'reported', label: 'Reported' },
+                        ].map((tab) => {
+                          const isActive = listingsActivityTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => { setListingsActivityTab(tab.key as any); setListingsPage(1); }}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        [
+                          { key: 'all', label: 'All listings' },
+                          { key: 'active', label: 'Active' },
+                          { key: 'inactive', label: 'Inactive' },
+                          { key: 'dayleft', label: 'Day left' },
+                          { key: 'under_review', label: 'Under review' },
+                        ].map((tab) => {
+                          const isActive = listingsListTab === (tab.key as any);
+                          return (
+                            <button
+                              key={tab.key}
+                              onClick={() => { setListingsListTab(tab.key as any); setListingsPage(1); }}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                padding: '0 0 10px 0',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontFamily: 'Poppins, sans-serif',
+                                color: isActive ? '#64B5F6' : '#B0B0B0',
+                                fontWeight: 400,
+                                borderBottom: isActive ? '2px solid #64B5F6' : '2px solid transparent'
+                              }}
+                            >
+                              {tab.label}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                      <button
+                        type="button"
+                        style={{
+                          border: 'none',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          color: '#64B5F6',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          padding: 0
+                        }}
+                      >
+                        <span style={{ color: '#64B5F6' }}>Export data</span>
+                        <img
+                          src={exportIcon}
+                          alt="Export"
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            filter: 'brightness(0) saturate(100%) invert(67%) sepia(45%) saturate(345%) hue-rotate(168deg) brightness(97%) contrast(93%)'
+                          }}
+                        />
+                      </button>
+
+                      <select
+                        value={listingsSortBy}
+                        onChange={(e) => setListingsSortBy(e.target.value)}
+                        style={{
+                          padding: '0 18px 0 0',
+                          borderRadius: '8px',
+                          border: 'none',
+                          fontSize: '11px',
+                          color: '#B0B0B0',
+                          backgroundColor: 'transparent',
+                          cursor: 'pointer',
+                          fontFamily: 'Poppins, sans-serif',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B0B0B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 4px center',
+                          backgroundSize: '12px'
+                        }}
+                      >
+                        <option>Sort by</option>
+                        <option>Date</option>
+                        <option>Activity</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', padding: '8px 0' }}>
+                    <span style={{ color: '#64B5F6', fontSize: '11px', fontFamily: 'Poppins, sans-serif', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {selectedListingIds.size} item{selectedListingIds.size !== 1 ? 's' : ''} selected
+                    </span>
+                    <button
+                      onClick={clearListingsSelectionMode}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                      Clear all selections
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#939393',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0
+                      }}
+                    >
+                      <img
+                        src={exportIcon}
+                        alt="Export"
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          filter: 'brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%)'
+                        }}
+                      />
+                      Export item data
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const idsToRemove = Array.from(selectedListingIds);
+                        if (idsToRemove.length === 0) return;
+                        setRemovedListingIds((prev) => {
+                          const next = new Set(prev);
+                          idsToRemove.forEach((id) => next.add(id));
+                          return next;
+                        });
+                        clearListingsSelectionMode();
+                      }}
+                      style={{
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: selectedListingIds.size ? 'pointer' : 'not-allowed',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        color: '#FF5151',
+                        fontSize: '11px',
+                        fontFamily: 'Poppins, sans-serif',
+                        padding: 0,
+                        opacity: selectedListingIds.size ? 1 : 0.5
+                      }}
+                    >
+                      <img src={trashIcon} alt="Delete" style={{ width: '14px', height: '14px' }} />
+                      Remove from activity list
+                    </button>
+                  </div>
+                )}
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '-1px' }} />
+
+                {/* Column headers */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr', gap: '8px', padding: '14px 0 12px 0' }}>
+                  {[
+                    { key: 'Listings', label: 'Listings' },
+                    { key: 'Date of creation', label: 'Date of creation' },
+                    { key: listingsToggle === 'list' ? 'Status' : 'Activity', label: listingsToggle === 'list' ? 'Status' : 'Activity' },
+                    { key: 'Author', label: 'Author' },
+                    { key: 'Actions', label: 'Actions' }
+                  ].map((h) => (
+                    <div
+                      key={h.key}
+                      style={{
+                        fontSize: '10px',
+                        color: '#939393',
+                        fontFamily: 'Poppins, sans-serif',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        marginLeft:
+                          h.key === 'Date of creation'
+                            ? '40px'
+                            : (h.key === 'Activity' || h.key === 'Status')
+                            ? '56px'
+                            : h.key === 'Author'
+                            ? '32px'
+                            : h.key === 'Actions'
+                            ? '64px'
+                            : 0
+                      }}
+                    >
+                      {h.label}
+                      {h.key !== 'Actions' && (
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 8l-6-6-6 6" />
+                          <path d="M18 16l-6 6-6-6" />
+                        </svg>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1' }} />
+
+                {/* Rows */}
+                <div>
+                  {pagedListingsRows.map((row, idx) => {
+                    const rowId = (row as { id?: number }).id;
+                    const rowKey = rowId != null ? `listing-${rowId}-${idx}` : `${row.productName}-${idx}`;
+                    const isListingRowActive = hoveredListingRowKey === rowKey || selectedListingRowKey === rowKey;
+                    return (
+                    <div
+                      key={rowId != null ? `listing-${rowId}` : `${row.productName}-${idx}`}
+                      onMouseEnter={() => setHoveredListingRowKey(rowKey)}
+                      onMouseLeave={() => setHoveredListingRowKey(null)}
+                      onClick={(e) => {
+                        const target = e.target as HTMLElement;
+                        if (target.closest('.listings-more-options-button') || target.closest('.checkbox-container') || isListingsSelectionMode) {
+                          return;
+                        }
+                        setSelectedListingRowKey(rowKey);
+                      }}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1.05fr 1.05fr 1.25fr 1.45fr 0.8fr',
+                        gap: '10px',
+                        padding: '14px 8px',
+                        borderBottom: idx < pagedListingsRows.length - 1 ? '1px solid #F1F1F1' : 'none',
+                        backgroundColor: isListingRowActive ? '#F6FBFF' : 'transparent',
+                        borderRadius: 0
+                      }}
+                    >
+                      {/* Listings column */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                        {isListingsSelectionMode && (
+                          <div
+                            className="checkbox-container"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              if (rowId == null) return;
+                              const newSelected = new Set(selectedListingIds);
+                              if (newSelected.has(rowId)) {
+                                newSelected.delete(rowId);
+                              } else {
+                                newSelected.add(rowId);
+                              }
+                              setSelectedListingIds(newSelected);
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              border: selectedListingIds.has(rowId!) ? '2px solid #64B5F6' : '2px solid #D9D9D9',
+                              borderRadius: '4px',
+                              backgroundColor: selectedListingIds.has(rowId!) ? '#64B5F6' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              flexShrink: 0
+                            }}
+                          >
+                            {selectedListingIds.has(rowId!) && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            )}
+                          </div>
+                        )}
+                        <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
+                          <img src={row.productImage} alt={row.productName} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {row.productName}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', minWidth: 0 }}>
+                            <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.price}</span>
+                            {listingsToggle === 'activities' && (row as any).status != null && (
+                              <>
+                                <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#939393', display: 'inline-block' }} />
+                                <span style={{ fontSize: '10px', color: getListingStatusColor((row as any).status), fontFamily: 'Bricolage Grotesque, sans-serif', whiteSpace: 'nowrap' }}>
+                                  {(row as any).status}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date of creation */}
+                      <div style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif', paddingTop: '6px', paddingLeft: '40px' }}>
+                        {row.date}
+                      </div>
+
+                      {/* Activity or Status */}
+                      <div style={{ paddingTop: '6px', paddingLeft: '56px' }}>
+                        {listingsToggle === 'list' ? (
+                          (() => {
+                            const status = (row as any).status as ListingListStatus | undefined;
+                            if (!status) return null;
+                            const badgeStyle = getListingListStatusBadgeStyle(status);
+                            const isDayLeft = badgeStyle.iconType === 'clock';
+                            return (
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  padding: isDayLeft ? '2px 10px' : '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '10px',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  backgroundColor: badgeStyle.backgroundColor,
+                                  color: badgeStyle.color
+                                }}
+                              >
+                                {badgeStyle.iconType === 'clock' ? (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" fill="#FAB951" />
+                                    <path d="M12 7v5l3 2" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                ) : badgeStyle.icon ? (
+                                  <img src={badgeStyle.icon} alt="" style={{ width: '12px', height: '12px' }} />
+                                ) : null}
+                                <span style={{ color: badgeStyle.color, fontFamily: 'Poppins, sans-serif' }}>{status}</span>
+                              </span>
+                            );
+                          })()
+                        ) : (
+                          <span style={{ fontSize: '10px', color: '#939393', fontFamily: 'Poppins, sans-serif' }}>{(row as any).activity}</span>
+                        )}
+                      </div>
+
+                      {/* Author */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, paddingLeft: '32px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: row.authorAvatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                          <img src={row.authorAvatar} alt={row.authorName} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '12px', color: '#6A6A6A', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.authorName}
+                            </span>
+                            {row.isNewUser && (
+                              <span style={{ backgroundColor: '#F0F8FE', color: '#64B5F6', fontSize: '8px', borderRadius: '4px', padding: '2px 6px', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
+                                New user
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                            <span style={{ fontSize: '10px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>{row.plan}</span>
+                            <span style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#B0B0B0', display: 'inline-block' }} />
+                            <span style={{ fontSize: '10px', color: '#B0B0B0', fontFamily: 'Poppins, sans-serif', whiteSpace: 'nowrap' }}>
+                              {row.verified ? 'Verified' : 'Unverified'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      {isListingsSelectionMode ? (
+                        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2px', paddingLeft: '64px' }}>
+                          {selectedListingIds.has(rowId!) && (
+                            <span style={{ fontSize: '11px', color: '#64B5F6', fontFamily: 'Poppins, sans-serif' }}>Selected</span>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '2px', position: 'relative', paddingLeft: '64px' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            style={{ width: '28px', height: '28px', border: 'none', borderRadius: '50%', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                          <div style={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className="listings-more-options-button"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                                listingsMoreMenuButtonRef.current = e.currentTarget as HTMLButtonElement;
+                                const rId = (row as { id?: number }).id;
+                                setListingsMoreMenu((prev) => (prev?.listingId === rId ? null : { listingId: rId!, anchorRect: rect }));
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                              }}
+                              style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                border: listingsMoreMenu?.listingId === rowId ? '0.3px solid #64B5F6' : '0.3px solid #B0B0B0',
+                                backgroundColor: '#FFFFFF',
+                                cursor: 'pointer',
+                                padding: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1001,
+                                position: 'relative'
+                              }}
+                            >
+                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="3" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="6" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
+                                <circle cx="9" cy="6" r="1.2" fill={listingsMoreMenu?.listingId === rowId ? '#64B5F6' : '#B0B0B0'} />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination (same as users) */}
+                <div style={{ height: '1px', backgroundColor: '#F1F1F1', marginTop: '8px' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <button
+                      aria-label="Previous page"
+                      onClick={() => setListingsPage((p) => Math.max(1, p - 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F0F0F0',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                      {listingsPaginationNumbers.map((page) => (
+                        <span
+                          key={page}
+                          onClick={() => setListingsPage(page)}
+                          style={{
+                            cursor: 'pointer',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            fontSize: '14px',
+                            color: listingsPage === page ? '#212121' : '#B0B0B0',
+                            fontWeight: listingsPage === page ? 600 : 500
+                          }}
+                        >
+                          {page}
+                        </span>
+                      ))}
+                      <span style={{ color: '#B0B0B0', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '14px' }}>...</span>
+                      <span
+                        onClick={() => setListingsPage(listingsTotalPages)}
+                        style={{
+                          cursor: 'pointer',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          fontSize: '14px',
+                          color: listingsPage === listingsTotalPages ? '#212121' : '#B0B0B0',
+                          fontWeight: listingsPage === listingsTotalPages ? 600 : 500
+                        }}
+                      >
+                        {listingsTotalPages}
+                      </span>
+                    </div>
+
+                    <button
+                      aria-label="Next page"
+                      onClick={() => setListingsPage((p) => Math.min(listingsTotalPages, p + 1))}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E9E9E9',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#939393', fontFamily: 'Poppins, sans-serif', fontSize: '12px' }}>Go to :</span>
+                    <input
+                      type="text"
+                      placeholder="e.g 40"
+                      value={listingsGoTo}
+                      onChange={(e) => setListingsGoTo(e.target.value)}
+                      style={{
+                        border: '1px solid #BABABA',
+                        borderRadius: '8px',
+                        padding: '6px 10px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        color: '#D9D9D9',
+                        width: '64px',
+                        textAlign: 'center'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const n = parseInt(listingsGoTo, 10);
+                        if (!Number.isNaN(n)) setListingsPage(Math.min(listingsTotalPages, Math.max(1, n)));
+                      }}
+                      style={{
+                        backgroundColor: '#212121',
+                        color: '#FFFFFF',
+                        borderRadius: '8px',
+                        padding: '6px 14px',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        fontSize: '12px',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Go
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
             </div>
           ) : (
-            <div>
-              {/* Metrics Cards and Reported Issues Container */}
+          <div>
+            {/* Metrics Cards and Reported Issues Container */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginTop: '0',
+              marginBottom: '0',
+              alignItems: 'start'
+            }}>
+              {/* Row for title/description + dropdown + reported issues title */}
+              <div style={{ gridColumn: '1 / 3', marginBottom: '0' }}>
+                <h1 style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 600, 
+                  color: '#212121',
+                  margin: 0,
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Dashboard
+                </h1>
+                <p style={{ 
+                  color: '#9C9C9C',
+                  fontSize: '12px',
+                  margin: '2px 0 0 0',
+                  fontFamily: 'Poppins, sans-serif'
+                }}>
+                  Last update: {getLastUpdate()}{' '}
+                  <button
+                    style={{
+                      color: '#64B5F6',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      padding: 0
+                    }}
+                  >
+                    Refresh
+                  </button>
+                </p>
+              </div>
+
+              {/* Row for dropdown and title above Active Listings and Reported Issues */}
+              <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0', marginTop: '22px' }}>
+                <select style={{
+                  padding: '6px 10px',
+                  paddingRight: '28px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '11px',
+                  color: '#6A6A6A',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  fontFamily: 'Poppins, sans-serif',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 8px center',
+                  backgroundSize: '12px'
+                }}>
+                  <option>This week</option>
+                </select>
+              </div>
+              <div style={{ gridColumn: '4', marginBottom: '0', marginTop: '6px' }}>
+                <h2 style={{ 
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#212121',
+                  margin: 0,
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Reported Issues
+                </h2>
+              </div>
+              {/* Visitors Card */}
               <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
-                gap: '10px',
-                marginTop: '0',
-                marginBottom: '0',
-                alignItems: 'start'
+                backgroundColor: '#FFFFFF',
+                borderRadius: '18px',
+                padding: '10px',
+                border: '1px solid #F1F1F1'
               }}>
-                {/* Row for title/description + dropdown + reported issues title */}
-                <div style={{ gridColumn: '1 / 3', marginBottom: '0' }}>
-                  <h1 style={{
-                    fontSize: '18px',
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <p style={{ 
+                      color: '#9C9C9C',
+                      fontSize: '10px',
+                      margin: '0 0 4px 0',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Visitors number
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <p style={{ 
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: 0,
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        569
+                      </p>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: '#EDFBF0',
+                        padding: '2px 6px',
+                        borderRadius: '12px'
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                      </div>
+                    </div>
+                    <p style={{ 
+                      color: '#9C9C9C',
+                      fontSize: '8px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Last month: 2094
+                    </p>
+                  </div>
+                  <img src={peopleIcon} alt="Visitors" style={{ width: '24px', height: '24px' }} />
+                </div>
+              </div>
+
+              {/* Active Users Card */}
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '18px',
+                padding: '10px',
+                border: '1px solid #F1F1F1'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <p style={{ 
+                      color: '#9C9C9C',
+                      fontSize: '10px',
+                      margin: '0 0 4px 0',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Active users
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <p style={{ 
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: 0,
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        201
+                      </p>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: '#FFE9E9',
+                        padding: '2px 6px',
+                        borderRadius: '12px'
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span style={{ color: '#EF4444', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
+                      </div>
+                    </div>
+                    <p style={{ 
+                      color: '#9C9C9C',
+                      fontSize: '8px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Last month: 2094
+                    </p>
+                  </div>
+                  <img src={activeusersIcon} alt="Active Users" style={{ width: '24px', height: '24px' }} />
+                </div>
+              </div>
+
+              {/* Active Listings Card */}
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '18px',
+                padding: '10px',
+                border: '1px solid #F1F1F1'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <p style={{ 
+                      color: '#9C9C9C',
+                      fontSize: '10px',
+                      margin: '0 0 4px 0',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Active listings
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <p style={{ 
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        color: '#212121',
+                        margin: 0,
+                        fontFamily: 'Bricolage Grotesque, sans-serif'
+                      }}>
+                        714
+                      </p>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: '#EDFBF0',
+                        padding: '2px 6px',
+                        borderRadius: '12px'
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                          <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+109</span>
+                      </div>
+                    </div>
+                    <p style={{ 
+                      color: '#9C9C9C',
+                      fontSize: '8px',
+                      margin: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      Last month: 2094
+                    </p>
+                  </div>
+                  <img src={activelistingsIcon} alt="Active Listings" style={{ width: '24px', height: '24px' }} />
+                </div>
+              </div>
+
+              {/* Reported Issues - aligned with Active Listings */}
+              <div style={{ display: 'flex', flexDirection: 'column', marginTop: '-24px' }}>
+                {/* Reported Issues */}
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  padding: '12px',
+                  border: '0.5px solid #F1F1F1',
+                  width: '100%',
+                  maxWidth: '320px'
+                }}>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {[
+                      { name: 'Clara Vanstone', issue: 'Phishing attempt', time: '30 min ago', avatar: avatar, bgColor: '#E3F2FD' },
+                      { name: 'Robert OWEN', issue: 'Phishing attempt', time: '2h ago', avatar: avatar, bgColor: '#FFF3E0' },
+                      { name: 'Kalhesi Doumbia', issue: 'Phishing attempt', time: 'Yesterday', avatar: avatar, bgColor: '#F3E5F5' }
+                    ].map((item, index) => (
+                      <div key={index} style={{ 
+                        display: 'flex', 
+                        alignItems: 'flex-start', 
+                        gap: '10px'
+                      }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: item.bgColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <img 
+                            src={item.avatar} 
+                            alt={item.name} 
+                            style={{ 
+                              width: '24px', 
+                              height: '24px', 
+                              borderRadius: '50%',
+                              objectFit: 'cover'
+                            }} 
+                          />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                            <p style={{ 
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              color: '#212121',
+                              margin: 0,
+                              fontFamily: 'Poppins, sans-serif',
+                              flex: 1
+                            }}>
+                              {item.name}
+                            </p>
+                            <button style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              flexShrink: 0
+                            }}>
+                              <svg width="12" height="12" viewBox="0 0 24 4" fill="none">
+                                <circle cx="4" cy="2" r="2" fill="#9C9C9C" />
+                                <circle cx="12" cy="2" r="2" fill="#9C9C9C" />
+                                <circle cx="20" cy="2" r="2" fill="#9C9C9C" />
+                              </svg>
+                            </button>
+                          </div>
+                          <p style={{ 
+                            fontSize: '10px',
+                            color: '#9C9C9C',
+                            margin: 0,
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            {item.issue}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
+                            <p style={{ 
+                              fontSize: '9px',
+                              color: '#B0B0B0',
+                              margin: 0,
+                              fontFamily: 'Poppins, sans-serif'
+                            }}>
+                              {item.time}
+                            </p>
+                            <div style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              backgroundColor: '#64B5F6'
+                            }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ textAlign: 'right', marginTop: '12px' }}>
+                    <button style={{
+                      color: '#64B5F6',
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontFamily: 'Poppins, sans-serif'
+                    }}>
+                      See all reported issues →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Performance Overview (left) + User per country (right) */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginTop: '0',
+              marginBottom: '12px',
+              alignItems: 'start'
+            }}>
+            {/* Performance Overview - left 3 columns */}
+            <div style={{ 
+              gridColumn: '1 / 4',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              padding: '16px',
+              border: '1px solid #F1F1F1',
+              width: '100%',
+              marginTop: '-100px'
+            }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  marginBottom: '4px',
+                  marginTop: '0'
+                }}>
+                  <h2 style={{ 
+                    fontSize: '16px',
                     fontWeight: 600,
                     color: '#212121',
                     margin: 0,
                     fontFamily: 'Bricolage Grotesque, sans-serif'
                   }}>
-                    Dashboard
-                  </h1>
-                  <p style={{
-                    color: '#9C9C9C',
-                    fontSize: '12px',
-                    margin: '2px 0 0 0',
-                    fontFamily: 'Poppins, sans-serif'
-                  }}>
-                    Last update: {getLastUpdate()}{' '}
-                    <button
-                      style={{
-                        color: '#64B5F6',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        fontSize: '12px',
-                        fontFamily: 'Poppins, sans-serif',
-                        padding: 0
-                      }}
-                    >
-                      Refresh
-                    </button>
-                  </p>
+                    Performance Overview
+                  </h2>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select style={{
+                      padding: '6px 10px',
+                      paddingRight: '28px',
+                      borderRadius: '8px',
+                      border: '1px solid #E4E4E4',
+                      fontSize: '11px',
+                      color: '#6A6A6A',
+                      backgroundColor: '#FFFFFF',
+                      cursor: 'pointer',
+                      fontFamily: 'Poppins, sans-serif',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '12px'
+                    }}>
+                      <option>Listings</option>
+                    </select>
+                    <select style={{
+                      padding: '6px 10px',
+                      paddingRight: '28px',
+                      borderRadius: '8px',
+                      border: '1px solid #E4E4E4',
+                      fontSize: '11px',
+                      color: '#6A6A6A',
+                      backgroundColor: '#FFFFFF',
+                      cursor: 'pointer',
+                      fontFamily: 'Poppins, sans-serif',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '12px'
+                    }}>
+                      <option>Month</option>
+                    </select>
+                  </div>
                 </div>
 
-                {/* Row for dropdown and title above Active Listings and Reported Issues */}
-                <div style={{ gridColumn: '3', display: 'flex', justifyContent: 'flex-end', marginBottom: '0', marginTop: '22px' }}>
+                {/* Legend */}
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      borderRadius: '50%', 
+                      backgroundColor: '#9C9C9C' 
+                    }} />
+                    <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Past weeks</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      borderRadius: '50%', 
+                      backgroundColor: '#F9A825' 
+                    }} />
+                    <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Current Week</span>
+                  </div>
+                </div>
+
+                {/* Chart */}
+                <div
+                  style={{
+                    position: 'relative',
+                    height: '280px',
+                    padding: '14px 14px 10px 14px',
+                    backgroundColor: 'transparent',
+                    borderRadius: '12px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ display: 'flex', height: '100%' }}>
+                    {/* Y-axis */}
+                    <div
+                      style={{
+                        width: '34px',
+                        flexShrink: 0,
+                        height: '100%',
+                        position: 'relative'
+                      }}
+                    >
+                      {['40k', '30k', '20k', '10k', '0k'].map((v, idx) => {
+                        // Align with grid lines: 0%, 25%, 50%, 75%, 100%
+                        const positions = [0, 0.25, 0.5, 0.75, 1];
+                        // Calculate position accounting for line height (1px) - center the text on the line
+                        // Same approach for all labels: position + 0.5px offset, then translateY(-50%) to center
+                        // Adjust 30k (idx 1), 20k (idx 2), 10k (idx 3), and 0k (idx 4) to move them up
+                        const offset =
+                          idx === 1 ? '-8px' :
+                          idx === 2 ? '-16px' :
+                          idx === 3 ? '-24px' :
+                          idx === 4 ? '-34px' :
+                          '0.5px';
+                        return (
+                          <div
+                            key={v}
+                            style={{
+                              position: 'absolute',
+                              top: `calc(${positions[idx] * 100}% + ${offset})`,
+                              transform: 'translateY(-50%)',
+                  display: 'flex',
+                              alignItems: 'center'
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif',
+                                lineHeight: 1
+                              }}
+                            >
+                              {v}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Bars + X axis */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      {/* Plot area (grid + axes + bars) */}
+                      <div
+                        style={{
+                          flex: 1,
+                          position: 'relative',
+                          paddingLeft: '6px',
+                          paddingRight: '6px',
+                          paddingBottom: '10px'
+                        }}
+                      >
+                        {/* Grid lines (aligned with Y-axis numbers) */}
+                        {[0, 1, 2, 3, 4].map((i) => {
+                          // Align with Y-axis labels: 0%, 25%, 50%, 75%, 100%
+                          const positions = [0, 0.25, 0.5, 0.75, 1];
+                          return (
+                            <div
+                              key={i}
+                              style={{
+                                position: 'absolute',
+                                left: '0',
+                                right: '0',
+                                top: `${positions[i] * 100}%`,
+                                height: '1px',
+                                backgroundImage:
+                                  'repeating-linear-gradient(to right, #D9D9D9 0 6px, transparent 6px 18px)',
+                                opacity: 1,
+                                pointerEvents: 'none',
+                                transform: 'translateY(-0.5px)'
+                              }}
+                            />
+                          );
+                        })}
+
+                        {/* Bars */}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: '1px',
+                            display: 'flex',
+                            alignItems: 'stretch',
+                            justifyContent: 'space-between',
+                            gap: '16px',
+                            paddingLeft: '16px',
+                            paddingRight: '6px',
+                            paddingBottom: '0px'
+                          }}
+                        >
+                  {[
+                            { month: 'Mar', trackH: 28, fillH: 55 },
+                            { month: 'Apr', trackH: 46, fillH: 35 },
+                            { month: 'May', trackH: 100, fillH: 30 },
+                            { month: 'Jun', trackH: 70, fillH: 30 },
+                            { month: 'Jul', trackH: 80, fillH: 20 },
+                            { month: 'Aug', trackH: 80, fillH: 14 },
+                            { month: 'Sep', trackH: 50, fillH: 30 },
+                            { month: 'Oct', trackH: 76, fillH: 36 },
+                            { month: 'Nov', trackH: 58, fillH: 26 },
+                            { month: 'Dec', trackH: 90, fillH: 56, isCurrent: true }
+                          ].map((item) => {
+                            const trackWidth = 'clamp(34px, 4.2vw, 48px)';
+                            const trackRadius = '12px';
+                            const fillRadius = '10px';
+
+                            return (
+                              <div
+                                key={item.month}
+                                style={{
+                                  flex: 1,
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  minWidth: 0,
+                                  height: '100%',
+                                  alignItems: 'flex-end'
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: trackWidth,
+                                    height: `${item.trackH}%`,
+                                    backgroundColor: '#FAFAFA',
+                                    borderRadius: trackRadius,
+                                    position: 'relative',
+                                    overflow: 'visible',
+                                    border: '1px solid rgba(0,0,0,0.04)'
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      left: '2px',
+                                      right: '2px',
+                                      bottom: '2px',
+                                      height: `${item.fillH}%`,
+                                      backgroundColor: item.isCurrent ? 'transparent' : '#E4E4E4',
+                                      backgroundImage: item.isCurrent
+                                        ? 'linear-gradient(0deg, rgba(249, 168, 37, 0.20) 0%, rgba(249, 168, 37, 0.80) 100%)'
+                                        : undefined,
+                                      borderRadius: fillRadius,
+                                      overflow: 'hidden'
+                                    }}
+                                  >
+                                    {/* zebra stripes for current week */}
+                        {item.isCurrent && (
+                                      <div
+                                        style={{
+                            position: 'absolute',
+                                          inset: 0,
+                                          backgroundImage:
+                                            'repeating-linear-gradient(135deg, rgba(249, 168, 37, 0.15) 0px, rgba(249, 168, 37, 0.15) 6px, rgba(255, 255, 255, 0) 6px, rgba(255, 255, 255, 0) 12px)'
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                  
+                                  {/* blue dot marker - at top of fill bar */}
+                                  {item.isCurrent && (
+                                    <div
+                                      style={{
+                                        position: 'absolute',
+                                        bottom: `calc(${item.fillH}% + 2px)`,
+                            left: '50%',
+                                        transform: 'translate(-50%, 50%)',
+                                        width: '12px',
+                                        height: '12px',
+                            borderRadius: '50%',
+                                        backgroundColor: '#64B5F6',
+                                        boxShadow: '0 0 0 1px #FFFFFF',
+                                        zIndex: 10
+                                      }}
+                                    />
+                        )}
+                      </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '16px',
+                          paddingLeft: '6px',
+                          paddingRight: '6px',
+                          paddingTop: '16px'
+                        }}
+                      >
+                        {['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
+                          <div
+                            key={m}
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                color: '#B0B0B0',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              {m}
+                            </span>
+                    </div>
+                  ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            {/* User per country - right column (independent of Performance Overview height) */}
+            <div style={{ gridColumn: '4', display: 'flex', flexDirection: 'column', marginTop: '12px' }}>
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  padding: '10px',
+                  border: '0.5px solid #F1F1F1',
+                  width: '100%',
+                  maxWidth: '320px'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '0px'
+                  }}>
+                    <h2 style={{ 
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#212121',
+                      margin: 0,
+                      fontFamily: 'Bricolage Grotesque, sans-serif'
+                    }}>
+                      User per country
+                    </h2>
+                    <select style={{
+                      padding: '6px 10px',
+                      paddingRight: '28px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '11px',
+                      color: '#B0B0B0',
+                      backgroundColor: '#FFFFFF',
+                      cursor: 'pointer',
+                      fontFamily: 'Poppins, sans-serif',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '12px'
+                    }}>
+                      <option>This week</option>
+                    </select>
+                  </div>
+
+                  {/* Progress Chart */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center',
+                    marginTop: '-74px',
+                    marginBottom: '8px'
+                  }}>
+                    <MustUsersArc 
+                      percentage={67.56}
+                      users={104}
+                      width={200}
+                    />
+                  </div>
+
+                  {/* Country Breakdown Section */}
+                  <div style={{
+                    padding: '4px 10px',
+                    backgroundColor: '#FAFAFA',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ flex: 1 }}>
+                      {/* Less users at top left */}
+                      <p style={{ 
+                        fontSize: '9px',
+                        color: '#6A6A6A',
+                        margin: '0 0 4px 0',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        Less users: 2.89%
+                      </p>
+                      
+                      {/* France text */}
+                      <p style={{ 
+                        fontSize: '10px',
+                        color: '#939393',
+                        margin: '0 0 3px 0',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        France
+                      </p>
+                      
+                      {/* Users count and badge - badge directly to the right in one line */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'nowrap' }}>
+                        <span style={{ 
+                          fontSize: '11px', 
+                          color: '#202224', 
+                          fontWeight: 500, 
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          67 Users
+                        </span>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '3px',
+                          backgroundColor: '#EDFBF0',
+                          padding: '2px 5px',
+                          borderRadius: '10px'
+                        }}>
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Globe visualization - reduced size to fit appropriately */}
+                    <div 
+                      ref={globeRef}
+                      style={{
+                        width: '160px',
+                        height: '65px',
+                        position: 'relative',
+                        flexShrink: 0,
+                        marginLeft: 'auto'
+                      }}
+                    >
+                      <img 
+                        src={visualIcon} 
+                        alt="Globe" 
+                        style={{ 
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activities - Full width to align with cards above */}
+            <div style={{
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
+              gap: '10px',
+              marginTop: '12px',
+              marginBottom: '0',
+              alignItems: 'start'
+            }}>
+              <div style={{
+                gridColumn: '1 / 5',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+                padding: '10px 6px 10px 12px',
+              border: '1px solid #F1F1F1',
+                boxSizing: 'border-box',
+                width: 'calc(100% - 20px)',
+                maxWidth: 'calc(100% - 20px)'
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '10px'
+              }}>
+                <h2 style={{ 
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#212121',
+                  margin: 0,
+                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                }}>
+                  Recents activities
+                </h2>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <select style={{
-                    padding: '6px 10px',
+                    padding: '4px 10px',
                     paddingRight: '28px',
                     borderRadius: '8px',
                     border: '1px solid #E4E4E4',
@@ -10886,1070 +11709,247 @@ const AdminDashboard: React.FC = () => {
                     cursor: 'pointer',
                     fontFamily: 'Poppins, sans-serif',
                     appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'right 8px center',
                     backgroundSize: '12px'
                   }}>
-                    <option>This week</option>
+                    <option>All</option>
+                  </select>
+                  <select style={{
+                    padding: '4px 10px',
+                    paddingRight: '28px',
+                    borderRadius: '8px',
+                    border: '1px solid #E4E4E4',
+                    fontSize: '11px',
+                    color: '#6A6A6A',
+                    backgroundColor: '#FFFFFF',
+                    cursor: 'pointer',
+                    fontFamily: 'Poppins, sans-serif',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 8px center',
+                    backgroundSize: '12px'
+                  }}>
+                    <option>Sort by</option>
                   </select>
                 </div>
-                <div style={{ gridColumn: '4', marginBottom: '0', marginTop: '6px' }}>
-                  <h2 style={{
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    color: '#212121',
-                    margin: 0,
-                    fontFamily: 'Bricolage Grotesque, sans-serif'
-                  }}>
-                    Reported Issues
-                  </h2>
-                </div>
-                {/* Visitors Card */}
-                <div style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '18px',
-                  padding: '10px',
-                  border: '1px solid #F1F1F1'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <p style={{
-                        color: '#9C9C9C',
+              </div>
+
+              {/* Table */}
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #F1F1F1' }}>
+                      <th style={{ 
+                        padding: '5px 8px',
+                        textAlign: 'left',
                         fontSize: '10px',
-                        margin: '0 0 4px 0',
+                        fontWeight: 500,
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
-                        Visitors number
-                      </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <p style={{
-                          fontSize: '20px',
-                          fontWeight: 600,
-                          color: '#212121',
-                          margin: 0,
-                          fontFamily: 'Bricolage Grotesque, sans-serif'
-                        }}>
-                          569
-                        </p>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          backgroundColor: '#EDFBF0',
-                          padding: '2px 6px',
-                          borderRadius: '12px'
-                        }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          Users
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8l-6-6-6 6" />
+                            <path d="M18 16l-6 6-6-6" />
                           </svg>
-                          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
                         </div>
-                      </div>
-                      <p style={{
-                        color: '#9C9C9C',
-                        fontSize: '8px',
-                        margin: 0,
-                        fontFamily: 'Poppins, sans-serif'
-                      }}>
-                        Last month: 2094
-                      </p>
-                    </div>
-                    <img src={peopleIcon} alt="Visitors" style={{ width: '24px', height: '24px' }} />
-                  </div>
-                </div>
-
-                {/* Active Users Card */}
-                <div style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '18px',
-                  padding: '10px',
-                  border: '1px solid #F1F1F1'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <p style={{
-                        color: '#9C9C9C',
+                      </th>
+                      <th style={{ 
+                        padding: '5px 8px',
+                        textAlign: 'left',
                         fontSize: '10px',
-                        margin: '0 0 4px 0',
+                        fontWeight: 500,
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
-                        Active users
-                      </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <p style={{
-                          fontSize: '20px',
-                          fontWeight: 600,
-                          color: '#212121',
-                          margin: 0,
-                          fontFamily: 'Bricolage Grotesque, sans-serif'
-                        }}>
-                          201
-                        </p>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          backgroundColor: '#FFE9E9',
-                          padding: '2px 6px',
-                          borderRadius: '12px'
-                        }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                            <path d="M17 7L7 17M7 17H17M7 17V7" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          Date of creation
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8l-6-6-6 6" />
+                            <path d="M18 16l-6 6-6-6" />
                           </svg>
-                          <span style={{ color: '#EF4444', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>-4.23%</span>
                         </div>
-                      </div>
-                      <p style={{
-                        color: '#9C9C9C',
-                        fontSize: '8px',
-                        margin: 0,
-                        fontFamily: 'Poppins, sans-serif'
-                      }}>
-                        Last month: 2094
-                      </p>
-                    </div>
-                    <img src={activeusersIcon} alt="Active Users" style={{ width: '24px', height: '24px' }} />
-                  </div>
-                </div>
-
-                {/* Active Listings Card */}
-                <div style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '18px',
-                  padding: '10px',
-                  border: '1px solid #F1F1F1'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <p style={{
-                        color: '#9C9C9C',
+                      </th>
+                      <th style={{ 
+                        padding: '5px 8px',
+                        textAlign: 'left',
                         fontSize: '10px',
-                        margin: '0 0 4px 0',
+                        fontWeight: 500,
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
-                        Active listings
-                      </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <p style={{
-                          fontSize: '20px',
-                          fontWeight: 600,
-                          color: '#212121',
-                          margin: 0,
-                          fontFamily: 'Bricolage Grotesque, sans-serif'
-                        }}>
-                          714
-                        </p>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          backgroundColor: '#EDFBF0',
-                          padding: '2px 6px',
-                          borderRadius: '12px'
-                        }}>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        Activity
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8l-6-6-6 6" />
+                            <path d="M18 16l-6 6-6-6" />
                           </svg>
-                          <span style={{ color: '#22C55E', fontSize: '9px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+109</span>
                         </div>
-                      </div>
-                      <p style={{
-                        color: '#9C9C9C',
-                        fontSize: '8px',
-                        margin: 0,
+                      </th>
+                      <th style={{ 
+                        padding: '5px 8px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 500,
+                        color: '#939393',
                         fontFamily: 'Poppins, sans-serif'
                       }}>
-                        Last month: 2094
-                      </p>
-                    </div>
-                    <img src={activelistingsIcon} alt="Active Listings" style={{ width: '24px', height: '24px' }} />
-                  </div>
-                </div>
-
-                {/* Reported Issues - aligned with Active Listings */}
-                <div style={{ display: 'flex', flexDirection: 'column', marginTop: '-24px' }}>
-                  {/* Reported Issues */}
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '20px',
-                    padding: '12px',
-                    border: '0.5px solid #F1F1F1',
-                    width: '100%',
-                    maxWidth: '320px'
-                  }}>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {[
-                        { name: 'Clara Vanstone', issue: 'Phishing attempt', time: '30 min ago', avatar: avatar, bgColor: '#E3F2FD' },
-                        { name: 'Robert OWEN', issue: 'Phishing attempt', time: '2h ago', avatar: avatar, bgColor: '#FFF3E0' },
-                        { name: 'Kalhesi Doumbia', issue: 'Phishing attempt', time: 'Yesterday', avatar: avatar, bgColor: '#F3E5F5' }
-                      ].map((item, index) => (
-                        <div key={index} style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '10px'
-                        }}>
-                          <div style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            backgroundColor: item.bgColor,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0
-                          }}>
-                            <img
-                              src={item.avatar}
-                              alt={item.name}
-                              style={{
-                                width: '24px',
-                                height: '24px',
-                                borderRadius: '50%',
-                                objectFit: 'cover'
-                              }}
-                            />
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                              <p style={{
-                                fontSize: '12px',
-                                fontWeight: 500,
-                                color: '#212121',
-                                margin: 0,
-                                fontFamily: 'Poppins, sans-serif',
-                                flex: 1
-                              }}>
-                                {item.name}
-                              </p>
-                              <button style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '2px',
-                                flexShrink: 0
-                              }}>
-                                <svg width="12" height="12" viewBox="0 0 24 4" fill="none">
-                                  <circle cx="4" cy="2" r="2" fill="#9C9C9C" />
-                                  <circle cx="12" cy="2" r="2" fill="#9C9C9C" />
-                                  <circle cx="20" cy="2" r="2" fill="#9C9C9C" />
-                                </svg>
-                              </button>
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined BAO Afrik', isNewUser: true, avatar: avatar },
+                      { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post new listing', isNewUser: false, avatar: avatar }
+                    ].map((item, index) => (
+                      <tr key={index} style={{ borderBottom: index < 1 ? '1px solid #F1F1F1' : 'none' }}>
+                        {/* Users Column */}
+                        <td style={{ padding: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                            {/* Square Profile Image */}
+                            <div style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '4px',
+                              backgroundColor: '#E3F2FD',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}>
+                              <img 
+                                src={item.avatar} 
+                                alt={item.name} 
+                                style={{ 
+                                  width: '26px', 
+                                  height: '26px', 
+                                  borderRadius: '4px',
+                                  objectFit: 'cover'
+                                }} 
+                              />
                             </div>
-                            <p style={{
+                            {/* User Info */}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' }}>
+                          <p style={{ 
+                                  fontSize: '10px',
+                            color: '#212121',
+                                  margin: 0,
+                            fontWeight: 500,
+                                  fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}>
+                            {item.name}
+                          </p>
+                                {item.isNewUser && (
+                                  <span style={{
+                                    backgroundColor: '#F0F8FE',
+                                    color: '#64B5F6',
+                                    fontSize: '8px',
+                                    fontWeight: 500,
+                                    padding: '2px 5px',
+                                    borderRadius: '4px',
+                                    fontFamily: 'Poppins, sans-serif',
+                                    whiteSpace: 'nowrap'
+                                  }}>
+                                    New user
+                                  </span>
+                                )}
+                              </div>
+                          <p style={{ 
+                                fontSize: '9px',
+                                color: '#939393',
+                                margin: 0,
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            {item.email}
+                          </p>
+                            </div>
+                          </div>
+                        </td>
+                        {/* Date of creation Column */}
+                        <td style={{ padding: '8px' }}>
+                          <p style={{ 
+                            fontSize: '10px',
+                            color: '#939393',
+                            margin: 0,
+                            fontFamily: 'Poppins, sans-serif'
+                          }}>
+                            {item.date}
+                          </p>
+                        </td>
+                        {/* Activity Column */}
+                        <td style={{ padding: '8px' }}>
+                            <p style={{ 
                               fontSize: '10px',
-                              color: '#9C9C9C',
+                            color: '#939393',
                               margin: 0,
                               fontFamily: 'Poppins, sans-serif'
                             }}>
-                              {item.issue}
+                            {item.activity}
                             </p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
-                              <p style={{
-                                fontSize: '9px',
-                                color: '#B0B0B0',
-                                margin: 0,
-                                fontFamily: 'Poppins, sans-serif'
-                              }}>
-                                {item.time}
-                              </p>
-                              <div style={{
-                                width: '6px',
-                                height: '6px',
+                        </td>
+                        {/* Actions Column */}
+                        <td style={{ padding: '8px' }}>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            {/* Eye Icon Button */}
+                            <button
+                              style={{
+                                width: '28px',
+                                height: '28px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                padding: 0
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                            </button>
+                            {/* More Options Button */}
+                            <button
+                              type="button"
+                              style={{
+                                width: '18px',
+                                height: '18px',
                                 borderRadius: '50%',
-                                backgroundColor: '#64B5F6'
-                              }} />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div style={{ textAlign: 'right', marginTop: '12px' }}>
-                      <button style={{
-                        color: '#64B5F6',
-                        fontSize: '11px',
-                        fontWeight: 500,
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: 0,
-                        fontFamily: 'Poppins, sans-serif'
-                      }}>
-                        See all reported issues →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2: Performance Overview (left) + User per country (right) */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
-                gap: '10px',
-                marginTop: '0',
-                marginBottom: '12px',
-                alignItems: 'start'
-              }}>
-                {/* Performance Overview - left 3 columns */}
-                <div style={{
-                  gridColumn: '1 / 4',
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '24px',
-                  padding: '16px',
-                  border: '1px solid #F1F1F1',
-                  width: '100%',
-                  marginTop: '-100px'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '4px',
-                    marginTop: '0'
-                  }}>
-                    <h2 style={{
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#212121',
-                      margin: 0,
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                    }}>
-                      Performance Overview
-                    </h2>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <select style={{
-                        padding: '6px 10px',
-                        paddingRight: '28px',
-                        borderRadius: '8px',
-                        border: '1px solid #E4E4E4',
-                        fontSize: '11px',
-                        color: '#6A6A6A',
-                        backgroundColor: '#FFFFFF',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 8px center',
-                        backgroundSize: '12px'
-                      }}>
-                        <option>Listings</option>
-                      </select>
-                      <select style={{
-                        padding: '6px 10px',
-                        paddingRight: '28px',
-                        borderRadius: '8px',
-                        border: '1px solid #E4E4E4',
-                        fontSize: '11px',
-                        color: '#6A6A6A',
-                        backgroundColor: '#FFFFFF',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 8px center',
-                        backgroundSize: '12px'
-                      }}>
-                        <option>Month</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Legend */}
-                  <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: '#9C9C9C'
-                      }} />
-                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Past weeks</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: '#F9A825'
-                      }} />
-                      <span style={{ fontSize: '9px', color: '#9C9C9C', fontFamily: 'Poppins, sans-serif' }}>Current Week</span>
-                    </div>
-                  </div>
-
-                  {/* Chart */}
-                  <div
-                    style={{
-                      position: 'relative',
-                      height: '280px',
-                      padding: '14px 14px 10px 14px',
-                      backgroundColor: 'transparent',
-                      borderRadius: '12px',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <div style={{ display: 'flex', height: '100%' }}>
-                      {/* Y-axis */}
-                      <div
-                        style={{
-                          width: '34px',
-                          flexShrink: 0,
-                          height: '100%',
-                          position: 'relative'
-                        }}
-                      >
-                        {['40k', '30k', '20k', '10k', '0k'].map((v, idx) => {
-                          // Align with grid lines: 0%, 25%, 50%, 75%, 100%
-                          const positions = [0, 0.25, 0.5, 0.75, 1];
-                          // Calculate position accounting for line height (1px) - center the text on the line
-                          // Same approach for all labels: position + 0.5px offset, then translateY(-50%) to center
-                          // Adjust 30k (idx 1), 20k (idx 2), 10k (idx 3), and 0k (idx 4) to move them up
-                          const offset =
-                            idx === 1 ? '-8px' :
-                              idx === 2 ? '-16px' :
-                                idx === 3 ? '-24px' :
-                                  idx === 4 ? '-34px' :
-                                    '0.5px';
-                          return (
-                            <div
-                              key={v}
-                              style={{
-                                position: 'absolute',
-                                top: `calc(${positions[idx] * 100}% + ${offset})`,
-                                transform: 'translateY(-50%)',
+                                border: '0.3px solid #B0B0B0',
+                                backgroundColor: '#FFFFFF',
                                 display: 'flex',
-                                alignItems: 'center'
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                padding: 0
                               }}
                             >
-                              <span
-                                style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif',
-                                  lineHeight: 1
-                                }}
-                              >
-                                {v}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Bars + X axis */}
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        {/* Plot area (grid + axes + bars) */}
-                        <div
-                          style={{
-                            flex: 1,
-                            position: 'relative',
-                            paddingLeft: '6px',
-                            paddingRight: '6px',
-                            paddingBottom: '10px'
-                          }}
-                        >
-                          {/* Grid lines (aligned with Y-axis numbers) */}
-                          {[0, 1, 2, 3, 4].map((i) => {
-                            // Align with Y-axis labels: 0%, 25%, 50%, 75%, 100%
-                            const positions = [0, 0.25, 0.5, 0.75, 1];
-                            return (
-                              <div
-                                key={i}
-                                style={{
-                                  position: 'absolute',
-                                  left: '0',
-                                  right: '0',
-                                  top: `${positions[i] * 100}%`,
-                                  height: '1px',
-                                  backgroundImage:
-                                    'repeating-linear-gradient(to right, #D9D9D9 0 6px, transparent 6px 18px)',
-                                  opacity: 1,
-                                  pointerEvents: 'none',
-                                  transform: 'translateY(-0.5px)'
-                                }}
-                              />
-                            );
-                          })}
-
-                          {/* Bars */}
-                          <div
-                            style={{
-                              position: 'absolute',
-                              left: 0,
-                              right: 0,
-                              top: 0,
-                              bottom: '1px',
-                              display: 'flex',
-                              alignItems: 'stretch',
-                              justifyContent: 'space-between',
-                              gap: '16px',
-                              paddingLeft: '16px',
-                              paddingRight: '6px',
-                              paddingBottom: '0px'
-                            }}
-                          >
-                            {[
-                              { month: 'Mar', trackH: 28, fillH: 55 },
-                              { month: 'Apr', trackH: 46, fillH: 35 },
-                              { month: 'May', trackH: 100, fillH: 30 },
-                              { month: 'Jun', trackH: 70, fillH: 30 },
-                              { month: 'Jul', trackH: 80, fillH: 20 },
-                              { month: 'Aug', trackH: 80, fillH: 14 },
-                              { month: 'Sep', trackH: 50, fillH: 30 },
-                              { month: 'Oct', trackH: 76, fillH: 36 },
-                              { month: 'Nov', trackH: 58, fillH: 26 },
-                              { month: 'Dec', trackH: 90, fillH: 56, isCurrent: true }
-                            ].map((item) => {
-                              const trackWidth = 'clamp(34px, 4.2vw, 48px)';
-                              const trackRadius = '12px';
-                              const fillRadius = '10px';
-
-                              return (
-                                <div
-                                  key={item.month}
-                                  style={{
-                                    flex: 1,
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    minWidth: 0,
-                                    height: '100%',
-                                    alignItems: 'flex-end'
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      width: trackWidth,
-                                      height: `${item.trackH}%`,
-                                      backgroundColor: '#FAFAFA',
-                                      borderRadius: trackRadius,
-                                      position: 'relative',
-                                      overflow: 'visible',
-                                      border: '1px solid rgba(0,0,0,0.04)'
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        position: 'absolute',
-                                        left: '2px',
-                                        right: '2px',
-                                        bottom: '2px',
-                                        height: `${item.fillH}%`,
-                                        backgroundColor: item.isCurrent ? 'transparent' : '#E4E4E4',
-                                        backgroundImage: item.isCurrent
-                                          ? 'linear-gradient(0deg, rgba(249, 168, 37, 0.20) 0%, rgba(249, 168, 37, 0.80) 100%)'
-                                          : undefined,
-                                        borderRadius: fillRadius,
-                                        overflow: 'hidden'
-                                      }}
-                                    >
-                                      {/* zebra stripes for current week */}
-                                      {item.isCurrent && (
-                                        <div
-                                          style={{
-                                            position: 'absolute',
-                                            inset: 0,
-                                            backgroundImage:
-                                              'repeating-linear-gradient(135deg, rgba(249, 168, 37, 0.15) 0px, rgba(249, 168, 37, 0.15) 6px, rgba(255, 255, 255, 0) 6px, rgba(255, 255, 255, 0) 12px)'
-                                          }}
-                                        />
-                                      )}
-                                    </div>
-
-                                    {/* blue dot marker - at top of fill bar */}
-                                    {item.isCurrent && (
-                                      <div
-                                        style={{
-                                          position: 'absolute',
-                                          bottom: `calc(${item.fillH}% + 2px)`,
-                                          left: '50%',
-                                          transform: 'translate(-50%, 50%)',
-                                          width: '12px',
-                                          height: '12px',
-                                          borderRadius: '50%',
-                                          backgroundColor: '#64B5F6',
-                                          boxShadow: '0 0 0 1px #FFFFFF',
-                                          zIndex: 10
-                                        }}
-                                      />
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
+                              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
+                                <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
+                                <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
+                                </svg>
+                            </button>
                           </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: '16px',
-                            paddingLeft: '6px',
-                            paddingRight: '6px',
-                            paddingTop: '16px'
-                          }}
-                        >
-                          {['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
-                            <div
-                              key={m}
-                              style={{
-                                flex: 1,
-                                display: 'flex',
-                                justifyContent: 'center'
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: '11px',
-                                  color: '#B0B0B0',
-                                  fontFamily: 'Poppins, sans-serif'
-                                }}
-                              >
-                                {m}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* User per country - right column (independent of Performance Overview height) */}
-                <div style={{ gridColumn: '4', display: 'flex', flexDirection: 'column', marginTop: '12px' }}>
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '20px',
-                    padding: '10px',
-                    border: '0.5px solid #F1F1F1',
-                    width: '100%',
-                    maxWidth: '320px'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '0px'
-                    }}>
-                      <h2 style={{
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: '#212121',
-                        margin: 0,
-                        fontFamily: 'Bricolage Grotesque, sans-serif'
-                      }}>
-                        User per country
-                      </h2>
-                      <select style={{
-                        padding: '6px 10px',
-                        paddingRight: '28px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        fontSize: '11px',
-                        color: '#B0B0B0',
-                        backgroundColor: '#FFFFFF',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 8px center',
-                        backgroundSize: '12px'
-                      }}>
-                        <option>This week</option>
-                      </select>
-                    </div>
-
-                    {/* Progress Chart */}
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginTop: '-74px',
-                      marginBottom: '8px'
-                    }}>
-                      <MustUsersArc
-                        percentage={67.56}
-                        users={104}
-                        width={200}
-                      />
-                    </div>
-
-                    {/* Country Breakdown Section */}
-                    <div style={{
-                      padding: '4px 10px',
-                      backgroundColor: '#FAFAFA',
-                      borderRadius: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      position: 'relative',
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{ flex: 1 }}>
-                        {/* Less users at top left */}
-                        <p style={{
-                          fontSize: '9px',
-                          color: '#6A6A6A',
-                          margin: '0 0 4px 0',
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          Less users: 2.89%
-                        </p>
-
-                        {/* France text */}
-                        <p style={{
-                          fontSize: '10px',
-                          color: '#939393',
-                          margin: '0 0 3px 0',
-                          fontFamily: 'Poppins, sans-serif'
-                        }}>
-                          France
-                        </p>
-
-                        {/* Users count and badge - badge directly to the right in one line */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'nowrap' }}>
-                          <span style={{
-                            fontSize: '11px',
-                            color: '#202224',
-                            fontWeight: 500,
-                            fontFamily: 'Bricolage Grotesque, sans-serif',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            67 Users
-                          </span>
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '3px',
-                            backgroundColor: '#EDFBF0',
-                            padding: '2px 5px',
-                            borderRadius: '10px'
-                          }}>
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none">
-                              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <span style={{ color: '#22C55E', fontSize: '8px', fontWeight: 500, fontFamily: 'Poppins, sans-serif' }}>+17.89%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Globe visualization - reduced size to fit appropriately */}
-                      <div
-                        ref={globeRef}
-                        style={{
-                          width: '160px',
-                          height: '65px',
-                          position: 'relative',
-                          flexShrink: 0,
-                          marginLeft: 'auto'
-                        }}
-                      >
-                        <img
-                          src={visualIcon}
-                          alt="Globe"
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain'
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-
-              {/* Recent Activities - Full width to align with cards above */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 0.85fr) 1fr',
-                gap: '10px',
-                marginTop: '12px',
-                marginBottom: '0',
-                alignItems: 'start'
-              }}>
-                <div style={{
-                  gridColumn: '1 / 5',
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '12px',
-                  padding: '10px 6px 10px 12px',
-                  border: '1px solid #F1F1F1',
-                  boxSizing: 'border-box',
-                  width: 'calc(100% - 20px)',
-                  maxWidth: 'calc(100% - 20px)'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '10px'
-                  }}>
-                    <h2 style={{
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      color: '#212121',
-                      margin: 0,
-                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                    }}>
-                      Recents activities
-                    </h2>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <select style={{
-                        padding: '4px 10px',
-                        paddingRight: '28px',
-                        borderRadius: '8px',
-                        border: '1px solid #E4E4E4',
-                        fontSize: '11px',
-                        color: '#6A6A6A',
-                        backgroundColor: '#FFFFFF',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 8px center',
-                        backgroundSize: '12px'
-                      }}>
-                        <option>All</option>
-                      </select>
-                      <select style={{
-                        padding: '4px 10px',
-                        paddingRight: '28px',
-                        borderRadius: '8px',
-                        border: '1px solid #E4E4E4',
-                        fontSize: '11px',
-                        color: '#6A6A6A',
-                        backgroundColor: '#FFFFFF',
-                        cursor: 'pointer',
-                        fontFamily: 'Poppins, sans-serif',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23939393' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 8px center',
-                        backgroundSize: '12px'
-                      }}>
-                        <option>Sort by</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Table */}
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid #F1F1F1' }}>
-                          <th style={{
-                            padding: '5px 8px',
-                            textAlign: 'left',
-                            fontSize: '10px',
-                            fontWeight: 500,
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              Users
-                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M18 8l-6-6-6 6" />
-                                <path d="M18 16l-6 6-6-6" />
-                              </svg>
-                            </div>
-                          </th>
-                          <th style={{
-                            padding: '5px 8px',
-                            textAlign: 'left',
-                            fontSize: '10px',
-                            fontWeight: 500,
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              Date of creation
-                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M18 8l-6-6-6 6" />
-                                <path d="M18 16l-6 6-6-6" />
-                              </svg>
-                            </div>
-                          </th>
-                          <th style={{
-                            padding: '5px 8px',
-                            textAlign: 'left',
-                            fontSize: '10px',
-                            fontWeight: 500,
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              Activity
-                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#939393" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M18 8l-6-6-6 6" />
-                                <path d="M18 16l-6 6-6-6" />
-                              </svg>
-                            </div>
-                          </th>
-                          <th style={{
-                            padding: '5px 8px',
-                            textAlign: 'left',
-                            fontSize: '10px',
-                            fontWeight: 500,
-                            color: '#939393',
-                            fontFamily: 'Poppins, sans-serif'
-                          }}>
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Joined BAO Afrik', isNewUser: true, avatar: avatar },
-                          { name: 'Clara Vanstone', email: 'mailaddresses@gmail.com', date: 'Mon, 21 Dec 2024', activity: 'Post new listing', isNewUser: false, avatar: avatar }
-                        ].map((item, index) => (
-                          <tr key={index} style={{ borderBottom: index < 1 ? '1px solid #F1F1F1' : 'none' }}>
-                            {/* Users Column */}
-                            <td style={{ padding: '8px' }}>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                                {/* Square Profile Image */}
-                                <div style={{
-                                  width: '32px',
-                                  height: '32px',
-                                  borderRadius: '4px',
-                                  backgroundColor: '#E3F2FD',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={item.avatar}
-                                    alt={item.name}
-                                    style={{
-                                      width: '26px',
-                                      height: '26px',
-                                      borderRadius: '4px',
-                                      objectFit: 'cover'
-                                    }}
-                                  />
-                                </div>
-                                {/* User Info */}
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px', flexWrap: 'wrap' }}>
-                                    <p style={{
-                                      fontSize: '10px',
-                                      color: '#212121',
-                                      margin: 0,
-                                      fontWeight: 500,
-                                      fontFamily: 'Bricolage Grotesque, sans-serif'
-                                    }}>
-                                      {item.name}
-                                    </p>
-                                    {item.isNewUser && (
-                                      <span style={{
-                                        backgroundColor: '#F0F8FE',
-                                        color: '#64B5F6',
-                                        fontSize: '8px',
-                                        fontWeight: 500,
-                                        padding: '2px 5px',
-                                        borderRadius: '4px',
-                                        fontFamily: 'Poppins, sans-serif',
-                                        whiteSpace: 'nowrap'
-                                      }}>
-                                        New user
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p style={{
-                                    fontSize: '9px',
-                                    color: '#939393',
-                                    margin: 0,
-                                    fontFamily: 'Poppins, sans-serif'
-                                  }}>
-                                    {item.email}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            {/* Date of creation Column */}
-                            <td style={{ padding: '8px' }}>
-                              <p style={{
-                                fontSize: '10px',
-                                color: '#939393',
-                                margin: 0,
-                                fontFamily: 'Poppins, sans-serif'
-                              }}>
-                                {item.date}
-                              </p>
-                            </td>
-                            {/* Activity Column */}
-                            <td style={{ padding: '8px' }}>
-                              <p style={{
-                                fontSize: '10px',
-                                color: '#939393',
-                                margin: 0,
-                                fontFamily: 'Poppins, sans-serif'
-                              }}>
-                                {item.activity}
-                              </p>
-                            </td>
-                            {/* Actions Column */}
-                            <td style={{ padding: '8px' }}>
-                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                {/* Eye Icon Button */}
-                                <button
-                                  style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: 'none',
-                                    background: 'transparent',
-                                    cursor: 'pointer',
-                                    padding: 0
-                                  }}
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                    <circle cx="12" cy="12" r="3" />
-                                  </svg>
-                                </button>
-                                {/* More Options Button */}
-                                <button
-                                  type="button"
-                                  style={{
-                                    width: '18px',
-                                    height: '18px',
-                                    borderRadius: '50%',
-                                    border: '0.3px solid #B0B0B0',
-                                    backgroundColor: '#FFFFFF',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    padding: 0
-                                  }}
-                                >
-                                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="3" cy="6" r="1.2" fill="#B0B0B0" />
-                                    <circle cx="6" cy="6" r="1.2" fill="#B0B0B0" />
-                                    <circle cx="9" cy="6" r="1.2" fill="#B0B0B0" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+            </div>
+          </div>
             </div>
           )}
 
@@ -12019,9 +12019,9 @@ const AdminDashboard: React.FC = () => {
                       }}
                     >
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                        <circle cx="4" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'} />
-                        <circle cx="8" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'} />
-                        <circle cx="12" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'} />
+                        <circle cx="4" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
+                        <circle cx="8" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
+                        <circle cx="12" cy="8" r="1.5" fill={activityDetailMoreMenu ? '#64B5F6' : '#212121'}/>
                       </svg>
                     </div>
                     {/* Close Button */}

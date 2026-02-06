@@ -8,6 +8,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import LocationAutocomplete from '../components/LocationAutocomplete';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Import product images from pre folder
 import pre1 from '../assets/images/pre/1.png';
@@ -45,6 +47,14 @@ import cameroonianCulture from '../assets/images/logos/culture.png'; // Traditio
 // Import scan icon
 import scanIcon from '../assets/images/logos/scanner (1).png';
 import SDicon from '../assets/images/pre/SDicon.svg';
+
+// Import admin icons for request modal
+import infoIcon from '../assets/images/admin/info.svg';
+import calenderIcon from '../assets/images/admin/calender.svg';
+import newlocIcon from '../assets/images/admin/newloc.svg';
+import bulbIcon from '../assets/images/admin/bulb.svg';
+import imageIcon from '../assets/images/pre/image.svg';
+import loadIcon from '../assets/images/pre/load.svg';
 
 interface BaseProduct {
   id: string;
@@ -185,6 +195,25 @@ const Home: React.FC = () => {
   const [selectedPlaceOfOriginText, setSelectedPlaceOfOriginText] = useState('');
   const [focusedSearchSection, setFocusedSearchSection] = useState<string | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestStep, setRequestStep] = useState(1);
+  const [requestCategory, setRequestCategory] = useState('');
+  const [requestQuantity, setRequestQuantity] = useState('');
+  const [requestQuantityUnit, setRequestQuantityUnit] = useState('KG');
+  const [requestEndDate, setRequestEndDate] = useState('');
+  const [requestLocation, setRequestLocation] = useState('');
+  const [requestImages, setRequestImages] = useState<File[]>([]);
+  const [requestImageUrls, setRequestImageUrls] = useState<string[]>([]);
+  const [isRequestImageLoading, setIsRequestImageLoading] = useState(false);
+  const [requestUploadProgress, setRequestUploadProgress] = useState(0);
+  const [requestPrimaryImageIndex, setRequestPrimaryImageIndex] = useState(0);
+  const [isRequestDraggingOver, setIsRequestDraggingOver] = useState(false);
+  const [isRequestCategoryDropdownOpen, setIsRequestCategoryDropdownOpen] = useState(false);
+  const [isRequestQuantityUnitDropdownOpen, setIsRequestQuantityUnitDropdownOpen] = useState(false);
+  const [focusedRequestField, setFocusedRequestField] = useState<string | null>(null);
+  const [showEndDateTooltip, setShowEndDateTooltip] = useState(false);
+  const requestCategoryDropdownRef = React.useRef<HTMLDivElement>(null);
+  const requestQuantityUnitDropdownRef = React.useRef<HTMLDivElement>(null);
+  const requestEndDateRef = React.useRef<HTMLInputElement>(null);
 
   // Handle "Post a Request" button click - check authentication
   const handleMakeRequestClick = () => {
@@ -1913,30 +1942,31 @@ const Home: React.FC = () => {
 
       let minPrice = 0;
       let maxPrice = 1000;
-      let currency = 'GBP';
+      const currency = 'GBP';
 
       if (requestPriceRange) {
         const range = requestPriceRange.toLowerCase();
 
         if (range.includes('less than')) {
-          const match = requestPriceRange.match(/less than (\d+)/i);
+          // "Less than £10" -> extract 10
+          const match = requestPriceRange.match(/£(\d+)/i);
           if (match) {
             minPrice = 0;
             maxPrice = Number(match[1]);
           }
         } else if (range.includes('more than')) {
-          const match = requestPriceRange.match(/more than (\d+)/i);
+          // "More than £200" -> extract 200
+          const match = requestPriceRange.match(/£(\d+)/i);
           if (match) {
             minPrice = Number(match[1]);
-            maxPrice = 1000000; // Or whatever your maximum should be
+            maxPrice = 1000000;
           }
         } else {
-          // Handle ranges like "10 - 50 GBP"
-          const match = requestPriceRange.match(/(\d+)\s*-\s*(\d+)\s*(\w{3})?/i);
+          // Handle ranges like "£10 - £50" or "£50 - £100"
+          const match = requestPriceRange.match(/£(\d+)\s*-\s*£(\d+)/i);
           if (match) {
             minPrice = Number(match[1]);
             maxPrice = Number(match[2]);
-            if (match[3]) currency = match[3].toUpperCase();
           }
         }
       }
@@ -2014,6 +2044,190 @@ const Home: React.FC = () => {
       alert(error.message || 'Failed to submit request. Please try again.');
     } finally {
       setIsSubmitting(false);
+      setIsSubmittingRequest(false);
+    }
+  };
+
+  // Handle new design request submission with image upload
+  const handleNewRequestSubmit = async () => {
+    if (!requestProductName.trim() || !requestProductOrigin) {
+      alert('Please fill required fields (Product name and Origin)');
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Please log in to submit a request');
+      return;
+    }
+
+    setIsSubmittingRequest(true);
+
+    try {
+      // Step 1: Upload images if any
+      const uploadedImages: { url: string; key: string; isPrimary: boolean; order: number }[] = [];
+
+      if (requestImages.length > 0) {
+        for (let i = 0; i < requestImages.length; i++) {
+          const file = requestImages[i];
+          
+          // Get presigned URL
+          const presignedResponse = await fetch(`${process.env.REACT_APP_API_URL}/requests/images/upload-url`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              fileName: file.name,
+              fileType: file.type
+            })
+          });
+
+          if (!presignedResponse.ok) {
+            throw new Error('Failed to get upload URL for image');
+          }
+
+          const presignedData = await presignedResponse.json();
+          const { uploadUrl, key, viewUrl } = presignedData.data;
+
+          // Upload file to GCP
+          const uploadResponse = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': file.type
+            },
+            body: file
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload image');
+          }
+
+          uploadedImages.push({
+            url: viewUrl,
+            key: key,
+            isPrimary: i === requestPrimaryImageIndex,
+            order: i
+          });
+        }
+      }
+
+      // Step 2: Parse price range (GBP £)
+      let minPrice = 0;
+      let maxPrice = 1000;
+      const currency = 'GBP';
+
+      if (requestPriceRange) {
+        const range = requestPriceRange.toLowerCase();
+
+        if (range.includes('less than')) {
+          // "Less than £10" -> extract 10
+          const match = requestPriceRange.match(/£(\d+)/i);
+          if (match) {
+            minPrice = 0;
+            maxPrice = Number(match[1]);
+          }
+        } else if (range.includes('more than')) {
+          // "More than £200" -> extract 200
+          const match = requestPriceRange.match(/£(\d+)/i);
+          if (match) {
+            minPrice = Number(match[1]);
+            maxPrice = 1000000;
+          }
+        } else {
+          // Handle ranges like "£10 - £50" or "£50 - £100"
+          const match = requestPriceRange.match(/£(\d+)\s*-\s*£(\d+)/i);
+          if (match) {
+            minPrice = Number(match[1]);
+            maxPrice = Number(match[2]);
+          }
+        }
+      }
+
+      // Step 3: Submit request to backend
+      const formData: any = {
+        productName: requestProductName.trim(),
+        description: requestDescription.trim() || undefined,
+        origin: requestProductOrigin,
+        sellerLocation: requestLocation,
+        minPrice,
+        maxPrice,
+        currency,
+        status: 'PENDING',
+        category: requestCategory || undefined,
+        quantity: requestQuantity || undefined,
+        quantityUnit: requestQuantityUnit || undefined,
+        // Convert date to ISO-8601 DateTime format for Prisma
+        endDate: requestEndDate ? new Date(requestEndDate + 'T00:00:00.000Z').toISOString() : undefined,
+        images: uploadedImages.length > 0 ? uploadedImages : undefined
+      };
+
+      // Remove undefined fields
+      Object.keys(formData).forEach(key => {
+        if (formData[key] === undefined) {
+          delete formData[key];
+        }
+      });
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorData.error || 'Failed to submit request');
+      }
+
+      // Refresh requests list
+      const refreshResponse = await fetch(`${process.env.REACT_APP_API_URL}/requests?limit=3`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (refreshResponse.ok) {
+        const refreshResult = await refreshResponse.json();
+        let requestsArray: any[] = [];
+
+        if (refreshResult.success && refreshResult.data) {
+          if (Array.isArray(refreshResult.data)) {
+            requestsArray = refreshResult.data;
+          }
+        }
+        setRequests(requestsArray);
+      }
+
+      // Reset form and close modal
+      setShowRequestModal(false);
+      setRequestStep(1);
+      setShowConfirmationModal(true);
+
+      // Reset all form fields
+      setRequestProductName('');
+      setRequestProductOrigin('');
+      setRequestProductOriginInput('');
+      setRequestCategory('');
+      setRequestQuantity('');
+      setRequestQuantityUnit('KG');
+      setRequestEndDate('');
+      setRequestDescription('');
+      setRequestPriceRange('');
+      setRequestLocation('London, United Kingdom');
+      setRequestImages([]);
+      setRequestImageUrls([]);
+      setRequestPrimaryImageIndex(0);
+
+    } catch (error: any) {
+      console.error('Error submitting request:', error);
+      alert(error.message || 'Failed to submit request. Please try again.');
+    } finally {
       setIsSubmittingRequest(false);
     }
   };
@@ -4939,10 +5153,8 @@ const Home: React.FC = () => {
       </section>
 
       {/* Request Modal/Form - Mobile: Full Page, Desktop: Modal */}
-      {showRequestModal && isMobile ? (
-        // Mobile: Full Page Form
+      {/* {showRequestModal && isMobile ? (
         <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          {/* Header with Title and X Button */}
           <div className="flex items-center justify-between px-4 pt-4 pb-3">
             <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif', fontStyle: 'bold' }}>
               Do a request
@@ -4958,10 +5170,8 @@ const Home: React.FC = () => {
             </button>
           </div>
 
-          {/* Form Content */}
           <div className="flex-1 overflow-y-auto px-4 pb-6">
 
-            {/* Product Name Input */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
                 Product name
@@ -4983,7 +5193,6 @@ const Home: React.FC = () => {
               />
             </div>
 
-            {/* Product Origin Input */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
                 Product Origin
@@ -5122,7 +5331,6 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Description Input */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
                 Description
@@ -5146,7 +5354,6 @@ const Home: React.FC = () => {
               />
             </div>
 
-            {/* Location Section */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '-2px' }}>
                 Your location
@@ -5180,7 +5387,6 @@ const Home: React.FC = () => {
                     Change location
                   </button>
                 </div>
-                {/* Location Dropdown */}
                 {isLocationDropdownOpen && (
                   <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
                     <div className="p-2 max-h-60 overflow-auto">
@@ -5205,7 +5411,6 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Price Range Section */}
             <div style={{ marginBottom: '20px' }}>
               <h3 style={{ fontSize: '13px', color: '#212121', marginBottom: '8px', fontWeight: '500' }}>
                 How much would you like to pay for the product?
@@ -5252,7 +5457,6 @@ const Home: React.FC = () => {
               </button>
             </div>
 
-            {/* Create Request Button */}
             <button
               style={{
                 display: 'flex',
@@ -5302,7 +5506,6 @@ const Home: React.FC = () => {
           }}
           onClick={() => setShowRequestModal(false)}
         >
-          {/* Request Modal */}
           <div
             style={{
               width: '580px',
@@ -5318,7 +5521,6 @@ const Home: React.FC = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
               <h2 style={{ fontSize: '18px', color: '#212121', fontWeight: '600' }}>
                 Do a request
@@ -5342,7 +5544,6 @@ const Home: React.FC = () => {
               </button>
             </div>
 
-            {/* Product Name Input */}
             <div style={{ marginBottom: '12px' }}>
               <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Product name
@@ -5364,7 +5565,6 @@ const Home: React.FC = () => {
               />
             </div>
 
-            {/* Product Origin Input */}
             <div style={{ marginBottom: '12px' }}>
               <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Product Origin
@@ -5502,7 +5702,6 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Description Input */}
             <div style={{ marginBottom: '12px' }}>
               <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '6px' }}>
                 Description
@@ -5526,7 +5725,6 @@ const Home: React.FC = () => {
               />
             </div>
 
-            {/* Location Section */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ fontSize: '12px', color: '#6A6A6A', display: 'block', marginBottom: '-4px' }}>
                 Your location
@@ -5549,7 +5747,6 @@ const Home: React.FC = () => {
                     Change location
                   </button>
                 </div>
-                {/* Location Dropdown */}
                 {isLocationDropdownOpen && (
                   <div className="absolute z-10 mt-1 w-full max-w-xs bg-white rounded-lg shadow-lg border border-gray-200" style={{ top: '100%', left: 0 }}>
                     <div className="p-2 max-h-60 overflow-auto">
@@ -5573,7 +5770,6 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Price Range Section */}
             <div style={{ marginBottom: '16px' }}>
               <h3 style={{ fontSize: '14px', color: '#212121', marginBottom: '10px', fontWeight: '500' }}>
                 How much would you like to pay for the product?
@@ -5620,7 +5816,6 @@ const Home: React.FC = () => {
               </button>
             </div>
 
-            {/* Create Request Button */}
             <button
               style={{
                 display: 'flex',
@@ -5650,6 +5845,1391 @@ const Home: React.FC = () => {
             >
               {(isSubmittingRequest || isSubmitting) ? 'Submitting...' : 'Create the request'}
             </button>
+          </div>
+        </div>
+      ) : null} */}
+
+      {showRequestModal && isMobile ? (
+        // Mobile: Full Page Form
+        <div className="fixed inset-0 bg-white flex flex-col" style={{ fontFamily: 'Poppins, sans-serif', zIndex: 10000 }}>
+          {/* Header with Title and X Button */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-3">
+            <h1 style={{ fontSize: '18px', fontWeight: 600, color: '#171717', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Do a request
+            </h1>
+            <button
+              onClick={() => setShowRequestModal(false)}
+              style={{ color: '#171717', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-1 overflow-y-auto px-4 pb-6">
+
+            {/* Product Name Input */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                Product name
+              </label>
+              <input
+                type="text"
+                value={requestProductName}
+                onChange={(e) => setRequestProductName(e.target.value)}
+                placeholder="Enter product name"
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '10px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            {/* Product Origin Input */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                Product Origin
+              </label>
+              <div className="relative" ref={requestProductOriginDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsRequestProductOriginDropdownOpen(!isRequestProductOriginDropdownOpen)}
+                  className="w-full px-3 py-2.5 border rounded-lg text-left flex items-center justify-between"
+                  style={{
+                    borderColor: '#E4E4E4',
+                    borderRadius: '8px',
+                    backgroundColor: '#FFFFFF',
+                    minHeight: '32px',
+                    padding: '6px 10px'
+                  }}
+                >
+                  <div className="flex items-center gap-2 flex-wrap flex-1">
+                    {requestProductOrigin ? (
+                      <div
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded"
+                        style={{
+                          backgroundColor: '#F1F1F1',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        <span style={{ fontSize: '10px', color: '#6A6A6A' }}>
+                          {requestProductOrigin}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRequestProductOrigin('');
+                          }}
+                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M9 3L3 9M3 3l6 6" stroke="#6A6A6A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: '#D9D9D9', fontSize: '10px' }}>Choose a location</span>
+                    )}
+                  </div>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6A6A6A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isRequestProductOriginDropdownOpen && (
+                  <div
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden"
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                  >
+                    {africanCountries.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        onClick={() => {
+                          setRequestProductOrigin(country.name);
+                          setIsRequestProductOriginDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 transition-colors flex items-center gap-2 relative"
+                        style={{
+                          color: '#6A6A6A',
+                          fontSize: '10px',
+                          backgroundColor: 'transparent'
+                        }}
+                      >
+                        <img src={country.flag} alt={country.name} style={{ width: '16px', height: '12px', borderRadius: '4px' }} />
+                        <span>{country.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Description Input */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '4px' }}>
+                Description
+              </label>
+              <textarea
+                value={requestDescription}
+                onChange={(e) => setRequestDescription(e.target.value)}
+                placeholder="Add an description"
+                rows={5}
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid #E4E4E4',
+                  fontSize: '9px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none',
+                  resize: 'none',
+                  color: requestDescription ? '#212121' : '#D9D9D9'
+                }}
+              />
+            </div>
+
+            {/* Location Section */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ fontSize: '10px', color: '#6A6A6A', display: 'block', marginBottom: '-2px' }}>
+                Your location
+              </label>
+              <div className="flex items-center justify-between">
+                <span style={{ fontSize: '10px', color: '#64B5F6' }}>
+                  {requestUserLocation}
+                </span>
+                <button
+                  onClick={() => setShowChangeLocationModal(true)}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F0F8FE',
+                    color: '#64B5F6',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '9px',
+                    fontFamily: 'Poppins, sans-serif'
+                  }}
+                >
+                  Change location
+                </button>
+              </div>
+            </div>
+
+            {/* Price Range Section */}
+            <div style={{ marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '13px', color: '#212121', marginBottom: '8px', fontWeight: '500' }}>
+                How much would you like to pay for the product?
+              </h3>
+              <div className="flex gap-2" style={{ marginBottom: '6px', flexWrap: 'wrap' }}>
+                {['Less than £10', '£10 - £50', '£50 - £100', '£100 - £200'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setRequestPriceRange(range)}
+                    style={{
+                      width: 'calc(50% - 4px)',
+                      padding: '6px 8px',
+                      borderRadius: '8px',
+                      border: `1px solid ${requestPriceRange === range ? 'transparent' : '#E4E4E4'}`,
+                      backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFF',
+                      color: requestPriceRange === range ? '#64B5F6' : '#6A6A6A',
+                      cursor: 'pointer',
+                      fontSize: '9px',
+                      fontFamily: 'Poppins, sans-serif',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setRequestPriceRange('More than £200')}
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  border: `1px solid ${requestPriceRange === 'More than £200' ? 'transparent' : '#E4E4E4'}`,
+                  backgroundColor: requestPriceRange === 'More than £200' ? '#F0F8FE' : '#FFF',
+                  color: requestPriceRange === 'More than £200' ? '#64B5F6' : '#6A6A6A',
+                  cursor: 'pointer',
+                  fontSize: '9px',
+                  fontFamily: 'Poppins, sans-serif',
+                  textAlign: 'center'
+                }}
+              >
+                More than £200
+              </button>
+            </div>
+
+            {/* Create Request Button */}
+            <button
+              style={{
+                display: 'flex',
+                width: '100%',
+                height: '36px',
+                padding: '8px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                flexShrink: 0,
+                borderRadius: '8px',
+                backgroundColor: '#F9A825',
+                color: '#FFF',
+                border: 'none',
+                cursor: isSubmittingRequest ? 'not-allowed' : 'pointer',
+                marginTop: '20px',
+                fontSize: '11px',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: '400',
+                margin: '0 auto',
+                opacity: isSubmittingRequest ? 0.7 : 1
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                handleRequestSubmit(e as any);
+              }}
+              disabled={isSubmittingRequest}
+            >
+              {isSubmittingRequest ? 'Submitting...' : 'Create the request'}
+            </button>
+          </div>
+        </div>
+      ) : showRequestModal && !isMobile ? (
+        // Desktop/Tablet: Modal Overlay - Redesigned
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#0000001A',
+            zIndex: 9998,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={() => {
+            setShowRequestModal(false);
+            setRequestStep(1);
+          }}
+        >
+          {/* Request Modal */}
+          <div
+            className="request-modal-container"
+            style={{
+              width: '560px',
+              maxHeight: '88vh',
+              flexShrink: 0,
+              borderRadius: '24px',
+              background: '#FFFFFF',
+              position: 'relative',
+              fontFamily: 'Poppins, sans-serif',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <style>{`
+              .request-modal-container::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            {/* Header */}
+            <div style={{ padding: '20px 24px 0 24px' }}>
+              <div className="flex items-center justify-between" style={{ marginBottom: '14px' }}>
+                <h2 style={{ fontSize: '16px', color: '#212121', fontWeight: '600', fontFamily: 'Bricolage Grotesque, sans-serif', margin: 0 }}>
+                  Post a request
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowRequestModal(false);
+                    setRequestStep(1);
+                  }}
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    color: '#212121',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Progress Indicator Bar */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <span style={{
+                    fontSize: '12px',
+                    color: requestStep === 1 ? '#212121' : '#919191',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: requestStep === 1 ? 500 : 400
+                  }}>
+                    {requestStep === 1 ? 'Informations' : 'Information'}
+                  </span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#919191" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                  <span style={{
+                    fontSize: '12px',
+                    color: requestStep === 2 ? '#212121' : '#919191',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: requestStep === 2 ? 500 : 400
+                  }}>
+                    Images
+                  </span>
+                </div>
+
+                {/* Circular Progress Indicator - Blue only when fields filled */}
+                {(() => {
+                  const step1Complete = requestProductName.trim() !== '' && requestProductOrigin !== '';
+                  const progressValue = step1Complete ? (requestStep === 2 ? 2 : 1) : 0;
+                  return (
+                    <div style={{ position: 'relative', width: '40px', height: '40px' }}>
+                      <svg width="40" height="40" viewBox="0 0 40 40">
+                        {/* Background circle */}
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="17"
+                          fill="none"
+                          stroke="#E9E9E9"
+                          strokeWidth="3"
+                        />
+                        {/* Progress circle - only shows when fields are filled */}
+                        {progressValue > 0 && (
+                          <circle
+                            cx="20"
+                            cy="20"
+                            r="17"
+                            fill="none"
+                            stroke="#64B5F6"
+                            strokeWidth="3"
+                            strokeDasharray={`${(progressValue / 2) * 106.8} 106.8`}
+                            strokeLinecap="round"
+                            transform="rotate(-90 20 20)"
+                          />
+                        )}
+                      </svg>
+                      <span style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        fontSize: '10px',
+                        color: '#919191',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}>
+                        {requestStep}/2
+                      </span>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Description */}
+              <p style={{ fontSize: '11px', color: '#919191', margin: '-6px 0 10px 0', fontFamily: 'Poppins, sans-serif' }}>
+                {requestStep === 1 ? 'Please fill out the information form for your request.' : 'Add images of what you need for easy identification.'}
+              </p>
+
+              {/* Divider below description */}
+              <div style={{ height: '1px', backgroundColor: '#F1F1F1', width: 'calc(100% + 48px)', marginLeft: '-24px' }} />
+            </div>
+
+            {/* Step 1: Information Form */}
+            {requestStep === 1 && (
+              <div style={{ padding: '14px 24px 18px 24px', flex: 1 }}>
+                <style>{`
+                  .request-modal-input::placeholder, .request-modal-textarea::placeholder {
+                    color: #E4E4E4 !important;
+                  }
+                  .request-dropdown-scroll::-webkit-scrollbar {
+                    display: none;
+                  }
+                  .request-dropdown-scroll {
+                    scrollbar-width: none;
+                    -ms-overflow-style: none;
+                  }
+                  .request-date-input::-webkit-calendar-picker-indicator {
+                    display: none;
+                    -webkit-appearance: none;
+                  }
+                  .request-date-input::-webkit-inner-spin-button,
+                  .request-date-input::-webkit-clear-button {
+                    display: none;
+                  }
+                `}</style>
+
+                {/* Product Name Input - Full Width */}
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    Product name
+                  </label>
+                  <input
+                    type="text"
+                    className="request-modal-input"
+                    value={requestProductName}
+                    onChange={(e) => setRequestProductName(e.target.value)}
+                    onFocus={() => setFocusedRequestField('productName')}
+                    onBlur={() => setFocusedRequestField(null)}
+                    placeholder="Enter the product name"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '12px',
+                      border: `1px solid ${focusedRequestField === 'productName' ? '#97CDF9' : '#E4E4E4'}`,
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      outline: 'none',
+                      backgroundColor: '#FFFFFF',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
+                    }}
+                  />
+                </div>
+
+                {/* Product Origin + Categories - Side by Side */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                  {/* Product Origin */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      Product Origin
+                    </label>
+                    <div style={{ position: 'relative' }} ref={requestProductOriginDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsRequestProductOriginDropdownOpen(!isRequestProductOriginDropdownOpen)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          border: `1px solid ${isRequestProductOriginDropdownOpen ? '#97CDF9' : '#E4E4E4'}`,
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'border-color 0.2s'
+                        }}
+                      >
+                        {requestProductOrigin ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <img
+                              src={africanCountries.find(c => c.name === requestProductOrigin)?.flag}
+                              alt={requestProductOrigin}
+                              style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                            <span style={{ color: '#212121' }}>{requestProductOrigin}</span>
+                          </div>
+                        ) : (
+                          <span style={{ color: '#E4E4E4' }}>Select the product's origin</span>
+                        )}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {isRequestProductOriginDropdownOpen && (
+                        <div
+                          className="request-dropdown-scroll"
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            marginTop: '4px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #E4E4E4',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                            zIndex: 100,
+                            maxHeight: '180px',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {africanCountries.map((country) => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setRequestProductOrigin(country.name);
+                                setIsRequestProductOriginDropdownOpen(false);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                backgroundColor: requestProductOrigin === country.name ? '#F0F8FE' : 'transparent',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                color: requestProductOrigin === country.name ? '#64B5F6' : '#212121',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              <img src={country.flag} alt={country.name} style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
+                              {country.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Categories */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      Categories <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                    </label>
+                    <div style={{ position: 'relative' }} ref={requestCategoryDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsRequestCategoryDropdownOpen(!isRequestCategoryDropdownOpen)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: '12px',
+                          border: `1px solid ${isRequestCategoryDropdownOpen ? '#97CDF9' : '#E4E4E4'}`,
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'border-color 0.2s'
+                        }}
+                      >
+                        <span style={{ color: requestCategory ? '#212121' : '#E4E4E4' }}>
+                          {requestCategory || 'Select the product category'}
+                        </span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {isRequestCategoryDropdownOpen && (
+                        <div
+                          className="request-dropdown-scroll"
+                          style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            marginTop: '4px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '12px',
+                            border: '1px solid #E4E4E4',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                            zIndex: 100,
+                            maxHeight: '180px',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {['Food & Spices', 'Fashion & Clothing', 'Beauty & Skincare', 'Home & Decor', 'Art & Crafts', 'Health & Wellness', 'Electronics', 'Other'].map((cat) => (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => {
+                                setRequestCategory(cat);
+                                setIsRequestCategoryDropdownOpen(false);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                backgroundColor: requestCategory === cat ? '#F0F8FE' : 'transparent',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                color: requestCategory === cat ? '#64B5F6' : '#212121',
+                                fontFamily: 'Poppins, sans-serif'
+                              }}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quantity + End Date - Side by Side */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                  {/* Quantity */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                      Quantity <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                    </label>
+                    <div style={{
+                      display: 'flex',
+                      border: `1px solid ${isRequestQuantityUnitDropdownOpen || focusedRequestField === 'quantity' ? '#97CDF9' : '#E4E4E4'}`,
+                      borderRadius: '12px',
+                      transition: 'border-color 0.2s',
+                      position: 'relative'
+                    }}>
+                      {/* Unit Dropdown */}
+                      <div style={{ position: 'relative' }} ref={requestQuantityUnitDropdownRef}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsRequestQuantityUnitDropdownOpen(!isRequestQuantityUnitDropdownOpen);
+                          }}
+                          style={{
+                            padding: '10px 8px',
+                            border: 'none',
+                            borderRight: '1px solid #E4E4E4',
+                            backgroundColor: '#FFFFFF',
+                            borderTopLeftRadius: '12px',
+                            borderBottomLeftRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            color: '#919191',
+                            fontFamily: 'Poppins, sans-serif',
+                            minWidth: '55px'
+                          }}
+                        >
+                          {requestQuantityUnit}
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        {isRequestQuantityUnitDropdownOpen && (
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              position: 'absolute',
+                              top: 'calc(100% + 4px)',
+                              left: '-1px',
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '12px',
+                              boxShadow: '0 4px 30px 0 rgba(0, 0, 0, 0.05)',
+                              zIndex: 9999,
+                              minWidth: '145px',
+                              padding: '4px'
+                            }}
+                          >
+                            {[
+                              { label: 'Kilogram · KG', value: 'KG' },
+                              { label: 'Liter · L', value: 'L' },
+                              { label: 'Pack · PK', value: 'PK' }
+                            ].map((unit) => (
+                              <button
+                                key={unit.value}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRequestQuantityUnit(unit.value);
+                                  setIsRequestQuantityUnitDropdownOpen(false);
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  border: 'none',
+                                  backgroundColor: requestQuantityUnit === unit.value ? '#F0F8FE' : 'transparent',
+                                  borderRadius: '8px',
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  fontSize: '11px',
+                                  color: requestQuantityUnit === unit.value ? '#64B5F6' : '#919191',
+                                  fontFamily: 'Poppins, sans-serif',
+                                  marginBottom: '1px'
+                                }}
+                              >
+                                {unit.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {/* Quantity Input */}
+                      <input
+                        type="text"
+                        className="request-modal-input"
+                        value={requestQuantity}
+                        onChange={(e) => setRequestQuantity(e.target.value)}
+                        onFocus={() => setFocusedRequestField('quantity')}
+                        onBlur={() => setFocusedRequestField(null)}
+                        placeholder="Ex : 1"
+                        style={{
+                          flex: 1,
+                          padding: '10px 12px',
+                          border: 'none',
+                          fontSize: '12px',
+                          fontFamily: 'Poppins, sans-serif',
+                          outline: 'none',
+                          backgroundColor: '#FFFFFF',
+                          borderTopRightRadius: '12px',
+                          borderBottomRightRadius: '12px'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* End Date */}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '11px', color: '#212121', display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500, position: 'relative' }}>
+                      End date of the request <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                      <div
+                        style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                        onMouseEnter={() => setShowEndDateTooltip(true)}
+                        onMouseLeave={() => setShowEndDateTooltip(false)}
+                        onClick={() => setShowEndDateTooltip(!showEndDateTooltip)}
+                      >
+                        <img src={infoIcon} alt="Info" style={{ width: '10px', height: '10px', opacity: 0.6, cursor: 'pointer' }} />
+                        {showEndDateTooltip && (
+                          <div style={{
+                            position: 'absolute',
+                            top: 'calc(100% + 6px)',
+                            left: '50%',
+                            transform: 'translateX(-80%)',
+                            backgroundColor: '#212121',
+                            borderRadius: '10px',
+                            padding: '10px 12px',
+                            width: '180px',
+                            zIndex: 9999,
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                          }}>
+                            {/* Arrow pointing up */}
+                            <div style={{
+                              position: 'absolute',
+                              top: '-5px',
+                              left: '80%',
+                              transform: 'translateX(-50%)',
+                              width: 0,
+                              height: 0,
+                              borderLeft: '5px solid transparent',
+                              borderRight: '5px solid transparent',
+                              borderBottom: '5px solid #212121'
+                            }} />
+                            {/* Title with bulb icon */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '5px' }}>
+                              <img src={bulbIcon} alt="Bulb" style={{ width: '16px', height: '16px', filter: 'brightness(0) invert(1)' }} />
+                              <span style={{ color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 600, fontSize: '10px' }}>End date</span>
+                            </div>
+                            {/* Description */}
+                            <p style={{ color: '#FFFFFF', fontFamily: 'Poppins, sans-serif', fontSize: '9px', lineHeight: '1.4', margin: 0 }}>
+                              This date refers to the end date of your request; after this date, your request will no longer be visible on the platform, and you can find it among your inactive requests and reactivate it if you wish from your requests list.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                    <div style={{ position: 'relative' }} className="request-end-date-picker">
+                      <style>{`
+                        .request-end-date-picker .react-datepicker-wrapper {
+                          width: 100%;
+                        }
+                        .request-end-date-picker .react-datepicker__input-container {
+                          width: 100%;
+                        }
+                        .request-end-date-picker .react-datepicker__input-container input {
+                          width: 100%;
+                          padding: 10px 12px;
+                          padding-left: 36px;
+                          border-radius: 12px;
+                          border: 1px solid #E4E4E4;
+                          font-size: 12px;
+                          font-family: 'Poppins', sans-serif;
+                          outline: none;
+                          background-color: #FFFFFF;
+                          box-sizing: border-box;
+                          transition: border-color 0.2s;
+                        }
+                        .request-end-date-picker .react-datepicker__input-container input:focus {
+                          border-color: #97CDF9;
+                        }
+                        .request-end-date-picker .react-datepicker__input-container input::placeholder {
+                          color: #E4E4E4;
+                        }
+                      `}</style>
+                      <DatePicker
+                        selected={requestEndDate ? (() => {
+                          const [year, month, day] = requestEndDate.split('-').map(Number);
+                          return new Date(year, month - 1, day);
+                        })() : null}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            const year = date.getFullYear();
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            const day = date.getDate().toString().padStart(2, '0');
+                            setRequestEndDate(`${year}-${month}-${day}`);
+                          } else {
+                            setRequestEndDate('');
+                          }
+                        }}
+                        dateFormat="dd-MM-yyyy"
+                        placeholderText="DD-MM-YYYY"
+                        minDate={new Date()}
+                        showMonthDropdown
+                        showYearDropdown
+                        dropdownMode="select"
+                        {...({} as any)}
+                        scrollableYearDropdown
+                        shouldCloseOnSelect
+                        showPopperArrow={false}
+                        calendarStartDay={1}
+                        onFocus={() => setFocusedRequestField('endDate')}
+                        onBlur={() => setFocusedRequestField(null)}
+                        onChangeRaw={(e) => {
+                          if (!e || typeof e !== 'object' || !e.target) return;
+
+                          const input = e.target as HTMLInputElement;
+                          const originalValue = input.value;
+
+                          if (originalValue && /^[0-9-]*$/.test(originalValue)) {
+                            let value = originalValue.replace(/\D/g, ''); // Remove all non-digits
+
+                            // Auto-format with hyphens: DD-MM-YYYY
+                            if (value.length > 4) {
+                              value = `${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4, 8)}`;
+                            } else if (value.length >= 2) {
+                              value = `${value.slice(0, 2)}-${value.slice(2)}`;
+                            }
+
+                            if (value !== originalValue) {
+                              input.value = value;
+                            }
+
+                            // Parse the formatted date when complete
+                            if (value.length === 10) {
+                              const [day, month, year] = value.split('-').map(Number);
+                              if (day && month && year) {
+                                const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                                setRequestEndDate(dateString);
+                                return;
+                              }
+                            }
+                          }
+                        }}
+                      />
+                      <img
+                        src={calenderIcon}
+                        alt="Calendar"
+                        style={{
+                          position: 'absolute',
+                          left: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          width: '14px',
+                          height: '14px',
+                          opacity: 0.4,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    Description <span style={{ color: '#919191', fontWeight: 400 }}>(Optional)</span>
+                  </label>
+                  <textarea
+                    className="request-modal-textarea"
+                    value={requestDescription}
+                    onChange={(e) => setRequestDescription(e.target.value)}
+                    onFocus={() => setFocusedRequestField('description')}
+                    onBlur={() => setFocusedRequestField(null)}
+                    placeholder="Enter description for the product"
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '12px',
+                      border: `1px solid ${focusedRequestField === 'description' ? '#97CDF9' : '#E4E4E4'}`,
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      outline: 'none',
+                      resize: 'none',
+                      backgroundColor: '#FFFFFF',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
+                    }}
+                  />
+                </div>
+
+                {/* Your Location */}
+                <div style={{ marginBottom: '14px' }}>
+                  <label style={{ fontSize: '11px', color: '#212121', display: 'block', marginBottom: '5px', fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 500 }}>
+                    Your location
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <LocationAutocomplete
+                      value={requestLocation}
+                      onChange={(val) => setRequestLocation(val)}
+                      onSelect={(val) => setRequestLocation(val)}
+                      placeholder="Type area or city"
+                      showLabel={false}
+                      inputStyle={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        paddingLeft: '36px',
+                        borderRadius: '12px',
+                        border: `1px solid ${focusedRequestField === 'location' ? '#97CDF9' : '#E4E4E4'}`,
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif',
+                        outline: 'none',
+                        backgroundColor: '#FFFFFF',
+                        boxSizing: 'border-box',
+                        transition: 'border-color 0.2s',
+                        color: '#939393'
+                      }}
+                    />
+                    <img
+                      src={newlocIcon}
+                      alt="Location"
+                      style={{
+                        position: 'absolute',
+                        left: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: '14px',
+                        height: '14px',
+                        opacity: 0.6,
+                        pointerEvents: 'none',
+                        zIndex: 1
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Price Range Section */}
+                <div style={{ marginBottom: '18px' }}>
+                  <h3 style={{ fontSize: '12px', color: '#212121', marginBottom: '10px', fontWeight: 500, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    How much would you like to pay for the product ?
+                  </h3>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {['Less than £10', '£10 - £50', '£50 - £100', '£100 - £200', 'More than £200'].map((range) => (
+                      <button
+                        key={range}
+                        onClick={() => setRequestPriceRange(range)}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '50px',
+                          border: `1px solid ${requestPriceRange === range ? '#64B5F6' : '#F1F1F1'}`,
+                          backgroundColor: requestPriceRange === range ? '#F0F8FE' : '#FFFFFF',
+                          color: requestPriceRange === range ? '#64B5F6' : '#919191',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {range}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bottom Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
+                  {/* Save as Draft */}
+                  <button
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #E4E4E4',
+                      backgroundColor: '#FFFFFF',
+                      color: '#939393',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    Save as draft
+                  </button>
+
+                  {/* Cancel + Next */}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => {
+                        setShowRequestModal(false);
+                        setRequestStep(1);
+                      }}
+                      style={{
+                        padding: '8px 20px',
+                        borderRadius: '8px',
+                        border: '1px solid #E4E4E4',
+                        backgroundColor: '#FFFFFF',
+                        color: '#939393',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => setRequestStep(2)}
+                      style={{
+                        padding: '8px 24px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: requestProductName.trim() !== '' && requestProductOrigin !== '' ? '#F9A825' : '#DFDEDE',
+                        color: '#FFFFFF',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontFamily: 'Poppins, sans-serif',
+                        transition: 'background-color 0.2s'
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Images */}
+            {requestStep === 2 && (
+              <div style={{ padding: '20px 24px 24px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {/* Image Upload Area - Always shows drag/drop interface */}
+                <div
+                  style={{
+                    borderRadius: '12px',
+                    padding: '40px 20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: (isRequestImageLoading || isRequestDraggingOver) ? 'transparent' : '#FDFDFD',
+                    background: (isRequestImageLoading || isRequestDraggingOver)
+                      ? 'repeating-linear-gradient(-45deg, #F5FBFF, #F5FBFF 18px, #F8FCFF 18px, #F8FCFF 36px)'
+                      : '#FDFDFD',
+                    marginTop: '8px',
+                    minHeight: '200px',
+                    cursor: 'pointer',
+                    border: (isRequestImageLoading || isRequestDraggingOver) ? '2px dashed #83C4F8' : '1.5px dashed #CCCCCC'
+                  }}
+                  onClick={() => !isRequestImageLoading && requestImageUrls.length < 5 && document.getElementById('request-image-input')?.click()}
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsRequestDraggingOver(true); }}
+                  onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsRequestDraggingOver(true); }}
+                  onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsRequestDraggingOver(false); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsRequestDraggingOver(false);
+                    const files = Array.from(e.dataTransfer.files).filter(file =>
+                      file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
+                    );
+                    if (files.length > 0 && requestImages.length < 5) {
+                      files.slice(0, 5 - requestImages.length).forEach((file) => {
+                        setIsRequestImageLoading(true);
+                        setRequestUploadProgress(0);
+
+                        const reader = new FileReader();
+                        let progress = 0;
+                        const progressInterval = setInterval(() => {
+                          progress += Math.random() * 15 + 5;
+                          if (progress > 100) progress = 100;
+                          setRequestUploadProgress(Math.floor(progress));
+                          if (progress >= 100) clearInterval(progressInterval);
+                        }, 200);
+
+                        reader.onload = (event) => {
+                          setTimeout(() => {
+                            setRequestImages(prev => [...prev, file]);
+                            setRequestImageUrls(prev => {
+                              const newUrls = [...prev, event.target?.result as string];
+                              setRequestPrimaryImageIndex(newUrls.length - 1);
+                              return newUrls;
+                            });
+                            setIsRequestImageLoading(false);
+                            setRequestUploadProgress(0);
+                          }, 1500);
+                        };
+                        reader.readAsDataURL(file);
+                      });
+                    }
+                  }}
+                >
+                  {isRequestImageLoading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <p style={{ fontSize: '12px', color: '#83C4F8', fontWeight: 500, marginBottom: '16px', fontFamily: 'Poppins, sans-serif' }}>
+                        Image loading
+                      </p>
+                      <div style={{ position: 'relative', marginBottom: '12px' }}>
+                        <svg width="60" height="60" style={{ transform: 'rotate(-90deg)' }}>
+                          <circle cx="30" cy="30" r="27" fill="none" stroke="#E9E9E9" strokeWidth="3" />
+                          <circle
+                            cx="30" cy="30" r="27" fill="none" stroke="#83C4F8" strokeWidth="3"
+                            strokeDasharray={`${(requestUploadProgress / 100) * 170} 170`}
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img
+                            src={loadIcon}
+                            alt="Loading"
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              filter: 'brightness(0) saturate(100%) invert(70%) sepia(36%) saturate(624%) hue-rotate(172deg) brightness(100%) contrast(96%)'
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <p style={{ fontSize: '14px', color: '#83C4F8', fontFamily: 'Poppins, sans-serif' }}>
+                        {requestUploadProgress}%
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <img
+                        src={imageIcon}
+                        alt="Upload"
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          marginBottom: '12px',
+                          filter: 'brightness(0) saturate(100%) invert(79%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(91%) contrast(87%)'
+                        }}
+                      />
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#212121',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        marginBottom: '6px',
+                        fontWeight: 500
+                      }}>
+                        Drag and drop product images here
+                      </p>
+                      <p style={{
+                        fontSize: '10px',
+                        color: '#999999',
+                        fontFamily: 'Poppins, sans-serif',
+                        marginBottom: '16px'
+                      }}>
+                        Compatible file types : JPEG, JPG, PNG · Maximum size 5MB
+                      </p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (requestImageUrls.length < 5) {
+                            document.getElementById('request-image-input')?.click();
+                          }
+                        }}
+                        style={{
+                          padding: '8px 20px',
+                          borderRadius: '8px',
+                          border: '1px solid #999999',
+                          backgroundColor: '#FFFFFF',
+                          color: '#999999',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        Browse files
+                      </button>
+                    </>
+                  )}
+                  <input
+                    id="request-image-input"
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/jpg,image/png"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []).filter(file =>
+                        file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
+                      );
+                      if (files.length > 0 && requestImages.length < 5) {
+                        files.slice(0, 5 - requestImages.length).forEach((file) => {
+                          setIsRequestImageLoading(true);
+                          setRequestUploadProgress(0);
+
+                          const reader = new FileReader();
+                          let progress = 0;
+                          const progressInterval = setInterval(() => {
+                            progress += Math.random() * 15 + 5;
+                            if (progress > 100) progress = 100;
+                            setRequestUploadProgress(Math.floor(progress));
+                            if (progress >= 100) clearInterval(progressInterval);
+                          }, 200);
+
+                          reader.onload = (event) => {
+                            setTimeout(() => {
+                              setRequestImages(prev => [...prev, file]);
+                              setRequestImageUrls(prev => {
+                                const newUrls = [...prev, event.target?.result as string];
+                                setRequestPrimaryImageIndex(newUrls.length - 1);
+                                return newUrls;
+                              });
+                              setIsRequestImageLoading(false);
+                              setRequestUploadProgress(0);
+                            }, 1500);
+                          };
+                          reader.readAsDataURL(file);
+                        });
+                      }
+                      e.target.value = '';
+                    }}
+                  />
+                </div>
+
+                {/* Up to 5 images / Count text - directly below upload area */}
+                <p style={{
+                  fontSize: '11px',
+                  color: '#999999',
+                  fontFamily: 'Poppins, sans-serif',
+                  textAlign: 'right',
+                  marginTop: '8px'
+                }}>
+                  {requestImageUrls.length > 0 ? `${requestImageUrls.length}/5` : 'Up to 5 images'}
+                </p>
+
+                {/* Image Thumbnails - Simple version */}
+                {requestImageUrls.length > 0 && (
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '12px', alignItems: 'center' }}>
+                    {requestImageUrls.map((url, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          position: 'relative',
+                          width: '70px',
+                          height: '70px',
+                          flexShrink: 0,
+                          borderRadius: '10px',
+                          overflow: 'visible'
+                        }}
+                      >
+                        <img
+                          src={url}
+                          alt={`Preview ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '10px'
+                          }}
+                        />
+                        {/* Remove button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRequestImages(prev => prev.filter((_, i) => i !== index));
+                            setRequestImageUrls(prev => prev.filter((_, i) => i !== index));
+                            if (requestPrimaryImageIndex === index) {
+                              setRequestPrimaryImageIndex(0);
+                            } else if (requestPrimaryImageIndex > index) {
+                              setRequestPrimaryImageIndex(prev => prev - 1);
+                            }
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            width: '18px',
+                            height: '18px',
+                            backgroundColor: '#4D4D4D',
+                            borderRadius: '50%',
+                            border: '2px solid white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            zIndex: 20
+                          }}
+                        >
+                          <svg width="6" height="6" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+                            <path d="M1 1L9 9M9 1L1 9" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Spacer */}
+                <div style={{ flex: 1, minHeight: '60px' }} />
+
+                {/* Bottom Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: '20px', gap: '10px' }}>
+                  <button
+                    onClick={() => {
+                      setShowRequestModal(false);
+                      setRequestStep(1);
+                    }}
+                    style={{
+                      padding: '8px 20px',
+                      borderRadius: '8px',
+                      border: '1px solid #E4E4E4',
+                      backgroundColor: '#FFFFFF',
+                      color: '#939393',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleNewRequestSubmit}
+                    disabled={isSubmittingRequest}
+                    style={{
+                      padding: '8px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: (requestProductName.trim() && requestProductOrigin) ? '#F9A825' : '#DFDEDE',
+                      color: '#FFFFFF',
+                      cursor: isSubmittingRequest ? 'not-allowed' : 'pointer',
+                      fontSize: '12px',
+                      fontFamily: 'Poppins, sans-serif',
+                      transition: 'background-color 0.2s',
+                      opacity: isSubmittingRequest ? 0.7 : 1
+                    }}
+                  >
+                    {isSubmittingRequest ? 'Submitting...' : 'Post a request'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : null}

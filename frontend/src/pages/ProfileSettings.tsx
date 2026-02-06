@@ -4320,7 +4320,7 @@ const ProfileSettings: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="mt-8">
+                          {/* <div className="mt-8">
                             <h3 className="text-sm font-medium mb-1.5" style={{ color: '#212121' }}>
                               First level verification
                             </h3>
@@ -4366,7 +4366,7 @@ const ProfileSettings: React.FC = () => {
                                 </div>
                               ))}
                             </div>
-                          </div>
+                          </div> */}
                         </div>
                       )}
                     </>
