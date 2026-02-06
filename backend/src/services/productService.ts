@@ -240,6 +240,12 @@ export class ProductService {
                     where: { id },
                     data: { viewCount: { increment: 1 } }
                 });
+
+                // Get message count for this product (messages in conversations about this product)
+                const messageCount = await prisma.message.count({
+                    where: { conversation: { productId: id } }
+                });
+                (product as any).messageCount = messageCount;
             }
 
             return product;
@@ -556,7 +562,8 @@ export class ProductService {
                             }
                         },
                         likes: true,
-                        saves: true
+                        saves: true,
+                        reviews: { select: { rating: true } }
                     },
                     orderBy: { createdAt: 'desc' },
                     skip,
@@ -565,8 +572,61 @@ export class ProductService {
                 prisma.product.count({ where })
             ]);
 
+            const productIds = products.map(p => p.id);
+
+            // Batch fetch review aggregates and message counts per product
+            const [reviewAggregates, messageCounts] = await Promise.all([
+                prisma.productReview.groupBy({
+                    by: ['productId'],
+                    where: { productId: { in: productIds } },
+                    _count: { id: true },
+                    _avg: { rating: true }
+                }),
+                productIds.length > 0
+                    ? prisma.message.findMany({
+                        where: { conversation: { productId: { in: productIds } } },
+                        select: { conversation: { select: { productId: true } } }
+                    })
+                    : Promise.resolve([])
+            ]);
+
+            const reviewMap = new Map(reviewAggregates.map(r => [
+                r.productId,
+                {
+                    averageRating: r._avg.rating ? parseFloat(r._avg.rating.toFixed(1)) : 0,
+                    reviewCount: r._count.id
+                }
+            ]));
+
+            // Sum message counts per product
+            const messageCountMap = new Map<string, number>();
+            for (const m of messageCounts) {
+                const productId = m.conversation?.productId;
+                if (productId) {
+                    messageCountMap.set(productId, (messageCountMap.get(productId) ?? 0) + 1);
+                }
+            }
+
+            const enrichedProducts = products.map(p => {
+                const reviewStats = reviewMap.get(p.id) || { averageRating: 0, reviewCount: 0 };
+                const messageCount = messageCountMap.get(p.id) ?? 0;
+                const { reviews, ...productWithoutReviews } = p;
+                return {
+                    ...productWithoutReviews,
+                    averageRating: reviewStats.averageRating,
+                    reviewCount: reviewStats.reviewCount,
+                    messageCount
+                };
+            });
+
             return {
-                products,
+                products: enrichedProducts,
+                pagination: {
+                    total,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(total / limit)
+                },
                 totalPages: Math.ceil(total / limit),
                 currentPage: page,
                 total
@@ -671,9 +731,12 @@ export class ProductService {
 
             let sum = 0;
             for (const review of reviews) {
-                sum += review.rating;
-                if (review.rating >= 1 && review.rating <= 5) {
-                    ratingDistribution[review.rating] = (ratingDistribution[review.rating] || 0) + 1;
+                const r = Number(review.rating);
+                sum += r;
+                if (r >= 0.5 && r <= 5) {
+                    // Bucket for bar chart: round to nearest int (4.5->5, 4.2->4)
+                    const bucket = Math.round(r);
+                    ratingDistribution[bucket] = (ratingDistribution[bucket] || 0) + 1;
                 }
             }
 
@@ -703,7 +766,8 @@ export class ProductService {
                 throw new Error('Product not found');
             }
 
-            const clampedRating = Math.min(5, Math.max(1, Math.round(rating)));
+            // Store rating as-is (0.5, 1, 1.5, 2, etc.) - clamp to valid range, round to 1 decimal
+            const clampedRating = parseFloat(Math.min(5, Math.max(0.5, rating)).toFixed(1));
 
             const review = await prisma.productReview.upsert({
                 where: {

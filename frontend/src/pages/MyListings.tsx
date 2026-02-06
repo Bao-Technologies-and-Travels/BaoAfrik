@@ -60,9 +60,10 @@ interface Product {
     origin: string;
     location: string;
     status: 'DRAFT' | 'PUBLISHED' | 'SOLD' | 'EXPIRED' | 'DELETED';
-    images: Array<{ url: string; isprimary: boolean }>;
+    images: Array<{ url: string; isprimary?: boolean }>;
     averageRating?: number;
     reviewCount?: number;
+    messageCount?: number;
     viewCount?: number;
     likeCount?: number;
     saveCount?: number;
@@ -659,13 +660,13 @@ const MyListings: React.FC = () => {
             id: product.id,
             title: product.title,
             image: product.images?.[0].url || '',
-            rating: product.averageRating || 0,
-            reviews: product.reviewCount || 0,
+            rating: product.averageRating ?? 0,
+            reviews: product.reviewCount ?? 0,
             price: product.price?.toString() || '0',
             currency: product.currency || 'GBP',
             createdAt: new Date(product.createdAt).getTime(),
             priceValue: product.price || 0,
-            messages: 0,
+            messages: product.messageCount ?? 0,
             category: product.category || 'Uncategorized',
             ...(() => {
                 if (product.status === 'PUBLISHED') {
@@ -696,11 +697,16 @@ const MyListings: React.FC = () => {
         // Store all products including drafts for stats calculation
         setProducts(data.products);
 
-        setCurrentPage(data.pagination.page);
-        setTotalPages(data.pagination.totalPages);
+        const pagination = data.pagination ?? {
+            page: (data as any).currentPage ?? 1,
+            totalPages: (data as any).totalPages ?? 1,
+            total: (data as any).total ?? 0
+        };
+        setCurrentPage(pagination.page);
+        setTotalPages(pagination.totalPages);
 
         setStats({
-            total: data.pagination.total,
+            total: pagination.total,
             drafts: data.products.filter((p: Product) => p.status === 'DRAFT').length,
             published: data.products.filter((p: Product) => p.status === 'PUBLISHED').length,
             sold: data.products.filter((p: Product) => p.status === 'SOLD').length

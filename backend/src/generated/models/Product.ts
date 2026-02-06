@@ -32,6 +32,7 @@ export type ProductAvgAggregateOutputType = {
   viewCount: number | null
   likeCount: number | null
   saveCount: number | null
+  engagements: number | null
 }
 
 export type ProductSumAggregateOutputType = {
@@ -40,6 +41,7 @@ export type ProductSumAggregateOutputType = {
   viewCount: number | null
   likeCount: number | null
   saveCount: number | null
+  engagements: number | null
 }
 
 export type ProductMinAggregateOutputType = {
@@ -59,6 +61,7 @@ export type ProductMinAggregateOutputType = {
   viewCount: number | null
   likeCount: number | null
   saveCount: number | null
+  engagements: number | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -83,6 +86,7 @@ export type ProductMaxAggregateOutputType = {
   viewCount: number | null
   likeCount: number | null
   saveCount: number | null
+  engagements: number | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -108,6 +112,7 @@ export type ProductCountAggregateOutputType = {
   viewCount: number
   likeCount: number
   saveCount: number
+  engagements: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -123,6 +128,7 @@ export type ProductAvgAggregateInputType = {
   viewCount?: true
   likeCount?: true
   saveCount?: true
+  engagements?: true
 }
 
 export type ProductSumAggregateInputType = {
@@ -131,6 +137,7 @@ export type ProductSumAggregateInputType = {
   viewCount?: true
   likeCount?: true
   saveCount?: true
+  engagements?: true
 }
 
 export type ProductMinAggregateInputType = {
@@ -150,6 +157,7 @@ export type ProductMinAggregateInputType = {
   viewCount?: true
   likeCount?: true
   saveCount?: true
+  engagements?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -174,6 +182,7 @@ export type ProductMaxAggregateInputType = {
   viewCount?: true
   likeCount?: true
   saveCount?: true
+  engagements?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -199,6 +208,7 @@ export type ProductCountAggregateInputType = {
   viewCount?: true
   likeCount?: true
   saveCount?: true
+  engagements?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -311,6 +321,7 @@ export type ProductGroupByOutputType = {
   viewCount: number
   likeCount: number
   saveCount: number
+  engagements: number
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -359,6 +370,7 @@ export type ProductWhereInput = {
   viewCount?: Prisma.IntFilter<"Product"> | number
   likeCount?: Prisma.IntFilter<"Product"> | number
   saveCount?: Prisma.IntFilter<"Product"> | number
+  engagements?: Prisma.IntFilter<"Product"> | number
   isActive?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -390,6 +402,7 @@ export type ProductOrderByWithRelationInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -424,6 +437,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   viewCount?: Prisma.IntFilter<"Product"> | number
   likeCount?: Prisma.IntFilter<"Product"> | number
   saveCount?: Prisma.IntFilter<"Product"> | number
+  engagements?: Prisma.IntFilter<"Product"> | number
   isActive?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -455,6 +469,7 @@ export type ProductOrderByWithAggregationInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -488,6 +503,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   viewCount?: Prisma.IntWithAggregatesFilter<"Product"> | number
   likeCount?: Prisma.IntWithAggregatesFilter<"Product"> | number
   saveCount?: Prisma.IntWithAggregatesFilter<"Product"> | number
+  engagements?: Prisma.IntWithAggregatesFilter<"Product"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -512,6 +528,7 @@ export type ProductCreateInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -543,6 +560,7 @@ export type ProductUncheckedCreateInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -572,6 +590,7 @@ export type ProductUpdateInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -603,6 +622,7 @@ export type ProductUncheckedUpdateInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -633,6 +653,7 @@ export type ProductCreateManyInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -657,6 +678,7 @@ export type ProductUpdateManyMutationInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -682,6 +704,7 @@ export type ProductUncheckedUpdateManyInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -717,6 +740,7 @@ export type ProductCountOrderByAggregateInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -730,6 +754,7 @@ export type ProductAvgOrderByAggregateInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
 }
 
 export type ProductMaxOrderByAggregateInput = {
@@ -749,6 +774,7 @@ export type ProductMaxOrderByAggregateInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -773,6 +799,7 @@ export type ProductMinOrderByAggregateInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -786,6 +813,7 @@ export type ProductSumOrderByAggregateInput = {
   viewCount?: Prisma.SortOrder
   likeCount?: Prisma.SortOrder
   saveCount?: Prisma.SortOrder
+  engagements?: Prisma.SortOrder
 }
 
 export type ProductScalarRelationFilter = {
@@ -943,6 +971,7 @@ export type ProductCreateWithoutSellerInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -972,6 +1001,7 @@ export type ProductUncheckedCreateWithoutSellerInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1031,6 +1061,7 @@ export type ProductScalarWhereInput = {
   viewCount?: Prisma.IntFilter<"Product"> | number
   likeCount?: Prisma.IntFilter<"Product"> | number
   saveCount?: Prisma.IntFilter<"Product"> | number
+  engagements?: Prisma.IntFilter<"Product"> | number
   isActive?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -1055,6 +1086,7 @@ export type ProductCreateWithoutLikesInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1085,6 +1117,7 @@ export type ProductUncheckedCreateWithoutLikesInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1129,6 +1162,7 @@ export type ProductUpdateWithoutLikesInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1159,6 +1193,7 @@ export type ProductUncheckedUpdateWithoutLikesInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1187,6 +1222,7 @@ export type ProductCreateWithoutSavesInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1217,6 +1253,7 @@ export type ProductUncheckedCreateWithoutSavesInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1261,6 +1298,7 @@ export type ProductUpdateWithoutSavesInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1291,6 +1329,7 @@ export type ProductUncheckedUpdateWithoutSavesInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1319,6 +1358,7 @@ export type ProductCreateWithoutReviewsInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1349,6 +1389,7 @@ export type ProductUncheckedCreateWithoutReviewsInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1393,6 +1434,7 @@ export type ProductUpdateWithoutReviewsInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1423,6 +1465,7 @@ export type ProductUncheckedUpdateWithoutReviewsInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1451,6 +1494,7 @@ export type ProductCreateWithoutMessagesInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1481,6 +1525,7 @@ export type ProductUncheckedCreateWithoutMessagesInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1525,6 +1570,7 @@ export type ProductUpdateWithoutMessagesInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1555,6 +1601,7 @@ export type ProductUncheckedUpdateWithoutMessagesInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1583,6 +1630,7 @@ export type ProductCreateWithoutConversationsInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1613,6 +1661,7 @@ export type ProductUncheckedCreateWithoutConversationsInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1657,6 +1706,7 @@ export type ProductUpdateWithoutConversationsInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1687,6 +1737,7 @@ export type ProductUncheckedUpdateWithoutConversationsInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1715,6 +1766,7 @@ export type ProductCreateManySellerInput = {
   viewCount?: number
   likeCount?: number
   saveCount?: number
+  engagements?: number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1739,6 +1791,7 @@ export type ProductUpdateWithoutSellerInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1768,6 +1821,7 @@ export type ProductUncheckedUpdateWithoutSellerInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1797,6 +1851,7 @@ export type ProductUncheckedUpdateManyWithoutSellerInput = {
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   likeCount?: Prisma.IntFieldUpdateOperationsInput | number
   saveCount?: Prisma.IntFieldUpdateOperationsInput | number
+  engagements?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1889,6 +1944,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   viewCount?: boolean
   likeCount?: boolean
   saveCount?: boolean
+  engagements?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1921,6 +1977,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   viewCount?: boolean
   likeCount?: boolean
   saveCount?: boolean
+  engagements?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1947,6 +2004,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   viewCount?: boolean
   likeCount?: boolean
   saveCount?: boolean
+  engagements?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1973,6 +2031,7 @@ export type ProductSelectScalar = {
   viewCount?: boolean
   likeCount?: boolean
   saveCount?: boolean
+  engagements?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1980,7 +2039,7 @@ export type ProductSelectScalar = {
   expiresAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "title" | "slug" | "description" | "price" | "currency" | "category" | "origin" | "location" | "deliveryAvailable" | "quantity" | "images" | "status" | "viewCount" | "likeCount" | "saveCount" | "isActive" | "createdAt" | "updatedAt" | "publishedAt" | "expiresAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "title" | "slug" | "description" | "price" | "currency" | "category" | "origin" | "location" | "deliveryAvailable" | "quantity" | "images" | "status" | "viewCount" | "likeCount" | "saveCount" | "engagements" | "isActive" | "createdAt" | "updatedAt" | "publishedAt" | "expiresAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   likes?: boolean | Prisma.Product$likesArgs<ExtArgs>
@@ -2025,6 +2084,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     viewCount: number
     likeCount: number
     saveCount: number
+    engagements: number
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -2476,6 +2536,7 @@ export interface ProductFieldRefs {
   readonly viewCount: Prisma.FieldRef<"Product", 'Int'>
   readonly likeCount: Prisma.FieldRef<"Product", 'Int'>
   readonly saveCount: Prisma.FieldRef<"Product", 'Int'>
+  readonly engagements: Prisma.FieldRef<"Product", 'Int'>
   readonly isActive: Prisma.FieldRef<"Product", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>

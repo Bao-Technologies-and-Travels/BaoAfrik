@@ -95,6 +95,7 @@ model Product {
   viewCount         Int           @default(0) @map("view_count")
   likeCount         Int           @default(0) @map("like_count")
   saveCount         Int           @default(0) @map("save_count")
+  engagements       Int           @default(0) @map("engagements")
   isActive          Boolean       @default(true) @map("is_active")
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
@@ -142,7 +143,7 @@ model ProductReview {
   id        String   @id @default(uuid())
   productId String   @map("product_id")
   userId    String   @map("user_id")
-  rating    Int
+  rating    Float
   comment   String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

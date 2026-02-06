@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { formatPriceDisplay } from '../utils/currency';
-
 import EmojiPicker, { Emoji } from 'emoji-picker-react';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -4141,7 +4140,7 @@ const Messages: React.FC = (): JSX.Element => {
         theme="light"
       />
 
-      <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <div className="h-screen bg-gray-50 flex flex-col md:flex-row overflow-hidden" style={{ fontFamily: '"Twemoji Country Flags", Poppins, sans-serif' }}>
         {/* Hidden file input for file attachments */}
         <input
           id="file-upload"
@@ -4780,7 +4779,7 @@ const Messages: React.FC = (): JSX.Element => {
                                             rel="noopener noreferrer"
                                             download={doc.name || doc.fileName || `file-${docIndex}`}
                                             className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
-                                            style={{ fontFamily: 'Poppins, sans-serif' }}
+                                            style={{ fontFamily: '"Twemoji Country Flags", Poppins, sans-serif' }}
                                           >
                                             <DocumentIcon size={32} />
                                             <div className="flex-1 min-w-0">
@@ -4823,7 +4822,7 @@ const Messages: React.FC = (): JSX.Element => {
                                               rel="noopener noreferrer"
                                               download={file.fileName || `file-${docIndex}`}
                                               className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
-                                              style={{ fontFamily: 'Poppins, sans-serif' }}
+                                              style={{ fontFamily: '"Twemoji Country Flags", Poppins, sans-serif' }}
                                             >
                                               <DocumentIcon size={32} />
                                               <div className="flex-1 min-w-0">
@@ -5253,7 +5252,7 @@ const Messages: React.FC = (): JSX.Element => {
                       const extensionLower = extension.toLowerCase();
                       const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
                       return (
-                        <div key={index} className="relative mb-2 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif' }}>
+                        <div key={index} className="relative mb-2 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: '"Twemoji Country Flags", Poppins, sans-serif' }}>
                           <DocumentIcon size={40} />
                           <div className="flex-1">
                             <p className="text-xs font-medium" style={{ color: '#6A6A6A' }}>
@@ -8065,7 +8064,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                 rel="noopener noreferrer"
                                                 download={doc.name || doc.fileName || `file-${docIndex}`}
                                                 className="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition-opacity"
-                                                style={{ fontFamily: 'Poppins, sans-serif' }}
+                                                style={{ fontFamily: '"Twemoji Country Flags", Poppins, sans-serif' }}
                                               >
                                                 <DocumentIcon size={40} />
                                                 <div className="flex-1 min-w-0">
@@ -8103,7 +8102,7 @@ const Messages: React.FC = (): JSX.Element => {
                                                   rel="noopener noreferrer"
                                                   download={file.fileName || `file-${docIndex}`}
                                                   className="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition-opacity"
-                                                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                                                  style={{ fontFamily: '"Twemoji Country Flags", Poppins, sans-serif' }}
                                                 >
                                                   <DocumentIcon size={40} />
                                                   <div className="flex-1 min-w-0">
@@ -9038,7 +9037,7 @@ const Messages: React.FC = (): JSX.Element => {
                               const extensionLower = extension.toLowerCase();
                               const DocumentIcon = extensionLower === 'pdf' ? PDFIcon : extensionLower === 'jpg' || extensionLower === 'jpeg' ? JPGIcon : extensionLower === 'png' ? PNGIcon : PDFIcon;
                               return (
-                                <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: 'Poppins, sans-serif', maxWidth: '400px' }}>
+                                <div key={index} className="relative mb-3 p-3 flex items-center space-x-3" style={{ backgroundColor: '#FAFAFA', borderRadius: '10px', fontFamily: '"Twemoji Country Flags", Poppins, sans-serif', maxWidth: '400px' }}>
                                   <DocumentIcon size={48} />
                                   <div className="flex-1">
                                     <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>

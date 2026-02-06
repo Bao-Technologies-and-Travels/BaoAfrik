@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS "products" (
     "view_count" INTEGER NOT NULL DEFAULT 0,
     "like_count" INTEGER NOT NULL DEFAULT 0,
     "save_count" INTEGER NOT NULL DEFAULT 0,
+    "engagements" INTEGER NOT NULL DEFAULT 0,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -671,5 +672,19 @@ DO $$ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_review_helpfulness_user_id_fkey') THEN
         ALTER TABLE "user_review_helpfulness" ADD CONSTRAINT "user_review_helpfulness_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
+
+-- Add engagements column to products (for existing databases)
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'engagements') THEN
+        ALTER TABLE "products" ADD COLUMN "engagements" INTEGER NOT NULL DEFAULT 0;
+    END IF;
+END $$;
+
+-- Change product_reviews.rating from INTEGER to DOUBLE PRECISION (to support 0.5, 1.5, etc.)
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'product_reviews') THEN
+        ALTER TABLE "product_reviews" ALTER COLUMN "rating" TYPE DOUBLE PRECISION USING "rating"::double precision;
     END IF;
 END $$;

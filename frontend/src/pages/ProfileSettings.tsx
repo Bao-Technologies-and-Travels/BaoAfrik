@@ -615,7 +615,7 @@ const ProfileSettings: React.FC = () => {
                 location: foundCountry.name
               }));
 
-              // Auto-save location to backend - only one request
+              // Auto-save location to backend 
               const token = localStorage.getItem('accessToken');
               if (token && isMounted) {
                 try {
@@ -4540,6 +4540,9 @@ const ProfileSettings: React.FC = () => {
                             </p>
                           </div>
                           <button
+                            type="button"
+                            disabled
+                            aria-label="Two step verification"
                             onClick={() => {
                               if (!isTwoFactorEnabled) {
                                 // Don't set to true yet - only after successful verification
@@ -4559,7 +4562,8 @@ const ProfileSettings: React.FC = () => {
                               }
                             }}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isMobileSecurityView ? 'shrink-0' : ''}`}
-                            style={{ backgroundColor: isTwoFactorEnabled ? '#64B5F6' : '#E4E4E4', marginTop: isMobileSecurityView ? '4px' : undefined }}
+                            style={{ backgroundColor: isTwoFactorEnabled ? '#64B5F6' : '#E4E4E4', marginTop: isMobileSecurityView ? '4px' : undefined, cursor: 'not-allowed' }}
+
                           >
                             <span
                               className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isTwoFactorEnabled ? 'translate-x-5' : 'translate-x-0.5'

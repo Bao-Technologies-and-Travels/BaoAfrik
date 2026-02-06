@@ -228,7 +228,7 @@ export type ProductReviewWhereInput = {
   id?: Prisma.StringFilter<"ProductReview"> | string
   productId?: Prisma.StringFilter<"ProductReview"> | string
   userId?: Prisma.StringFilter<"ProductReview"> | string
-  rating?: Prisma.IntFilter<"ProductReview"> | number
+  rating?: Prisma.FloatFilter<"ProductReview"> | number
   comment?: Prisma.StringNullableFilter<"ProductReview"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProductReview"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProductReview"> | Date | string
@@ -258,7 +258,7 @@ export type ProductReviewWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProductReviewWhereInput | Prisma.ProductReviewWhereInput[]
   productId?: Prisma.StringFilter<"ProductReview"> | string
   userId?: Prisma.StringFilter<"ProductReview"> | string
-  rating?: Prisma.IntFilter<"ProductReview"> | number
+  rating?: Prisma.FloatFilter<"ProductReview"> | number
   comment?: Prisma.StringNullableFilter<"ProductReview"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProductReview"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProductReview"> | Date | string
@@ -289,7 +289,7 @@ export type ProductReviewScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ProductReview"> | string
   productId?: Prisma.StringWithAggregatesFilter<"ProductReview"> | string
   userId?: Prisma.StringWithAggregatesFilter<"ProductReview"> | string
-  rating?: Prisma.IntWithAggregatesFilter<"ProductReview"> | number
+  rating?: Prisma.FloatWithAggregatesFilter<"ProductReview"> | number
   comment?: Prisma.StringNullableWithAggregatesFilter<"ProductReview"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProductReview"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProductReview"> | Date | string
@@ -319,7 +319,7 @@ export type ProductReviewUncheckedCreateInput = {
 
 export type ProductReviewUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -332,7 +332,7 @@ export type ProductReviewUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,7 +351,7 @@ export type ProductReviewCreateManyInput = {
 
 export type ProductReviewUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -361,7 +361,7 @@ export type ProductReviewUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -509,6 +509,14 @@ export type ProductReviewUncheckedUpdateManyWithoutProductNestedInput = {
   deleteMany?: Prisma.ProductReviewScalarWhereInput | Prisma.ProductReviewScalarWhereInput[]
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ProductReviewCreateNestedOneWithoutHelpfulnessVotesInput = {
   create?: Prisma.XOR<Prisma.ProductReviewCreateWithoutHelpfulnessVotesInput, Prisma.ProductReviewUncheckedCreateWithoutHelpfulnessVotesInput>
   connectOrCreate?: Prisma.ProductReviewCreateOrConnectWithoutHelpfulnessVotesInput
@@ -576,7 +584,7 @@ export type ProductReviewScalarWhereInput = {
   id?: Prisma.StringFilter<"ProductReview"> | string
   productId?: Prisma.StringFilter<"ProductReview"> | string
   userId?: Prisma.StringFilter<"ProductReview"> | string
-  rating?: Prisma.IntFilter<"ProductReview"> | number
+  rating?: Prisma.FloatFilter<"ProductReview"> | number
   comment?: Prisma.StringNullableFilter<"ProductReview"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ProductReview"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProductReview"> | Date | string
@@ -666,7 +674,7 @@ export type ProductReviewUpdateToOneWithWhereWithoutHelpfulnessVotesInput = {
 
 export type ProductReviewUpdateWithoutHelpfulnessVotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -678,7 +686,7 @@ export type ProductReviewUncheckedUpdateWithoutHelpfulnessVotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -695,7 +703,7 @@ export type ProductReviewCreateManyUserInput = {
 
 export type ProductReviewUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -706,7 +714,7 @@ export type ProductReviewUpdateWithoutUserInput = {
 export type ProductReviewUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -716,7 +724,7 @@ export type ProductReviewUncheckedUpdateWithoutUserInput = {
 export type ProductReviewUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -733,7 +741,7 @@ export type ProductReviewCreateManyProductInput = {
 
 export type ProductReviewUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -744,7 +752,7 @@ export type ProductReviewUpdateWithoutProductInput = {
 export type ProductReviewUncheckedUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -754,7 +762,7 @@ export type ProductReviewUncheckedUpdateWithoutProductInput = {
 export type ProductReviewUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1299,7 +1307,7 @@ export interface ProductReviewFieldRefs {
   readonly id: Prisma.FieldRef<"ProductReview", 'String'>
   readonly productId: Prisma.FieldRef<"ProductReview", 'String'>
   readonly userId: Prisma.FieldRef<"ProductReview", 'String'>
-  readonly rating: Prisma.FieldRef<"ProductReview", 'Int'>
+  readonly rating: Prisma.FieldRef<"ProductReview", 'Float'>
   readonly comment: Prisma.FieldRef<"ProductReview", 'String'>
   readonly createdAt: Prisma.FieldRef<"ProductReview", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProductReview", 'DateTime'>

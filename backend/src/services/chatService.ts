@@ -1074,6 +1074,23 @@ export class ChatService {
                 }
             });
 
+            // Track engagement: when first message is sent in a product conversation, increment product.engagements
+            if (conversation.productId) {
+                const existingMessageCount = await tx.message.count({
+                    where: {
+                        conversationId: data.conversationId,
+                        id: { not: message.id }
+                    }
+                });
+                // This is the first message in the conversation (we just created it, so "existing" = 0)
+                if (existingMessageCount === 0) {
+                    await tx.product.update({
+                        where: { id: conversation.productId },
+                        data: { engagements: { increment: 1 } }
+                    });
+                }
+            }
+
             // create message status for sender
             await tx.messageStatus.create({
                 data: {

@@ -527,7 +527,7 @@ class EmailService {
     });
   }
 
-  /** Send contact support form to pageo.fonsah@baotechnologiesandtravels.com */
+  /** Send contact support form to baoafrik@gmail.com*/
   async sendContactSupportEmail(payload: {
     name: string;
     email: string;
@@ -535,7 +535,7 @@ class EmailService {
     subject: string;
     message: string;
   }): Promise<boolean> {
-    const CONTACT_SUPPORT_TO = 'pageo.fonsah@baotechnologiesandtravels.com';
+    const CONTACT_SUPPORT_TO = 'baoafrik@gmail.com';
     const { name, email, phone, subject: userSubject, message } = payload;
     const subject = `BaoAfrik Contact Support: ${userSubject}`;
     const replyTo = `"${name.replace(/"/g, '\\"')}" <${email}>`;

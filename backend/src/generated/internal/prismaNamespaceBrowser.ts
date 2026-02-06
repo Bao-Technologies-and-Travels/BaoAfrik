@@ -156,6 +156,7 @@ export const ProductScalarFieldEnum = {
   viewCount: 'viewCount',
   likeCount: 'likeCount',
   saveCount: 'saveCount',
+  engagements: 'engagements',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',

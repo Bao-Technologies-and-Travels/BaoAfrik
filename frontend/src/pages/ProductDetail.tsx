@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatPriceDisplay } from "../utils/currency";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import axios from "axios";
+import { useNotificationToast } from '../contexts/NotificationToastContext';
 
 // Import product images
 import mainImage from "../assets/images/logos/0.png";
@@ -132,6 +133,8 @@ interface Product {
   seller: Seller;
   imageUrls?: string[];
   sellerId?: string;
+  messageCount?: number;
+  engagements?: number;
   sellerProfile?: {
     firstName: string;
     lastName: string;
@@ -290,7 +293,6 @@ const ProductDetail: React.FC = () => {
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
   const [productConversations, setProductConversations] = useState<any[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
-  const [locationFilter, setLocationFilter] = useState('');
   const [sellerProducts, setSellerProducts] = useState<Product[]>([]);
   const [isLoadingSellerProducts, setIsLoadingSellerProducts] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -307,6 +309,7 @@ const ProductDetail: React.FC = () => {
   const repostModalRef = useRef<HTMLDivElement>(null);
   const ownerViewState = routerLocation.state as OwnerListingState | null;
   const ownerListingFromState = ownerViewState?.listing;
+  const { showNotification } = useNotificationToast();
 
   // Determine if current user is the owner of this product
   const isProductOwner = user && product?.seller?.id === user.id;
@@ -647,7 +650,8 @@ const ProductDetail: React.FC = () => {
   };
 
   const productDaysLeft = product?.expiresAt ? calculateDaysLeft(product.expiresAt) : ownerListing?.daysLeft;
-  const messagesCount = productConversations.length;
+  const messagesCount = productConversations.length; // Number of conversations
+  const totalMessageCount = product?.messageCount ?? 0; // Total messages sent for this product
 
   // Load product reviews from backend
   const loadReviews = useCallback(async () => {
@@ -1537,11 +1541,17 @@ const ProductDetail: React.FC = () => {
       setHoverRating(null);
 
       // Show success message
-      addToast({
-        type: 'success',
-        title: 'Review posted',
-        message: 'Thank you for your feedback!',
-        duration: 2000
+      // addToast({
+      //   type: 'success',
+      //   title: 'Review posted',
+      //   message: 'Thank you for your feedback!',
+      //   duration: 2000
+      // });
+      showNotification({
+        type: 'app',
+        mainText: 'Review posted',
+        subText:'Thank you for your feedback',
+        duration:  2000
       });
 
     } catch (error: any) {
@@ -2092,7 +2102,7 @@ const ProductDetail: React.FC = () => {
               )}
 
               {/* Messages Received Component - Only show for active listings */}
-              {isOwnerView && ownerListing?.status === 'active' && messagesCount > 0 && (
+              {isOwnerView && ownerListing?.status === 'active' && (messagesCount > 0 || totalMessageCount > 0) && (
                 <div ref={messagesDropdownRef} className="relative">
                   <div
                     className="flex items-center gap-2 px-3 rounded-full cursor-pointer hover:opacity-90 transition-opacity mb-2"
@@ -2142,8 +2152,10 @@ const ProductDetail: React.FC = () => {
                         fontFamily: 'Poppins, sans-serif'
                       }}
                     >
-                      {messagesCount === 0
-                        ? '0 messages received for this product'
+                      {messagesCount === 0 && totalMessageCount === 0
+                        ? '0 messages for this product'
+                        : totalMessageCount > 0
+                        ? `${totalMessageCount} Message${totalMessageCount !== 1 ? 's' : ''} sent for this product`
                         : `${messagesCount} Message${messagesCount !== 1 ? 's' : ''} received for this product`}
                     </span>
 
@@ -3173,8 +3185,10 @@ const ProductDetail: React.FC = () => {
                     fontFamily: 'Poppins, sans-serif'
                   }}
                 >
-                  {messagesCount === 0
-                    ? '0 messages received for this product'
+                  {messagesCount === 0 && totalMessageCount === 0
+                    ? '0 messages for this product'
+                    : totalMessageCount > 0
+                    ? `${totalMessageCount} Message${totalMessageCount !== 1 ? 's' : ''} sent for this product`
                     : `${messagesCount} Message${messagesCount !== 1 ? 's' : ''} received for this product`}
                 </span>
 
@@ -3971,7 +3985,7 @@ const ProductDetail: React.FC = () => {
                         color: userRating > 0 ? '#64B5F6' : (userReviewText.length > 0 ? '#64B5F6' : '#D9D9D9'),
                         fontSize: '10px'
                       }}>
-                        {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                        {userRating > 0 ? (Number.isInteger(userRating) ? `${userRating}.0` : String(userRating)) : 'give a note'}
                       </div>
 
                       {/* Review Text Input */}
@@ -5281,7 +5295,7 @@ const ProductDetail: React.FC = () => {
                       color: userRating > 0 ? '#64B5F6' : (userReviewText.length > 0 ? '#64B5F6' : '#D9D9D9'),
                       fontSize: '10px'
                     }}>
-                      {userRating > 0 ? `${userRating}.0` : 'give a note'}
+                      {userRating > 0 ? (Number.isInteger(userRating) ? `${userRating}.0` : String(userRating)) : 'give a note'}
                     </div>
 
                     {/* Review Text Input */}
@@ -5457,7 +5471,7 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* Mobile Messages Modal */}
-      {showMobileMessagesModal && isMobile && isOwnerView && ownerListing?.messages && ownerListing.messages > 0 && (
+      {showMobileMessagesModal && isMobile && isOwnerView && (totalMessageCount > 0 || messagesCount > 0 || (ownerListing?.messages ?? 0) > 0) && (
         <>
           {/* Overlay */}
           <div
@@ -5483,7 +5497,7 @@ const ProductDetail: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4">
               <h3 style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '16px', fontWeight: 600, color: '#212121' }}>
-                {ownerListing.messages} Message{ownerListing.messages !== 1 ? 's' : ''} for this product
+                {ownerListing?.messages} Message{ownerListing?.messages !== 1 ? 's' : ''} for this product
               </h3>
               <button
                 onClick={() => setShowMobileMessagesModal(false)}
@@ -5509,7 +5523,7 @@ const ProductDetail: React.FC = () => {
                       padding: '12px'
                     }}
                     onClick={() => {
-                      navigate(`/messages?productId=${ownerListing.id}&conversationId=${message.id}`);
+                      navigate(`/messages?productId=${ownerListing?.id}&conversationId=${message.id}`);
                       setShowMobileMessagesModal(false);
                     }}
                   >
