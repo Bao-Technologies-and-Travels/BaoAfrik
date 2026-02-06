@@ -1053,11 +1053,10 @@ const Header: React.FC<HeaderProps> = ({
                             </div>
                           </Link>
 
-                          {/* Bookmarks */}
-                          <Link
-                            to="/bookmarks"
-                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                            onClick={() => setIsDesktopMenuOpen(false)}
+                          {/* Bookmarks - Disabled */}
+                          <div
+                            className="flex items-center justify-between px-3 py-2 transition-colors rounded-lg"
+                            style={{ cursor: 'not-allowed', opacity: 0.5 }}
                           >
                             <div className="flex items-center space-x-2">
                               <img
@@ -1075,11 +1074,11 @@ const Header: React.FC<HeaderProps> = ({
                                 </div>
                               </div>
                             </div>
-                          </Link>
+                          </div>
 
                           {/* Help Centre */}
                           <Link
-                            to="/help"
+                            to="/help-centre"
                             className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                             onClick={() => setIsDesktopMenuOpen(false)}
                           >
@@ -1733,11 +1732,10 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </Link>
 
-                      {/* Bookmarks */}
-                      <Link
-                        to="/bookmarks"
-                        className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                      {/* Bookmarks - Disabled */}
+                      <div
+                        className="flex items-center justify-between px-3 py-3 transition-colors rounded-lg"
+                        style={{ cursor: 'not-allowed', opacity: 0.5 }}
                       >
                         <div className="flex items-center space-x-2">
                           <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{ color: '#64B5F6' }} />
@@ -1745,11 +1743,11 @@ const Header: React.FC<HeaderProps> = ({
                             <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Bookmarks</div>
                           </div>
                         </div>
-                      </Link>
+                      </div>
 
                       {/* Help Centre */}
                       <Link
-                        to="/help"
+                        to="/help-centre"
                         className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
@@ -1884,11 +1882,10 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
                       </Link>
 
-                      {/* Bookmarks */}
-                      <Link
-                        to="/bookmarks"
-                        className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                      {/* Bookmarks - Disabled */}
+                      <div
+                        className="flex items-center justify-between px-3 py-2 transition-colors rounded-lg"
+                        style={{ cursor: 'not-allowed', opacity: 0.5 }}
                       >
                         <div className="flex items-center space-x-3">
                           <img src={frameIcon} alt="Frame" className="w-5 h-5" style={{ color: '#64B5F6' }} />
@@ -1901,7 +1898,7 @@ const Header: React.FC<HeaderProps> = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </div>
-                      </Link>
+                      </div>
 
                       {/* Become a seller */}
                       {/* <Link
@@ -1925,7 +1922,7 @@ const Header: React.FC<HeaderProps> = ({
 
                       {/* Help Centre */}
                       <Link
-                        to="/help"
+                        to="/help-centre"
                         className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

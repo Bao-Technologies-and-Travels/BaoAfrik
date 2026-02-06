@@ -4529,7 +4529,7 @@ const ProfileSettings: React.FC = () => {
                         </div>
 
                         {/* Two Step Verification Section */}
-                        <div className={isMobileSecurityView ? 'p-4 rounded-2xl bg-white flex items-start justify-between gap-3' : 'flex items-start justify-between gap-4 flex-wrap'} style={isMobileSecurityView ? { marginLeft: '-8px' } : undefined}>
+                        {/* <div className={isMobileSecurityView ? 'p-4 rounded-2xl bg-white flex items-start justify-between gap-3' : 'flex items-start justify-between gap-4 flex-wrap'} style={isMobileSecurityView ? { marginLeft: '-8px' } : undefined}>
                           <div className={isMobileSecurityView ? 'space-y-2' : 'flex-1 space-y-1'}>
                             <p className="text-sm font-medium" style={{ color: '#6A6A6A' }}>Two step verification</p>
                             <p className="text-xs" style={{ color: '#B0B0B0', marginBottom: '6px' }}>
@@ -4570,7 +4570,7 @@ const ProfileSettings: React.FC = () => {
                                 }`}
                             />
                           </button>
-                        </div>
+                        </div> */}
 
                         {/* Sessions Section */}
                         <div className={isMobileSecurityView ? 'space-y-3 mt-2' : 'space-y-3 mt-6 mb-10'}>

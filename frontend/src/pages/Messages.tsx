@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { formatPriceDisplay } from '../utils/currency';
+import { productUrlSlug } from '../utils/slug';
 import EmojiPicker, { Emoji } from 'emoji-picker-react';
 import logo from '../assets/images/pre/logo.png';
 import sideIcon from '../assets/images/pre/side.png';
@@ -4748,9 +4749,13 @@ const Messages: React.FC = (): JSX.Element => {
                                                 {message.productData.description}
                                               </p>
                                             )}
-                                            <a href="#" className="text-xs mt-1 block" style={{ color: message.isIncoming ? '#83C4F8' : '#FFFFFF' }}>
-                                              baoafrik.com/product-id/
-                                            </a>
+                                            <Link 
+                                              to={`/product/${productUrlSlug({ slug: message.productData.slug, title: message.productData.name || message.productData.title, id: String(message.productData.id) })}`}
+                                              className="text-xs mt-1 block hover:underline" 
+                                              style={{ color: message.isIncoming ? '#83C4F8' : '#FFFFFF' }}
+                                            >
+                                              baoafrik.com/{message.productData.name || message.productData.title || 'View Product'}
+                                            </Link>
                                           </div>
                                         </div>
                                       </div>
@@ -5192,12 +5197,15 @@ const Messages: React.FC = (): JSX.Element => {
                         </div>
                       </div>
                       <p style={{ fontSize: '8px', marginTop: '4px', lineHeight: '1.4', color: '#6A6A6A' }}>
-                        Premium White Pepper sourced from the fertile soils of Africa.<br />
-                        Known for its smooth, aromatic heat and rich flavor...
+                        {productData.description || 'Premium product sourced from the fertile soils of Africa.'}
                       </p>
-                      <a href="#" style={{ fontSize: '9px', marginTop: '4px', display: 'block', color: '#83C4F8' }}>
-                        baoafrik.com/product-id-link?
-                      </a>
+                      <Link 
+                        to={`/product/${productUrlSlug({ slug: productData.slug, title: productData.name || productData.title, id: String(productData.id) })}`}
+                        style={{ fontSize: '9px', marginTop: '4px', display: 'block', color: '#83C4F8' }}
+                        className="hover:underline"
+                      >
+                        baoafrik.com/{productData.name || productData.title || 'View Product'}
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -6970,11 +6978,10 @@ const Messages: React.FC = (): JSX.Element => {
                           </Link>
 
 
-                          {/* Bookmarks */}
-                          <Link
-                            to="/bookmarks"
-                            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors rounded-lg"
-                            onClick={() => setIsMenuDropdownOpen(false)}
+                          {/* Bookmarks - Disabled */}
+                          <div
+                            className="flex items-center justify-between px-3 py-2 transition-colors rounded-lg"
+                            style={{ cursor: 'not-allowed', opacity: 0.5 }}
                           >
                             <div className="flex items-center space-x-2">
                               <img src={frameIcon} alt="Frame" className="w-4 h-4" style={{ color: '#64B5F6' }} />
@@ -6982,7 +6989,7 @@ const Messages: React.FC = (): JSX.Element => {
                                 <div className="font-medium text-sm" style={{ color: '#6A6A6A' }}>Bookmarks</div>
                               </div>
                             </div>
-                          </Link>
+                          </div>
 
                           {/* Help Centre */}
                           <Link
@@ -8023,9 +8030,13 @@ const Messages: React.FC = (): JSX.Element => {
                                                     {message.productData.description}
                                                   </p>
                                                 )}
-                                                <a href="#" className="text-xs mt-1 block" style={{ color: '#000000' }}>
-                                                  baoafrik.com/product-id/
-                                                </a>
+                                                <Link 
+                                                  to={`/product/${productUrlSlug({ slug: message.productData.slug, title: message.productData.name || message.productData.title, id: String(message.productData.id) })}`}
+                                                  className="text-xs mt-1 block hover:underline" 
+                                                  style={{ color: '#000000' }}
+                                                >
+                                                  baoafrik.com/{message.productData.name || message.productData.title || 'View Product'}
+                                                </Link>
                                               </div>
                                             </div>
                                           </div>
@@ -8644,9 +8655,13 @@ const Messages: React.FC = (): JSX.Element => {
                               >
                                 {productData.description}
                               </p>
-                              <a href="#" className="text-xs mt-1 block" style={{ color: '#83C4F8' }}>
-                                baoafrik.com/product-id/
-                              </a>
+                              <Link 
+                                to={`/product/${productUrlSlug({ slug: productData.slug, title: productData.name || productData.title, id: String(productData.id) })}`}
+                                className="text-xs mt-1 block hover:underline" 
+                                style={{ color: '#83C4F8' }}
+                              >
+                                baoafrik.com/{productData.name || productData.title || 'View Product'}
+                              </Link>
                             </div>
                           </div>
                         </div>

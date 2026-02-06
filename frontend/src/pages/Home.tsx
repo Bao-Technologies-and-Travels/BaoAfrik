@@ -33,6 +33,9 @@ import locIcon from '../assets/images/pre/Loc.svg';
 import requestArrowIcon from '../assets/images/pre/requestarrow.svg';
 import shareIcon from '../assets/images/pre/Share.svg';
 import requestIcon from '../assets/images/pre/request.svg';
+import fbIcon from '../assets/images/pre/FB1.svg';
+import xIcon from '../assets/images/pre/x.svg';
+import zapIcon from '../assets/images/pre/zap1.svg';
 
 // Import banner images
 import cameroonianFashion from '../assets/images/logos/Fashion.png'; // Traditional Kente fabrics
@@ -158,6 +161,8 @@ const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sharedProducts, setSharedProducts] = useState<Set<number>>(new Set());
   const [savedProducts, setSavedProducts] = useState<Set<number>>(new Set());
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [currentRequestForShare, setCurrentRequestForShare] = useState<{ id: number; productName: string } | null>(null);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -1650,6 +1655,12 @@ const Home: React.FC = () => {
         return newShared;
       }
     });
+  };
+
+  // Handle share request functionality - opens share modal
+  const handleShareRequest = (request: { id: number; productName: string }) => {
+    setCurrentRequestForShare(request);
+    setShowShareModal(true);
   };
 
   // Load saved products on mount
@@ -4482,6 +4493,10 @@ const Home: React.FC = () => {
                               border: 'none',
                               cursor: 'pointer'
                             }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShareRequest(request);
+                            }}
                           >
                             <img
                               src={shareIcon}
@@ -4526,6 +4541,7 @@ const Home: React.FC = () => {
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
+                            handleShareRequest(request);
                           }}
                         >
                           <img
@@ -7480,6 +7496,101 @@ const Home: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Share Request Modal */}
+      {showShareModal && currentRequestForShare && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}
+            onClick={() => setShowShareModal(false)}
+          />
+
+          {/* Share Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div
+              className="bg-white rounded-2xl shadow-xl relative max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+              style={{ padding: '32px 24px' }}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              {/* Heading */}
+              <h3 className="text-xl font-semibold text-center mb-3 mt-4" style={{ color: '#212121', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Share this request
+              </h3>
+              {/* Description */}
+              <p className="text-xs text-center mb-6" style={{ color: '#B0B0B0' }}>
+                Spread the word! Share this request with others who might be able to help.
+              </p>
+              {/* Copy Link Section */}
+              <div className="flex items-center gap-3 mb-6">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${window.location.origin}/requests/${currentRequestForShare.id}`}
+                  className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium focus:outline-none"
+                  style={{ backgroundColor: '#F4F4F4', color: '#6A6A6A', border: 'none' }}
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/requests/${currentRequestForShare.id}`);
+                    alert('Link copied to clipboard!');
+                  }}
+                  className="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#000000' }}
+                >
+                  Copy link
+                </button>
+              </div>
+              {/* Share To Section */}
+              <div>
+                <p className="text-sm mb-4 text-center" style={{ color: '#6A6A6A' }}>Share to</p>
+                <div className="flex items-center justify-center space-x-6">
+                  <button
+                    className="flex flex-col items-center space-y-2"
+                    onClick={() => {
+                      const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${window.location.origin}/requests/${currentRequestForShare.id}`)}`;
+                      window.open(url, '_blank', 'width=600,height=500');
+                    }}
+                  >
+                    <img src={fbIcon} alt="Facebook" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>Facebook</span>
+                  </button>
+                  <button
+                    className="flex flex-col items-center space-y-2"
+                    onClick={() => {
+                      const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`${window.location.origin}/requests/${currentRequestForShare.id}`)}&text=${encodeURIComponent(`Check out this request: ${currentRequestForShare.productName}`)}`;
+                      window.open(url, '_blank', 'width=600,height=500');
+                    }}
+                  >
+                    <img src={xIcon} alt="X" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>X</span>
+                  </button>
+                  <button
+                    className="flex flex-col items-center space-y-2"
+                    onClick={() => {
+                      const url = `https://wa.me/?text=${encodeURIComponent(`Check out this request: ${currentRequestForShare.productName} - ${window.location.origin}/requests/${currentRequestForShare.id}`)}`;
+                      window.open(url, '_blank', 'width=600,height=500');
+                    }}
+                  >
+                    <img src={zapIcon} alt="WhatsApp" className="w-10 h-10" />
+                    <span className="text-xs" style={{ color: '#B0B0B0' }}>WhatsApp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Mobile country picker dropdown - rendered in portal so it's always visible on top */}

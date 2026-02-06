@@ -77,7 +77,6 @@ const Requests: React.FC = () => {
   const [goToPage, setGoToPage] = useState<number>(1);
   const [isManagingRequest, setIsManagingRequest] = useState(false);
   const [moreOptionsOpenFor, setMoreOptionsOpenFor] = useState<string | null>(null);
-  const moreOptionsRef = useRef<HTMLDivElement>(null);
   const [selectedCard, setSelectedCard] = useState<ProductRequest | null>(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [openFilterDropdown, setOpenFilterDropdown] = useState<string | null>(null);
@@ -161,8 +160,15 @@ const Requests: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
 
-      // Check for more options dropdown
-      if (moreOptionsRef.current && !moreOptionsRef.current.contains(target)) {
+      // Check for more options dropdown (use data attribute like other dropdowns)
+      const moreOptionsDropdowns = document.querySelectorAll('[data-more-options-dropdown]');
+      let isInsideMoreOptions = false;
+      moreOptionsDropdowns.forEach(dropdown => {
+        if (dropdown.contains(target)) {
+          isInsideMoreOptions = true;
+        }
+      });
+      if (!isInsideMoreOptions && moreOptionsOpenFor) {
         setMoreOptionsOpenFor(null);
       }
 
@@ -1158,8 +1164,9 @@ const Requests: React.FC = () => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (req) {
-                      handleManageRequest(req);
+                    const request = req || productData?.request;
+                    if (request) {
+                      handleManageRequest(request);
                     }
                   }}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-lg border"
@@ -1188,8 +1195,9 @@ const Requests: React.FC = () => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (req) {
-                      handleShareClick(e, req);
+                    const request = req || productData?.request;
+                    if (request) {
+                      handleShareClick(e, request);
                     }
                   }}
                   className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -1225,7 +1233,7 @@ const Requests: React.FC = () => {
                 >
                   {statusDisplay}
                 </div>
-                <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <div style={{ position: 'relative' }} data-more-options-dropdown>
                   <button
                     type="button"
                     className="w-5 h-5 rounded-full border flex items-center justify-center"
@@ -1263,14 +1271,15 @@ const Requests: React.FC = () => {
                         isolation: 'isolate'
                       }}
                     >
-                      {/* Manage request */}
+                      {/* Contact Buyer */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setMoreOptionsOpenFor(null);
-                          if (req) {
-                            handleManageRequest(req);
+                          const request = req || productData?.request;
+                          if (request) {
+                            handleManageRequest(request);
                           }
                         }}
                         style={{
@@ -1299,7 +1308,7 @@ const Requests: React.FC = () => {
                             filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                           }}
                         />
-                        <span>Manage request</span>
+                        <span>Contact Buyer</span>
                       </button>
 
                       {/* Share the request */}
@@ -1308,8 +1317,9 @@ const Requests: React.FC = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           setMoreOptionsOpenFor(null);
-                          if (req) {
-                            handleShareClick(e, req);
+                          const request = req || productData?.request;
+                          if (request) {
+                            handleShareClick(e, request);
                           }
                         }}
                         style={{
@@ -1399,8 +1409,9 @@ const Requests: React.FC = () => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (req) {
-                      handleManageRequest(req);
+                    const request = req || productData?.request;
+                    if (request) {
+                      handleManageRequest(request);
                     }
                   }}
                   className="flex items-center gap-1 px-2 py-0.5 rounded-lg border"
@@ -1429,8 +1440,9 @@ const Requests: React.FC = () => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (req) {
-                      handleShareClick(e, req);
+                    const request = req || productData?.request;
+                    if (request) {
+                      handleShareClick(e, request);
                     }
                   }}
                   className="rounded-full flex items-center justify-center"
@@ -1469,7 +1481,7 @@ const Requests: React.FC = () => {
                 >
                   {statusDisplay}
                 </div>
-                <div style={{ position: 'relative' }} ref={moreOptionsRef}>
+                <div style={{ position: 'relative' }} data-more-options-dropdown>
                   <button
                     type="button"
                     className="w-5 h-5 rounded-full border flex items-center justify-center"
@@ -1507,14 +1519,15 @@ const Requests: React.FC = () => {
                         isolation: 'isolate'
                       }}
                     >
-                      {/* Manage request */}
+                      {/* Contact Buyer */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setMoreOptionsOpenFor(null);
-                          if (req) {
-                            handleManageRequest(req);
+                          const request = req || productData?.request;
+                          if (request) {
+                            handleManageRequest(request);
                           }
                         }}
                         style={{
@@ -1543,7 +1556,7 @@ const Requests: React.FC = () => {
                             filter: 'brightness(0) saturate(100%) invert(73%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%)'
                           }}
                         />
-                        <span>Manage request</span>
+                        <span>Contact Buyer</span>
                       </button>
 
                       {/* Share the request */}
@@ -1552,8 +1565,9 @@ const Requests: React.FC = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           setMoreOptionsOpenFor(null);
-                          if (req) {
-                            handleShareClick(e, req);
+                          const request = req || productData?.request;
+                          if (request) {
+                            handleShareClick(e, request);
                           }
                         }}
                         style={{
